@@ -1,0 +1,58 @@
+/** @type {import("tailwindcss").Config} */
+module.exports = {
+  content: [ "./src/**/*.{index,vue,js,ts,jsx,tsx}" ],
+  theme: {
+    extend: {
+      colors: {
+        "base": {
+          DEFAULT: "#36414C",
+          50: "#8C9DAD",
+          100: "#8093A5",
+          200: "#697E94",
+          300: "#586A7C",
+          400: "#475564",
+          500: "#36414C",
+          600: "#1F252B",
+          700: "#07090A",
+          800: "#000000",
+          900: "#000000",
+          950: "#000000",
+        },
+        "primary": {
+          DEFAULT: "#3083CE",
+          50: "#C4DCF1",
+          100: "#B4D2ED",
+          200: "#93BEE6",
+          300: "#72ABDE",
+          400: "#5097D6",
+          500: "#3083CE",
+          600: "#2566A1",
+          700: "#1B4973",
+          800: "#102C46",
+          900: "#060F18",
+          950: "#000101",
+        },
+        "secondary": {
+          DEFAULT: "#D69F2F",
+          50: "#F4E6C8",
+          100: "#F1DEB7",
+          200: "#EACE95",
+          300: "#E3BE73",
+          400: "#DDAF51",
+          500: "#D69F2F",
+          600: "#AB7E22",
+          700: "#7C5B19",
+          800: "#4D390F",
+          900: "#1F1606",
+          950: "#070501",
+        },
+      },
+    },
+  },
+  plugins: [
+    // 'prettier-plugin-tailwindcss',
+    // require('@tailwindcss/typography'),
+    // require('@tailwindcss/forms'),
+    // require('daisyui'),
+  ],
+};
