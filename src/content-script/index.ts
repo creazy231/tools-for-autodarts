@@ -1,4 +1,5 @@
 import "./index.scss";
+import "./auto-start";
 import { useLocalStorage } from "@/composables/useLocalStorage";
 
 const { get, set } = useLocalStorage();
