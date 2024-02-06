@@ -46,6 +46,11 @@ function onChange(index) {
 </script>
 
 <style>
+html, body {
+  width: 480px;
+  margin: 0 auto;
+}
+
 html {
   background: #1A202C;
 }
