@@ -46,7 +46,7 @@ function startObserver() {
   observer = new MutationObserver((mutationsList, observer) => {
     for (const mutation of mutationsList) {
       if (mutation.type === "childList") {
-        if (window.location.href.includes("/matches/") && !initialized) {
+        if ((window.location.href.includes("/matches/") || window.location.href.includes("/boards/")) && !initialized) {
           observer.disconnect();
           console.log("[Stream Mode] Observer disconnected");
           initStreamMode().catch(err => console.error(err));
