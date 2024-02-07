@@ -3,6 +3,7 @@
     "@headlessui/vue": "^1.7.17",
     "@iconify/vue": "^4.1.1",
     "lodash": "^4.17.21",
+    "mustache": "^4.2.0",
     "tailwind-merge": "^2.2.0",
     "vue": "^3.4.6",
     "vue-router": "^4.2.5"
@@ -15,6 +16,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@types/eslint": "^8.56.1",
     "@types/lodash": "^4.14.202",
+    "@types/mustache": "^4.2.5",
     "@types/node": "^20.10.7",
     "@typescript-eslint/eslint-plugin": "^6.18.0",
     "@typescript-eslint/parser": "^6.18.0",
@@ -65,5 +67,5 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "version": "0.0.3"
+  "version": "0.0.4"
 }

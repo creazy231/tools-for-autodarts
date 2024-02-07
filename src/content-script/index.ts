@@ -1,5 +1,6 @@
 import "./index.scss";
 import "./auto-start";
+import "./stream-mode";
 import { useLocalStorage } from "@/composables/useLocalStorage";
 
 const { get, set } = useLocalStorage();
@@ -39,9 +40,6 @@ async function modifyColors() {
 
   const gameElement = await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(2)");
   gameElement.setAttribute("style", `--chakra-colors-blue-500: ${colors.background}; color: ${colors.text};`);
-  // find a tag in gameElement and set color to black
-  // const gameElementUser = gameElement.querySelector("a");
-  // gameElementUser?.setAttribute("style", "color: black;");
 
   const dartsElements = [
     await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(3) > div:nth-of-type(2)"),

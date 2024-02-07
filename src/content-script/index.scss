@@ -1,9 +1,109 @@
-.crx-iframe {
-  margin-left: 8px;
-  width: calc(100% - 8px);
-  height: auto;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02);
-  background-color: #fff;
+#autodarts-tools__stream-mode.hidden {
+  display: none;
+}
+
+#autodarts-tools__stream-mode {
+  position: fixed;
+  inset: 0;
+  //background-color: rgba(#00b140, .5);
+  background-color: #00b140;
+  z-index: 1000;
+  font-weight: normal;
+  font-size: 1.5rem;
+
+  .autodarts-tools__stream-mode__score {
+    font-size: 3rem;
+  }
+
+  .autodarts-tools__stream-mode__container {
+    position: absolute;
+    bottom: 3rem;
+    right: 12rem;
+    display: grid;
+    // first column minWidth is 20rem and second column is 5rem
+    grid-template-columns: minmax(30rem, 1fr) 15rem;
+    align-items: center;
+    border: 2px solid #111;
+  }
+
+  .autodarts-tools__stream-mode__header, .autodarts-tools__stream-mode__footer {
+    padding: 0.5rem 1rem;
+  }
+
+  .autodarts-tools__stream-mode__header {
+    border-bottom: 2px solid #111;
+  }
+
+  .autodarts-tools__stream-mode__footer {
+    grid-column: 1 / -1;
+    font-size: 1rem;
+  }
+
+  .autodarts-tools__stream-mode__header, .autodarts-tools__stream-mode__info div, .autodarts-tools__stream-mode__footer {
+    background-color: #222;
+  }
+
+  .autodarts-tools__stream-mode__info, .autodarts-tools__stream-mode__score {
+    display: flex;
+
+    div {
+      display: flex;
+      padding: .25rem 0;
+      justify-content: center;
+      align-items: center;
+      width: 50%;
+    }
+  }
+
+  .autodarts-tools__stream-mode__info-legs {
+    border-bottom: 2px solid #111;
+  }
+
+  .autodarts-tools__stream-mode__score > div:nth-child(1) {
+    border-right: 2px solid #111;
+  }
+
+  .autodarts-tools__stream-mode__name, .autodarts-tools__stream-mode__score > div {
+    border-bottom: 2px solid #111;
+  }
+
+  .autodarts-tools__stream-mode__score div {
+    padding: 0.35rem 3rem;
+    background-color: #3F3E3F;
+    font-weight: bold;
+    position: relative;
+  }
+
+  .autodarts-tools__stream-mode__active {
+    position: absolute;
+    right: calc(-7.5rem - 2px);
+    border: 2px solid #111;
+    border-left: none;
+    padding: 0.3rem 0;
+    text-align: center;
+    width: 7.5rem;
+    height: 5.3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--chakra-colors-blue-500);
+
+    svg {
+      width: 4rem;
+      height: 4rem;
+      fill: var(--chakra-colors-white);
+    }
+  }
+
+  .autodarts-tools__stream-mode__name {
+    background-color: var(--chakra-colors-whiteAlpha-900);
+    color: var(--chakra-colors-blackAlpha-900);
+    padding: 1.5rem 1rem;
+    font-weight: bold;
+    border-right: 2px solid #111;
+  }
+
+  .invisible {
+    opacity: 0;
+  }
 }

@@ -9,6 +9,7 @@ A [Vite](https://vitejs.dev/) powered WebExtension ([Chrome](https://developer.c
 - Simple color customization
 - Extended Lobby and Game information
 - Auto-Start feature inside Lobby [v0.0.2]
+- Stream-Mode with green screen [v0.0.4]
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
