@@ -42,7 +42,9 @@ const router = useRouter();
 
 onMounted(() => {
   document.body.style.width = "480px";
+  document.body.style.height = "280px";
   document.getElementsByTagName("html")[0].style.width = "480px";
+  document.getElementsByTagName("html")[0].style.height = "280px";
 });
 
 function onChange(index: number) {
