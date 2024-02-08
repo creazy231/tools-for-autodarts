@@ -40,7 +40,12 @@ const pages = [
 
 const router = useRouter();
 
-function onChange(index) {
+onMounted(() => {
+  document.body.style.width = "480px";
+  document.getElementsByTagName("html")[0].style.width = "480px";
+});
+
+function onChange(index: number) {
   router.push(pages[index].path);
 }
 </script>
