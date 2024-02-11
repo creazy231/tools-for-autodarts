@@ -36,6 +36,7 @@ const streamModeTemplate = `
 </div>
 `;
 
+let streamModeActive = false;
 let initialized = false;
 let observer: MutationObserver;
 
@@ -72,7 +73,13 @@ function startObserver() {
 startObserver();
 
 setInterval(() => {
-  console.log(initialized);
+  if (streamModeActive) {
+    const streamModeDiv = document.getElementById("autodarts-tools__stream-mode") as HTMLElement;
+    if (streamModeDiv && streamModeDiv.classList.contains("hidden")) {
+      streamModeDiv.classList.remove("hidden");
+      getGameStatsInterval = setInterval(getGameStats, 500);
+    }
+  }
 }, 1000);
 
 async function initStreamMode() {
@@ -136,11 +143,17 @@ async function toggleStreamMode() {
   streamModeDiv.classList.toggle("hidden");
 
   if (!streamModeDiv.classList.contains("hidden")) {
+    streamModeActive = true;
     getGameStatsInterval = setInterval(getGameStats, 500);
   } else {
+    streamModeActive = false;
     clearInterval(getGameStatsInterval);
   }
 }
+
+setInterval(() => {
+  // if (streamModeActive && !initialized) toggleStreamMode();
+}, 1000);
 
 async function getGameStats() {
   const gameContainerElement = await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(2)");
