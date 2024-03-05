@@ -106,7 +106,7 @@ async function updateLobbiesUsers(lobbiesData: any[]) {
     const hostUser = users.find((user: any) => user.id === hostUserId);
     if (!hostUser) continue;
 
-    const hostUserElement = document.querySelector(`table > tbody > tr:nth-of-type(${i + 1}) > td:nth-of-type(1) > a > span:nth-of-type(2)`);
+    const hostUserElement = document.querySelector(`table > tbody > tr:nth-of-type(${i + 1}) > td:nth-of-type(1) > a > div:nth-of-type(1)`);
     if (!hostUserElement) continue;
     hostUserElement.innerHTML = `
       <span style="display: flex; align-items: center;">
