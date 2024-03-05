@@ -156,7 +156,7 @@ setInterval(() => {
 }, 1000);
 
 async function getGameStats() {
-  const gameContainerElement = await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(2)");
+  const gameContainerElement = await waitForElement("#root > div:nth-of-type(2) > div > div.chakra-stack");
 
   // count elements inside gameContainerElement
   const elementsCount = gameContainerElement?.childElementCount;
