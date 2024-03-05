@@ -182,7 +182,7 @@ async function getGameStats() {
     // a span where not has any child elements
     let playerName = player?.querySelector("a")?.textContent;
     const playerScore = player?.querySelector("p")?.textContent;
-    const playerLegs = document.querySelector(`#root > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(${i + 1}) > div > div > div`)?.textContent;
+    const playerLegs = document.querySelector(`#root > div:nth-of-type(2) > div > div.chakra-stack > div:nth-of-type(${i + 1}) > div > div > div`)?.textContent;
 
     // remove all lowercase letters from playerName
     playerName = playerName?.replace(/[a-z]/g, "");
