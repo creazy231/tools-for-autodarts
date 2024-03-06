@@ -18,7 +18,7 @@ const streamModeTemplate = `
   </div>
   {{#players}}
   <div class="autodarts-tools__stream-mode__name">
-    {{name}}
+    {{name}} <span class="autodarts-tools__stream-mode__avg">({{ avg }})</span>
   </div>
   <div class="autodarts-tools__stream-mode__score">
     <div>{{legs}}</div>
@@ -97,7 +97,7 @@ async function initStreamMode() {
   // TODO: Edit waitForElement to accept multiple selectors
   const modeGroupElement = await new Promise((resolve) => {
     const interval = setInterval(() => {
-      const element = document.querySelector("#root > div:nth-of-type(2) > div > div > div:nth-of-type(4) > div") || document.querySelector("#root > div:nth-of-type(2) > div > div:nth-of-type(1)> div > div:nth-of-type(1)");
+      const element = document.querySelector("#root > div:nth-of-type(2) > div > div > div:nth-of-type(4) > div") || document.querySelector("#root > div:nth-of-type(2) > div > div > div");
       if (element) {
         clearInterval(interval);
         resolve(element);
@@ -106,7 +106,7 @@ async function initStreamMode() {
   }) as Element;
 
   // get last "button" element inside modeGroupElement
-  const liveModeButton = modeGroupElement?.lastElementChild as Node;
+  const liveModeButton = modeGroupElement?.firstElementChild as Node;
 
   // make a copy of the button and add it to the modeGroupElement
   let streamModeButton = liveModeButton.cloneNode(true) as Element;
@@ -151,10 +151,6 @@ async function toggleStreamMode() {
   }
 }
 
-setInterval(() => {
-  // if (streamModeActive && !initialized) toggleStreamMode();
-}, 1000);
-
 async function getGameStats() {
   const gameContainerElement = await waitForElement("#root > div:nth-of-type(2) > div > div.chakra-stack");
 
@@ -182,7 +178,9 @@ async function getGameStats() {
     // a span where not has any child elements
     let playerName = player?.querySelector("a")?.textContent;
     const playerScore = player?.querySelector("p")?.textContent;
-    const playerLegs = document.querySelector(`#root > div:nth-of-type(2) > div > div.chakra-stack > div:nth-of-type(${i + 1}) > div > div > div`)?.textContent;
+    const playerLegs = document.querySelector(`#root > div:nth-of-type(2) > div > div.chakra-stack > div:nth-of-type(${i + 1}) > div:nth-of-type(2) > div > div`)?.textContent;
+    const playerStats = document.querySelector(`#root > div:nth-of-type(2) > div > div.chakra-stack > div:nth-of-type(${i + 1}) > div:nth-of-type(2) > div > p`)?.textContent;
+    const playerAVG = playerStats?.split("PPR:")[1].trim();
 
     // remove all lowercase letters from playerName
     playerName = playerName?.replace(/[a-z]/g, "");
@@ -191,6 +189,7 @@ async function getGameStats() {
       name: playerName,
       score: playerScore,
       legs: playerLegs || 0,
+      avg: playerAVG,
       active,
     });
   }

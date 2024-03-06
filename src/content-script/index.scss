@@ -101,6 +101,15 @@
     padding: 1.5rem 1rem;
     font-weight: bold;
     border-right: 2px solid #111;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .autodarts-tools__stream-mode__avg {
+      opacity: .7;
+      font-size: 80%;
+      margin-left: .5rem;
+    }
   }
 
   .invisible {
