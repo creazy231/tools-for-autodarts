@@ -38,13 +38,13 @@ async function modifyColors() {
   const colors = await get("colors");
   if (!colors?.enabled) return;
 
-  const gameElement = await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(2)");
+  const gameElement = await waitForElement("#root > div:nth-of-type(2) > div > div.chakra-stack");
   gameElement.setAttribute("style", `--chakra-colors-blue-500: ${colors.background}; color: ${colors.text};`);
 
   const dartsElements = [
-    await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(3) > div:nth-of-type(2)"),
-    await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(3) > div:nth-of-type(3)"),
-    await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(3) > div:nth-of-type(4)"),
+    await waitForElement("#root > div:nth-of-type(2) > div > .chakra-stack:nth-last-of-type(2) > div:nth-of-type(2)"),
+    await waitForElement("#root > div:nth-of-type(2) > div > .chakra-stack:nth-last-of-type(2) > div:nth-of-type(3)"),
+    await waitForElement("#root > div:nth-of-type(2) > div > .chakra-stack:nth-last-of-type(2) > div:nth-of-type(4)"),
   ];
 
   dartsElements.forEach((dartsElement) => {
