@@ -18,7 +18,7 @@ const streamModeTemplate = `
   </div>
   {{#players}}
   <div class="autodarts-tools__stream-mode__name">
-    {{name}} <span class="autodarts-tools__stream-mode__avg">({{ avg }})</span>
+    {{name}} <span class="autodarts-tools__stream-mode__avg">{{ avg }}</span>
   </div>
   <div class="autodarts-tools__stream-mode__score">
     <div>{{legs}}</div>
@@ -97,10 +97,10 @@ async function initStreamMode() {
   // TODO: Edit waitForElement to accept multiple selectors
   const modeGroupElement = await new Promise((resolve) => {
     const interval = setInterval(() => {
-      const element = document.querySelector("#root > div:nth-of-type(2) > div > div > div:nth-of-type(4) > div") || document.querySelector("#root > div:nth-of-type(2) > div > div > div");
+      const element = document.querySelector("#root > div:nth-of-type(2) [aria-label='Live mode']");
       if (element) {
         clearInterval(interval);
-        resolve(element);
+        resolve(element.parentElement!);
       }
     }, 100);
   }) as Element;
@@ -164,7 +164,7 @@ async function getGameStats() {
     footer: "Game provided by Autodarts.io",
   };
 
-  const gameSettingsContainerElement = document.querySelector("#root > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1)");
+  const gameSettingsContainerElement = document.querySelector("#root > div:nth-of-type(2) .chakra-wrap__list .chakra-wrap__list");
   // set game.title to all span's textContent inside gameSettingsContainerElement joined by " - "
   game.title = Array.from(gameSettingsContainerElement?.querySelectorAll("span") || []).map(span => span.textContent).filter(span => !span!.includes("/") && !span!.includes("-")).join(" - ");
 
@@ -180,7 +180,7 @@ async function getGameStats() {
     const playerScore = player?.querySelector("p")?.textContent;
     const playerLegs = document.querySelector(`#root > div:nth-of-type(2) > div > div.chakra-stack > div:nth-of-type(${i + 1}) > div:nth-of-type(2) > div > div`)?.textContent;
     const playerStats = document.querySelector(`#root > div:nth-of-type(2) > div > div.chakra-stack > div:nth-of-type(${i + 1}) > div:nth-of-type(2) > div > p`)?.textContent;
-    const playerAVG = playerStats?.split("PPR:")[1].trim();
+    const playerAVG = playerStats?.split("|")[1].trim();
 
     // remove all lowercase letters from playerName
     playerName = playerName?.replace(/[a-z]/g, "");
