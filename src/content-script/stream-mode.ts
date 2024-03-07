@@ -152,7 +152,7 @@ async function toggleStreamMode() {
 }
 
 async function getGameStats() {
-  const gameContainerElement = await waitForElement("#root > div:nth-of-type(2) > div > div.chakra-stack");
+  const gameContainerElement = await waitForElement("#root > div:nth-of-type(2) > div > div:nth-of-type(3)");
 
   // count elements inside gameContainerElement
   const elementsCount = gameContainerElement?.childElementCount;
