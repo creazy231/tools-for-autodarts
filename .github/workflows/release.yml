@@ -51,4 +51,4 @@ jobs:
           tag_name: ${{ steps.get-version.outputs.version }}
           release_name: ${{ steps.get-version.outputs.version }}
           draft: true
-          files: autodarts-tools-wxt-${{ steps.get-version.outputs.version }}-chrome.zip
+          files: .output/autodarts-tools-wxt-${{ steps.get-version.outputs.version }}-chrome.zip

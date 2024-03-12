@@ -3,6 +3,12 @@
   "description": "Autodarts Tools enhances the gaming experience on autodarts.io",
   "version": "1.0.0",
   "type": "module",
+  "author": {
+    "name": "Tobias Thiele",
+    "email": "info@tobias-thiele.de",
+    "url": "https://tobias-thiele.de"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
