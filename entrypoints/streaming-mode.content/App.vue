@@ -192,68 +192,72 @@ async function initStreamModeButton() {
 }
 
 function getGameStats() {
-  const players = document.querySelector("#ad-ext-player-display")?.children || [];
+  try {
+    const players = document.querySelector("#ad-ext-player-display")?.children || [];
 
-  const gameSettingsContainerElement = document.querySelector("#ad-ext-game-variant")?.parentElement;
+    const gameSettingsContainerElement = document.querySelector("#ad-ext-game-variant")?.parentElement;
 
-  enabled.value = true;
-  game.players = [];
-  game.throws = [];
+    enabled.value = true;
+    game.players = [];
+    game.throws = [];
 
-  if (!gameSettingsContainerElement) return;
-  // set game.title to all span's textContent inside gameSettingsContainerElement joined by " - "
-  game.title = Array.from(gameSettingsContainerElement?.querySelectorAll("span") || []).map(span => span.textContent).filter(span => span && !span!.includes("/") && span.trim().length >= 2).join(" - ");
+    if (!gameSettingsContainerElement) return;
+    // set game.title to all span's textContent inside gameSettingsContainerElement joined by " - "
+    game.title = Array.from(gameSettingsContainerElement?.querySelectorAll("span") || []).map(span => span.textContent).filter(span => span && !span!.includes("/") && span.trim().length >= 2).join(" - ");
 
-  for (let i = 0; i < players.length; i++) {
-    const player = players[i];
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
 
-    const active = !player?.querySelector("div")?.classList.contains("ad-ext-player-inactive");
+      const active = !player?.querySelector("div")?.classList.contains("ad-ext-player-inactive");
 
-    let playerName = player?.querySelector(".ad-ext-player-name")?.textContent;
-    const playerScore = player?.querySelector(".ad-ext-player-score")?.textContent;
+      let playerName = player?.querySelector(".ad-ext-player-name")?.textContent;
+      const playerScore = player?.querySelector(".ad-ext-player-score")?.textContent;
 
-    const playerSetsAndLegs = document.querySelector(`#ad-ext-player-display > div:nth-of-type(${i + 1}) > div:nth-of-type(2) > div > div`);
+      const playerSetsAndLegs = document.querySelector(`#ad-ext-player-display > div:nth-of-type(${i + 1}) > div:nth-of-type(2) > div > div`);
 
-    const setsCheck = playerSetsAndLegs!.children.length >= 2;
-    const playerLegs = setsCheck
-      ? player?.querySelector("div:nth-of-type(2) > div > div > div:nth-of-type(2) > p")?.textContent
-      : player?.querySelector("div:nth-of-type(2) > div > div > div > p")?.textContent;
+      const setsCheck = playerSetsAndLegs!.children.length >= 2;
+      const playerLegs = setsCheck
+        ? player?.querySelector("div:nth-of-type(2) > div > div > div:nth-of-type(2) > p")?.textContent
+        : player?.querySelector("div:nth-of-type(2) > div > div > div > p")?.textContent;
 
-    const playerSets = setsCheck
-      ? player?.querySelector("div:nth-of-type(2) > div > div > div > p")?.textContent
-      : undefined;
+      const playerSets = setsCheck
+        ? player?.querySelector("div:nth-of-type(2) > div > div > div > p")?.textContent
+        : undefined;
 
-    const playerStats = player?.querySelector("div:nth-of-type(2) > div > p")?.textContent;
-    const playerAVG = playerStats?.split("|")[1].trim();
+      const playerStats = player?.querySelector("div:nth-of-type(2) > div > p")?.textContent;
+      const playerAVG = playerStats?.split("|")[1].trim();
 
-    // remove all lowercase letters from playerName
-    playerName = playerName?.replace(/[a-z]/g, "");
+      // remove all lowercase letters from playerName
+      playerName = playerName?.replace(/[a-z]/g, "");
 
-    const playerObj = {
-      name: playerName,
-      score: playerScore || 0,
-      legs: playerLegs || 0,
-      sets: playerSets,
-      avg: playerAVG,
-      active,
-    } as Player;
+      const playerObj = {
+        name: playerName,
+        score: playerScore || 0,
+        legs: playerLegs || 0,
+        sets: playerSets,
+        avg: playerAVG,
+        active,
+      } as Player;
 
-    game.players.push(playerObj);
-  }
-
-  const throws = document.querySelector("#ad-ext-turn")?.childNodes as NodeListOf<HTMLElement> | undefined;
-
-  if (throws?.length) {
-    for (let j = 0; j < throws?.length || 0; j++) {
-      const playerThrow = throws[j];
-
-      const playerThrowObj = {
-        value: playerThrow?.textContent || undefined,
-        active: playerThrow?.classList.contains("ad-ext-turn-throw"),
-      } as Throw;
-
-      game.throws!.push(playerThrowObj);
+      game.players.push(playerObj);
     }
+
+    const throws = document.querySelector("#ad-ext-turn")?.childNodes as NodeListOf<HTMLElement> | undefined;
+
+    if (throws?.length) {
+      for (let j = 0; j < throws?.length || 0; j++) {
+        const playerThrow = throws[j];
+
+        const playerThrowObj = {
+          value: playerThrow?.textContent || undefined,
+          active: playerThrow?.classList.contains("ad-ext-turn-throw"),
+        } as Throw;
+
+        game.throws!.push(playerThrowObj);
+      }
+    }
+  } catch (e) {
+    console.error(e);
   }
 }
 </script>
