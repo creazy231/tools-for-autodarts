@@ -43,7 +43,8 @@ jobs:
 
       - run: yarn build
       - run: yarn zip
-#      - run: zip -r ${{ steps.get-version.outputs.version }}.zip dist
+      - run: yarn build:firefox
+      - run: yarn zip:firefox
 
       - name: GH Release
         uses: softprops/action-gh-release@v0.1.15
@@ -51,4 +52,6 @@ jobs:
           tag_name: ${{ steps.get-version.outputs.version }}
           release_name: ${{ steps.get-version.outputs.version }}
           draft: true
-          files: .output/autodarts-tools-${{ steps.get-version.outputs.version }}-chrome.zip
+          files: |
+            .output/autodarts-tools-${{ steps.get-version.outputs.version }}-chrome.zip
+            .output/autodarts-tools-${{ steps.get-version.outputs.version }}-firefox.zip
