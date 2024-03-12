@@ -11,6 +11,9 @@
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
+## Usage
+TODO
+
 ## Credits
 
 🎯 Autodarts - [Autodarts](https://autodarts.io)
