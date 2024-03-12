@@ -1,26 +1,16 @@
-# WXT + Vue 3
+# Autodarts Tools
 
-This template should help get you started developing with Vue 3 in WXT.
+[![build](https://github.com/creazy231/autodarts-tools/actions/workflows/build.yml/badge.svg)](https://github.com/mubaidr/vite-vue3-chrome-extension-v3/actions/workflows/build.yml)
 
-```bash
-git clone --depth=1 https://github.com/rotick/autodarts-tools-wxt.git new-project
+## Features
 
-cd new-project
+- Simple color customization
+- Auto-Start feature inside Lobbies
+- Stream-Mode with green screen and threw darts
+- Discord Webhook integration for private Lobbies
 
-rm -rf .git
-mv .env.example .env
-```
+_Please create an issue if you feel some feature is missing or could be improved._
 
-Replace all:
+## Credits
 
-- autodarts-tools-wxt -> { your extension name }
-
-## Development
-
-```bash
-# install
-pnpm install
-
-# development
-pnpm run dev
-```
+🎯 Autodarts - [Autodarts](https://autodarts.io)
