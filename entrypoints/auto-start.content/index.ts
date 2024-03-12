@@ -15,7 +15,6 @@ export default defineContentScript({
       if (!config.autoStart.enabled) return;
 
       if (config.url.includes("/lobbies/") && !config.url.includes("/new/")) {
-        console.log("RIGHT PAGE");
         const div = document.querySelector("autodarts-tools-auto-start");
         if (!div) init(ctx).catch(console.error);
       } else {

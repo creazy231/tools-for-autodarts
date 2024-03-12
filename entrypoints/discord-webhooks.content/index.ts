@@ -16,7 +16,6 @@ export default defineContentScript({
       if (!config.discord.enabled) return;
 
       if (config.url.includes("/lobbies/") && !config.url.includes("/new/")) {
-        console.log("RIGHT PAGE");
         const div = document.querySelector("autodarts-tools-discord-webhooks");
         if (!div) init(ctx).catch(console.error);
       } else {

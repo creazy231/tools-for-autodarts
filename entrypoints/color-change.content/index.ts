@@ -15,7 +15,6 @@ export default defineContentScript({
       if (!config.colors.enabled) return;
 
       if (config.url.includes("/matches/") || config.url.includes("/boards/")) {
-        console.log("RIGHT PAGE");
         const div = document.querySelector("autodarts-tools-color-change");
         if (!div) init(ctx).catch(console.error);
       } else {

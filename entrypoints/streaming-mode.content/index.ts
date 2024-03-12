@@ -16,7 +16,6 @@ export default defineContentScript({
       if (!config.streamingMode.enabled) return;
       // @ts-expect-error
       if (config.url.includes("/matches/") || config.url.includes("/boards/") || window.ADT_STREAMING_MODE_ACTIVE) {
-        console.log("RIGHT PAGE");
         const div = document.querySelector("autodarts-tools-streaming-mode");
         if (!div) init(ctx).catch(console.error);
       } else {
