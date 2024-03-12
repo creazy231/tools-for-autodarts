@@ -17,7 +17,7 @@ export default defineConfig({
     host_permissions: [ "*://play.autodarts.io/*" ],
     permissions: [ "storage" ],
     name: "Autodarts Tools",
-    description: "__MSG_extDescription__",
+    description: "Autodarts Tools enhances the gaming experience on autodarts.io",
   },
   vite: () => ({
     resolve: {
