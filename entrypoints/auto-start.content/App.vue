@@ -23,13 +23,13 @@ onMounted(async () => {
       button.textContent = button.textContent === "Autostart ON" ? "Autostart OFF" : "Autostart ON";
       button.style.color = button.textContent === "Autostart ON" ? "var(--chakra-colors-green-500)" : "var(--chakra-colors-red-500)";
       autostartEnabled.value = !autostartEnabled.value;
-    });
 
-    if (autostartEnabled.value) {
-      checkAutoStartInterval.value = setInterval(checkAutoStart, 1000);
-    } else {
-      clearInterval(checkAutoStartInterval.value);
-    }
+      if (autostartEnabled.value) {
+        checkAutoStartInterval.value = setInterval(checkAutoStart, 1000);
+      } else {
+        clearInterval(checkAutoStartInterval.value);
+      }
+    });
 
     buttonsContainer.appendChild(button);
   } catch (e) {
@@ -42,6 +42,7 @@ onBeforeUnmount(() => {
 });
 
 async function checkAutoStart() {
+  console.log("CHECKING AUTO START");
   const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) > div > table > tbody > tr");
   if (rows.length > 1) {
     await new Promise(resolve => setTimeout(resolve, 3000));
