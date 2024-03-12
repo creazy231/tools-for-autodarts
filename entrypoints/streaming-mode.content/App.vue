@@ -246,7 +246,6 @@ function getGameStats() {
   if (throws?.length) {
     for (let j = 0; j < throws?.length || 0; j++) {
       const playerThrow = throws[j];
-      console.log(playerThrow?.textContent);
 
       const playerThrowObj = {
         value: playerThrow?.textContent || undefined,
@@ -256,7 +255,5 @@ function getGameStats() {
       game.throws!.push(playerThrowObj);
     }
   }
-
-  console.log(game.throws);
 }
 </script>

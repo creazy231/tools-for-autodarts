@@ -106,7 +106,6 @@
 <script setup lang="ts">
 import AppToggle from "@/components/AppToggle.vue";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
-import "primevue/resources/themes/aura-light-green/theme.css";
 
 const config = ref();
 const colorPickerElement = ref();

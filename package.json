@@ -24,7 +24,6 @@
     "@headlessui/vue": "^1.7.19",
     "@vueuse/core": "^10.7.2",
     "mitt": "^3.0.1",
-    "primevue": "^3.49.1",
     "vue": "^3.4.13",
     "vue-i18n": "^9.9.0"
   },

@@ -4,22 +4,23 @@ import App from "./App.vue";
 import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
-let globalUI: any;
-let globalUnwatch: any;
+let autoStartUI: any;
+let autoStartUnwatch: any;
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
   async main(ctx) {
-    globalUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
+    autoStartUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
       if (!config.autoStart.enabled) return;
 
       if (config.url.includes("/lobbies/") && !config.url.includes("/new/")) {
         console.log("RIGHT PAGE");
-        init(ctx).catch(console.error);
+        const div = document.querySelector("autodarts-tools-auto-start");
+        if (!div) init(ctx).catch(console.error);
       } else {
-        globalUI?.remove();
-        globalUI = null;
+        autoStartUI?.remove();
+        autoStartUI = null;
       }
     });
   },
@@ -27,7 +28,7 @@ export default defineContentScript({
 
 async function init(ctx) {
   await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3)");
-  globalUI = await createShadowRootUi(ctx, {
+  autoStartUI = await createShadowRootUi(ctx, {
     name: "autodarts-tools-auto-start",
     position: "inline",
     anchor: "#root",
@@ -43,5 +44,5 @@ async function init(ctx) {
       app?.unmount();
     },
   });
-  globalUI.mount();
+  autoStartUI.mount();
 }

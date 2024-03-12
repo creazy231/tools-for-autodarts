@@ -4,14 +4,15 @@ import App from "./App.vue";
 import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
-let globalUI: any;
-let globalUnwatch: any;
+let streamingModeUI: any;
+let streamingModeUnwatch: any;
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
+  runAt: "document_end",
   async main(ctx) {
-    globalUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
+    streamingModeUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
       if (!config.streamingMode.enabled) return;
       // @ts-expect-error
       if (config.url.includes("/matches/") || config.url.includes("/boards/") || window.ADT_STREAMING_MODE_ACTIVE) {
@@ -19,8 +20,8 @@ export default defineContentScript({
         const div = document.querySelector("autodarts-tools-streaming-mode");
         if (!div) init(ctx).catch(console.error);
       } else {
-        globalUI?.remove();
-        globalUI = null;
+        streamingModeUI?.remove();
+        streamingModeUI = null;
       }
     });
   },
@@ -28,7 +29,7 @@ export default defineContentScript({
 
 async function init(ctx) {
   await waitForElement("#root > div > div:nth-of-type(2)");
-  globalUI = await createShadowRootUi(ctx, {
+  streamingModeUI = await createShadowRootUi(ctx, {
     name: "autodarts-tools-streaming-mode",
     position: "inline",
     anchor: "#root",
@@ -44,5 +45,5 @@ async function init(ctx) {
       app?.unmount();
     },
   });
-  globalUI.mount();
+  streamingModeUI.mount();
 }

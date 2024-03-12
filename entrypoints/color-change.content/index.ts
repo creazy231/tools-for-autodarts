@@ -4,23 +4,23 @@ import App from "./App.vue";
 import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
-let globalUI: any;
-let globalUnwatch: any;
+let colorChangeUI: any;
+let colorChangeUnwatch: any;
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
   async main(ctx) {
-    globalUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
+    colorChangeUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
       if (!config.colors.enabled) return;
-      // @ts-expect-error
-      if (config.url.includes("/matches/") || config.url.includes("/boards/") || window.ADT_STREAMING_MODE_ACTIVE) {
+
+      if (config.url.includes("/matches/") || config.url.includes("/boards/")) {
         console.log("RIGHT PAGE");
         const div = document.querySelector("autodarts-tools-color-change");
         if (!div) init(ctx).catch(console.error);
       } else {
-        globalUI?.remove();
-        globalUI = null;
+        colorChangeUI?.remove();
+        colorChangeUI = null;
       }
     });
   },
@@ -28,7 +28,7 @@ export default defineContentScript({
 
 async function init(ctx) {
   await waitForElement("#root > div > div:nth-of-type(2)");
-  globalUI = await createShadowRootUi(ctx, {
+  colorChangeUI = await createShadowRootUi(ctx, {
     name: "autodarts-tools-color-change",
     position: "inline",
     anchor: "#root",
@@ -44,5 +44,5 @@ async function init(ctx) {
       app?.unmount();
     },
   });
-  globalUI.mount();
+  colorChangeUI.mount();
 }

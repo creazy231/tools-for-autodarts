@@ -1,6 +1,5 @@
 import "~/assets/tailwind.css";
 import { createApp } from "vue";
-import PrimeVue from "primevue/config";
 import App from "./App.vue";
 import { waitForElement } from "@/utils";
 
@@ -16,7 +15,6 @@ export default defineContentScript({
       onMount: (container) => {
         const app = createApp(App);
         app.mount(container);
-        app.use(PrimeVue);
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
           container.classList.add("dark");
         }

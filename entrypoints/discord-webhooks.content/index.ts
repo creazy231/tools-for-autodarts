@@ -4,22 +4,24 @@ import App from "./App.vue";
 import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
-let globalUI: any;
-let globalUnwatch: any;
+let discordWebhookUI: any;
+let discordWebhookUnwatch: any;
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
+  runAt: "document_end",
   async main(ctx) {
-    globalUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
+    discordWebhookUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
       if (!config.discord.enabled) return;
 
       if (config.url.includes("/lobbies/") && !config.url.includes("/new/")) {
         console.log("RIGHT PAGE");
-        init(ctx).catch(console.error);
+        const div = document.querySelector("autodarts-tools-discord-webhooks");
+        if (!div) init(ctx).catch(console.error);
       } else {
-        globalUI?.remove();
-        globalUI = null;
+        discordWebhookUI?.remove();
+        discordWebhookUI = null;
       }
     });
   },
@@ -27,7 +29,7 @@ export default defineContentScript({
 
 async function init(ctx) {
   await waitForElement("#root > div:nth-of-type(1)");
-  globalUI = await createShadowRootUi(ctx, {
+  discordWebhookUI = await createShadowRootUi(ctx, {
     name: "autodarts-tools-discord-webhooks",
     position: "inline",
     anchor: "#root",
@@ -43,5 +45,5 @@ async function init(ctx) {
       app?.unmount();
     },
   });
-  globalUI.mount();
+  discordWebhookUI.mount();
 }
