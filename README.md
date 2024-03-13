@@ -1,7 +1,8 @@
 # Autodarts Tools
 
-[![build](https://github.com/creazy231/autodarts-tools/actions/workflows/release.yml/badge.svg)](https://github.com/mubaidr/vite-vue3-chrome-extension-v3/actions/workflows/build.yml)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/creazy231/autodarts-tools)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/creazy231/autodarts-tools/release.yml)
+![GitHub Release](https://img.shields.io/github/v/release/creazy231/autodarts-tools)
 ![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/oolfddhehmbpdnlmoljmllcdggmkgihh)
 
 
