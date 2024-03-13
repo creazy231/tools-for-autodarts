@@ -17,8 +17,8 @@ const isConfigPage = ref(true);
 watch(currentUrl, async (newURL, oldURL) => {
   const config = await AutodartsToolsConfig.getValue();
   await AutodartsToolsConfig.setValue({
-    ...defaultConfig,
-    ...config,
+    ...JSON.parse(JSON.stringify(defaultConfig)),
+    ...JSON.parse(JSON.stringify(config)),
     url: newURL,
   });
 

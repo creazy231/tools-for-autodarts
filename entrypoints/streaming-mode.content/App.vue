@@ -11,7 +11,13 @@
           hasSets && 'grid-cols-[35rem_8rem_8rem_8rem]',
         )"
       >
-        <div v-if="config.streamingMode.throws" class="col-span-3 border-b-2 border-black">
+        <div
+          v-if="config.streamingMode.throws"
+          :class="twMerge(
+            'col-span-3 border-b-2 border-black',
+            hasSets && 'col-span-4',
+          )"
+        >
           <div class="grid grid-cols-4 divide-x-2 divide-black text-center text-5xl font-bold">
             <div
               v-for="(t, index) in game.throws"

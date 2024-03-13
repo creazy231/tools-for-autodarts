@@ -1,7 +1,7 @@
 {
   "name": "autodarts-tools",
   "description": "Autodarts Tools enhances the gaming experience on autodarts.io",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "type": "module",
   "author": {
     "name": "Tobias Thiele",
@@ -48,17 +48,17 @@
     "eslint-plugin-vue": "^9.22.0",
     "eventsource-parser": "^1.1.1",
     "json-stringify-pretty-compact": "^4.0.0",
-    "postcss": "^8.4.33",
+    "postcss": "^8.4.35",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3",
-    "undici": "^6.3.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2",
+    "undici": "^6.8.0",
     "unplugin-auto-import": "^0.17.5",
     "unplugin-vue-components": "^0.26.0",
-    "vue-eslint-parser": "^9.4.0",
-    "vue-tsc": "^1.8.27",
-    "wxt": "^0.14.6",
+    "vue-eslint-parser": "^9.4.2",
+    "vue-tsc": "^2.0.6",
+    "wxt": "^0.17.7",
     "zx": "^7.2.3"
   }
 }

@@ -87,7 +87,6 @@
               <span class="pointer-events-none absolute inset-0 flex items-center justify-center text-xs drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">Click here to change color</span>
             </div>
             <div
-              @click="triggerColorPicker('text')"
               class="col-span-2 flex h-14 w-full items-center justify-center rounded-md text-5xl font-bold"
               :style="{
                 backgroundColor: config.colors.background,
@@ -108,8 +107,6 @@ import AppToggle from "@/components/AppToggle.vue";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 
 const config = ref();
-const colorPickerElement = ref();
-const colorPickerKey = ref("");
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
@@ -117,24 +114,10 @@ onMounted(async () => {
 
 watch(config, async () => {
   await AutodartsToolsConfig.setValue({
-    ...defaultConfig,
-    ...config.value,
+    ...JSON.parse(JSON.stringify(defaultConfig)),
+    ...JSON.parse(JSON.stringify(config.value)),
   });
 }, { deep: true });
-
-async function triggerColorPicker(key: string) {
-  console.log(colorPickerElement.value);
-
-  colorPickerKey.value = key;
-  await nextTick();
-  colorPickerElement.value.click();
-}
-
-async function onColorChange(event: Event) {
-  const key = colorPickerKey.value;
-  const color = event.target?.value;
-  console.log(key, color);
-}
 </script>
 
 <style>
