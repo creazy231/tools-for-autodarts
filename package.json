@@ -1,7 +1,7 @@
 {
   "name": "autodarts-tools",
   "description": "Autodarts Tools enhances the gaming experience on autodarts.io",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "author": {
     "name": "Tobias Thiele",
@@ -35,7 +35,7 @@
     "@types/eslint": "^8.56.5",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
-    "@vitejs/plugin-vue": "^5.0.1",
+    "@vitejs/plugin-vue": "^4.6.2",
     "autoprefixer": "^10.4.17",
     "dotenv": "^16.3.1",
     "eslint": "^8.57.0",

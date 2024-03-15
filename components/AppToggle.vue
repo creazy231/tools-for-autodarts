@@ -11,7 +11,7 @@
     <span
       :class="enabled ? 'text-sm -translate-x-4' : 'text-sm translate-x-5'"
     >
-      {{ enabled ? 'ON' : 'OFF' }}
+      {{ enabled ? textOn : textOff }}
     </span>
   </Switch>
 </template>
@@ -21,8 +21,12 @@ import { Switch } from "@headlessui/vue";
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
+  textOn?: string;
+  textOff?: string;
 }>(), {
   modelValue: false,
+  textOn: "ON",
+  textOff: "OFF",
 });
 
 const emit = defineEmits([ "update:modelValue" ]);

@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-8">
+  <div class="mb-16 space-y-8">
     <div class="space-y-4">
       <h1 class="text-3xl font-bold">
         Autodarts Tools
@@ -55,6 +55,19 @@
             <AppToggle v-model="config.streamingMode.throws" />
             <p>Display Throws</p>
           </div>
+          <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.streamingMode.board" />
+            <p>Display the Board</p>
+          </div>
+          <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.streamingMode.boardImage" text-on="IMG" text-off="SVG" />
+            <p>Toggles the Board between Image / SVG mode</p>
+          </div>
+          <input
+            v-model="config.streamingMode.footerText"
+            placeholder="Bottom text of the streaming overlay"
+            class="col-span-2 w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
+          >
         </div>
 
         <div class="space-y-4 rounded border border-white/10 p-4">
@@ -95,6 +108,29 @@
             >
               501
             </div>
+          </div>
+        </div>
+
+        <div class="space-y-4 rounded border border-white/10 p-4">
+          <div>
+            <h2 class="text-lg font-semibold">
+              Extend recent Local Players
+            </h2>
+            <p class="max-w-2xl text-white/40">
+              Default recent local players capped at 5, this will extend it to infinite.
+            </p>
+          </div>
+          <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.recentLocalPlayers.enabled" />
+          </div>
+          <div v-if="config.recentLocalPlayers.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <input
+              v-model="config.recentLocalPlayers.cap"
+              placeholder="10"
+              type="number"
+              class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
+            >
+            <p>Maximum recent players you want to store</p>
           </div>
         </div>
       </template>

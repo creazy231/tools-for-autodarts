@@ -4,6 +4,11 @@
     v-if="enabled"
     class="fixed inset-0 z-[100] bg-[#00b140] font-sans"
   >
+    <div
+      v-if="game?.players.length"
+      class="absolute left-0 top-0 size-[40vw]"
+      v-html="coords"
+    />
     <div v-if="game?.players.length" class="absolute bottom-8 right-24 border-2 border-black bg-gray-800 text-2xl">
       <div
         :class="twMerge(
@@ -137,6 +142,7 @@ const game = reactive<{
 });
 
 const config = ref();
+const coords = ref("");
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
@@ -197,7 +203,7 @@ async function initStreamModeButton() {
   modeGroupElement?.appendChild(streamModeButton);
 }
 
-function getGameStats() {
+async function getGameStats() {
   try {
     const players = document.querySelector("#ad-ext-player-display")?.children || [];
 
@@ -260,6 +266,26 @@ function getGameStats() {
         } as Throw;
 
         game.throws!.push(playerThrowObj);
+      }
+    }
+
+    config.value = await AutodartsToolsConfig.getValue();
+    if (config.value.streamingMode.footerText) {
+      game.footer = config.value.streamingMode.footerText;
+    }
+
+    if (config.value.streamingMode.board) {
+      // find button with aria-label="Coords mode" and no "data-active" attribute
+      const coordsModeButton = config.value.streamingMode.boardImage ? document.querySelector("button[aria-label='Live mode']:not([data-active])") as HTMLButtonElement | null : document.querySelector("button[aria-label='Coords mode']:not([data-active])") as HTMLButtonElement | null;
+      coordsModeButton?.click();
+
+      try {
+        // find svg with `viewBox="0 0 1000 1000"` attribute and its html
+        const coordsSvg = document.querySelector("svg[viewBox='0 0 1000 1000']") as SVGSVGElement | null;
+        coords.value = coordsSvg?.outerHTML || "";
+        console.log(coords.value);
+      } catch (e) {
+        console.error(e);
       }
     }
   } catch (e) {

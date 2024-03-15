@@ -10,8 +10,9 @@
 
 - Simple color customization
 - Auto-Start feature inside Lobbies
-- Stream-Mode with green screen and threw darts
+- Stream-Mode with green screen, board and threw darts
 - Discord Webhook integration for private Lobbies
+- Extend recent local players list
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
