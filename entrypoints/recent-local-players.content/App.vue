@@ -1,6 +1,6 @@
 <template>
   <div v-if="config?.recentLocalPlayers?.players?.length">
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <div
         @click="addUserToLobby(player)"
         v-for="player in config.recentLocalPlayers.players"
@@ -109,7 +109,6 @@ async function addUserToLobby(player: string) {
     addUserInput.value.dispatchEvent(new Event("input", { bubbles: true }));
     if (addUserButton.value) {
       addUserButton.value.removeAttribute("disabled");
-      await nextTick();
       addUserButton.value.click();
     }
   }

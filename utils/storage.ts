@@ -23,7 +23,7 @@ export const defaultConfig = {
     text: "#FFFFFF",
   },
   recentLocalPlayers: {
-    enabled: true,
+    enabled: false,
     cap: 10,
     players: [],
   },

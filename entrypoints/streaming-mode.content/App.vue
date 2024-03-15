@@ -240,7 +240,7 @@ async function getGameStats() {
         : undefined;
 
       const playerStats = player?.querySelector("div:nth-of-type(2) > div > p")?.textContent;
-      const playerAVG = playerStats?.split("|")[1].trim();
+      const playerAVG = playerStats?.split("|")[1]?.trim();
 
       // remove all lowercase letters from playerName
       playerName = playerName?.replace(/[a-z]/g, "");
@@ -286,7 +286,6 @@ async function getGameStats() {
         // find svg with `viewBox="0 0 1000 1000"` attribute and its html
         const coordsSvg = document.querySelector("svg[viewBox='0 0 1000 1000']") as SVGSVGElement | null;
         coords.value = coordsSvg?.outerHTML || "";
-        console.log(coords.value);
       } catch (e) {
         console.error(e);
       }
