@@ -11,6 +11,7 @@ export const defaultConfig = {
   },
   streamingMode: {
     enabled: false,
+    chromaKeyColor: "#009933",
     throws: false,
     footerText: "",
     board: false,

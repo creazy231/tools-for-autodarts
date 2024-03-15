@@ -51,6 +51,14 @@
           <div class="grid grid-cols-[5rem_auto] items-center gap-4">
             <AppToggle v-model="config.streamingMode.enabled" />
           </div>
+          <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <input
+              v-model="config.streamingMode.chromaKeyColor"
+              type="color"
+              class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
+            >
+            <p>Chroma Key Color</p>
+          </div>
           <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
             <AppToggle v-model="config.streamingMode.throws" />
             <p>Display Throws</p>
@@ -61,7 +69,7 @@
           </div>
           <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
             <AppToggle v-model="config.streamingMode.boardImage" text-on="IMG" text-off="SVG" />
-            <p>Toggles the Board between Image / SVG mode</p>
+            <p>Toggles the Board between Image and SVG mode</p>
           </div>
           <input
             v-model="config.streamingMode.footerText"

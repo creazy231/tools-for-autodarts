@@ -2,11 +2,14 @@
   <div
     @click="enabled = !enabled"
     v-if="enabled"
-    class="fixed inset-0 z-[100] bg-[#00b140] font-sans"
+    class="fixed inset-0 z-[100] font-sans"
+    :style="{
+      backgroundColor: config.streamingMode.chromaKeyColor,
+    }"
   >
     <div
       v-if="game?.players.length"
-      class="absolute left-0 top-0 size-[40vw]"
+      class="absolute left-0 top-0 size-[35vw]"
       v-html="coords"
     />
     <div v-if="game?.players.length" class="absolute bottom-8 right-24 border-2 border-black bg-gray-800 text-2xl">
