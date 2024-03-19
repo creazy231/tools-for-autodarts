@@ -2,7 +2,7 @@
   <div
     @click="enabled = !enabled"
     v-if="enabled"
-    class="fixed inset-0 z-[100] font-sans"
+    class="fixed inset-0 z-[200] font-sans"
     :style="{
       backgroundColor: config.streamingMode.chromaKeyColor,
     }"

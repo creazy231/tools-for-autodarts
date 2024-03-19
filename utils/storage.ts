@@ -27,6 +27,9 @@ export const defaultConfig = {
     cap: 10,
     players: [],
   },
+  takeout: {
+    enabled: false,
+  },
 };
 
 export const AutodartsToolsConfig = storage.defineItem(

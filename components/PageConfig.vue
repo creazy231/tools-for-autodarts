@@ -141,6 +141,20 @@
             <p>Maximum recent players you want to store</p>
           </div>
         </div>
+
+        <div class="space-y-4 rounded border border-white/10 p-4">
+          <div>
+            <h2 class="text-lg font-semibold">
+              Takeout Notification
+            </h2>
+            <p class="max-w-2xl text-white/40">
+              Displays a notification when ever takeout of darts is in progress.
+            </p>
+          </div>
+          <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.takeout.enabled" />
+          </div>
+        </div>
       </template>
     </div>
   </div>
