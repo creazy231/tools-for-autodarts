@@ -5,11 +5,12 @@
     "jsx": "preserve",
     "lib": ["ESNext", "DOM"],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
+    "noImplicitAny": false,
     "target": "ESNext",
     "useDefineForClassFields": true,
     "paths": {
@@ -17,7 +18,6 @@
       "~/*": ["./*"],
       "src/*": ["./*"]
     },
-    "types": ["unplugin-icons/types/vue", "chrome-types"]
   },
   "include": [
     "vite.config.ts",

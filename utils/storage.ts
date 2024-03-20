@@ -32,6 +32,6 @@ export const defaultConfig = {
 export const AutodartsToolsConfig = storage.defineItem(
   "local:config",
   {
-    config: defaultConfig,
+    defaultValue: defaultConfig,
   },
 );
