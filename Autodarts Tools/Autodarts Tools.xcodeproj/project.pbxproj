@@ -1,0 +1,954 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		691D3ED52BABD13200CA29AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3ED42BABD13200CA29AF /* AppDelegate.swift */; };
+		691D3ED72BABD13200CA29AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3ED62BABD13200CA29AF /* SceneDelegate.swift */; };
+		691D3EDA2BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3ED92BABD13200CA29AF /* Base */; };
+		691D3EDD2BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EDC2BABD13200CA29AF /* Base */; };
+		691D3EE62BABD13200CA29AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3EE52BABD13200CA29AF /* AppDelegate.swift */; };
+		691D3EE92BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EE82BABD13200CA29AF /* Base */; };
+		691D3EF12BABD13200CA29AF /* Autodarts Tools Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 691D3EF02BABD13200CA29AF /* Autodarts Tools Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		691D3EFB2BABD13200CA29AF /* Autodarts Tools Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 691D3EFA2BABD13200CA29AF /* Autodarts Tools Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		691D3F012BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC52BABD13100CA29AF /* Base */; };
+		691D3F022BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC52BABD13100CA29AF /* Base */; };
+		691D3F032BABD13200CA29AF /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC62BABD13100CA29AF /* Icon.png */; };
+		691D3F042BABD13200CA29AF /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC62BABD13100CA29AF /* Icon.png */; };
+		691D3F052BABD13200CA29AF /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC72BABD13100CA29AF /* Style.css */; };
+		691D3F062BABD13200CA29AF /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC72BABD13100CA29AF /* Style.css */; };
+		691D3F072BABD13200CA29AF /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC82BABD13100CA29AF /* Script.js */; };
+		691D3F082BABD13200CA29AF /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC82BABD13100CA29AF /* Script.js */; };
+		691D3F092BABD13200CA29AF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3EC92BABD13100CA29AF /* ViewController.swift */; };
+		691D3F0A2BABD13200CA29AF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3EC92BABD13100CA29AF /* ViewController.swift */; };
+		691D3F0B2BABD13200CA29AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691D3ECA2BABD13200CA29AF /* Assets.xcassets */; };
+		691D3F0C2BABD13200CA29AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 691D3ECA2BABD13200CA29AF /* Assets.xcassets */; };
+		691D3F0D2BABD13200CA29AF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3ECC2BABD13200CA29AF /* SafariWebExtensionHandler.swift */; };
+		691D3F0E2BABD13200CA29AF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3ECC2BABD13200CA29AF /* SafariWebExtensionHandler.swift */; };
+		691D3F242BABD13200CA29AF /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F202BABD13200CA29AF /* background.js */; };
+		691D3F252BABD13200CA29AF /* content-scripts in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F212BABD13200CA29AF /* content-scripts */; };
+		691D3F262BABD13200CA29AF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F222BABD13200CA29AF /* manifest.json */; };
+		691D3F272BABD13200CA29AF /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F232BABD13200CA29AF /* icon */; };
+		691D3F282BABD13200CA29AF /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F202BABD13200CA29AF /* background.js */; };
+		691D3F292BABD13200CA29AF /* content-scripts in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F212BABD13200CA29AF /* content-scripts */; };
+		691D3F2A2BABD13200CA29AF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F222BABD13200CA29AF /* manifest.json */; };
+		691D3F2B2BABD13200CA29AF /* icon in Resources */ = {isa = PBXBuildFile; fileRef = 691D3F232BABD13200CA29AF /* icon */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		691D3EF22BABD13200CA29AF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 691D3EBE2BABD13100CA29AF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 691D3EEF2BABD13200CA29AF;
+			remoteInfo = "Autodarts Tools Extension (iOS)";
+		};
+		691D3EFC2BABD13200CA29AF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 691D3EBE2BABD13100CA29AF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 691D3EF92BABD13200CA29AF;
+			remoteInfo = "Autodarts Tools Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		691D3F142BABD13200CA29AF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				691D3EF12BABD13200CA29AF /* Autodarts Tools Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3F1B2BABD13200CA29AF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				691D3EFB2BABD13200CA29AF /* Autodarts Tools Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		691D3EC52BABD13100CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
+		691D3EC62BABD13100CA29AF /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		691D3EC72BABD13100CA29AF /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		691D3EC82BABD13100CA29AF /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		691D3EC92BABD13100CA29AF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		691D3ECA2BABD13200CA29AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		691D3ECC2BABD13200CA29AF /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		691D3ED12BABD13200CA29AF /* Autodarts Tools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Autodarts Tools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3ED42BABD13200CA29AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		691D3ED62BABD13200CA29AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		691D3ED92BABD13200CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		691D3EDC2BABD13200CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		691D3EDE2BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		691D3EE32BABD13200CA29AF /* Autodarts Tools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Autodarts Tools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3EE52BABD13200CA29AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		691D3EE82BABD13200CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		691D3EEA2BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		691D3EEB2BABD13200CA29AF /* Autodarts Tools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Autodarts Tools.entitlements"; sourceTree = "<group>"; };
+		691D3EF02BABD13200CA29AF /* Autodarts Tools Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Autodarts Tools Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3EF52BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		691D3EFA2BABD13200CA29AF /* Autodarts Tools Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Autodarts Tools Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3EFF2BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		691D3F002BABD13200CA29AF /* Autodarts Tools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Autodarts Tools.entitlements"; sourceTree = "<group>"; };
+		691D3F202BABD13200CA29AF /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = "../../.output/safari-mv2/background.js"; sourceTree = "<group>"; };
+		691D3F212BABD13200CA29AF /* content-scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "content-scripts"; path = "../../.output/safari-mv2/content-scripts"; sourceTree = "<group>"; };
+		691D3F222BABD13200CA29AF /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../.output/safari-mv2/manifest.json"; sourceTree = "<group>"; };
+		691D3F232BABD13200CA29AF /* icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icon; path = "../../.output/safari-mv2/icon"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		691D3ECE2BABD13200CA29AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EE02BABD13200CA29AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EED2BABD13200CA29AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EF72BABD13200CA29AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		691D3EBD2BABD13100CA29AF = {
+			isa = PBXGroup;
+			children = (
+				691D3EC22BABD13100CA29AF /* Shared (App) */,
+				691D3ECB2BABD13200CA29AF /* Shared (Extension) */,
+				691D3ED32BABD13200CA29AF /* iOS (App) */,
+				691D3EE42BABD13200CA29AF /* macOS (App) */,
+				691D3EF42BABD13200CA29AF /* iOS (Extension) */,
+				691D3EFE2BABD13200CA29AF /* macOS (Extension) */,
+				691D3ED22BABD13200CA29AF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		691D3EC22BABD13100CA29AF /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				691D3EC92BABD13100CA29AF /* ViewController.swift */,
+				691D3ECA2BABD13200CA29AF /* Assets.xcassets */,
+				691D3EC32BABD13100CA29AF /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		691D3EC32BABD13100CA29AF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				691D3EC42BABD13100CA29AF /* Main.html */,
+				691D3EC62BABD13100CA29AF /* Icon.png */,
+				691D3EC72BABD13100CA29AF /* Style.css */,
+				691D3EC82BABD13100CA29AF /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		691D3ECB2BABD13200CA29AF /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				691D3F1F2BABD13200CA29AF /* Resources */,
+				691D3ECC2BABD13200CA29AF /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		691D3ED22BABD13200CA29AF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				691D3ED12BABD13200CA29AF /* Autodarts Tools.app */,
+				691D3EE32BABD13200CA29AF /* Autodarts Tools.app */,
+				691D3EF02BABD13200CA29AF /* Autodarts Tools Extension.appex */,
+				691D3EFA2BABD13200CA29AF /* Autodarts Tools Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		691D3ED32BABD13200CA29AF /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				691D3ED42BABD13200CA29AF /* AppDelegate.swift */,
+				691D3ED62BABD13200CA29AF /* SceneDelegate.swift */,
+				691D3ED82BABD13200CA29AF /* LaunchScreen.storyboard */,
+				691D3EDB2BABD13200CA29AF /* Main.storyboard */,
+				691D3EDE2BABD13200CA29AF /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		691D3EE42BABD13200CA29AF /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				691D3EE52BABD13200CA29AF /* AppDelegate.swift */,
+				691D3EE72BABD13200CA29AF /* Main.storyboard */,
+				691D3EEA2BABD13200CA29AF /* Info.plist */,
+				691D3EEB2BABD13200CA29AF /* Autodarts Tools.entitlements */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		691D3EF42BABD13200CA29AF /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				691D3EF52BABD13200CA29AF /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		691D3EFE2BABD13200CA29AF /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				691D3EFF2BABD13200CA29AF /* Info.plist */,
+				691D3F002BABD13200CA29AF /* Autodarts Tools.entitlements */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		691D3F1F2BABD13200CA29AF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				691D3F202BABD13200CA29AF /* background.js */,
+				691D3F212BABD13200CA29AF /* content-scripts */,
+				691D3F222BABD13200CA29AF /* manifest.json */,
+				691D3F232BABD13200CA29AF /* icon */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		691D3ED02BABD13200CA29AF /* Autodarts Tools (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 691D3F152BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools (iOS)" */;
+			buildPhases = (
+				691D3ECD2BABD13200CA29AF /* Sources */,
+				691D3ECE2BABD13200CA29AF /* Frameworks */,
+				691D3ECF2BABD13200CA29AF /* Resources */,
+				691D3F142BABD13200CA29AF /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				691D3EF32BABD13200CA29AF /* PBXTargetDependency */,
+			);
+			name = "Autodarts Tools (iOS)";
+			productName = "Autodarts Tools (iOS)";
+			productReference = 691D3ED12BABD13200CA29AF /* Autodarts Tools.app */;
+			productType = "com.apple.product-type.application";
+		};
+		691D3EE22BABD13200CA29AF /* Autodarts Tools (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 691D3F1C2BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools (macOS)" */;
+			buildPhases = (
+				691D3EDF2BABD13200CA29AF /* Sources */,
+				691D3EE02BABD13200CA29AF /* Frameworks */,
+				691D3EE12BABD13200CA29AF /* Resources */,
+				691D3F1B2BABD13200CA29AF /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				691D3EFD2BABD13200CA29AF /* PBXTargetDependency */,
+			);
+			name = "Autodarts Tools (macOS)";
+			productName = "Autodarts Tools (macOS)";
+			productReference = 691D3EE32BABD13200CA29AF /* Autodarts Tools.app */;
+			productType = "com.apple.product-type.application";
+		};
+		691D3EEF2BABD13200CA29AF /* Autodarts Tools Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 691D3F112BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools Extension (iOS)" */;
+			buildPhases = (
+				691D3EEC2BABD13200CA29AF /* Sources */,
+				691D3EED2BABD13200CA29AF /* Frameworks */,
+				691D3EEE2BABD13200CA29AF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Autodarts Tools Extension (iOS)";
+			productName = "Autodarts Tools Extension (iOS)";
+			productReference = 691D3EF02BABD13200CA29AF /* Autodarts Tools Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		691D3EF92BABD13200CA29AF /* Autodarts Tools Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 691D3F182BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools Extension (macOS)" */;
+			buildPhases = (
+				691D3EF62BABD13200CA29AF /* Sources */,
+				691D3EF72BABD13200CA29AF /* Frameworks */,
+				691D3EF82BABD13200CA29AF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Autodarts Tools Extension (macOS)";
+			productName = "Autodarts Tools Extension (macOS)";
+			productReference = 691D3EFA2BABD13200CA29AF /* Autodarts Tools Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		691D3EBE2BABD13100CA29AF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					691D3ED02BABD13200CA29AF = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					691D3EE22BABD13200CA29AF = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					691D3EEF2BABD13200CA29AF = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					691D3EF92BABD13200CA29AF = {
+						CreatedOnToolsVersion = 15.3;
+					};
+				};
+			};
+			buildConfigurationList = 691D3EC12BABD13100CA29AF /* Build configuration list for PBXProject "Autodarts Tools" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 691D3EBD2BABD13100CA29AF;
+			productRefGroup = 691D3ED22BABD13200CA29AF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				691D3ED02BABD13200CA29AF /* Autodarts Tools (iOS) */,
+				691D3EE22BABD13200CA29AF /* Autodarts Tools (macOS) */,
+				691D3EEF2BABD13200CA29AF /* Autodarts Tools Extension (iOS) */,
+				691D3EF92BABD13200CA29AF /* Autodarts Tools Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		691D3ECF2BABD13200CA29AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F032BABD13200CA29AF /* Icon.png in Resources */,
+				691D3EDA2BABD13200CA29AF /* Base in Resources */,
+				691D3F012BABD13200CA29AF /* Base in Resources */,
+				691D3F072BABD13200CA29AF /* Script.js in Resources */,
+				691D3F0B2BABD13200CA29AF /* Assets.xcassets in Resources */,
+				691D3EDD2BABD13200CA29AF /* Base in Resources */,
+				691D3F052BABD13200CA29AF /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EE12BABD13200CA29AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F042BABD13200CA29AF /* Icon.png in Resources */,
+				691D3F062BABD13200CA29AF /* Style.css in Resources */,
+				691D3EE92BABD13200CA29AF /* Base in Resources */,
+				691D3F082BABD13200CA29AF /* Script.js in Resources */,
+				691D3F0C2BABD13200CA29AF /* Assets.xcassets in Resources */,
+				691D3F022BABD13200CA29AF /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EEE2BABD13200CA29AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F282BABD13200CA29AF /* background.js in Resources */,
+				691D3F2B2BABD13200CA29AF /* icon in Resources */,
+				691D3F2A2BABD13200CA29AF /* manifest.json in Resources */,
+				691D3F292BABD13200CA29AF /* content-scripts in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EF82BABD13200CA29AF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F242BABD13200CA29AF /* background.js in Resources */,
+				691D3F272BABD13200CA29AF /* icon in Resources */,
+				691D3F262BABD13200CA29AF /* manifest.json in Resources */,
+				691D3F252BABD13200CA29AF /* content-scripts in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		691D3ECD2BABD13200CA29AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F092BABD13200CA29AF /* ViewController.swift in Sources */,
+				691D3ED52BABD13200CA29AF /* AppDelegate.swift in Sources */,
+				691D3ED72BABD13200CA29AF /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EDF2BABD13200CA29AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F0A2BABD13200CA29AF /* ViewController.swift in Sources */,
+				691D3EE62BABD13200CA29AF /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EEC2BABD13200CA29AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F0D2BABD13200CA29AF /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		691D3EF62BABD13200CA29AF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				691D3F0E2BABD13200CA29AF /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		691D3EF32BABD13200CA29AF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 691D3EEF2BABD13200CA29AF /* Autodarts Tools Extension (iOS) */;
+			targetProxy = 691D3EF22BABD13200CA29AF /* PBXContainerItemProxy */;
+		};
+		691D3EFD2BABD13200CA29AF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 691D3EF92BABD13200CA29AF /* Autodarts Tools Extension (macOS) */;
+			targetProxy = 691D3EFC2BABD13200CA29AF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		691D3EC42BABD13100CA29AF /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				691D3EC52BABD13100CA29AF /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		691D3ED82BABD13200CA29AF /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				691D3ED92BABD13200CA29AF /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		691D3EDB2BABD13200CA29AF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				691D3EDC2BABD13200CA29AF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		691D3EE72BABD13200CA29AF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				691D3EE82BABD13200CA29AF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		691D3F0F2BABD13200CA29AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		691D3F102BABD13200CA29AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		691D3F122BABD13200CA29AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
+				PRODUCT_NAME = "Autodarts Tools Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		691D3F132BABD13200CA29AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
+				PRODUCT_NAME = "Autodarts Tools Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		691D3F162BABD13200CA29AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
+				PRODUCT_NAME = "Autodarts Tools";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		691D3F172BABD13200CA29AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
+				PRODUCT_NAME = "Autodarts Tools";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		691D3F192BABD13200CA29AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Autodarts Tools.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
+				PRODUCT_NAME = "Autodarts Tools Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		691D3F1A2BABD13200CA29AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Autodarts Tools.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
+				PRODUCT_NAME = "Autodarts Tools Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		691D3F1D2BABD13200CA29AF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Autodarts Tools.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
+				PRODUCT_NAME = "Autodarts Tools";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		691D3F1E2BABD13200CA29AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Autodarts Tools.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BXYGXAJ99T;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Autodarts Tools";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
+				PRODUCT_NAME = "Autodarts Tools";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		691D3EC12BABD13100CA29AF /* Build configuration list for PBXProject "Autodarts Tools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				691D3F0F2BABD13200CA29AF /* Debug */,
+				691D3F102BABD13200CA29AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		691D3F112BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				691D3F122BABD13200CA29AF /* Debug */,
+				691D3F132BABD13200CA29AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		691D3F152BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				691D3F162BABD13200CA29AF /* Debug */,
+				691D3F172BABD13200CA29AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		691D3F182BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				691D3F192BABD13200CA29AF /* Debug */,
+				691D3F1A2BABD13200CA29AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		691D3F1C2BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Autodarts Tools (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				691D3F1D2BABD13200CA29AF /* Debug */,
+				691D3F1E2BABD13200CA29AF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 691D3EBE2BABD13100CA29AF /* Project object */;
+}

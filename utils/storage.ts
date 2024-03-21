@@ -30,11 +30,14 @@ export const defaultConfig = {
   takeout: {
     enabled: false,
   },
+  shufflePlayers: {
+    enabled: false,
+  },
 };
 
 export const AutodartsToolsConfig = storage.defineItem(
   "local:config",
   {
-    config: defaultConfig,
+    defaultValue: defaultConfig,
   },
 );

@@ -1,4 +1,3 @@
-// @ts-expect-error
 import mitt from "mitt";
 
 const emitter = mitt();
