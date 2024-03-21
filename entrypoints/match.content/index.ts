@@ -17,7 +17,7 @@ export default defineContentScript({
   cssInjectionMode: "ui",
   async main(ctx: any) {
     matchReadyUnwatch = AutodartsToolsConfig.watch(async (config: IConfig) => {
-      if (config.url.match(/\/matches\/[0-9a-fA-F]{8}\b-/)?.[0]) {
+      if (config.url.match(/\/matches|boards\/[0-9a-fA-F]{8}\b-/)?.[0]) {
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
         const callerDiv = document.querySelector("autodarts-tools-caller");
