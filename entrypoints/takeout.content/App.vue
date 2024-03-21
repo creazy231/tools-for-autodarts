@@ -38,12 +38,19 @@
 import { twMerge } from "tailwind-merge";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
-const checkStatusInterval = ref();
-const takeoutInProgress = ref(false);
-const show = ref(false);
-const finished = ref(false);
+const checkStatusInterval = ref<NodeJS.Timer>();
+const takeoutInProgress = ref<boolean>(false);
+const show = ref<boolean>(false);
+const finished = ref<boolean>(false);
 
 onMounted(async () => {
+  console.log("timeout  onMounted");
+  const config = await AutodartsToolsConfig.getValue();
+
+  if (!config.takeout.enabled) {
+    return;
+  }
+
   checkStatus().catch(console.error);
   checkStatusInterval.value = setInterval(checkStatus, 250);
 });
@@ -67,13 +74,8 @@ watch(takeoutInProgress, () => {
 });
 
 async function checkStatus() {
+  console.log("timeout checkStatus");
   try {
-    const config = await AutodartsToolsConfig.getValue();
-    if (!config.takeout.enabled) {
-      if (checkStatusInterval.value) clearInterval(checkStatusInterval.value);
-      return;
-    }
-
     const status = document.querySelector("#root ul > div:nth-of-type(4) a")?.textContent;
     takeoutInProgress.value = status === "✊";
     // takeoutInProgress.value = status === "🔴";
