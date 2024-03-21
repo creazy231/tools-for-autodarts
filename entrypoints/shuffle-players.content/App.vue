@@ -63,7 +63,7 @@ async function shufflePlayers() {
   // shuffle the player names by ordering them in a random order
   shuffledPlayerNames.value = [ ...playerNames ] as string[];
 
-  let shuffledArrayIsDifferent = false;
+  let shuffledArrayIsDifferent = playerNames.length < 2;
   while (!shuffledArrayIsDifferent) {
     shuffledPlayerNames.value.sort(() => Math.random() - 0.5);
     shuffledArrayIsDifferent = !playerNames.every((value, index) => value === shuffledPlayerNames.value[index]);
