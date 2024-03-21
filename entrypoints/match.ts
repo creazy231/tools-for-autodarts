@@ -1,7 +1,7 @@
-import "~/assets/tailwind.css";
+import "@/assets/tailwind.css";
 import { createApp } from "vue";
-import Caller from "./Caller.vue";
-import Takeout from "./Takeout.vue";
+import Caller from "./match.content/Caller.vue";
+import Takeout from "./match.content/Takeout.vue";
 import { waitForElement } from "@/utils";
 import type { IMatchStatus } from "@/utils/storage";
 import { AutodartsToolsBoardStatus, AutodartsToolsConfig, AutodartsToolsMatchStatus, BoardStatus } from "@/utils/storage";
