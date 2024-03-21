@@ -42,7 +42,6 @@ onBeforeUnmount(() => {
 });
 
 async function checkAutoStart() {
-  console.log("CHECKING AUTO START");
   const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) > div > table > tbody > tr");
   if (rows.length > 1) {
     await new Promise(resolve => setTimeout(resolve, 3000));

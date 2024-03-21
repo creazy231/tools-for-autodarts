@@ -16,6 +16,7 @@
 - Stream-Mode with green screen, board and threw darts
 - Discord Webhook integration for private Lobbies
 - Extend recent local players list
+- Shuffle players in Lobbies
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
