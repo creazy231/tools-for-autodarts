@@ -40,7 +40,6 @@ async function checkPlayers() {
 }
 
 function getPlayerNameFromRow(row: HTMLTableRowElement) {
-  console.log(row.querySelector("td:nth-of-type(2) > a > div p")?.textContent);
   return row.querySelector("td:nth-of-type(2) > a > div p")?.textContent;
 }
 
