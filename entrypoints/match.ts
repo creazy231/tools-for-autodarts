@@ -3,7 +3,7 @@ import { createApp } from "vue";
 import Caller from "./match.content/Caller.vue";
 import Takeout from "./match.content/Takeout.vue";
 import { waitForElement } from "@/utils";
-import type { IMatchStatus } from "@/utils/storage";
+import type { IConfig, IMatchStatus } from "@/utils/storage";
 import { AutodartsToolsBoardStatus, AutodartsToolsConfig, AutodartsToolsMatchStatus, BoardStatus } from "@/utils/storage";
 
 let callerUI: any;
@@ -16,7 +16,7 @@ export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
   async main(ctx: any) {
-    matchReadyUnwatch = AutodartsToolsConfig.watch(async (config: any) => {
+    matchReadyUnwatch = AutodartsToolsConfig.watch(async (config: IConfig) => {
       if (config.url.match(/\/matches\/[0-9a-fA-F]{8}\b-/)?.[0]) {
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
@@ -105,7 +105,7 @@ function startThrowsObserver() {
     return;
   }
   throwsObserver = new MutationObserver(() => {
-    throwsChange();
+    throwsChange().catch(console.error);
   });
   throwsObserver.observe(targetNode, { childList: true, subtree: true, attributes: true });
 }
@@ -120,7 +120,7 @@ function startBoardStatusObserver() {
   boardStatusObserver = new MutationObserver((m) => {
     m.forEach((record) => {
       if (record.type === "characterData" && record.target.textContent && Object.values(BoardStatus).includes(record.target.textContent as BoardStatus)) {
-        AutodartsToolsBoardStatus.setValue(record.target.textContent as BoardStatus);
+        AutodartsToolsBoardStatus.setValue(record.target.textContent as BoardStatus).catch(console.error);
       }
     });
   });
