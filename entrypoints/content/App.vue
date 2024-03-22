@@ -26,7 +26,7 @@ watch(currentUrl, async (newURL, oldURL) => {
   });
 
   if (newURL !== oldURL && oldURL) {
-    console.log("URL changed", newURL);
+    // console.log("URL changed", newURL);
     useGlobalEvent("url:changed", newURL);
 
     if (newURL.includes("/tools") && !configVisible.value) {
@@ -109,7 +109,6 @@ onBeforeUnmount(() => {
 });
 
 function startObserver() {
-  console.log("Observer started");
   const targetNode = document.getElementById("root");
   if (!targetNode) {
     console.error("Target node not found");
