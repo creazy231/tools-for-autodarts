@@ -21,7 +21,7 @@ export default defineContentScript({
       if (config.url.match(/\/matches|boards\/[0-9a-fA-F]{8}\b-/)?.[0]) {
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
-        scoreSmaller();
+        await scoreSmaller();
         const callerDiv = document.querySelector("autodarts-tools-caller");
         if (!callerDiv) initCaller(ctx).catch(console.error);
         const takeoutDiv = document.querySelector("autodarts-tools-takeout");
@@ -87,7 +87,6 @@ async function throwsChange() {
 
   const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
 
-  console.log("editPlayerThrowActive", !!editPlayerThrowActive);
   await AutodartsToolsMatchStatus.setValue({
     ...matchStatus,
     // throws: [
