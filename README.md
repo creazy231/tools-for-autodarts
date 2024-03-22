@@ -17,6 +17,8 @@
 - Discord Webhook integration for private Lobbies
 - Extend recent local players list
 - Shuffle players in Lobbies
+- Takeout visualization
+- Smaller font size for inactive players
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
