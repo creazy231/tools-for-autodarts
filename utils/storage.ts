@@ -105,14 +105,14 @@ export const defaultMatchStatus: IMatchStatus = {
 };
 
 export const AutodartsToolsMatchStatus: WxtStorageItem<IMatchStatus, any> = storage.defineItem(
-  "local:matchdata",
+  "local:matchstatus",
   {
     defaultValue: defaultMatchStatus,
   },
 );
 
 export const AutodartsToolsBoardStatus: WxtStorageItem<TBoardStatus, any> = storage.defineItem(
-  "local:matchdata",
+  "local:boardstatus",
   {
     defaultValue: undefined,
   },

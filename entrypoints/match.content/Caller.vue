@@ -16,14 +16,14 @@ AutodartsToolsMatchStatus.watch(async (matchStatus: IMatchStatus) => {
 });
 
 onBeforeMount(async () => {
-  console.log("caller onBeforeMount");
+  // console.log("caller onBeforeMount");
 });
 
 onMounted(async () => {
-  console.log("caller onMounted");
+  // console.log("caller onMounted");
 });
 
 onBeforeUnmount(() => {
-  console.log("caller onBeforeUnmount");
+  // console.log("caller onBeforeUnmount");
 });
 </script>

@@ -1,0 +1,1 @@
+export const getResetBtn = () => [ ...document.getElementById("ad-ext-game-settings-extra")?.previousElementSibling?.querySelectorAll("button") as NodeListOf<HTMLButtonElement> ].find(el => el.textContent === "Reset");
