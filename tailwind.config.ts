@@ -12,6 +12,7 @@ export default {
       },
       fontFamily: {
         sans: [ "Open Sans", "sans-serif" ],
+        system: [ "system-ui" ],
       },
     },
   },
