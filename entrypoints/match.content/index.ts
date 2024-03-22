@@ -82,7 +82,8 @@ async function initTakeout(ctx) {
 }
 
 async function throwsChange() {
-  console.log("throws change");
+  await scoreSmaller();
+
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
 
   const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();

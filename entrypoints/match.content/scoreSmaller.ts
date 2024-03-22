@@ -12,9 +12,7 @@ export async function scoreSmaller() {
   const { inactiveSmall } = await AutodartsToolsConfig.getValue();
 
   const setScoreSmaller = () => {
-    console.log("score Smaller", inactiveSmall);
     if (!inactiveSmall.enabled) return;
-    console.log("score Smaller!");
     if (inactivePlayerCardPointsElArr.length && activePlayerCardPointsEl) {
       activePlayerCardPointsEl.classList.remove("adp_points-small");
       [ ...inactivePlayerCardPointsElArr ].forEach(el => el.classList.add("adp_points-small"));
