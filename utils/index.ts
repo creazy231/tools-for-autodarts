@@ -29,3 +29,9 @@ export function waitForElement(selector: string | string[], timeout = 3000): Pro
     }, 100);
   });
 }
+
+export function addStyles(css: string) {
+  const style = document.createElement("style");
+  style.innerHTML = css;
+  document.getElementsByTagName("head")[0].appendChild(style);
+}

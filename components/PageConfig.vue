@@ -159,6 +159,20 @@
         <div class="space-y-4 rounded border border-white/10 p-4">
           <div>
             <h2 class="text-lg font-semibold">
+              Score smaller
+            </h2>
+            <p class="max-w-2xl text-white/40">
+              Reduces the font-size of the score of inactive players.
+            </p>
+          </div>
+          <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.inactiveSmall.enabled" />
+          </div>
+        </div>
+
+        <div class="space-y-4 rounded border border-white/10 p-4">
+          <div>
+            <h2 class="text-lg font-semibold">
               Shuffle Players
             </h2>
             <p class="max-w-2xl text-white/40">
@@ -176,9 +190,10 @@
 
 <script setup lang="ts">
 import AppToggle from "@/components/AppToggle.vue";
+import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 
-const config = ref();
+const config = ref<IConfig>();
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();

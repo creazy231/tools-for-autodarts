@@ -5,6 +5,7 @@ import Takeout from "./Takeout.vue";
 import { waitForElement } from "@/utils";
 import type { IConfig, IMatchStatus } from "@/utils/storage";
 import { AutodartsToolsBoardStatus, AutodartsToolsConfig, AutodartsToolsMatchStatus, BoardStatus } from "@/utils/storage";
+import { scoreSmaller } from "@/entrypoints/match.content/scoreSmaller";
 
 let callerUI: any;
 let takeoutUI: any;
@@ -20,6 +21,7 @@ export default defineContentScript({
       if (config.url.match(/\/matches|boards\/[0-9a-fA-F]{8}\b-/)?.[0]) {
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
+        scoreSmaller();
         const callerDiv = document.querySelector("autodarts-tools-caller");
         if (!callerDiv) initCaller(ctx).catch(console.error);
         const takeoutDiv = document.querySelector("autodarts-tools-takeout");
@@ -82,9 +84,6 @@ async function initTakeout(ctx) {
 async function throwsChange() {
   console.log("throws change");
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
-  const activePlayerCardPointsEl = document.querySelector(".ad-ext-player-active .ad-ext-player-score");
-  const inactivePlayerCardPointsElArr = [ ...document.querySelectorAll(".ad-ext-player-inactive .ad-ext-player-score") ];
-  const winnerPlayerCard = document.querySelector(".ad-ext-player-winner");
 
   const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
 

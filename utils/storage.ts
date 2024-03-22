@@ -31,6 +31,9 @@ export interface IConfig {
   takeout: {
     enabled: boolean;
   };
+  inactiveSmall: {
+    enabled: boolean;
+  };
   shufflePlayers: {
     enabled: boolean;
   };
@@ -79,6 +82,9 @@ export const defaultConfig: IConfig = {
     players: [],
   },
   takeout: {
+    enabled: false,
+  },
+  inactiveSmall: {
     enabled: false,
   },
   shufflePlayers: {
