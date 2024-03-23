@@ -1,6 +1,5 @@
 import "~/assets/tailwind.css";
 import { createApp } from "vue";
-import Caller from "./Caller.vue";
 import Takeout from "./Takeout.vue";
 import { waitForElement } from "@/utils";
 import type { IConfig, IMatchStatus } from "@/utils/storage";
@@ -8,8 +7,8 @@ import { AutodartsToolsBoardStatus, AutodartsToolsConfig, AutodartsToolsMatchSta
 import { scoreSmaller } from "@/entrypoints/match.content/scoreSmaller";
 import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/match.content/color-change";
 import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
+import { caller } from "@/entrypoints/match.content/caller";
 
-let callerUI: any;
 let takeoutUI: any;
 let streamingModeUI: any;
 let matchReadyUnwatch: any;
@@ -25,8 +24,6 @@ export default defineContentScript({
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
         await scoreSmaller();
-        const callerDiv = document.querySelector("autodarts-tools-caller");
-        if (!callerDiv) initCaller(ctx).catch(console.error);
         const takeoutDiv = document.querySelector("autodarts-tools-takeout");
         if (!takeoutDiv) initTakeout(ctx).catch(console.error);
         await throwsChange(); // init matchData
@@ -45,8 +42,6 @@ export default defineContentScript({
       } else {
         throwsObserver?.disconnect();
         boardStatusObserver?.disconnect();
-        callerUI?.remove();
-        callerUI = null;
         takeoutUI?.remove();
         takeoutUI = null;
 
@@ -55,26 +50,6 @@ export default defineContentScript({
     });
   },
 });
-
-async function initCaller(ctx) {
-  callerUI = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-caller",
-    position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
-    onMount: (container) => {
-      const caller = createApp(Caller);
-      caller.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
-      return caller;
-    },
-    onRemove: (caller) => {
-      caller?.unmount();
-    },
-  });
-  callerUI.mount();
-}
 
 async function initTakeout(ctx) {
   takeoutUI = await createShadowRootUi(ctx, {
@@ -119,6 +94,7 @@ async function initStreamingMode(ctx) {
 
 async function throwsChange() {
   await scoreSmaller();
+  await caller();
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
 

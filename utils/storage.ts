@@ -40,6 +40,10 @@ export interface IConfig {
   caller: {
     enabled: boolean;
   };
+  // TODO: implement to PageConfig
+  soundAfterBotThrow: {
+    enabled: boolean;
+  };
 }
 
 export interface IMatchStatus {
@@ -94,6 +98,9 @@ export const defaultConfig: IConfig = {
     enabled: false,
   },
   caller: {
+    enabled: true,
+  },
+  soundAfterBotThrow: {
     enabled: true,
   },
 };

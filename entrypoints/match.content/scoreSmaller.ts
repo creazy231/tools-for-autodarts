@@ -20,8 +20,4 @@ export async function scoreSmaller() {
   };
 
   setScoreSmaller();
-
-  AutodartsToolsConfig.watch(async () => {
-    setScoreSmaller();
-  });
 }

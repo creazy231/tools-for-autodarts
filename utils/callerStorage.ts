@@ -1,7 +1,7 @@
 import type { WxtStorageItem } from "wxt/storage";
 import { storage } from "wxt/storage";
 
-interface TCaller {
+export interface TCaller {
   name?: string;
   folder: string;
   url: string;
@@ -12,9 +12,10 @@ interface TCaller {
 export interface ICallerConfig {
   caller: TCaller[];
 }
-
+const privateCaller = import.meta.env.DEV && import.meta.env.VITE_PRIVATE_CALLER ? JSON.parse(import.meta.env.VITE_PRIVATE_CALLER).privateCaller || [] : [];
+console.log("privateCaller", privateCaller);
 export const defaultCallerConfig: ICallerConfig = {
-  caller: [
+  caller: [ ...[
     {
       name: "Male eng",
       folder: "1_male_eng",
@@ -32,7 +33,7 @@ export const defaultCallerConfig: ICallerConfig = {
       folder: "google_de",
       url: "",
     },
-  ],
+  ], ...privateCaller ],
 };
 
 export const AutodartsToolsCallerConfig: WxtStorageItem<ICallerConfig, any> = storage.defineItem(
