@@ -37,6 +37,9 @@ export interface IConfig {
   shufflePlayers: {
     enabled: boolean;
   };
+  caller: {
+    enabled: boolean;
+  };
 }
 
 export interface IMatchStatus {
@@ -89,6 +92,9 @@ export const defaultConfig: IConfig = {
   },
   shufflePlayers: {
     enabled: false,
+  },
+  caller: {
+    enabled: true,
   },
 };
 

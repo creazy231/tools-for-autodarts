@@ -9,6 +9,62 @@
         <div class="space-y-4 rounded border border-white/10 p-4">
           <div>
             <h2 class="text-lg font-semibold">
+              Caller
+            </h2>
+            <p class="max-w-2xl text-white/40">
+              Adds a caller.
+            </p>
+          </div>
+          <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.caller.enabled" />
+          </div>
+          <div v-if="config.caller.enabled && callerConfig">
+            <div class="grid gap-4">
+              <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_4fr_2fr_1fr_50px] lg:grid-rows-1">
+                <div>Caller {{ index + 1 }}</div>
+                <input
+                  v-model="callerConfig.caller[index].name"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <input
+                  v-model="callerConfig.caller[index].url"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <input
+                  v-model="callerConfig.caller[index].folder"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <input
+                  v-model="callerConfig.caller[index].fileExt"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="callerConfig.caller.splice(index, 1)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete]" />
+                </button>
+              </div>
+
+              <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
+                <button
+                  @click="callerConfig.caller.push({ url: '', folder: '' })"
+                  class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
+                >
+                  <span class="icon-[mdi-light--plus]" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4 rounded border border-white/10 p-4">
+          <div>
+            <h2 class="text-lg font-semibold">
               Discord Webhooks
             </h2>
             <p class="max-w-2xl text-white/40">
@@ -192,17 +248,28 @@
 import AppToggle from "@/components/AppToggle.vue";
 import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
+import type { ICallerConfig } from "@/utils/callerStorage";
+import { AutodartsToolsCallerConfig, defaultCallerConfig } from "@/utils/callerStorage";
 
 const config = ref<IConfig>();
+const callerConfig = ref<ICallerConfig>();
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
+  callerConfig.value = await AutodartsToolsCallerConfig.getValue();
 });
 
 watch(config, async () => {
   await AutodartsToolsConfig.setValue({
     ...JSON.parse(JSON.stringify(defaultConfig)),
     ...JSON.parse(JSON.stringify(config.value)),
+  });
+}, { deep: true });
+
+watch(callerConfig, async () => {
+  await AutodartsToolsCallerConfig.setValue({
+    ...JSON.parse(JSON.stringify(defaultCallerConfig)),
+    ...JSON.parse(JSON.stringify(callerConfig.value)),
   });
 }, { deep: true });
 </script>
