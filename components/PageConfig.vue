@@ -7,7 +7,7 @@
 
       <template v-if="config">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div class="space-y-4 rounded border border-white/10 p-4">
+          <div class="col-span-2 space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
                 Caller
@@ -21,7 +21,7 @@
             </div>
             <div v-if="config.caller.enabled && callerConfig">
               <div class="grid gap-4">
-                <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_4fr_2fr_1fr_50px] lg:grid-rows-1">
+                <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_4fr_2fr_1fr_50px_50px] lg:grid-rows-1">
                   <div>Caller {{ index + 1 }}</div>
                   <input
                     v-model="callerConfig.caller[index].name"
@@ -43,6 +43,13 @@
                     type="text"
                     class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                   >
+                  <button
+                    @click="setActive(index)"
+                    class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 outline-none"
+                    :class="callerConfig.caller[index].isActive && 'bg-cyan-600 border-cyan-600'"
+                  >
+                    <span class="icon-[mdi-light--check]" />
+                  </button>
                   <button
                     @click="callerConfig.caller.splice(index, 1)"
                     class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
@@ -94,45 +101,6 @@
             <div class="grid grid-cols-[5rem_auto] items-center gap-4">
               <AppToggle v-model="config.autoStart.enabled" />
             </div>
-          </div>
-
-          <div class="space-y-4 rounded border border-white/10 p-4">
-            <div>
-              <h2 class="text-lg font-semibold">
-                Streaming Mode
-              </h2>
-              <p class="max-w-2xl text-white/40">
-                Adds a button to the game page to enable streaming mode. If streaming mode is enabled, it will displays a green overlay with stats and scores which then can be captured by OBS or any other streaming software.
-              </p>
-            </div>
-            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.enabled" />
-            </div>
-            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <input
-                v-model="config.streamingMode.chromaKeyColor"
-                type="color"
-                class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
-              >
-              <p>Chroma Key Color</p>
-            </div>
-            <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.throws" />
-              <p>Display Throws</p>
-            </div>
-            <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.board" />
-              <p>Display the Board</p>
-            </div>
-            <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.boardImage" text-on="IMG" text-off="SVG" />
-              <p>Toggles the Board between Image and SVG mode</p>
-            </div>
-            <input
-              v-model="config.streamingMode.footerText"
-              placeholder="Bottom text of the streaming overlay"
-              class="col-span-2 w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
-            >
           </div>
 
           <div class="space-y-4 rounded border border-white/10 p-4">
@@ -240,6 +208,45 @@
               <AppToggle v-model="config.shufflePlayers.enabled" />
             </div>
           </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Streaming Mode
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Adds a button to the game page to enable streaming mode. If streaming mode is enabled, it will displays a green overlay with stats and scores which then can be captured by OBS or any other streaming software.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.streamingMode.enabled" />
+            </div>
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <input
+                v-model="config.streamingMode.chromaKeyColor"
+                type="color"
+                class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
+              >
+              <p>Chroma Key Color</p>
+            </div>
+            <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.streamingMode.throws" />
+              <p>Display Throws</p>
+            </div>
+            <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.streamingMode.board" />
+              <p>Display the Board</p>
+            </div>
+            <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.streamingMode.boardImage" text-on="IMG" text-off="SVG" />
+              <p>Toggles the Board between Image and SVG mode</p>
+            </div>
+            <input
+              v-model="config.streamingMode.footerText"
+              placeholder="Bottom text of the streaming overlay"
+              class="col-span-2 w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
+            >
+          </div>
         </div>
       </template>
     </div>
@@ -255,6 +262,12 @@ import { AutodartsToolsCallerConfig, defaultCallerConfig } from "@/utils/callerS
 
 const config = ref<IConfig>();
 const callerConfig = ref<ICallerConfig>();
+
+function setActive(index: number) {
+  callerConfig?.value?.caller.forEach((caller, i) => {
+    caller.isActive = i === index;
+  });
+}
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();

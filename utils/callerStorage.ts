@@ -6,6 +6,7 @@ interface TCaller {
   folder: string;
   url: string;
   fileExt?: string;
+  isActive?: boolean;
 };
 
 export interface ICallerConfig {
@@ -19,6 +20,7 @@ export const defaultCallerConfig: ICallerConfig = {
       folder: "1_male_eng",
       url: "https://autodarts.x10.mx",
       fileExt: ".mp3",
+      isActive: true,
     },
     {
       name: "Google eng",
