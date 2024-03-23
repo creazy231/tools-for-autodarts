@@ -1,12 +1,7 @@
-<template>
-  <div />
-</template>
-
-<script setup lang="ts">
 import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
-onMounted(async () => {
+export async function discordWebhooks() {
   try {
     const lobbyLinkElement = await waitForElement("#root input") as HTMLInputElement;
     const lobbyLink = lobbyLinkElement.value.split("#")[0];
@@ -52,7 +47,6 @@ onMounted(async () => {
       }),
     });
   } catch (e) {
-    // silence is golden
+    console.error("Autodarts Tools: Discord Webhook - Error sending discord webhook: ", e);
   }
-});
-</script>
+}

@@ -1,14 +1,9 @@
-<template>
-  <div />
-</template>
-
-<script setup lang="ts">
 import { waitForElement } from "@/utils";
 
-const autostartEnabled = ref(false);
-const checkAutoStartInterval = ref();
+let autostartEnabled: boolean = false;
+let checkAutoStartInterval: NodeJS.Timeout | null = null;
 
-onMounted(async () => {
+export async function autoStart() {
   try {
     const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
     const button = buttonsContainer.children[0].cloneNode(true) as HTMLButtonElement;
@@ -22,24 +17,25 @@ onMounted(async () => {
     button.addEventListener("click", () => {
       button.textContent = button.textContent === "Autostart ON" ? "Autostart OFF" : "Autostart ON";
       button.style.color = button.textContent === "Autostart ON" ? "var(--chakra-colors-green-500)" : "var(--chakra-colors-red-500)";
-      autostartEnabled.value = !autostartEnabled.value;
+      autostartEnabled = !autostartEnabled;
 
-      if (autostartEnabled.value) {
-        checkAutoStartInterval.value = setInterval(checkAutoStart, 1000);
+      if (autostartEnabled) {
+        checkAutoStartInterval = setInterval(checkAutoStart, 1000);
       } else {
-        clearInterval(checkAutoStartInterval.value);
+        if (checkAutoStartInterval) clearInterval(checkAutoStartInterval);
       }
     });
 
     buttonsContainer.appendChild(button);
   } catch (e) {
-    // silence is golden
+    console.error("Autodarts Tools: Auto Start - Error adding auto start button: ", e);
   }
-});
+}
 
-onBeforeUnmount(() => {
-  clearInterval(checkAutoStartInterval.value);
-});
+export async function onRemove() {
+  if (checkAutoStartInterval) clearInterval(checkAutoStartInterval);
+  autostartEnabled = false;
+}
 
 async function checkAutoStart() {
   const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) > div > table > tbody > tr");
@@ -50,7 +46,6 @@ async function checkAutoStart() {
     const startButton = Array.from(buttons).find(button => button.textContent === "Start");
     startButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
-    clearInterval(checkAutoStartInterval.value);
+    if (checkAutoStartInterval) clearInterval(checkAutoStartInterval);
   }
 }
-</script>

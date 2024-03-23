@@ -83,7 +83,7 @@ onMounted(async () => {
     // hide recentUsersDiv
     recentUsersDiv.value.style.display = "none";
   } catch (e) {
-    // silence is golden
+    console.log("Autodarts Tools: RecentLocalPlayers - Error", e);
   }
 });
 

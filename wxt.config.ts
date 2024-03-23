@@ -1,6 +1,7 @@
 import { URL, fileURLToPath } from "node:url";
 import { defineConfig } from "wxt";
 import vue from "@vitejs/plugin-vue";
+import AutoImport from "unplugin-auto-import/vite";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -30,25 +31,25 @@ export default defineConfig({
     plugins: [
       vue(),
 
-      // AutoImport({
-      //   imports: [
-      //     "vue",
-      //     "vue-router",
-      //     "vue/macros",
-      //     "@vueuse/core",
-      //     {
-      //       wxt: [
-      //         "browser",
-      //         "defineBackground",
-      //         "defineContentScript",
-      //         "createShadowRootUi",
-      //         "createIntegratedUi",
-      //       ],
-      //     },
-      //   ],
-      //   dts: "auto-imports.d.ts",
-      //   dirs: [ "composables/" ],
-      // }),
+      AutoImport({
+        imports: [
+          "vue",
+          "vue-router",
+          "vue/macros",
+          "@vueuse/core",
+          {
+            wxt: [
+              "browser",
+              "defineBackground",
+              "defineContentScript",
+              "createShadowRootUi",
+              "createIntegratedUi",
+            ],
+          },
+        ],
+        dts: "auto-imports.d.ts",
+        dirs: [ "composables/" ],
+      }),
 
       // Components({
       //   dirs: [ "components" ],
