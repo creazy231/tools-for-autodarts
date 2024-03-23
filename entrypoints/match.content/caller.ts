@@ -1,8 +1,9 @@
-import { AutodartsToolsConfig } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsMatchStatus } from "@/utils/storage";
 import { addStyles } from "@/utils";
 import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
-import { playSound2, playSound3 } from "@/utils/playSound";
+
+import { playPointsSound, playSound2, playSound3 } from "@/utils/playSound";
 
 export async function caller() {
   addStyles(`
@@ -14,6 +15,7 @@ export async function caller() {
   const callerArr = (await AutodartsToolsCallerConfig.getValue()).caller;
   const callerActive = (await AutodartsToolsCallerConfig.getValue()).caller.filter(caller => caller.isActive)[0];
 
+  const isInEditMode = (await AutodartsToolsMatchStatus.getValue()).isInEditMode;
   // Sounds
   const soundServerUrl = "https://autodarts-plus.x10.mx";
   const bustSound = (await AutodartsToolsSoundsConfig.getValue()).bust;
@@ -76,7 +78,34 @@ export async function caller() {
           playSound2(`${callerServerUrl}/${callerFolder}/` + `0${fileExt}`);
         }
       } else {
-        console.log("no");
+        // if (curThrowPointsName === 'BULL') {
+        //   if (triplesound === '1') {
+        //     playSound2(soundServerUrl + '/' + 'beep_1.mp3');
+        //   }
+        //   if (triplesound === '2') {
+        //     playSound2(soundServerUrl + '/' + 'beep_2_bullseye.mp3');
+        //   }
+        // } else if (curThrowPointsBed === 'Outside') {
+        //   if (boosound === true) {
+        //     const randomMissCount = Math.floor(Math.random() * 3) + 1;
+        //     playSound2(soundServerUrl + '/' + 'miss_' + randomMissCount + '.mp3');
+        //   }
+        // } else {
+        //   if (matchVariant === 'X01' || (matchVariant === 'Cricket' && curThrowPointsNumber >= 15)) {
+        //     if (curThrowPointsMultiplier === 3) {
+        //       if (triplesound === '1') {
+        //         playSound2(soundServerUrl + '/' + 'beep_1.mp3');
+        //       }
+        //       if (triplesound === '2' && curThrowPointsNumber >= 17) {
+        //         playSound2(soundServerUrl + '/' + 'beep_2_' + curThrowPointsNumber + '.wav');
+        //       }
+        //     }
+        //   }
+        // }
+
+        if (throwPointsArr.length === 3 && callerFolder.length && !isInEditMode) {
+          playPointsSound(callerFolder, turnPoints, callerServerUrl);
+        }
       }
     }, isBot ? 500 : 0);
   };

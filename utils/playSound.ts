@@ -25,7 +25,8 @@ export function playSound3(fileName) {
   soundEffect3.src = fileName;
 }
 
-export function playPointsSound(callerFolder: string, turnPoints: string, callerServerUrl?: string) {
+export function playPointsSound(callerFolder: string, turnPoints?: string, callerServerUrl?: string) {
+  if (!turnPoints) return;
   if (callerFolder.startsWith("google")) {
     playSound1(`https://autodarts.de.cool/mp3_helper.php?language=${callerFolder.substring(7, 9)}&text=${turnPoints}`);
   } else {
