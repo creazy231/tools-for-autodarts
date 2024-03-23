@@ -1,21 +1,12 @@
-<template>
-  <div />
-</template>
-
-<script setup lang="ts">
-import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig } from "@/utils/storage";
+import { waitForElement } from "@/utils";
 
-const colorChangeInterval = ref();
+let colorChangeInterval: NodeJS.Timeout | null = null;
 
-onMounted(async () => {
+export async function colorChange() {
   handleChangeColor().catch(console.error);
-  colorChangeInterval.value = setInterval(handleChangeColor, 500);
-});
-
-onBeforeUnmount(() => {
-  clearInterval(colorChangeInterval.value);
-});
+  colorChangeInterval = setInterval(handleChangeColor, 500);
+}
 
 async function handleChangeColor() {
   try {
@@ -40,7 +31,11 @@ async function handleChangeColor() {
       element.style.color = `${config.colors.text}`;
     });
   } catch (e) {
-    // silence is golden
+    console.error("Autodarts Tools: Color Change - Error changing color: ", e);
+    if (colorChangeInterval) clearInterval(colorChangeInterval);
   }
 }
-</script>
+
+export async function onRemove() {
+  if (colorChangeInterval) clearInterval(colorChangeInterval);
+}

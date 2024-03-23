@@ -1,15 +1,10 @@
-<template>
-  <div />
-</template>
-
-<script setup lang="ts">
 import { waitForElement } from "@/utils";
 
-const checkPlayersInterval = ref();
-const playerRows: Ref<HTMLTableRowElement[]> = ref([]);
-const shuffledPlayerNames: Ref<string[]> = ref([]);
+let checkPlayersInterval: NodeJS.Timeout | null = null;
+let playerRows: HTMLTableRowElement[] = [];
+let shuffledPlayerNames: string[] = [];
 
-onMounted(async () => {
+export async function shufflePlayers() {
   try {
     const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
     const button = buttonsContainer.children[0].cloneNode(true) as HTMLButtonElement;
@@ -20,23 +15,19 @@ onMounted(async () => {
     button.innerText = "Shuffle";
     button.style.color = "var(--chakra-colors-white)";
 
-    button.addEventListener("click", shufflePlayers);
+    button.addEventListener("click", handleShuffle);
 
-    checkPlayersInterval.value = setInterval(checkPlayers, 500);
+    checkPlayersInterval = setInterval(checkPlayers, 500);
 
     buttonsContainer.appendChild(button);
   } catch (e) {
     // silence is golden
   }
-});
-
-onBeforeUnmount(() => {
-  clearInterval(checkPlayersInterval.value);
-});
+}
 
 async function checkPlayers() {
   const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) > div > table > tbody > tr");
-  playerRows.value = rows as unknown as HTMLTableRowElement[];
+  playerRows = rows as unknown as HTMLTableRowElement[];
 }
 
 function getPlayerNameFromRow(row: HTMLTableRowElement) {
@@ -44,35 +35,35 @@ function getPlayerNameFromRow(row: HTMLTableRowElement) {
 }
 
 function getIndexByPlayerName(playerName: string) {
-  for (let i = 0; i < playerRows.value.length; i++) {
-    const row = playerRows.value[i];
+  for (let i = 0; i < playerRows.length; i++) {
+    const row = playerRows[i];
     if (getPlayerNameFromRow(row) === playerName) return i;
   }
 }
 
-async function shufflePlayers() {
+async function handleShuffle() {
   const shuffleButton = document.querySelector("#autodarts-tools-shuffle-button") as HTMLButtonElement;
   shuffleButton.setAttribute("disabled", "true");
   shuffleButton.innerText = "Shuffling...";
 
-  clearInterval(checkPlayersInterval.value);
+  if (checkPlayersInterval) clearInterval(checkPlayersInterval);
 
   // get player names from the rows
-  const playerNames = Array.from(playerRows.value).map(row => row.querySelector("td:nth-of-type(2) > a > div p")?.textContent);
+  const playerNames = Array.from(playerRows).map(row => row.querySelector("td:nth-of-type(2) > a > div p")?.textContent);
 
   // shuffle the player names by ordering them in a random order
-  shuffledPlayerNames.value = [ ...playerNames ] as string[];
+  shuffledPlayerNames = [ ...playerNames ] as string[];
 
   let shuffledArrayIsDifferent = playerNames.length < 2;
   while (!shuffledArrayIsDifferent) {
-    shuffledPlayerNames.value.sort(() => Math.random() - 0.5);
-    shuffledArrayIsDifferent = !playerNames.every((value, index) => value === shuffledPlayerNames.value[index]);
+    shuffledPlayerNames.sort(() => Math.random() - 0.5);
+    shuffledArrayIsDifferent = !playerNames.every((value, index) => value === shuffledPlayerNames[index]);
   }
 
   const playerButtons = {};
 
   function updatePlayerButtons() {
-    for (const row of playerRows.value) {
+    for (const row of playerRows) {
       const playerName = row.querySelector("td:nth-of-type(2) > a > div p")?.textContent;
       const playerButtonUp = row.querySelector("button:nth-of-type(1)");
       const playerButtonDown = row.querySelector("button:nth-of-type(2)");
@@ -86,8 +77,8 @@ async function shufflePlayers() {
   while (!orderIsCorrect) {
     orderIsCorrect = true;
 
-    for (let i = 0; i < shuffledPlayerNames.value.length; i++) {
-      const playerName = shuffledPlayerNames.value[i];
+    for (let i = 0; i < shuffledPlayerNames.length; i++) {
+      const playerName = shuffledPlayerNames[i];
       let playerIndex = getIndexByPlayerName(playerName);
 
       while (playerIndex !== i) {
@@ -103,8 +94,16 @@ async function shufflePlayers() {
     }
   }
 
-  checkPlayersInterval.value = setInterval(checkPlayers, 500);
+  checkPlayersInterval = setInterval(checkPlayers, 500);
   shuffleButton.removeAttribute("disabled");
   shuffleButton.innerText = "Shuffle";
 }
-</script>
+
+export async function onRemove() {
+  if (checkPlayersInterval) clearInterval(checkPlayersInterval);
+
+  // reset default values
+  checkPlayersInterval = null;
+  playerRows = [];
+  shuffledPlayerNames = [];
+}

@@ -6,9 +6,12 @@ import { waitForElement } from "@/utils";
 import type { IConfig, IMatchStatus } from "@/utils/storage";
 import { AutodartsToolsBoardStatus, AutodartsToolsConfig, AutodartsToolsMatchStatus, BoardStatus } from "@/utils/storage";
 import { scoreSmaller } from "@/entrypoints/match.content/scoreSmaller";
+import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/match.content/color-change";
+import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 
 let callerUI: any;
 let takeoutUI: any;
+let streamingModeUI: any;
 let matchReadyUnwatch: any;
 let throwsObserver: MutationObserver;
 let boardStatusObserver: MutationObserver;
@@ -18,7 +21,7 @@ export default defineContentScript({
   cssInjectionMode: "ui",
   async main(ctx: any) {
     matchReadyUnwatch = AutodartsToolsConfig.watch(async (config: IConfig) => {
-      if (config.url.match(/\/matches|boards\/[0-9a-fA-F]{8}\b-/)?.[0]) {
+      if (/\/matches\/|\/boards\//.test(config.url)) {
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
         await scoreSmaller();
@@ -29,6 +32,16 @@ export default defineContentScript({
         await throwsChange(); // init matchData
         startThrowsObserver();
         startBoardStatusObserver();
+
+        if (config.colors.enabled) {
+          await waitForElement("#ad-ext-player-display");
+          await colorChange();
+        }
+
+        if (config.streamingMode.enabled) {
+          const div = document.querySelector("autodarts-tools-streaming-mode");
+          if (!div) initStreamingMode(ctx).catch(console.error);
+        }
       } else {
         throwsObserver?.disconnect();
         boardStatusObserver?.disconnect();
@@ -36,6 +49,8 @@ export default defineContentScript({
         callerUI = null;
         takeoutUI?.remove();
         takeoutUI = null;
+
+        await onRemoveColorChange();
       }
     });
   },
@@ -79,6 +94,27 @@ async function initTakeout(ctx) {
     },
   });
   takeoutUI.mount();
+}
+
+async function initStreamingMode(ctx) {
+  await waitForElement("#ad-ext-player-display");
+  streamingModeUI = await createShadowRootUi(ctx, {
+    name: "autodarts-tools-streaming-mode",
+    position: "inline",
+    anchor: "#root",
+    onMount: (container: any) => {
+      const app = createApp(StreamingMode);
+      app.mount(container);
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        container.classList.add("dark");
+      }
+      return app;
+    },
+    onRemove: (app: any) => {
+      app?.unmount();
+    },
+  });
+  streamingModeUI.mount();
 }
 
 async function throwsChange() {
