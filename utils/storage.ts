@@ -3,7 +3,6 @@ import { storage } from "wxt/storage";
 import type { BoardStatus } from "@/utils/types";
 
 export interface IConfig {
-  url: string;
   discord: {
     enabled: boolean;
     url: string;
@@ -69,7 +68,6 @@ export interface IMatchStatus {
 export type TBoardStatus = BoardStatus | undefined;
 
 export const defaultConfig: IConfig = {
-  url: window.location.href,
   discord: {
     enabled: false,
     url: "",
@@ -149,5 +147,12 @@ export const AutodartsToolsBoardStatus: WxtStorageItem<TBoardStatus, any> = stor
   "local:boardstatus",
   {
     defaultValue: undefined,
+  },
+);
+
+export const AutodartsToolsUrlStatus: WxtStorageItem<string, any> = storage.defineItem(
+  "local:urlstatus",
+  {
+    defaultValue: window.location.href,
   },
 );

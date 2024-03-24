@@ -3,7 +3,12 @@ import { createApp } from "vue";
 import Takeout from "./Takeout.vue";
 import { waitForElement } from "@/utils";
 import type { IConfig, IMatchStatus } from "@/utils/storage";
-import { AutodartsToolsBoardStatus, AutodartsToolsConfig, AutodartsToolsMatchStatus } from "@/utils/storage";
+import {
+  AutodartsToolsBoardStatus,
+  AutodartsToolsConfig,
+  AutodartsToolsMatchStatus,
+  AutodartsToolsUrlStatus,
+} from "@/utils/storage";
 
 import { scoreSmaller } from "@/entrypoints/match.content/scoreSmaller";
 import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/match.content/color-change";
@@ -24,8 +29,9 @@ export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
   async main(ctx: any) {
-    matchReadyUnwatch = AutodartsToolsConfig.watch(async (config: IConfig) => {
-      if (/\/matches\/|\/boards\//.test(config.url)) {
+    matchReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
+      const config: IConfig = await AutodartsToolsConfig.getValue();
+      if (/\/matches\/|\/boards\//.test(url)) {
         await waitForElement("#ad-ext-turn");
         console.log("match ready");
 

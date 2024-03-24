@@ -2,7 +2,7 @@ import "~/assets/tailwind.css";
 import { createApp } from "vue";
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import type { IConfig } from "@/utils/storage";
-import { AutodartsToolsConfig } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsUrlStatus } from "@/utils/storage";
 import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
@@ -15,8 +15,9 @@ export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
   cssInjectionMode: "ui",
   async main(ctx: any) {
-    lobbyReadyUnwatch = AutodartsToolsConfig.watch(async (config: IConfig) => {
-      if (/\/lobbies\/(?!.*\/new\/)/.test(config.url)) {
+    lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
+      const config: IConfig = await AutodartsToolsConfig.getValue();
+      if (/\/lobbies\/(?!.*\/new\/)/.test(url)) {
         console.log("lobby ready");
         if (config.discord.enabled) {
           await waitForElementWithTextContent("h2", "Lobby");
