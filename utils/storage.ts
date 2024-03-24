@@ -12,11 +12,23 @@ export interface IConfig {
   };
   streamingMode: {
     enabled: boolean;
+    backgroundImage: boolean;
     chromaKeyColor: string;
+    image: string;
     throws: boolean;
     footerText: string;
     board: boolean;
     boardImage: boolean;
+    scoreBoardSettings: {
+      scale: number;
+      x: number;
+      y: number;
+    };
+    coordsSettings: {
+      scale: number;
+      x: number;
+      y: number;
+    };
   };
   colors: {
     enabled: boolean;
@@ -65,11 +77,23 @@ export const defaultConfig: IConfig = {
   },
   streamingMode: {
     enabled: false,
+    backgroundImage: false,
     chromaKeyColor: "#009933",
+    image: "",
     throws: false,
     footerText: "",
     board: false,
     boardImage: false,
+    scoreBoardSettings: {
+      scale: 1,
+      x: 0,
+      y: 0,
+    },
+    coordsSettings: {
+      scale: 1,
+      x: 0,
+      y: 0,
+    },
   },
   colors: {
     enabled: false,

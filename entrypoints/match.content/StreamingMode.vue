@@ -1,18 +1,102 @@
 <template>
   <div
-    @click="enabled = !enabled"
-    v-if="enabled"
+    v-if="enabled && config"
     class="fixed inset-0 z-[200] font-sans"
-    :style="{
-      backgroundColor: config.streamingMode.chromaKeyColor,
-    }"
   >
+    <div v-if="settings" class="absolute inset-0 z-10 flex items-center justify-center bg-black/70">
+      <OnClickOutside
+        @trigger="handleToggleSettings"
+        class="settings relative w-full max-w-sm overflow-hidden rounded-md bg-[#13212C]/80 p-4"
+      >
+        <div class="space-y-8">
+          <div v-if="config.streamingMode.board" class="space-y-2">
+            <p>Board Scale: ({{ 100 / 5 * coordsElementScale }} %)</p>
+            <SliderRoot
+              @update:model-value="handleSliderUpdate('coords', $event)"
+              class="relative flex h-5 w-full touch-none select-none items-center"
+              :max="5"
+              :min="0.5"
+              :step="0.1"
+              :default-value="[coordsElementScale]"
+            >
+              <SliderTrack class="relative h-[3px] grow rounded-full bg-white/30">
+                <SliderRange class="absolute h-full rounded-full bg-white" />
+              </SliderTrack>
+              <SliderThumb
+                class="block size-5 rounded-[10px] bg-white shadow-[0_2px_10px] focus:outline-none"
+                aria-label="Volume"
+              />
+            </SliderRoot>
+          </div>
+          <div class="space-y-2">
+            <p>Score Scale: ({{ 100 / 5 * scoreBoardScale }} %)</p>
+            <SliderRoot
+              @update:model-value="handleSliderUpdate('score', $event)"
+              class="relative flex h-5 w-full touch-none select-none items-center"
+              :max="5"
+              :min="0.5"
+              :step="0.1"
+              :default-value="[scoreBoardScale]"
+            >
+              <SliderTrack class="relative h-[3px] grow rounded-full bg-white/30">
+                <SliderRange class="absolute h-full rounded-full bg-white" />
+              </SliderTrack>
+              <SliderThumb
+                class="block size-5 rounded-[10px] bg-white shadow-[0_2px_10px] focus:outline-none"
+                aria-label="Volume"
+              />
+            </SliderRoot>
+          </div>
+          <div
+            @click="handleToggleSettings"
+            class="grid grid-cols-[25%_auto] gap-4"
+          >
+            <AppButton @click="handleResetSettings">
+              Reset
+            </AppButton>
+            <AppButton @click="handleCloseSettings">
+              Save
+            </AppButton>
+          </div>
+        </div>
+      </OnClickOutside>
+    </div>
+    <div
+      @click="enabled = !enabled"
+      class="absolute inset-0"
+      :style="{
+        backgroundColor: config.streamingMode.chromaKeyColor,
+        backgroundImage: config.streamingMode.backgroundImage ? `url(${config.streamingMode.image})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }"
+    />
     <div
       v-if="game?.players.length"
-      class="absolute left-0 top-0 size-[35vw]"
-      v-html="coords"
-    />
-    <div v-if="game?.players.length" class="absolute bottom-8 right-24 border-2 border-black bg-gray-800 text-2xl">
+      :key="`coords-${coordsElementScale}`"
+      ref="coordsElement"
+      class="absolute size-[35vw] origin-top-left overflow-hidden rounded-full"
+      :style="{
+        transform: `scale(${coordsElementScale})`,
+        left: `${coordsElementX}px`,
+        top: `${coordsElementY}px`,
+      }"
+    >
+      <div v-html="coords" />
+    </div>
+    <div
+      v-if="game?.players.length"
+      ref="scoreBoardElement"
+      :class="twMerge(
+        'fixed border-2 border-black bg-gray-800 text-2xl origin-top-left',
+        (scoreBoardElementX === 0 && scoreBoardElementY === 0) && 'bottom-8 right-24',
+      )"
+      :style="{
+        transform: `scale(${scoreBoardScale})`,
+        left: (scoreBoardElementX === 0 && scoreBoardElementY === 0) ? undefined : `${scoreBoardElementX}px`,
+        top: (scoreBoardElementX === 0 && scoreBoardElementY === 0) ? undefined : `${scoreBoardElementY}px`,
+      }"
+    >
       <div
         :class="twMerge(
           'grid grid-cols-[30rem_8rem_8rem]',
@@ -100,8 +184,18 @@
             </div>
           </div>
         </template>
-        <div class="grid-cols-3 px-4 py-2 text-lg">
-          {{ game.footer }}
+        <div
+          :class="twMerge(
+            'col-span-3 px-4 py-2 text-lg',
+            hasSets && 'col-span-4',
+          )"
+        >
+          <div class="grid grid-cols-[auto_2rem]">
+            <div>{{ game.footer }}</div>
+            <div @click="handleToggleSettings" class="flex cursor-pointer items-center justify-end opacity-20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20H4q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v5h-2V6H4v12h8zm-2.5-3.5v-9l7 4.5zm8.35 6.5l-.3-1.5q-.3-.125-.562-.262t-.538-.338l-1.45.45l-1-1.7l1.15-1q-.05-.35-.05-.65t.05-.65l-1.15-1l1-1.7l1.45.45q.275-.2.538-.337t.562-.263l.3-1.5h2l.3 1.5q.3.125.563.275t.537.375l1.45-.5l1 1.75l-1.15 1q.05.3.05.625t-.05.625l1.15 1l-1 1.7l-1.45-.45q-.275.2-.537.338t-.563.262l-.3 1.5zm1-3q.825 0 1.413-.587T20.85 18q0-.825-.587-1.412T18.85 16q-.825 0-1.412.588T16.85 18q0 .825.588 1.413T18.85 20" /></svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -111,8 +205,12 @@
 <script setup lang="ts">
 // https://cdn.discordapp.com/attachments/1204187269293019146/1214536247993962506/image.png?ex=65f97806&is=65e70306&hm=093003542526fd254295af85a5f7efc02f14390e1492567c0eec0928f41a49d7&
 import { twMerge } from "tailwind-merge";
+import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from "radix-vue";
+import type { Ref } from "vue";
+import { OnClickOutside } from "@vueuse/components";
 import { waitForElement } from "@/utils";
-import { AutodartsToolsConfig } from "@/utils/storage";
+import { AutodartsToolsConfig, type IConfig, defaultConfig } from "@/utils/storage";
+import AppButton from "@/components/AppButton.vue";
 
 interface Player {
   name?: string;
@@ -130,8 +228,24 @@ interface Throw {
 }
 
 const enabled = ref(false);
+const settings = ref(false);
 const getGameStatsInterval = ref();
 const streamModeButtonInterval = ref();
+
+const coordsElement = ref<HTMLElement | null>(null);
+const coordsElementScale = ref(1);
+const {
+  x: coordsElementX,
+  y: coordsElementY,
+} = useDraggable(coordsElement);
+
+const scoreBoardElement = ref<HTMLElement | null>(null);
+const scoreBoardScale = ref(1);
+const {
+  x: scoreBoardElementX,
+  y: scoreBoardElementY,
+} = useDraggable(scoreBoardElement);
+
 const game = reactive<{
   title: string;
   players: Player[];
@@ -144,12 +258,17 @@ const game = reactive<{
   throws: [],
 });
 
-const config = ref();
+const config: Ref<IConfig | null> = ref(null);
 const coords = ref("");
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
   try {
+    console.log(config.value.streamingMode);
+
+    coordsElementScale.value = config.value.streamingMode.coordsSettings?.scale || 1;
+    scoreBoardScale.value = config.value.streamingMode.scoreBoardSettings?.scale || 1;
+
     // @ts-expect-error
     enabled.value = window.ADT_STREAMING_MODE_ACTIVE || false;
 
@@ -157,13 +276,14 @@ onMounted(async () => {
 
     // enabled.value = true;
   } catch (e) {
-    // silence is golden
+    console.error("Autodarts Tools: Streaming Mode - error", e);
   }
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(async () => {
   clearInterval(getGameStatsInterval.value);
   clearInterval(streamModeButtonInterval.value);
+  await saveSettings();
 });
 
 watch(enabled, (value) => {
@@ -294,4 +414,69 @@ async function getGameStats() {
     console.error(e);
   }
 }
+
+function handleToggleSettings() {
+  settings.value = !settings.value;
+}
+
+async function handleCloseSettings() {
+  await saveSettings();
+  settings.value = false;
+}
+
+function handleSliderUpdate(type: "coords" | "score", value: any) {
+  switch (type) {
+    case "coords":
+      coordsElementScale.value = value[0];
+      break;
+    case "score":
+      scoreBoardScale.value = value[0];
+      break;
+  }
+}
+
+async function saveSettings() {
+  await AutodartsToolsConfig.setValue({
+    ...JSON.parse(JSON.stringify(defaultConfig)),
+    ...JSON.parse(JSON.stringify(config.value)),
+    streamingMode: {
+      ...config.value!.streamingMode,
+      coordsSettings: {
+        scale: coordsElementScale.value,
+        x: coordsElementX.value,
+        y: coordsElementY.value,
+      },
+      scoreBoardSettings: {
+        scale: scoreBoardScale.value,
+        x: scoreBoardElementX.value,
+        y: scoreBoardElementY.value,
+      },
+    },
+  });
+
+  const test = await AutodartsToolsConfig.getValue();
+  console.log(test);
+}
+
+async function handleResetSettings() {
+  coordsElementScale.value = 1;
+  coordsElementY.value = 0;
+  coordsElementX.value = 0;
+  scoreBoardScale.value = 1;
+  scoreBoardElementY.value = 0;
+  scoreBoardElementX.value = 0;
+
+  await saveSettings();
+}
 </script>
+
+<style scoped>
+.settings::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(217deg, rgba(32, 48, 81, 0.2), rgba(32, 48, 81, 0) 70.71%) fixed, linear-gradient(127deg, rgba(29, 113, 184, 0.2), rgba(29, 113, 184, 0) 70.71%), linear-gradient(336deg, rgba(46, 235, 248, 0.2), rgba(46, 235, 248, 0) 70.71%);
+  z-index: -1;
+  pointer-events: none;
+}
+</style>

@@ -22,8 +22,11 @@
   "dependencies": {
     "@floating-ui/dom": "^1.6.1",
     "@headlessui/vue": "^1.7.19",
-    "@vueuse/core": "^10.7.2",
+    "@vueuse/components": "^10.9.0",
+    "@vueuse/core": "^10.9.0",
+    "lodash": "^4.17.21",
     "mitt": "^3.0.1",
+    "radix-vue": "^1.5.3",
     "vue": "^3.4.13",
     "vue-i18n": "^9.9.0"
   },
@@ -33,6 +36,7 @@
     "@iconify/tailwind": "^0.1.4",
     "@intlify/unplugin-vue-i18n": "^2.0.0",
     "@types/eslint": "^8.56.5",
+    "@types/lodash": "^4.17.0",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-vue": "^4.6.2",
