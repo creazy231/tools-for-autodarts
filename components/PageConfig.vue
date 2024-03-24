@@ -52,12 +52,51 @@
             <AppToggle v-model="config.streamingMode.enabled" />
           </div>
           <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <AppToggle v-model="config.streamingMode.backgroundImage" text-on="IMG" text-off="CK" />
+            <p>Toggles the Background between Chrome Key and Image</p>
+          </div>
+          <div v-if="!config.streamingMode.backgroundImage" class="grid grid-cols-[5rem_auto] items-center gap-4">
             <input
               v-model="config.streamingMode.chromaKeyColor"
               type="color"
               class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
             >
             <p>Chroma Key Color</p>
+          </div>
+          <div v-else class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <div
+              @click="handleStreamingModeBackgroundFileSelect"
+              class="aspect-square w-full cursor-pointer overflow-hidden rounded-md border border-dashed border-white/15"
+            >
+              <img
+                v-if="config.streamingMode.image"
+                :src="config.streamingMode.image"
+                class="size-full object-cover"
+              >
+              <div class="flex size-full items-center justify-center opacity-15">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h9v2H5v14h14v-9h2v9q0 .825-.587 1.413T19 21zM17 9V7h-2V5h2V3h2v2h2v2h-2v2zM6 17h12l-3.75-5l-3 4L9 13zM5 5v14z" /></svg>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <AppButton
+                @click="handleStreamingModeBackgroundFileSelect"
+                auto
+              >
+                Change Image
+              </AppButton>
+              <AppButton
+                @click="handleStreamingModeBackgroundReset"
+                auto
+              >
+                Reset
+              </AppButton>
+            </div>
+            <input
+              @change="handleStreamingModeBackgroundFileSelected"
+              ref="streamingModeBackgroundFileSelect"
+              class="hidden"
+              type="file"
+            >
           </div>
           <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
             <AppToggle v-model="config.streamingMode.throws" />
@@ -192,8 +231,10 @@
 import AppToggle from "@/components/AppToggle.vue";
 import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
+import AppButton from "@/components/AppButton.vue";
 
 const config = ref<IConfig>();
+const streamingModeBackgroundFileSelect = ref() as Ref<HTMLInputElement>;
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
@@ -205,6 +246,28 @@ watch(config, async () => {
     ...JSON.parse(JSON.stringify(config.value)),
   });
 }, { deep: true });
+
+function handleStreamingModeBackgroundFileSelect() {
+  streamingModeBackgroundFileSelect.value.click();
+}
+
+function handleStreamingModeBackgroundFileSelected() {
+  const file = streamingModeBackgroundFileSelect.value.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    config.value!.streamingMode.image = reader.result as string;
+    console.log(reader.result);
+  };
+  reader.readAsDataURL(file);
+
+  streamingModeBackgroundFileSelect.value.value = "";
+}
+
+function handleStreamingModeBackgroundReset() {
+  config.value!.streamingMode.image = "";
+}
 </script>
 
 <style>
