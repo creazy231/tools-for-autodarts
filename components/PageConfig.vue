@@ -215,8 +215,8 @@
                 <p>Display the Board</p>
               </div>
               <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
-                <AppToggle v-model="config.streamingMode.boardImage" text-on="IMG" text-off="SVG" />
-                <p>Toggles the Board between Image and SVG mode</p>
+                <AppToggle v-model="config.streamingMode.boardImage" text-on="LIVE" text-off="IMG" />
+                <p>Toggles the Board between Live and Image mode</p>
               </div>
               <input
                 v-model="config.streamingMode.footerText"
