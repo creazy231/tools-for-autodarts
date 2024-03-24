@@ -166,70 +166,72 @@
             <div class="grid grid-cols-[5rem_auto] items-center gap-4">
               <AppToggle v-model="config.streamingMode.enabled" />
             </div>
-            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.backgroundImage" text-on="IMG" text-off="CK" />
-              <p>Toggles the Background between Chrome Key and Image</p>
-            </div>
-            <div v-if="!config.streamingMode.backgroundImage" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <input
-                v-model="config.streamingMode.chromaKeyColor"
-                type="color"
-                class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
-              >
-              <p>Chroma Key Color</p>
-            </div>
-            <div v-else class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <div
-                @click="handleStreamingModeBackgroundFileSelect"
-                class="aspect-square w-full cursor-pointer overflow-hidden rounded-md border border-dashed border-white/15"
-              >
-                <img
-                  v-if="config.streamingMode.image"
-                  :src="config.streamingMode.image"
-                  class="size-full object-cover"
-                >
-                <div class="flex size-full items-center justify-center opacity-15">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h9v2H5v14h14v-9h2v9q0 .825-.587 1.413T19 21zM17 9V7h-2V5h2V3h2v2h2v2h-2v2zM6 17h12l-3.75-5l-3 4L9 13zM5 5v14z" /></svg>
-                </div>
+            <template v-if="config.streamingMode.enabled">
+              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppToggle v-model="config.streamingMode.backgroundImage" text-on="IMG" text-off="CK" />
+                <p>Toggles the Background between Chrome Key and Image</p>
               </div>
-              <div class="flex items-center gap-4">
-                <AppButton
+              <div v-if="!config.streamingMode.backgroundImage" class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <input
+                  v-model="config.streamingMode.chromaKeyColor"
+                  type="color"
+                  class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
+                >
+                <p>Chroma Key Color</p>
+              </div>
+              <div v-else class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <div
                   @click="handleStreamingModeBackgroundFileSelect"
-                  auto
+                  class="aspect-square w-full cursor-pointer overflow-hidden rounded-md border border-dashed border-white/15"
                 >
-                  Change Image
-                </AppButton>
-                <AppButton
-                  @click="handleStreamingModeBackgroundReset"
-                  auto
+                  <img
+                    v-if="config.streamingMode.image"
+                    :src="config.streamingMode.image"
+                    class="size-full object-cover"
+                  >
+                  <div class="flex size-full items-center justify-center opacity-15">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h9v2H5v14h14v-9h2v9q0 .825-.587 1.413T19 21zM17 9V7h-2V5h2V3h2v2h2v2h-2v2zM6 17h12l-3.75-5l-3 4L9 13zM5 5v14z" /></svg>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <AppButton
+                    @click="handleStreamingModeBackgroundFileSelect"
+                    auto
+                  >
+                    Change Image
+                  </AppButton>
+                  <AppButton
+                    @click="handleStreamingModeBackgroundReset"
+                    auto
+                  >
+                    Reset
+                  </AppButton>
+                </div>
+                <input
+                  @change="handleStreamingModeBackgroundFileSelected"
+                  ref="streamingModeBackgroundFileSelect"
+                  class="hidden"
+                  type="file"
                 >
-                  Reset
-                </AppButton>
+              </div>
+              <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppToggle v-model="config.streamingMode.throws" />
+                <p>Display Throws</p>
+              </div>
+              <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppToggle v-model="config.streamingMode.board" />
+                <p>Display the Board</p>
+              </div>
+              <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppToggle v-model="config.streamingMode.boardImage" text-on="LIVE" text-off="IMG" />
+                <p>Toggles the Board between Live and Image mode</p>
               </div>
               <input
-                @change="handleStreamingModeBackgroundFileSelected"
-                ref="streamingModeBackgroundFileSelect"
-                class="hidden"
-                type="file"
+                v-model="config.streamingMode.footerText"
+                placeholder="Bottom text of the streaming overlay"
+                class="col-span-2 w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
               >
-            </div>
-            <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.throws" />
-              <p>Display Throws</p>
-            </div>
-            <div v-if="config.streamingMode.enabled" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.board" />
-              <p>Display the Board</p>
-            </div>
-            <div v-if="config.streamingMode.enabled && config.streamingMode.board" class="grid grid-cols-[5rem_auto] items-center gap-4">
-              <AppToggle v-model="config.streamingMode.boardImage" text-on="IMG" text-off="SVG" />
-              <p>Toggles the Board between Image and SVG mode</p>
-            </div>
-            <input
-              v-model="config.streamingMode.footerText"
-              placeholder="Bottom text of the streaming overlay"
-              class="col-span-2 w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
-            >
+            </template>
           </div>
         </div>
       </template>
