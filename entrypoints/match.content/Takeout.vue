@@ -28,8 +28,9 @@
 <script setup lang="ts">
 import { twMerge } from "tailwind-merge";
 import "./styles.css";
-import { AutodartsToolsBoardStatus, AutodartsToolsConfig, BoardStatus, type TBoardStatus } from "@/utils/storage";
+import { AutodartsToolsBoardStatus, AutodartsToolsConfig, type TBoardStatus } from "@/utils/storage";
 import { getResetBtn } from "@/utils/getElements";
+import { BoardStatus } from "@/utils/types";
 
 const show = ref<boolean>(false);
 

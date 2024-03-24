@@ -13,7 +13,7 @@ export interface ICallerConfig {
   caller: TCaller[];
 }
 const privateCaller = import.meta.env.DEV && import.meta.env.VITE_PRIVATE_CALLER ? JSON.parse(import.meta.env.VITE_PRIVATE_CALLER).privateCaller || [] : [];
-console.log("privateCaller", privateCaller);
+// console.log("privateCaller", privateCaller);
 export const defaultCallerConfig: ICallerConfig = {
   caller: [ ...[
     {
