@@ -1,5 +1,6 @@
 import type { WxtStorageItem } from "wxt/storage";
 import { storage } from "wxt/storage";
+import type { BoardStatus } from "@/utils/types";
 
 export interface IConfig {
   url: string;
@@ -49,19 +50,20 @@ export interface IConfig {
   shufflePlayers: {
     enabled: boolean;
   };
+  caller: {
+    enabled: boolean;
+  };
+  // TODO: implement to PageConfig
+  soundAfterBotThrow: {
+    enabled: boolean;
+  };
 }
 
 export interface IMatchStatus {
   throws: string[];
+  turnPoints: string | null ;
   isInEditMode: boolean;
-}
-
-export enum BoardStatus {
-  TAKEOUT = "✊",
-  TAKEOUT_READY = "🖐",
-  THROW = "🎯",
-  STOPPED = "🟡",
-  STARTING = "⌛️",
+  hasWinner: boolean;
 }
 
 export type TBoardStatus = BoardStatus | undefined;
@@ -114,6 +116,12 @@ export const defaultConfig: IConfig = {
   shufflePlayers: {
     enabled: false,
   },
+  caller: {
+    enabled: true,
+  },
+  soundAfterBotThrow: {
+    enabled: true,
+  },
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
@@ -125,7 +133,9 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
 
 export const defaultMatchStatus: IMatchStatus = {
   throws: [],
+  turnPoints: null,
   isInEditMode: false,
+  hasWinner: false,
 };
 
 export const AutodartsToolsMatchStatus: WxtStorageItem<IMatchStatus, any> = storage.defineItem(

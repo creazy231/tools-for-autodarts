@@ -1,5 +1,5 @@
 <template>
-  <div v-if="configVisible" id="autodarts-tools-config" class="mx-auto w-full max-w-[1366px] p-4">
+  <div v-if="configVisible" id="autodarts-tools-config" class="mx-auto w-full max-w-[1366px] p-4 pr-8 lg:pr-4">
     <PageConfig />
   </div>
 </template>

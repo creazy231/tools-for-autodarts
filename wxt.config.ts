@@ -22,6 +22,9 @@ export default defineConfig({
     name: "Autodarts Tools",
     description: "Autodarts Tools enhances the gaming experience on autodarts.io",
   },
+  dev: {
+    reloadCommand: "Alt+T",
+  },
   vite: () => ({
     resolve: {
       alias: {
