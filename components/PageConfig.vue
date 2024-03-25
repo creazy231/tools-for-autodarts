@@ -1,9 +1,17 @@
 <template>
   <div class="mb-16 space-y-8">
     <div class="space-y-4">
-      <h1 class="text-3xl font-bold">
-        Autodarts Tools
-      </h1>
+      <div class="flex items-center">
+        <AppButton
+          @click="goBack()"
+          class="mr-4 h-9 w-8 rounded-md border border-white/10 bg-transparent p-0 pt-[0.2rem] text-xl hover:bg-white/10"
+        >
+          <span class="icon-[mdi-light--chevron-left]" />
+        </AppButton>
+        <h1 class="text-3xl font-bold">
+          Autodarts Tools
+        </h1>
+      </div>
 
       <template v-if="config">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -247,6 +255,11 @@ function setActive(index: number) {
   callerConfig?.value?.caller.forEach((caller, i) => {
     caller.isActive = i === index;
   });
+}
+
+function goBack() {
+  window.history.back();
+  window.history.back();
 }
 
 onMounted(async () => {

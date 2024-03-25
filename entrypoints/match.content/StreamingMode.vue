@@ -264,7 +264,7 @@ const coords = ref("");
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
   try {
-    console.log(config.value.streamingMode);
+    // console.log(config.value.streamingMode);
 
     coordsElementScale.value = config.value.streamingMode.coordsSettings?.scale || 1;
     scoreBoardScale.value = config.value.streamingMode.scoreBoardSettings?.scale || 1;
