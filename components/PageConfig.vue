@@ -32,6 +32,12 @@
                 class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
               >
             </div>
+            <template v-if="config.discord.enabled">
+              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppToggle v-model="config.discord.manually" text-on="MAN" text-off="AUT" />
+                <p>Toggles between sending the invitation link automatically or manually.</p>
+              </div>
+            </template>
           </div>
 
           <div class="space-y-4 rounded border border-white/10 p-4">

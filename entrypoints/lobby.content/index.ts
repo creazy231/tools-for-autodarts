@@ -18,18 +18,18 @@ export default defineContentScript({
     lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
       const config: IConfig = await AutodartsToolsConfig.getValue();
       if (/\/lobbies\/(?!.*\/new\/)/.test(url)) {
-        console.log("lobby ready");
+        console.log("Autodarts Tools: Lobby Ready");
         if (config.discord.enabled) {
           await waitForElementWithTextContent("h2", "Lobby");
-          await discordWebhooks();
+          await initScript(discordWebhooks, url);
         }
         if (config.autoStart.enabled) {
           await waitForElementWithTextContent("h2", "Lobby");
-          await autoStart();
+          await initScript(autoStart, url);
         }
         if (config.shufflePlayers.enabled) {
           await waitForElementWithTextContent("h2", "Lobby");
-          await shufflePlayers();
+          await initScript(shufflePlayers, url);
         }
         if (config.recentLocalPlayers.enabled) {
           const div = document.querySelector("autodarts-tools-recent-local-players");
@@ -42,6 +42,11 @@ export default defineContentScript({
     });
   },
 });
+
+async function initScript(fn: any, url: string) {
+  if (window.location.href !== url) return;
+  await fn();
+}
 
 async function initRecentLocalPlayers(ctx: any) {
   const lobbyUserInput = await waitForElement("input[placeholder=\"Enter name for local player\"]");
