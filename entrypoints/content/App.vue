@@ -48,14 +48,11 @@ watch(configVisible, async () => {
 });
 
 onMounted(async () => {
-  await nextTick();
+  const url = await AutodartsToolsUrlStatus.getValue();
   currentUrl.value = window.location.href;
-  isConfigPage.value = window.location.href.includes("/tools");
+  isConfigPage.value = url.includes("/tools");
 
   if (isConfigPage.value) {
-    const settingsButton = document.querySelector("a[href='/settings']") as HTMLAnchorElement | null;
-    settingsButton?.click();
-
     window.history.pushState(null, "", "/tools");
 
     await nextTick();
@@ -109,7 +106,7 @@ function startObserver() {
     console.error("Target node not found");
     return;
   }
-  observer = new MutationObserver((mutationsList, observer2) => {
+  observer = new MutationObserver((mutationsList) => {
     for (const mutation of mutationsList) {
       if (mutation.type === "childList") {
         if (window.location.href !== currentUrl.value) {
