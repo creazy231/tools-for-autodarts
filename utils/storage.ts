@@ -5,6 +5,7 @@ import type { BoardStatus } from "@/utils/types";
 export interface IConfig {
   discord: {
     enabled: boolean;
+    manually: boolean;
     url: string;
   };
   autoStart: {
@@ -70,6 +71,7 @@ export type TBoardStatus = BoardStatus | undefined;
 export const defaultConfig: IConfig = {
   discord: {
     enabled: false,
+    manually: false,
     url: "",
   },
   autoStart: {
