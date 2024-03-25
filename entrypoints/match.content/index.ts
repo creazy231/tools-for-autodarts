@@ -33,7 +33,7 @@ export default defineContentScript({
       const config: IConfig = await AutodartsToolsConfig.getValue();
       if (/\/matches\/|\/boards\//.test(url)) {
         await waitForElement("#ad-ext-turn");
-        console.log("match ready");
+        console.log("Autodarts Tools: Match Ready");
 
         const takeoutDiv = document.querySelector("autodarts-tools-takeout");
         if (!takeoutDiv) initTakeout(ctx).catch(console.error);
