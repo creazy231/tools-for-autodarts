@@ -8,6 +8,7 @@ export default defineContentScript({
   cssInjectionMode: "ui",
   async main(ctx) {
     if (window.location.href.includes("/tools")) {
+      document.querySelector("#root")?.remove();
       window.location.href = "/settings";
     } else {
       await waitForElement("#root > div:nth-of-type(1)");
