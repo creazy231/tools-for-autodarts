@@ -5,6 +5,8 @@
     :class="twMerge(
       'group relative flex w-full items-center rounded-md px-5 py-1 outline-none transition-all ease-in-out bg-white/15 font-bold text-white enabled:hover:bg-white/20',
       (disabled && !loading) && 'cursor-not-allowed opacity-50',
+      (type === 'danger') && 'bg-red-300 enabled:hover:bg-red-400 text-gray-900',
+      (type === 'success') && 'bg-green-300 enabled:hover:bg-green-400 text-gray-900',
       auto && 'w-auto',
       $attrs.class?.toString(),
     )"
@@ -47,9 +49,11 @@ const props = withDefaults(defineProps<{
   disabled?: boolean;
   auto?: boolean;
   centered?: boolean;
+  type?: "default" | "danger" | "success";
 }>(), {
   size: "md",
   centered: true,
+  type: "default",
 });
 
 const emit = defineEmits([ "click" ]);
