@@ -67,7 +67,7 @@ export interface IConfig {
 
 export interface IMatchStatus {
   throws: string[];
-  turnPoints: string | null ;
+  turnPoints?: string ;
   isInEditMode: boolean;
   hasWinner: boolean;
 }
@@ -143,7 +143,7 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
 
 export const defaultMatchStatus: IMatchStatus = {
   throws: [],
-  turnPoints: null,
+  turnPoints: undefined,
   isInEditMode: false,
   hasWinner: false,
 };

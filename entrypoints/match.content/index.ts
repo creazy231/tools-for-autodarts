@@ -8,17 +8,19 @@ import {
   AutodartsToolsConfig,
   AutodartsToolsMatchStatus,
   AutodartsToolsUrlStatus,
+  defaultMatchStatus,
 } from "@/utils/storage";
 
 import { scoreSmaller } from "@/entrypoints/match.content/scoreSmaller";
 import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/match.content/color-change";
 import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 
-import { caller } from "@/entrypoints/match.content/caller";
+import { sounds } from "@/entrypoints/match.content/sounds";
 import { getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
 import { isBullOff, isX01 } from "@/utils/helpers";
 import SoundsStart from "@/entrypoints/match.content/SoundsStart.vue";
+import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -89,6 +91,7 @@ async function initMatch() {
   startBoardStatusObserver();
 
   const config = await AutodartsToolsConfig.getValue();
+  await AutodartsToolsMatchStatus.setValue(defaultMatchStatus);
 
   if (config.colors.enabled) {
     await colorChange();
@@ -139,14 +142,13 @@ async function initSoundsstart(ctx) {
 }
 
 async function throwsChange() {
-  // console.log("throwsChange");
-
-  await scoreSmaller();
-  await caller();
+  const hasWinner = document.querySelector(".ad-ext-player-winner");
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
-  const hasWinner = document.querySelector(".ad-ext-player-winner");
+
+  const turnContainerEl = document.getElementById("ad-ext-turn");
+  const throws = [ ...turnContainerEl?.querySelectorAll(".ad-ext-turn-throw") as NodeListOf<HTMLElement> ].map(el => el.innerText);
 
   if (isBullOff() && hasWinner) {
     const bullOffInterval = setInterval(() => {
@@ -161,13 +163,15 @@ async function throwsChange() {
 
   await AutodartsToolsMatchStatus.setValue({
     ...matchStatus,
-    // throws: [
-    //   ...matchData.throws,
-    // ],
-    turnPoints: turnPoints || null,
+    throws,
+    turnPoints,
     isInEditMode: !!editPlayerThrowActive,
     hasWinner: !!hasWinner,
   });
+
+  await scoreSmaller();
+  await sounds();
+  hasWinner && (await soundsWinner());
 }
 
 function startThrowsObserver() {
@@ -177,7 +181,10 @@ function startThrowsObserver() {
     return;
   }
   throwsObserver = new MutationObserver((m) => {
-    if (m[0].attributeName === "class") throwsChange().catch(console.error);
+    if (m[0].attributeName === "class") {
+      // timeout to get correct values after edit
+      setTimeout(() => throwsChange().catch(console.error), 500);
+    }
   });
   throwsObserver.observe(targetNode, { childList: false, subtree: true, attributes: true });
 }

@@ -1,8 +1,12 @@
 import { soundEffect1, soundEffect2, soundEffect3 } from "@/utils/helpers";
 
+soundEffect1.autoplay = true;
+soundEffect2.autoplay = true;
+soundEffect3.autoplay = true;
+
 export function playSound1(fileName) {
   if (!fileName) return;
-  console.log("fileName1", fileName);
+  // console.log("fileName1", fileName);
   soundEffect1.src = fileName;
 }
 

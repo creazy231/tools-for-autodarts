@@ -3,6 +3,7 @@ import { storage } from "wxt/storage";
 
 export interface ISoundsConfig {
   bust: string;
+  T: string;
   T15: string;
   T16: string;
   T17: string;
@@ -13,11 +14,14 @@ export interface ISoundsConfig {
   miss: string[];
   bot: string;
   botOutside: string;
+  cricketHit: string;
+  cricketMiss: string;
   winner: { name: string; url: string }[];
 }
 
 export const defaultSoundsConfig: ISoundsConfig = {
   bust: "https://www.myinstants.com/media/sounds/super-mario-dies.mp3",
+  T: "https://autodarts-plus.x10.mx/beep_1.mp3",
   T15: "https://autodarts-plus.x10.mx/beep_1.mp3",
   T16: "https://autodarts-plus.x10.mx/beep_1.mp3",
   T17: "https://autodarts-plus.x10.mx/beep_2_17.wav",
@@ -32,10 +36,10 @@ export const defaultSoundsConfig: ISoundsConfig = {
   ],
   bot: "https://autodarts-plus.x10.mx/sound_chopping-wood.mp3",
   botOutside: "https://autodarts-plus.x10.mx/sound_wood-block.mp3",
+  cricketHit: "https://autodarts-plus.x10.mx/bonus-points.mp3",
+  cricketMiss: "https://autodarts-plus.x10.mx/sound_double_windart.wav",
   winner: [
-    { name: "Fallback", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp3" },
-    { name: "sebudde", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp3" },
-    { name: "jane", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp3" },
+    { name: "Fallback", url: "" },
   ],
 };
 

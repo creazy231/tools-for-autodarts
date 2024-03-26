@@ -42,7 +42,6 @@ onMounted(async () => {
 });
 
 async function checkStatus() {
-  console.log("checkStsus");
   show.value = !await AutodartsToolsSoundAutoplayStatus.getValue();
 }
 
