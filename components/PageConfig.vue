@@ -21,7 +21,10 @@
                 Sounds
               </h2>
             </div>
-            <div class="grid gap-4">
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.sounds.enabled" />
+            </div>
+            <div v-if="config.sounds.enabled && soundsConfig" class="grid gap-4">
               <div v-for="tripleCount in tripleCountArr" :key="tripleCount" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
                 <div>T{{ tripleCount }}</div>
                 <input
@@ -100,7 +103,7 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div>
+              <div class="mt-1.5">
                 <span class="font-semibold">
                   Miss sounds
                 </span>
@@ -134,7 +137,7 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div>
+              <div class="mt-1.5">
                 <span class="font-semibold">Bot throw sound</span>
               </div>
               <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
@@ -189,7 +192,7 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div>
+              <div class="mt-1.5">
                 <span class="font-semibold">Winner sounds</span>
               </div>
               <div v-for="(_, index) in soundsConfig.winner.slice(1)" :key="index" class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px] lg:grid-rows-1">

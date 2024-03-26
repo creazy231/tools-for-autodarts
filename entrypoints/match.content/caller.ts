@@ -11,7 +11,7 @@ export async function caller() {
         `);
 
   const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled;
-  const soundAfterBotThrow = (await AutodartsToolsConfig.getValue()).soundAfterBotThrow.enabled;
+  const soundAfterBotThrow = true;
   const callerArr = (await AutodartsToolsCallerConfig.getValue()).caller;
   const callerActive = (await AutodartsToolsCallerConfig.getValue()).caller.filter(caller => caller.isActive)[0];
 

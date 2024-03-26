@@ -53,16 +53,15 @@ export interface IConfig {
   caller: {
     enabled: boolean;
   };
+  sounds: {
+    enabled: boolean;
+  };
   externalBoards: {
     enabled: boolean;
     boards: {
       id: string;
       name: string;
     }[];
-  };
-  // TODO: implement to PageConfig
-  soundAfterBotThrow: {
-    enabled: boolean;
   };
 }
 
@@ -126,12 +125,12 @@ export const defaultConfig: IConfig = {
   caller: {
     enabled: true,
   },
+  sounds: {
+    enabled: true,
+  },
   externalBoards: {
     enabled: false,
     boards: [],
-  },
-  soundAfterBotThrow: {
-    enabled: true,
   },
 };
 
