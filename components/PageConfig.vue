@@ -101,7 +101,7 @@
                 </button>
               </div>
               <div v-for="(_, index) in soundsConfig.miss" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
-                <div>miss {{ index + 1 }}</div>
+                <div>Miss {{ index + 1 }}</div>
                 <input
                   v-model="soundsConfig.miss[index]"
                   type="text"
@@ -126,6 +126,60 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+              <div>
+                <span>Winner sounds</span>
+              </div>
+              <div v-for="(_, index) in soundsConfig.winner.slice(1)" :key="index" class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px] lg:grid-rows-1">
+                <input
+                  v-model="soundsConfig.winner[index + 1].name"
+                  placeholder="Player name"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <input
+                  v-model="soundsConfig.winner[index + 1].url"
+                  placeholder="URL of sound file"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="playSound1(soundsConfig.winner[index + 1].url)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <div />
+                <button
+                  @click="soundsConfig.winner.splice(index + 1, 1)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
+              <div class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px] lg:grid-rows-1">
+                <div>Fallback</div>
+                <input
+                  v-model="soundsConfig.winner[0].url"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="playSound1(soundsConfig.winner[0].url)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <div />
+                <div />
+              </div>
+              <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
+                <button
+                  @click="soundsConfig.winner.push({ name: '', url: '' })"
+                  class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
+                >
+                  <span class="icon-[mdi-light--plus]" />
+                </button>
+              </div>
             </div>
           </div>
           <div class="col-span-2 space-y-4 rounded border border-white/10 p-4">
@@ -142,7 +196,7 @@
             </div>
             <div v-if="config.caller.enabled && callerConfig">
               <div class="grid gap-4">
-                <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_4fr_2fr_1fr_50px_50px] lg:grid-rows-1">
+                <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_5fr_1fr_1fr_50px_50px] lg:grid-rows-1">
                   <div>Caller {{ index + 1 }}</div>
                   <input
                     v-model="callerConfig.caller[index].name"
@@ -154,11 +208,9 @@
                     type="text"
                     class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                   >
-                  <input
-                    v-model="callerConfig.caller[index].folder"
-                    type="text"
-                    class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
-                  >
+                  <div>
+                    <span>[filename]</span>
+                  </div>
                   <input
                     v-model="callerConfig.caller[index].fileExt"
                     type="text"
@@ -179,13 +231,17 @@
                   </button>
                 </div>
 
-                <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
+                <div class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_5fr_1fr_1fr_50px_50px] lg:grid-rows-1">
                   <button
-                    @click="callerConfig.caller.push({ url: '', folder: '' })"
+                    @click="callerConfig.caller.push({ url: '' })"
                     class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
                   >
                     <span class="icon-[mdi-light--plus]" />
                   </button>
+                  <div />
+                  <div class="col-span-5 text-white/40">
+                    [filename] => 0-180, 'gameshot', 'gameshot and the match'
+                  </div>
                 </div>
               </div>
             </div>

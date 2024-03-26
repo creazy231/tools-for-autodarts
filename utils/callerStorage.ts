@@ -3,7 +3,6 @@ import { storage } from "wxt/storage";
 
 export interface TCaller {
   name?: string;
-  folder: string;
   url: string;
   fileExt?: string;
   isActive?: boolean;
@@ -18,8 +17,7 @@ export const defaultCallerConfig: ICallerConfig = {
   caller: [ ...[
     {
       name: "Male eng",
-      folder: "1_male_eng",
-      url: "https://autodarts.x10.mx",
+      url: "https://autodarts.x10.mx/1_male_eng",
       fileExt: ".mp3",
       isActive: true,
     },

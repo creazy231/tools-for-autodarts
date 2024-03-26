@@ -11,6 +11,7 @@ export interface ISoundsConfig {
   T20: string;
   bull: string;
   miss: string[];
+  winner: { name: string; url: string }[];
 }
 
 export const defaultSoundsConfig: ISoundsConfig = {
@@ -26,6 +27,11 @@ export const defaultSoundsConfig: ISoundsConfig = {
     "https://autodarts-plus.x10.mx/miss_1.mp3",
     "https://autodarts-plus.x10.mx/miss_2.mp3",
     "https://autodarts-plus.x10.mx/miss_3.mp3",
+  ],
+  winner: [
+    { name: "Fallback", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp31" },
+    { name: "sebudde", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp32" },
+    { name: "jane", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp33" },
   ],
 };
 
