@@ -19,12 +19,10 @@ import { sounds } from "@/entrypoints/match.content/sounds";
 import { getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
 import { isBullOff, isX01 } from "@/utils/helpers";
-import SoundsStart from "@/entrypoints/match.content/SoundsStart.vue";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 
 let takeoutUI: any;
 let streamingModeUI: any;
-let soundsstartUI: any;
 let matchReadyUnwatch: any;
 let throwsObserver: MutationObserver;
 let boardStatusObserver: MutationObserver;
@@ -47,19 +45,12 @@ export default defineContentScript({
           if (!div) initStreamingMode(ctx).catch(console.error);
         }
 
-        if (config.sounds.enabled || config.caller.enabled) {
-          const div = document.querySelector("autodarts-tools-soundsstart");
-          if (!div) initSoundsstart(ctx).catch(console.error);
-        }
-
         initMatch().catch(console.error);
       } else {
         throwsObserver?.disconnect();
         boardStatusObserver?.disconnect();
         takeoutUI?.remove();
         takeoutUI = null;
-        soundsstartUI?.remove();
-        soundsstartUI = null;
         await onRemoveColorChange();
       }
     });
@@ -119,26 +110,6 @@ async function initStreamingMode(ctx) {
     },
   });
   streamingModeUI.mount();
-}
-
-async function initSoundsstart(ctx) {
-  soundsstartUI = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-soundsstart",
-    position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
-    onMount: (container) => {
-      const soundsstart = createApp(SoundsStart);
-      soundsstart.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
-      return soundsstart;
-    },
-    onRemove: (soundsstart) => {
-      soundsstart?.unmount();
-    },
-  });
-  soundsstartUI.mount();
 }
 
 async function throwsChange() {

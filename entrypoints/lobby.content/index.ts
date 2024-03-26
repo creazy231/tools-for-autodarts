@@ -7,7 +7,6 @@ import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
 import RecentLocalPlayers from "@/entrypoints/lobby.content/RecentLocalPlayers.vue";
-import { allowAudioAutoPlay } from "@/utils/helpers";
 
 let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
@@ -20,13 +19,6 @@ export default defineContentScript({
       const config: IConfig = await AutodartsToolsConfig.getValue();
       if (/\/lobbies\/(?!.*\/new\/)/.test(url)) {
         console.log("Autodarts Tools: Lobby Ready");
-
-        if (config.sounds.enabled || config.caller.enabled) {
-          const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
-          buttonsContainer.firstChild?.addEventListener("click", () => {
-            allowAudioAutoPlay();
-          });
-        }
 
         if (config.discord.enabled) {
           await waitForElementWithTextContent("h2", "Lobby");

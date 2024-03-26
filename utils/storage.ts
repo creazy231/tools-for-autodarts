@@ -123,7 +123,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
   },
   caller: {
-    enabled: true,
+    enabled: false,
   },
   sounds: {
     enabled: true,
