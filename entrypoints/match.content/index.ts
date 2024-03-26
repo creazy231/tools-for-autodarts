@@ -85,7 +85,6 @@ async function initTakeout(ctx) {
 }
 
 async function initMatch() {
-  console.log("init match");
   startThrowsObserver();
   startBoardStatusObserver();
 
