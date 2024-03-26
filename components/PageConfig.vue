@@ -101,12 +101,12 @@
                 </button>
               </div>
               <div>
-                <div class="font-semibold">
+                <span class="font-semibold">
                   Miss sounds
-                </div>
-                <div class="text-white/40">
-                  played randomly
-                </div>
+                </span>
+                <span class="text-white/40">
+                  &nbsp;(random)
+                </span>
               </div>
               <div v-for="(_, index) in soundsConfig.miss" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
                 <div>Miss {{ index + 1 }}</div>
