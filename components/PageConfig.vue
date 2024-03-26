@@ -100,6 +100,14 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+              <div>
+                <div class="font-semibold">
+                  Miss sounds
+                </div>
+                <div class="text-white/40">
+                  played randomly
+                </div>
+              </div>
               <div v-for="(_, index) in soundsConfig.miss" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
                 <div>Miss {{ index + 1 }}</div>
                 <input
@@ -127,7 +135,62 @@
                 </button>
               </div>
               <div>
-                <span>Winner sounds</span>
+                <span class="font-semibold">Bot throw sound</span>
+              </div>
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+                <div>Hit</div>
+                <input
+                  v-model="soundsConfig.bot"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="playSound1(soundsConfig.bot)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.bot = defaultSoundsConfig.bot"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.bot = ''"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+                <div>Miss</div>
+                <input
+                  v-model="soundsConfig.botOutside"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="playSound1(soundsConfig.botOutside)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.botOutside = defaultSoundsConfig.botOutside"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.botOutside = ''"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
+              <div>
+                <span class="font-semibold">Winner sounds</span>
               </div>
               <div v-for="(_, index) in soundsConfig.winner.slice(1)" :key="index" class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px] lg:grid-rows-1">
                 <input
@@ -170,7 +233,12 @@
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <div />
-                <div />
+                <button
+                  @click="soundsConfig.winner[0].url = ''"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
               </div>
               <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
                 <button
