@@ -285,6 +285,7 @@
                   <input
                     v-model="callerConfig.caller[index].fileExt"
                     type="text"
+                    placeholder=".mp3"
                     class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                   >
                   <button

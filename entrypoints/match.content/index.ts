@@ -14,13 +14,15 @@ import { scoreSmaller } from "@/entrypoints/match.content/scoreSmaller";
 import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/match.content/color-change";
 import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 
-// import { caller } from "@/entrypoints/match.content/caller";
+import { caller } from "@/entrypoints/match.content/caller";
 import { getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
 import { isBullOff, isX01 } from "@/utils/helpers";
+import SoundsStart from "@/entrypoints/match.content/SoundsStart.vue";
 
 let takeoutUI: any;
 let streamingModeUI: any;
+let soundsstartUI: any;
 let matchReadyUnwatch: any;
 let throwsObserver: MutationObserver;
 let boardStatusObserver: MutationObserver;
@@ -43,12 +45,19 @@ export default defineContentScript({
           if (!div) initStreamingMode(ctx).catch(console.error);
         }
 
+        if (config.sounds.enabled || config.caller.enabled) {
+          const div = document.querySelector("autodarts-tools-soundsstart");
+          if (!div) initSoundsstart(ctx).catch(console.error);
+        }
+
         initMatch().catch(console.error);
       } else {
         throwsObserver?.disconnect();
         boardStatusObserver?.disconnect();
         takeoutUI?.remove();
         takeoutUI = null;
+        soundsstartUI?.remove();
+        soundsstartUI = null;
         await onRemoveColorChange();
       }
     });
@@ -76,7 +85,7 @@ async function initTakeout(ctx) {
 }
 
 async function initMatch() {
-  // console.log("init match");
+  console.log("init match");
   startThrowsObserver();
   startBoardStatusObserver();
 
@@ -110,11 +119,31 @@ async function initStreamingMode(ctx) {
   streamingModeUI.mount();
 }
 
+async function initSoundsstart(ctx) {
+  soundsstartUI = await createShadowRootUi(ctx, {
+    name: "autodarts-tools-soundsstart",
+    position: "inline",
+    anchor: "#root > div > div:nth-of-type(2)",
+    onMount: (container) => {
+      const soundsstart = createApp(SoundsStart);
+      soundsstart.mount(container);
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        container.classList.add("dark");
+      }
+      return soundsstart;
+    },
+    onRemove: (soundsstart) => {
+      soundsstart?.unmount();
+    },
+  });
+  soundsstartUI.mount();
+}
+
 async function throwsChange() {
   // console.log("throwsChange");
 
   await scoreSmaller();
-  // await caller();
+  await caller();
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();

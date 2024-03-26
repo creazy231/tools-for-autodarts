@@ -2,6 +2,7 @@ import "~/assets/tailwind.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import { waitForElement } from "@/utils";
+import { AutodartsToolsSoundAutoplayStatus } from "@/utils/storage";
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
@@ -12,6 +13,7 @@ export default defineContentScript({
       window.location.href = "/settings";
     } else {
       await waitForElement("#root > div:nth-of-type(1)");
+      await AutodartsToolsSoundAutoplayStatus.setValue(false);
       const ui = await createShadowRootUi(ctx, {
         name: "autodarts-tools-wxt",
         position: "inline",

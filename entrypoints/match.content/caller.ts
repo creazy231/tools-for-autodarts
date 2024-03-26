@@ -23,9 +23,9 @@ export async function caller() {
   const handleCaller = () => {
     if (!isCallerEnabled || !callerActive) return;
 
-    const callerFolder = callerActive?.folder || "";
-    const callerServerUrl = callerActive?.url || "";
-    const fileExt = callerActive?.fileExt || ".mp3";
+    let callerServerUrl = callerActive?.url || "";
+    if (callerServerUrl.at(-1) !== "/") callerServerUrl += "/";
+    const callerFileExt = callerActive?.fileExt || ".mp3";
 
     const turnContainerEl = document.getElementById("ad-ext-turn");
 
@@ -74,8 +74,8 @@ export async function caller() {
       if (turnPoints === "BUST") {
         if (bustSound?.length) {
           playSound2(bustSound);
-        } else if (callerFolder.length && callerServerUrl.length) {
-          playSound2(`${callerServerUrl}/${callerFolder}/` + `0${fileExt}`);
+        } else if (callerServerUrl.length) {
+          playSound2(`${callerServerUrl}` + `0${callerFileExt}`);
         }
       } else {
         // if (curThrowPointsName === 'BULL') {
@@ -103,8 +103,8 @@ export async function caller() {
         //   }
         // }
 
-        if (throwPointsArr.length === 3 && callerFolder.length && !isInEditMode) {
-          playPointsSound(callerFolder, turnPoints, callerServerUrl);
+        if (throwPointsArr.length === 3 && !isInEditMode && turnPoints !== "BUST" && callerServerUrl.length && callerFileExt.length) {
+          playPointsSound(callerServerUrl, callerFileExt, turnPoints);
         }
       }
     }, isBot ? 500 : 0);

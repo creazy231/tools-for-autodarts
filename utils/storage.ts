@@ -162,6 +162,13 @@ export const AutodartsToolsBoardStatus: WxtStorageItem<TBoardStatus, any> = stor
   },
 );
 
+export const AutodartsToolsSoundAutoplayStatus: WxtStorageItem<boolean, any> = storage.defineItem(
+  "local:soundstartstatus",
+  {
+    defaultValue: false,
+  },
+);
+
 export const AutodartsToolsUrlStatus: WxtStorageItem<string, any> = storage.defineItem(
   "local:urlstatus",
   {

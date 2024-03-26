@@ -21,16 +21,6 @@ export const defaultCallerConfig: ICallerConfig = {
       fileExt: ".mp3",
       isActive: true,
     },
-    {
-      name: "Google eng",
-      folder: "google_eng",
-      url: "",
-    },
-    {
-      name: "Google de",
-      folder: "google_de",
-      url: "",
-    },
   ], ...privateCaller ],
 };
 

@@ -33,9 +33,9 @@ export const defaultSoundsConfig: ISoundsConfig = {
   bot: "https://autodarts-plus.x10.mx/sound_chopping-wood.mp3",
   botOutside: "https://autodarts-plus.x10.mx/sound_wood-block.mp3",
   winner: [
-    { name: "Fallback", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp31" },
-    { name: "sebudde", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp32" },
-    { name: "jane", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp33" },
+    { name: "Fallback", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp3" },
+    { name: "sebudde", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp3" },
+    { name: "jane", url: "https://autodarts.x10.mx/chase_the_sun/chase_the_sun.mp3" },
   ],
 };
 
