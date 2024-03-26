@@ -3,7 +3,7 @@
     <h2 class="text-4xl font-bold">
       External Boards
     </h2>
-    <div v-if="config" class="grid grid-cols-2 gap-4">
+    <div v-if="config" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
       <div
         v-for="board in config.externalBoards.boards"
         :key="board.id"
