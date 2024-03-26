@@ -22,6 +22,7 @@
 - Shuffle players in Lobbies
 - Takeout visualization
 - Smaller font size for inactive players
+- External Boards to easily follow them
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
