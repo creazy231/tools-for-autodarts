@@ -18,10 +18,9 @@ const isConfigPage = ref(true);
 const navigationCheckInterval = ref();
 
 watch(currentUrl, async (newURL, oldURL) => {
-  await AutodartsToolsUrlStatus.setValue(newURL);
+  await AutodartsToolsUrlStatus.setValue(newURL.split("#")[0]);
 
   if (newURL !== oldURL && oldURL) {
-    // console.log("URL changed", newURL);
     useGlobalEvent("url:changed", newURL);
 
     if (newURL.includes("/tools") && !configVisible.value) {
@@ -49,6 +48,8 @@ watch(configVisible, async () => {
 
 onMounted(async () => {
   const url = await AutodartsToolsUrlStatus.getValue();
+  currentUrl.value = "";
+  await nextTick();
   currentUrl.value = window.location.href;
   isConfigPage.value = url.includes("/tools");
 

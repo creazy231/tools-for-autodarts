@@ -331,6 +331,12 @@
                 class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
               >
             </div>
+            <template v-if="config.discord.enabled">
+              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppToggle v-model="config.discord.manually" text-on="MAN" text-off="AUT" />
+                <p>Toggles between sending the invitation link automatically or manually.</p>
+              </div>
+            </template>
           </div>
 
           <div class="space-y-4 rounded border border-white/10 p-4">
@@ -531,6 +537,20 @@
                 class="col-span-2 w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none placeholder:opacity-50"
               >
             </template>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                External Boards
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Allows you to save external Boards to easily follow them.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.externalBoards.enabled" />
+            </div>
           </div>
         </div>
       </template>

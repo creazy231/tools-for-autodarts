@@ -5,6 +5,7 @@ import type { BoardStatus } from "@/utils/types";
 export interface IConfig {
   discord: {
     enabled: boolean;
+    manually: boolean;
     url: string;
   };
   autoStart: {
@@ -52,6 +53,13 @@ export interface IConfig {
   caller: {
     enabled: boolean;
   };
+  externalBoards: {
+    enabled: boolean;
+    boards: {
+      id: string;
+      name: string;
+    }[];
+  };
   // TODO: implement to PageConfig
   soundAfterBotThrow: {
     enabled: boolean;
@@ -70,6 +78,7 @@ export type TBoardStatus = BoardStatus | undefined;
 export const defaultConfig: IConfig = {
   discord: {
     enabled: false,
+    manually: false,
     url: "",
   },
   autoStart: {
@@ -117,6 +126,10 @@ export const defaultConfig: IConfig = {
   caller: {
     enabled: true,
   },
+  externalBoards: {
+    enabled: false,
+    boards: [],
+  },
   soundAfterBotThrow: {
     enabled: true,
   },
@@ -153,6 +166,6 @@ export const AutodartsToolsBoardStatus: WxtStorageItem<TBoardStatus, any> = stor
 export const AutodartsToolsUrlStatus: WxtStorageItem<string, any> = storage.defineItem(
   "local:urlstatus",
   {
-    defaultValue: window.location.href,
+    defaultValue: window.location.href.split("#")[0],
   },
 );

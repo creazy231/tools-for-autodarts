@@ -5,11 +5,15 @@ let checkAutoStartInterval: NodeJS.Timeout | null = null;
 
 export async function autoStart() {
   try {
+    const hasAutoStartButton = document.getElementById("adt-autostart-button");
+    if (hasAutoStartButton) return;
+
     const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
     const button = buttonsContainer.children[0].cloneNode(true) as HTMLButtonElement;
 
     if (button.innerText !== "Start") return;
 
+    button.id = "adt-autostart-button";
     button.innerText = "Autostart OFF";
     button.style.color = "var(--chakra-colors-green-500)";
     button.style.color = "var(--chakra-colors-red-500)";
