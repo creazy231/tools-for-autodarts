@@ -2,14 +2,15 @@ import type { WxtStorageItem } from "wxt/storage";
 import { storage } from "wxt/storage";
 
 export interface ISoundsConfig {
-  bust?: string;
-  T15?: string;
-  T16?: string;
-  T17?: string;
-  T18?: string;
-  T19?: string;
-  T20?: string;
-  bull?: string;
+  bust: string;
+  T15: string;
+  T16: string;
+  T17: string;
+  T18: string;
+  T19: string;
+  T20: string;
+  bull: string;
+  miss: string[];
 }
 
 export const defaultSoundsConfig: ISoundsConfig = {
@@ -21,6 +22,11 @@ export const defaultSoundsConfig: ISoundsConfig = {
   T19: "https://autodarts-plus.x10.mx/beep_2_19.wav",
   T20: "https://autodarts-plus.x10.mx/beep_2_20.wav",
   bull: "https://autodarts-plus.x10.mx/beep_2_bullseye.mp3",
+  miss: [
+    "https://autodarts-plus.x10.mx/miss_1.mp3",
+    "https://autodarts-plus.x10.mx/miss_2.mp3",
+    "https://autodarts-plus.x10.mx/miss_3.mp3",
+  ],
 };
 
 export const AutodartsToolsSoundsConfig: WxtStorageItem<ISoundsConfig, any> = storage.defineItem(

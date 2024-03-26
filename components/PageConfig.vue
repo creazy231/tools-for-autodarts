@@ -22,7 +22,7 @@
               </h2>
             </div>
             <div class="grid gap-4">
-              <div v-for="tripleCount in tripleCountArr" :key="tripleCount" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px] lg:grid-rows-1">
+              <div v-for="tripleCount in tripleCountArr" :key="tripleCount" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
                 <div>T{{ tripleCount }}</div>
                 <input
                   v-model="soundsConfig[`T${tripleCount}`]"
@@ -30,25 +30,37 @@
                   class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                 >
                 <button
+                  @click="playSound1(soundsConfig[`T${tripleCount}`])"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
                   @click="soundsConfig[`T${tripleCount}`] = defaultSoundsConfig[`T${tripleCount}`]"
-                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
                   @click="soundsConfig[`T${tripleCount}`] = ''"
-                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
                 <div>Bull</div>
                 <input
                   v-model="soundsConfig.bull"
                   type="text"
                   class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                 >
+                <button
+                  @click="playSound1(soundsConfig.bull)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
                 <button
                   @click="soundsConfig.bull = defaultSoundsConfig.bull"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
@@ -62,13 +74,19 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
                 <div>Bust</div>
                 <input
                   v-model="soundsConfig.bust"
                   type="text"
                   class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                 >
+                <button
+                  @click="playSound1(soundsConfig.bust)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
                 <button
                   @click="soundsConfig.bust = defaultSoundsConfig.bust"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
@@ -77,6 +95,32 @@
                 </button>
                 <button
                   @click="soundsConfig.bust = ''"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
+              <div v-for="(_, index) in soundsConfig.miss" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+                <div>miss {{ index + 1 }}</div>
+                <input
+                  v-model="soundsConfig.miss[index]"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="playSound1(soundsConfig.miss[index])"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.miss[index] = defaultSoundsConfig.miss[index]"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.miss[index] = ''"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
@@ -379,6 +423,7 @@ import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsCallerConfig, defaultCallerConfig } from "@/utils/callerStorage";
 import type { ISoundsConfig } from "@/utils/soundsStorage";
 import { AutodartsToolsSoundsConfig, defaultSoundsConfig } from "@/utils/soundsStorage";
+import { playSound1 } from "@/utils/playSound";
 
 const config = ref<IConfig>();
 const callerConfig = ref<ICallerConfig>();
