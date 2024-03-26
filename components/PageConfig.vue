@@ -13,7 +13,7 @@
         </h1>
       </div>
 
-      <template v-if="config && soundsConfig">
+      <template v-if="config">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div class="space-y-4 rounded border border-white/10 p-4">
             <div>
@@ -263,8 +263,15 @@
                 Adds a caller.
               </p>
             </div>
-            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <div class="grid grid-cols-[5rem_auto_50px] items-center gap-4">
               <AppToggle v-model="config.caller.enabled" />
+              <div />
+              <button
+                @click="callerConfig = defaultCallerConfig"
+                class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+              >
+                <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+              </button>
             </div>
             <div v-if="config.caller.enabled && callerConfig">
               <div class="grid gap-4">
