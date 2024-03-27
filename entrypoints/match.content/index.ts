@@ -18,8 +18,9 @@ import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 import { sounds } from "@/entrypoints/match.content/sounds";
 import { getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
-import { isBullOff, isX01 } from "@/utils/helpers";
+import { isBullOff, isCricket, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
+import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -113,6 +114,7 @@ async function initStreamingMode(ctx) {
 }
 
 async function throwsChange() {
+  console.log("throwsChange");
   const hasWinner = document.querySelector(".ad-ext-player-winner");
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
@@ -130,10 +132,13 @@ async function throwsChange() {
     }, 1000);
   }
 
+  const playerCount = document.getElementById("ad-ext-player-display")?.children.length || 0;
+
   const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
 
   await AutodartsToolsMatchStatus.setValue({
     ...matchStatus,
+    playerCount,
     throws,
     turnPoints,
     isInEditMode: !!editPlayerThrowActive,
@@ -142,6 +147,9 @@ async function throwsChange() {
 
   await scoreSmaller();
   await sounds();
+
+  if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
+
   hasWinner && (await soundsWinner());
 }
 

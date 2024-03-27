@@ -1,4 +1,4 @@
-import { AutodartsToolsConfig, AutodartsToolsMatchStatus } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsCricketClosedPoints, AutodartsToolsMatchStatus } from "@/utils/storage";
 import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 
@@ -11,6 +11,8 @@ export async function sounds() {
 
   const soundConfig = await AutodartsToolsSoundsConfig.getValue();
   const matchStatus = (await AutodartsToolsMatchStatus.getValue());
+
+  const cricketClosedPoints = await AutodartsToolsCricketClosedPoints.getValue();
 
   // if (!isCallerEnabled || !callerActive) return;
 
@@ -93,17 +95,19 @@ export async function sounds() {
           }
         }
       }
+
       /// ///////////// Cricket ////////////////////
-      // if (isCricket()) {
-      //   if (curThrowPointsNumber >= 0) {
-      //     if (curThrowPointsNumber >= 15 && !cricketClosedPoints.includes(curThrowPointsNumber)) {
-      //       setCricketClosedPoints();
-      //       playSound3(soundConfig.cricketHit);
-      //     } else {
-      //       playSound3(soundConfig.cricketMiss);
-      //     }
-      //   }
-      // }
+      if (isCricket()) {
+        console.log("cricketClosedPoints", cricketClosedPoints);
+        if (curThrowPointsNumber >= 0) {
+          if (curThrowPointsNumber >= 15 && !cricketClosedPoints.includes(curThrowPointsNumber)) {
+            // setCricketClosedPoints();
+            playSound3(soundConfig.cricketHit);
+          } else {
+            playSound3(soundConfig.cricketMiss);
+          }
+        }
+      }
 
       if (isCallerEnabled && throwPointsArr.length === 3 && !(isCricket() && turnPoints === "0") && !matchStatus.isInEditMode && turnPoints !== "BUST" && callerServerUrl.length && callerFileExt.length) {
         playPointsSound(callerServerUrl, callerFileExt, turnPoints);

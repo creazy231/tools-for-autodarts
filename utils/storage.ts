@@ -66,6 +66,7 @@ export interface IConfig {
 }
 
 export interface IMatchStatus {
+  playerCount: number;
   throws: string[];
   turnPoints?: string ;
   isInEditMode: boolean;
@@ -142,6 +143,7 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
 );
 
 export const defaultMatchStatus: IMatchStatus = {
+  playerCount: 0,
   throws: [],
   turnPoints: undefined,
   isInEditMode: false,
@@ -173,5 +175,12 @@ export const AutodartsToolsUrlStatus: WxtStorageItem<string, any> = storage.defi
   "local:urlstatus",
   {
     defaultValue: window.location.href.split("#")[0],
+  },
+);
+
+export const AutodartsToolsCricketClosedPoints: WxtStorageItem<number[], any> = storage.defineItem(
+  "local:cricketpointsstatus",
+  {
+    defaultValue: [],
   },
 );
