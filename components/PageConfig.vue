@@ -663,7 +663,12 @@
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
-                <div />
+                <button
+                  @click="soundsConfig.winner[0] = defaultSoundsConfig.winner[0]"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
                 <button
                   @click="soundsConfig.winner[0].url = ''"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
