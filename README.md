@@ -7,7 +7,6 @@
 
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/oolfddhehmbpdnlmoljmllcdggmkgihh?logo=google-chrome&logoColor=%23FFFFFF&label=Chrome)](https://chromewebstore.google.com/detail/autodarts-tools/oolfddhehmbpdnlmoljmllcdggmkgihh)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/autodarts-tools?logo=firefox&logoColor=%23FFFFFF&label=Firefox)](https://addons.mozilla.org/de/firefox/addon/autodarts-tools)
-[![](https://img.shields.io/badge/dynamic/json?prefix=v&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fofimfclpndfejbdpliafjmjbajajikhm&logo=microsoft%20edge&logoColor=%23FFFFFF&label=Edge)](https://microsoftedge.microsoft.com/addons/detail/autodarts-tools/ofimfclpndfejbdpliafjmjbajajikhm)
 [![](https://img.shields.io/itunes/v/6479754594?logo=apple&label=MacOS%20%26%20iOS
 )](https://apps.apple.com/de/app/autodarts-tools/id6479754594)
 
