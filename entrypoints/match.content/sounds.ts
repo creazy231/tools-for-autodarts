@@ -74,7 +74,7 @@ export async function sounds() {
     if (turnPoints === "BUST") {
       if (soundConfig.bust?.length) {
         playSound2(soundConfig.bust);
-      } else if (callerServerUrl.length) {
+      } else if (callerServerUrl.length && isCallerEnabled) {
         playSound2(`${callerServerUrl}` + `0${callerFileExt}`);
       }
     } else {
@@ -105,7 +105,7 @@ export async function sounds() {
       //   }
       // }
 
-      if (throwPointsArr.length === 3 && !(isCricket() && turnPoints === "0") && !matchStatus.isInEditMode && turnPoints !== "BUST" && callerServerUrl.length && callerFileExt.length) {
+      if (isCallerEnabled && throwPointsArr.length === 3 && !(isCricket() && turnPoints === "0") && !matchStatus.isInEditMode && turnPoints !== "BUST" && callerServerUrl.length && callerFileExt.length) {
         playPointsSound(callerServerUrl, callerFileExt, turnPoints);
       }
     }
