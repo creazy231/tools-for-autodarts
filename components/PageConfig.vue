@@ -275,16 +275,29 @@
             </div>
             <div v-if="config.caller.enabled && callerConfig">
               <div class="grid gap-4">
-                <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_2fr_5fr_1fr_1fr_50px_50px] lg:grid-rows-1">
+                <div v-for="(_, index) in callerConfig.caller" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_50px_2fr_5fr_1fr_1fr_50px_50px] lg:grid-rows-1">
                   <div>Caller {{ index + 1 }}</div>
+                  <button
+                    @click="setActive(index)"
+                    :disabled="!callerConfig.caller[index].url"
+                    :class="twMerge(
+                      'flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10',
+                      !callerConfig.caller[index].url && 'bg-white/2 hover:bg-white/2',
+                      callerConfig.caller[index].isActive && 'bg-cyan-600 border-cyan-600',
+                    )"
+                  >
+                    <span :class="twMerge('icon-[mdi-light--check] text-xl', !callerConfig.caller[index].url && 'text-white/30')" />
+                  </button>
                   <input
                     v-model="callerConfig.caller[index].name"
                     type="text"
+                    placeholder="Name (optional)"
                     class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                   >
                   <input
                     v-model="callerConfig.caller[index].url"
                     type="text"
+                    placeholder="URL of folder with caller sound files"
                     class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                   >
                   <div>
@@ -297,11 +310,14 @@
                     class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                   >
                   <button
-                    @click="setActive(index)"
-                    class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 outline-none"
-                    :class="callerConfig.caller[index].isActive && 'bg-cyan-600 border-cyan-600'"
+                    @click="playCallerSound(index)"
+                    :disabled="!callerConfig.caller[index].url"
+                    :class="twMerge(
+                      'flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10',
+                      !callerConfig.caller[index].url && 'bg-white/2 hover:bg-white/2',
+                    )"
                   >
-                    <span class="icon-[mdi-light--check] text-xl" />
+                    <span :class="twMerge('icon-[mdi-light--play] text-xl', !callerConfig.caller[index].url && 'text-white/30')" />
                   </button>
                   <button
                     @click="callerConfig.caller.splice(index, 1)"
@@ -318,6 +334,7 @@
                   >
                     <span class="icon-[mdi-light--plus]" />
                   </button>
+                  <div />
                   <div />
                   <div class="col-span-5 text-white/40">
                     [filename] => 0-180, 'gameshot', 'gameshot and the match'
@@ -693,6 +710,7 @@
 </template>
 
 <script setup lang="ts">
+import { twMerge } from "tailwind-merge";
 import AppToggle from "@/components/AppToggle.vue";
 import type { IConfig } from "@/utils/storage";
 import type { ICallerConfig } from "@/utils/callerStorage";
@@ -701,7 +719,7 @@ import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsCallerConfig, defaultCallerConfig } from "@/utils/callerStorage";
 import type { ISoundsConfig } from "@/utils/soundsStorage";
 import { AutodartsToolsSoundsConfig, defaultSoundsConfig } from "@/utils/soundsStorage";
-import { playSound1 } from "@/utils/playSound";
+import { playPointsSound, playSound1 } from "@/utils/playSound";
 
 const config = ref<IConfig>();
 const callerConfig = ref<ICallerConfig>();
@@ -713,6 +731,15 @@ function setActive(index: number) {
   callerConfig?.value?.caller.forEach((caller, i) => {
     caller.isActive = i === index;
   });
+}
+
+function playCallerSound(index: number) {
+  const caller = callerConfig?.value?.caller[index];
+  let callerServerUrl = caller?.url || "";
+  if (callerServerUrl.at(-1) !== "/") callerServerUrl += "/";
+  const callerFileExt = caller?.fileExt || ".mp3";
+  const random = Math.floor(Math.random() * 180).toString();
+  playPointsSound(callerServerUrl, callerFileExt, random);
 }
 
 function goBack() {
