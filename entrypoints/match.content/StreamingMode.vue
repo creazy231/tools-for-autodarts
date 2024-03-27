@@ -453,9 +453,6 @@ async function saveSettings() {
       },
     },
   });
-
-  const test = await AutodartsToolsConfig.getValue();
-  console.log(test);
 }
 
 async function handleResetSettings() {

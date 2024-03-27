@@ -44,7 +44,6 @@ export async function sounds() {
       curThrowPointsNumber = 0;
       curThrowPointsBed = "Outside";
     } else if (curThrowPointsName === "BULL") {
-      console.log("bull");
       curThrowPointsNumber = 25;
       curThrowPointsBed = "D";
     } else if (curThrowPointsName === "25") {
@@ -98,7 +97,6 @@ export async function sounds() {
 
       /// ///////////// Cricket ////////////////////
       if (isCricket()) {
-        console.log("cricketClosedPoints", cricketClosedPoints);
         if (curThrowPointsNumber >= 0) {
           if (curThrowPointsNumber >= 15 && !cricketClosedPoints.includes(curThrowPointsNumber)) {
             // setCricketClosedPoints();

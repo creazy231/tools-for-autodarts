@@ -114,7 +114,6 @@ async function initStreamingMode(ctx) {
 }
 
 async function throwsChange() {
-  console.log("throwsChange");
   const hasWinner = document.querySelector(".ad-ext-player-winner");
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
