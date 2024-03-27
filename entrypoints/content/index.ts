@@ -3,6 +3,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import { waitForElement } from "@/utils";
 import { AutodartsToolsSoundAutoplayStatus } from "@/utils/storage";
+import { isiOS } from "@/utils/helpers";
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
@@ -12,6 +13,9 @@ export default defineContentScript({
       document.querySelector("#root")?.remove();
       window.location.href = "/settings";
     } else {
+      if (isiOS()) {
+        document.querySelector("body")!.style!.minHeight = "calc(100vh + 1px)";
+      }
       await waitForElement("#root > div:nth-of-type(1)");
       await AutodartsToolsSoundAutoplayStatus.setValue(false);
       const ui = await createShadowRootUi(ctx, {

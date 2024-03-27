@@ -5,3 +5,9 @@ export const isCricket = () => document.getElementById("ad-ext-game-variant")?.t
 export const soundEffect1 = new Audio();
 export const soundEffect2 = new Audio();
 export const soundEffect3 = new Audio();
+
+export function isiOS() {
+  return [
+    "iPad Simulator", "iPhone Simulator", "iPod Simulator", "iPad", "iPhone", "iPod" ].includes(navigator.platform) // iPad on iOS 13 detection
+    || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+}

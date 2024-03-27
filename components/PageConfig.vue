@@ -9,7 +9,7 @@
           <span class="icon-[mdi-light--chevron-left]" />
         </AppButton>
         <h1 class="text-3xl font-bold">
-          Autodarts Tools
+          Autodarts Tools{{ isiOS() ? ' (iOS)' : '' }}
         </h1>
       </div>
 
@@ -720,6 +720,7 @@ import { AutodartsToolsCallerConfig, defaultCallerConfig } from "@/utils/callerS
 import type { ISoundsConfig } from "@/utils/soundsStorage";
 import { AutodartsToolsSoundsConfig, defaultSoundsConfig } from "@/utils/soundsStorage";
 import { playPointsSound, playSound1 } from "@/utils/playSound";
+import { isiOS } from "@/utils/helpers";
 
 const config = ref<IConfig>();
 const callerConfig = ref<ICallerConfig>();
