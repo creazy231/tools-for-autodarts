@@ -254,7 +254,7 @@
             </div>
           </div>
 
-          <div class="col-span-2 space-y-4 rounded border border-white/10 p-4">
+          <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">
                 Caller
@@ -327,7 +327,7 @@
             </div>
           </div>
 
-          <div class="col-span-2 space-y-4 rounded border border-white/10 p-4">
+          <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">
                 Sounds
