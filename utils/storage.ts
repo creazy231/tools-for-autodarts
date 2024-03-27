@@ -126,7 +126,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
   },
   sounds: {
-    enabled: true,
+    enabled: false,
   },
   externalBoards: {
     enabled: false,
