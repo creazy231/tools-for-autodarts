@@ -441,6 +441,33 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+              <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px] lg:grid-rows-1">
+                <div>Ready. Throw!</div>
+                <input
+                  v-model="soundsConfig.playerStart"
+                  placeholder="sound to play when it's time to throw"
+                  type="text"
+                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                >
+                <button
+                  @click="playSound1(soundsConfig.playerStart)"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.playerStart = defaultSoundsConfig.playerStart"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
+                <button
+                  @click="soundsConfig.playerStart = ''"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
               <div class="mt-1.5">
                 <span class="font-semibold">
                   Miss sounds

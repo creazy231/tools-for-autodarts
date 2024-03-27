@@ -16,6 +16,7 @@ export interface ISoundsConfig {
   botOutside: string;
   cricketHit: string;
   cricketMiss: string;
+  playerStart: string;
   winner: { name: string; url: string }[];
 }
 
@@ -38,8 +39,9 @@ export const defaultSoundsConfig: ISoundsConfig = {
   botOutside: "https://autodarts-plus.x10.mx/sound_wood-block.mp3",
   cricketHit: "https://autodarts-plus.x10.mx/bonus-points.mp3",
   cricketMiss: "https://autodarts-plus.x10.mx/sound_double_windart.wav",
+  playerStart: "",
   winner: [
-    { name: "Fallback", url: "" },
+    { name: "Fallback", url: "https://www.myinstants.com/media/sounds/dart-winner.mp3" },
   ],
 };
 

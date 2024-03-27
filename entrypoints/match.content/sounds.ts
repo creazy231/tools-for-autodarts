@@ -2,7 +2,7 @@ import { AutodartsToolsConfig, AutodartsToolsMatchStatus } from "@/utils/storage
 import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 
-import { playPointsSound, playSound2, playSound3 } from "@/utils/playSound";
+import { playPointsSound, playSound1, playSound2, playSound3 } from "@/utils/playSound";
 import { isCricket } from "@/utils/helpers";
 
 export async function sounds() {
@@ -25,6 +25,11 @@ export async function sounds() {
 
   const playerEl: HTMLElement | null = document.querySelector(".ad-ext-player-active .ad-ext-player-name");
   const playerName = playerEl && playerEl.innerText;
+
+  const turnContainerEl = document.getElementById("ad-ext-turn");
+  const letsGo = [ ...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement> ].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
+
+  if (letsGo) playSound1(soundConfig.playerStart);
 
   // console.log("curThrowPointsName", curThrowPointsName);
 
