@@ -25,6 +25,8 @@
 - Takeout visualization
 - Smaller font size for inactive players
 - External Boards to easily follow them
+- Caller to announce scores
+- Various sounds for different events
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
