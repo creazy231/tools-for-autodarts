@@ -28,6 +28,5 @@ export async function playSound3(fileName) {
 
 export function playPointsSound(callerServerUrl: string, callerFileExt: string, turnPoints?: string) {
   if (!turnPoints) return;
-  if (callerServerUrl?.length) playSound1(callerServerUrl + turnPoints + callerFileExt);
-  // if (callerServerUrl?.length) soundEffect1.src = callerServerUrl + turnPoints + callerFileExt;
+  if (callerServerUrl?.length) soundEffect1.src = callerServerUrl + turnPoints + callerFileExt;
 }
