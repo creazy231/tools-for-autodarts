@@ -53,6 +53,9 @@ export interface IConfig {
   caller: {
     enabled: boolean;
   };
+  sounds: {
+    enabled: boolean;
+  };
   externalBoards: {
     enabled: boolean;
     boards: {
@@ -60,15 +63,12 @@ export interface IConfig {
       name: string;
     }[];
   };
-  // TODO: implement to PageConfig
-  soundAfterBotThrow: {
-    enabled: boolean;
-  };
 }
 
 export interface IMatchStatus {
+  playerCount: number;
   throws: string[];
-  turnPoints: string | null ;
+  turnPoints?: string ;
   isInEditMode: boolean;
   hasWinner: boolean;
 }
@@ -124,14 +124,14 @@ export const defaultConfig: IConfig = {
     enabled: false,
   },
   caller: {
-    enabled: true,
+    enabled: false,
+  },
+  sounds: {
+    enabled: false,
   },
   externalBoards: {
     enabled: false,
     boards: [],
-  },
-  soundAfterBotThrow: {
-    enabled: true,
   },
 };
 
@@ -143,8 +143,9 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
 );
 
 export const defaultMatchStatus: IMatchStatus = {
+  playerCount: 0,
   throws: [],
-  turnPoints: null,
+  turnPoints: undefined,
   isInEditMode: false,
   hasWinner: false,
 };
@@ -163,9 +164,23 @@ export const AutodartsToolsBoardStatus: WxtStorageItem<TBoardStatus, any> = stor
   },
 );
 
+export const AutodartsToolsSoundAutoplayStatus: WxtStorageItem<boolean, any> = storage.defineItem(
+  "local:soundstartstatus",
+  {
+    defaultValue: false,
+  },
+);
+
 export const AutodartsToolsUrlStatus: WxtStorageItem<string, any> = storage.defineItem(
   "local:urlstatus",
   {
     defaultValue: window.location.href.split("#")[0],
+  },
+);
+
+export const AutodartsToolsCricketClosedPoints: WxtStorageItem<number[], any> = storage.defineItem(
+  "local:cricketpointsstatus",
+  {
+    defaultValue: [],
   },
 );

@@ -13,7 +13,6 @@ export default defineContentScript({
   cssInjectionMode: "ui",
   async main(ctx: any) {
     boardsReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
-      console.log(url);
       const config: IConfig = await AutodartsToolsConfig.getValue();
       if (url.endsWith("/boards")) {
         console.log("Autodarts Tools: Boards Ready");

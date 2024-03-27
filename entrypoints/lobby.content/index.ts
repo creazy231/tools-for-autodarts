@@ -19,6 +19,7 @@ export default defineContentScript({
       const config: IConfig = await AutodartsToolsConfig.getValue();
       if (/\/lobbies\/(?!.*\/new\/)/.test(url)) {
         console.log("Autodarts Tools: Lobby Ready");
+
         if (config.discord.enabled) {
           await waitForElementWithTextContent("h2", "Lobby");
           await initScript(discordWebhooks, url);
