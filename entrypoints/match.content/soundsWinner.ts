@@ -14,11 +14,12 @@ export async function soundsWinner() {
   const winnerPlayerName = (winnerPlayerCard?.querySelector(".ad-ext-player-name") as HTMLElement)?.innerText;
 
   const isSoundsEnabled = (await AutodartsToolsConfig.getValue()).sounds.enabled;
+  const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled;
 
   const callerActive = (await AutodartsToolsCallerConfig.getValue()).caller.filter(caller => caller.isActive)[0];
   const soundConfig = await AutodartsToolsSoundsConfig.getValue();
 
-  if (!isSoundsEnabled) return;
+  if (!isCallerEnabled && !isSoundsEnabled) return;
 
   let callerServerUrl = callerActive?.url || "";
   if (callerServerUrl.at(-1) !== "/") callerServerUrl += "/";
@@ -28,16 +29,18 @@ export async function soundsWinner() {
     buttons.some((button) => {
       // --- Leg finished ---
       if ((button as HTMLElement).innerText === "Next Leg") {
-        if (callerServerUrl.length) playSound3(`${callerServerUrl}gameshot.mp3`);
+        if (isCallerEnabled && callerServerUrl.length) playSound3(`${callerServerUrl}gameshot.mp3`);
         return true;
       }
       // --- Match finished ---
       if ((button as HTMLElement).innerText === "Finish") {
-        if (callerServerUrl.length) playSound3(`${callerServerUrl}gameshot and the match.mp3`);
-        setTimeout(() => {
-          const winnerSound = soundConfig.winner.find(winner => winner.name.toLowerCase() === winnerPlayerName?.toLowerCase())?.url;
-          playSound2(winnerSound || soundConfig.winner[0].url);
-        }, 1000);
+        if (isCallerEnabled && callerServerUrl.length) playSound3(`${callerServerUrl}gameshot and the match.mp3`);
+        if (isSoundsEnabled) {
+          setTimeout(() => {
+            const winnerSound = soundConfig.winner.find(winner => winner.name.toLowerCase() === winnerPlayerName?.toLowerCase())?.url;
+            playSound2(winnerSound || soundConfig.winner[0].url);
+          }, 1000);
+        }
         return true;
       }
       return false;
