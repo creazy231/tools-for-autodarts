@@ -124,7 +124,7 @@ async function throwsChange() {
 
   if (isBullOff() && hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isX01()) {
+      if (isX01() || isCricket()) {
         clearInterval(bullOffInterval);
         initMatch().catch(console.error);
       }
