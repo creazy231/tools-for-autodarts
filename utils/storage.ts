@@ -63,6 +63,7 @@ export interface IConfig {
       name: string;
     }[];
   };
+  menuDisabled?: boolean;
 }
 
 export interface IMatchStatus {
@@ -133,6 +134,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
     boards: [],
   },
+  menuDisabled: false,
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(

@@ -16,11 +16,12 @@ import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/matc
 import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 
 import { sounds } from "@/entrypoints/match.content/sounds";
-import { getMenuBar } from "@/utils/getElements";
+import { getMenu, getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
 import { isBullOff, isCricket, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
+import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -53,6 +54,7 @@ export default defineContentScript({
         takeoutUI?.remove();
         takeoutUI = null;
         await onRemoveColorChange();
+        getMenu().style.display = "flex";
       }
     });
   },
@@ -88,6 +90,8 @@ async function initMatch() {
   if (config.colors.enabled) {
     await colorChange();
   }
+
+  await hideMenu();
 
   throwsChange().catch(console.error);
 }
