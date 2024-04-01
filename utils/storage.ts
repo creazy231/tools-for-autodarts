@@ -64,6 +64,10 @@ export interface IConfig {
     }[];
   };
   menuDisabled?: boolean;
+  automaticNextLeg: {
+    enabled: boolean;
+    sec: number;
+  };
 }
 
 export interface IMatchStatus {
@@ -135,6 +139,10 @@ export const defaultConfig: IConfig = {
     boards: [],
   },
   menuDisabled: false,
+  automaticNextLeg: {
+    enabled: false,
+    sec: 5,
+  },
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(

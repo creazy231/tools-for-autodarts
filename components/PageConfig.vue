@@ -268,6 +268,27 @@
             </div>
           </div>
 
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Automatic next Leg
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Automatically starts the next leg after x seconds.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.automaticNextLeg.enabled" />
+              <input
+                v-if="config.automaticNextLeg.enabled"
+                v-model="config.automaticNextLeg.sec"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+              <span v-if="config.automaticNextLeg.enabled">seconds</span>
+            </div>
+          </div>
+
           <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">

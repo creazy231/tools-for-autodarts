@@ -22,6 +22,7 @@ import { isBullOff, isCricket, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
+import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -54,7 +55,7 @@ export default defineContentScript({
         takeoutUI?.remove();
         takeoutUI = null;
         await onRemoveColorChange();
-        getMenu().style.display = "flex";
+        getMenu()!.style!.display = "flex";
       }
     });
   },
@@ -150,6 +151,7 @@ async function throwsChange() {
 
   await scoreSmaller();
   await sounds();
+  hasWinner && (await automaticNextLeg());
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
@@ -181,6 +183,12 @@ function startBoardStatusObserver() {
     m.forEach((record) => {
       if (record.type === "characterData" && record.target.textContent && Object.values(BoardStatus).includes(record.target.textContent as BoardStatus)) {
         AutodartsToolsBoardStatus.setValue(record.target.textContent as BoardStatus).catch(console.error);
+        // automatic next leg if board status is throw
+        if (record.target.textContent === BoardStatus.THROW) {
+          AutodartsToolsMatchStatus.getValue().then((matchStatus) => {
+            if (matchStatus.hasWinner) automaticNextLeg().catch(console.error);
+          });
+        }
       }
     });
   });
