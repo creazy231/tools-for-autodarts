@@ -55,7 +55,8 @@ export default defineContentScript({
         takeoutUI?.remove();
         takeoutUI = null;
         await onRemoveColorChange();
-        getMenu()!.style!.display = "flex";
+        const menu = getMenu();
+        if (menu) menu.style.display = "flex";
       }
     });
   },
