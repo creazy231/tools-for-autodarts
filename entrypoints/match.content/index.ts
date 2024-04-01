@@ -149,7 +149,7 @@ async function throwsChange() {
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
-  hasWinner && (await soundsWinner());
+  hasWinner && !isBullOff() && (await soundsWinner());
 }
 
 function startThrowsObserver() {
