@@ -331,6 +331,20 @@
             </div>
           </div>
 
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Winner animation
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows an animation around player card when a player wins a leg.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.winnerAnimation.enabled" />
+            </div>
+          </div>
+
           <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">

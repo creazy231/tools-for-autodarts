@@ -12,3 +12,5 @@ export function getMenuBar(): Element | null {
 export const getResetBtn = () => [ ...getMenuBar()?.querySelectorAll("button") as NodeListOf<HTMLButtonElement> ].find(el => el.textContent === "Reset");
 
 export const getMenu = () => document.querySelector("#root > div > div") as HTMLElement | null;
+
+export const getWinnerPlayerCard = () => document.querySelector(".ad-ext-player-winner");

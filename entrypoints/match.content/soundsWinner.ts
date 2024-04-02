@@ -2,6 +2,7 @@ import { AutodartsToolsConfig, AutodartsToolsMatchStatus } from "@/utils/storage
 import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 import { playPointsSound, playSound } from "@/utils/playSound";
+import { getWinnerPlayerCard } from "@/utils/getElements";
 
 export async function soundsWinner() {
   const matchStatus = (await AutodartsToolsMatchStatus.getValue());
@@ -10,7 +11,7 @@ export async function soundsWinner() {
 
   const waitForSumCallingIsOver = throwPointsArr.length === 3 ? 2500 : 0;
 
-  const winnerPlayerCard = document.querySelector(".ad-ext-player-winner");
+  const winnerPlayerCard = getWinnerPlayerCard();
   const winnerPlayerName = (winnerPlayerCard?.querySelector(".ad-ext-player-name") as HTMLElement)?.innerText;
 
   const isSoundsEnabled = (await AutodartsToolsConfig.getValue()).sounds.enabled;

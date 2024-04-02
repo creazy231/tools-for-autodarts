@@ -76,6 +76,9 @@ export interface IConfig {
     enabled: boolean;
     sec: number;
   };
+  winnerAnimation: {
+    enabled: boolean;
+  };
 }
 
 export interface IMatchStatus {
@@ -153,6 +156,8 @@ export const defaultConfig: IConfig = {
     enabled: false,
     sec: 5,
   },
+  winnerAnimation: { enabled: false },
+
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(

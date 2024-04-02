@@ -24,6 +24,7 @@ import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPo
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
 import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
+import { winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -124,6 +125,8 @@ async function initStreamingMode(ctx) {
 async function throwsChange() {
   const hasWinner = document.querySelector(".ad-ext-player-winner");
 
+  const isValidGameMode = isX01() || isCricket();
+
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
 
@@ -132,7 +135,7 @@ async function throwsChange() {
 
   if (isBullOff() && hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isX01() || isCricket()) {
+      if (isValidGameMode) {
         clearInterval(bullOffInterval);
         initMatch().catch(console.error);
       }
@@ -158,7 +161,8 @@ async function throwsChange() {
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
-  hasWinner && !isBullOff() && (await soundsWinner());
+  hasWinner && isValidGameMode && (await soundsWinner());
+  hasWinner && isValidGameMode && (await winnerAnimation());
 }
 
 function startThrowsObserver() {
