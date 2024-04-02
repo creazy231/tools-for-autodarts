@@ -614,7 +614,7 @@
                   )"
                 >
                 <button
-                  @click="playSound('miss', 2, index)"
+                  @click="playSound('miss', 1, index)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
@@ -834,7 +834,7 @@
                   )"
                 >
                 <button
-                  @click="playSound('winner', 2, index + 1)"
+                  @click="playSound('winner', 1, index + 1)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
@@ -866,7 +866,7 @@
                   )"
                 >
                 <button
-                  @click="playSound('winner', 2, 0)"
+                  @click="playSound('winner', 1, 0)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
