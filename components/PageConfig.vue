@@ -385,8 +385,15 @@
                 Sounds
               </h2>
             </div>
-            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <div class="grid grid-cols-[5rem_auto_50px] items-center gap-4">
               <AppToggle v-model="config.sounds.enabled" />
+              <div />
+              <button
+                @click="soundsConfig = defaultSoundsConfig"
+                class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+              >
+                <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+              </button>
             </div>
             <div v-if="config.sounds.enabled && soundsConfig" class="grid gap-4">
               <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
@@ -607,7 +614,7 @@
                   )"
                 >
                 <button
-                  @click="playSound('miss', null, index)"
+                  @click="playSound('miss', 2, index)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
@@ -827,7 +834,7 @@
                   )"
                 >
                 <button
-                  @click="playSound('winner', null, index + 1)"
+                  @click="playSound('winner', 2, index + 1)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
@@ -859,7 +866,7 @@
                   )"
                 >
                 <button
-                  @click="playSound('winner', null, 0)"
+                  @click="playSound('winner', 2, 0)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
