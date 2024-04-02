@@ -192,7 +192,7 @@ function startBoardStatusObserver() {
     m.forEach((record) => {
       if (record.type === "characterData" && record.target.textContent && Object.values(BoardStatus).includes(record.target.textContent as BoardStatus)) {
         AutodartsToolsBoardStatus.setValue(record.target.textContent as BoardStatus).catch(console.error);
-        // automatic next leg if board status is throw
+        // automatic next leg if board status is throw (so it starts counting after takeout)
         if (record.target.textContent === BoardStatus.THROW) {
           AutodartsToolsMatchStatus.getValue().then((matchStatus) => {
             if (matchStatus.hasWinner) automaticNextLeg().catch(console.error);
