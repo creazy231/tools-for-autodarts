@@ -92,13 +92,10 @@ export async function winnerAnimation() {
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
     winnerAnimationMessageElement.textContent = "Game Shot!";
     winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.8}px`;
-    winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3}px`;
+    winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.2}px`;
 
-    const finalScoreEl = winnerPlayerCard?.querySelector(".ad-ext-player-score");
-    if (finalScoreEl) {
-      (finalScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 2}px`;
-      winnerScoreWrapperEl.appendChild(winnerAnimationMessageElement);
-    }
+    (winnerScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 1.8}px`;
+    winnerScoreWrapperEl.appendChild(winnerAnimationMessageElement);
 
     if (!isX01()) return;
 

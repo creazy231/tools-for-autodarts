@@ -25,6 +25,7 @@ import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
 import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
 import { winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
+import { thrownDarts } from "@/entrypoints/match.content/thrownDarts";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -162,6 +163,7 @@ async function throwsChange() {
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
   hasWinner && isValidGameMode && (await soundsWinner());
+  hasWinner && isValidGameMode && (await thrownDarts());
   hasWinner && isValidGameMode && (await winnerAnimation());
 }
 
