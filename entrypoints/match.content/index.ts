@@ -158,7 +158,6 @@ async function throwsChange() {
 
   await scoreSmaller();
   await sounds();
-  hasWinner && (await automaticNextLeg());
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
