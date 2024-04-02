@@ -277,15 +277,15 @@
                 Shows the legs and sets larger on the match page.
               </p>
             </div>
-            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+            <div class="grid grid-cols-[5rem_5rem_5rem] items-center gap-4">
               <AppToggle v-model="config.legsSetsLarger.enabled" />
+              <span v-if="config.legsSetsLarger.enabled" class="text-right">size</span>
               <input
                 v-if="config.legsSetsLarger.enabled"
                 v-model="config.legsSetsLarger.value"
                 type="text"
                 class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
               >
-              <span v-if="config.legsSetsLarger.enabled">rem</span>
             </div>
           </div>
 
@@ -298,15 +298,15 @@
                 Shows the player match data larger on the match page.
               </p>
             </div>
-            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+            <div class="grid grid-cols-[5rem_5rem_5rem] items-center gap-4">
               <AppToggle v-model="config.playerMatchData.enabled" />
+              <span v-if="config.playerMatchData.enabled" class="text-right">size</span>
               <input
                 v-if="config.playerMatchData.enabled"
                 v-model="config.playerMatchData.value"
                 type="text"
                 class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
               >
-              <span v-if="config.playerMatchData.enabled">rem</span>
             </div>
           </div>
 
