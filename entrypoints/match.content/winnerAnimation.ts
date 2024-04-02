@@ -118,10 +118,10 @@ export async function winnerAnimation() {
     const winnerAnimationMessageElement = document.createElement("p");
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
     winnerAnimationMessageElement.textContent = "Game Shot!";
-    winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.8}px`;
-    winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.2}px`;
+    winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.2}px`;
+    winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.6}px`;
 
-    (winnerScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 1.8}px`;
+    (winnerScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 1.4}px`;
     winnerScoreWrapperEl.appendChild(winnerAnimationMessageElement);
 
     if (!isX01()) return;
