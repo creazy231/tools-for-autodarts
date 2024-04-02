@@ -4,9 +4,24 @@ import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { isX01 } from "@/utils/helpers";
 
+export async function removeWinnerAnimation() {
+  await waitForElement("#ad-ext-turn");
+
+  try {
+    const winnerAnimationContainer = document.querySelector(".ad-ext_winner-animation");
+    if (!winnerAnimationContainer) return;
+    document.getElementById("ad-ext_winner-animation--message")?.remove();
+    const winnerScoreEl = winnerAnimationContainer.querySelector(".ad-ext-player-score");
+    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.fontSize = "";
+    document.querySelector(".ad-ext_winner-animation")?.classList.remove("ad-ext_winner-animation");
+  } catch (e) {
+    console.error("Autodarts Tools: Winner Animation - Error: ", e);
+  }
+}
+
 export async function winnerAnimation() {
   addStyles(`
-      .ad-ext-player-score {
+      .ad-ext-player-winner .ad-ext-player-score {
         text-align: center;
         line-height: 1;
       }
@@ -72,21 +87,33 @@ export async function winnerAnimation() {
 
   try {
     const config: IConfig = await AutodartsToolsConfig.getValue();
-    if (!config.winnerAnimation.enabled) return;
+    if (!config.winnerAnimation.enabled && !config.thrownDartsOnWin.enabled) return;
 
     const winnerPlayerCard = getWinnerPlayerCard();
-    const winnerPlayerCardContainer = getWinnerPlayerCard()?.parentElement;
-    winnerPlayerCardContainer?.classList.add("ad-ext_winner-animation");
 
     const winnerScoreEl = winnerPlayerCard?.querySelector(".ad-ext-player-score");
-
     if (!winnerScoreEl) return;
-    const winnerScoreWrapperEl = document.createElement("div");
-    winnerScoreEl.parentNode?.insertBefore(winnerScoreWrapperEl, winnerScoreEl);
-    winnerScoreWrapperEl.appendChild(winnerScoreEl);
+
+    const dartsThrown = getDartsThrown(winnerPlayerCard as HTMLElement);
+
+    if (config.thrownDartsOnWin.enabled) (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`;
+
+    if (!config.winnerAnimation.enabled) return;
+
+    const winnerPlayerCardContainer = winnerPlayerCard?.parentElement;
+    winnerPlayerCardContainer?.classList.add("ad-ext_winner-animation");
 
     const winnerScoreElHeight = winnerScoreEl.clientHeight;
-    winnerScoreWrapperEl.style.height = `${winnerScoreElHeight}px`;
+    let winnerScoreWrapperEl = winnerPlayerCard?.querySelector(".ad-ext_winner-score-wrapper");
+
+    if (!winnerScoreWrapperEl) {
+      winnerScoreWrapperEl = document.createElement("div");
+      winnerScoreWrapperEl.classList.add("ad-ext_winner-score-wrapper");
+      winnerScoreEl.parentNode?.insertBefore(winnerScoreWrapperEl, winnerScoreEl);
+      winnerScoreWrapperEl.appendChild(winnerScoreEl);
+
+      (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
+    }
 
     const winnerAnimationMessageElement = document.createElement("p");
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
@@ -100,7 +127,6 @@ export async function winnerAnimation() {
     if (!isX01()) return;
 
     const baseScore = document.querySelector("#ad-ext-game-variant")?.nextSibling?.textContent;
-    const dartsThrown = getDartsThrown(winnerPlayerCard as HTMLElement);
 
     if (!baseScore || !dartsThrown) return;
 

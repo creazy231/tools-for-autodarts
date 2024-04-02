@@ -24,8 +24,7 @@ import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPo
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
 import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
-import { winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
-import { thrownDarts } from "@/entrypoints/match.content/thrownDarts";
+import { removeWinnerAnimation, winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -125,8 +124,15 @@ async function initStreamingMode(ctx) {
 
 async function throwsChange() {
   const hasWinner = document.querySelector(".ad-ext-player-winner");
-
   const isValidGameMode = isX01() || isCricket();
+
+  if (isValidGameMode) {
+    if (hasWinner) {
+      await winnerAnimation();
+    } else {
+      await removeWinnerAnimation();
+    }
+  }
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
@@ -162,8 +168,6 @@ async function throwsChange() {
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
   hasWinner && isValidGameMode && (await soundsWinner());
-  hasWinner && isValidGameMode && (await thrownDarts());
-  hasWinner && isValidGameMode && (await winnerAnimation());
 }
 
 function startThrowsObserver() {
