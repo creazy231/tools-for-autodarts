@@ -271,6 +271,48 @@
           <div class="space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
+                Legs / Sets larger
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows the legs and sets larger on the match page.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.legsSetsLarger.enabled" />
+              <input
+                v-if="config.legsSetsLarger.enabled"
+                v-model="config.legsSetsLarger.value"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+              <span v-if="config.legsSetsLarger.enabled">rem</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Player match data larger
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows the player match data larger on the match page.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.playerMatchData.enabled" />
+              <input
+                v-if="config.playerMatchData.enabled"
+                v-model="config.playerMatchData.value"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+              <span v-if="config.playerMatchData.enabled">rem</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
                 Automatic next Leg
               </h2>
               <p class="max-w-2xl text-white/40">
