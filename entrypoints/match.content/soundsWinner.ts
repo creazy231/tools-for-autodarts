@@ -8,8 +8,12 @@ export async function soundsWinner() {
   const matchStatus = (await AutodartsToolsMatchStatus.getValue());
 
   const throwPointsArr = matchStatus.throws;
+  const turnPoints = matchStatus.turnPoints;
 
-  const waitForSumCallingIsOver = throwPointsArr.length === 3 ? 2500 : 0;
+  // if turnPoints is 100 or more, then sum calling time is 3500ms, otherwise 2500ms, because of longer time to call 100+ points
+  const sumCallingTime = turnPoints ? (Number.parseInt(turnPoints) >= 100 ? 3500 : 2500) : 0;
+
+  const waitForSumCallingIsOver = throwPointsArr.length === 3 ? sumCallingTime : 0;
 
   const winnerPlayerCard = getWinnerPlayerCard();
   const winnerPlayerName = (winnerPlayerCard?.querySelector(".ad-ext-player-name") as HTMLElement)?.innerText;
