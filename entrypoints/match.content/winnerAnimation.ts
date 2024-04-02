@@ -1,5 +1,8 @@
 import { addStyles, waitForElement } from "@/utils";
-import { getWinnerPlayerCard } from "@/utils/getElements";
+import { getDartsThrown, getWinnerPlayerCard } from "@/utils/getElements";
+import type { IConfig } from "@/utils/storage";
+import { AutodartsToolsConfig } from "@/utils/storage";
+import { isX01 } from "@/utils/helpers";
 
 export async function winnerAnimation() {
   addStyles(`
@@ -68,7 +71,9 @@ export async function winnerAnimation() {
   await waitForElement("#ad-ext-turn");
 
   try {
-    console.log("winner animation");
+    const config: IConfig = await AutodartsToolsConfig.getValue();
+    if (!config.winnerAnimation.enabled) return;
+
     const winnerPlayerCard = getWinnerPlayerCard();
     const winnerPlayerCardContainer = getWinnerPlayerCard()?.parentElement;
     winnerPlayerCardContainer?.classList.add("ad-ext_winner-animation");
@@ -86,13 +91,41 @@ export async function winnerAnimation() {
     const winnerAnimationMessageElement = document.createElement("p");
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
     winnerAnimationMessageElement.textContent = "Game Shot!";
-    winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 3}px`;
+    winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.8}px`;
+    winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3}px`;
 
     const finalScoreEl = winnerPlayerCard?.querySelector(".ad-ext-player-score");
     if (finalScoreEl) {
       (finalScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 2}px`;
       winnerScoreWrapperEl.appendChild(winnerAnimationMessageElement);
     }
+
+    if (!isX01()) return;
+
+    const baseScore = document.querySelector("#ad-ext-game-variant")?.nextSibling?.textContent;
+    const dartsThrown = getDartsThrown(winnerPlayerCard as HTMLElement);
+
+    if (!baseScore || !dartsThrown) return;
+
+    const motivationMapping = {
+      v121: [ 3, 4, 5, 6 ],
+      v170: [ 3, 5, 7, 9 ],
+      v301: [ 6, 9, 12, 15 ],
+      v501: [ 9, 15, 20, 25 ],
+      v701: [ 12, 18, 23, 28 ],
+      v901: [ 16, 22, 27, 32 ],
+    };
+
+    const motivationText = [ "UNBELIEVABLE!", "Splendid Game!", "Great Game!", "Nice Game!" ];
+
+    const baseScoreKeys = motivationMapping[`v${baseScore}`];
+    baseScoreKeys.some((key, index) => {
+      if (dartsThrown <= key) {
+        winnerAnimationMessageElement.textContent = motivationText[index];
+        return true;
+      }
+      return false;
+    });
   } catch (e) {
     console.error("Autodarts Tools: Winner Animation - Error: ", e);
   }
