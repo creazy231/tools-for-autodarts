@@ -15,6 +15,7 @@ let observer = new MutationObserver(() => {});
 const currentUrl = ref();
 const configVisible = ref(false);
 const isConfigPage = ref(true);
+const isTournamentsPage = ref(true);
 const navigationCheckInterval = ref();
 
 watch(currentUrl, async (newURL, oldURL) => {
@@ -52,6 +53,15 @@ onMounted(async () => {
   await nextTick();
   currentUrl.value = window.location.href;
   isConfigPage.value = url.includes("/tools");
+  isTournamentsPage.value = url.includes("/adt-tournaments");
+
+  if (isTournamentsPage.value) {
+    window.history.pushState(null, "", "/adt-tournaments");
+
+    await nextTick();
+
+    isTournamentsPage.value = false;
+  }
 
   if (isConfigPage.value) {
     window.history.pushState(null, "", "/tools");

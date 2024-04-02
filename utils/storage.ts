@@ -63,6 +63,9 @@ export interface IConfig {
       name: string;
     }[];
   };
+  tournaments: {
+    enabled: boolean;
+  };
 }
 
 export interface IMatchStatus {
@@ -132,6 +135,9 @@ export const defaultConfig: IConfig = {
   externalBoards: {
     enabled: false,
     boards: [],
+  },
+  tournaments: {
+    enabled: false,
   },
 };
 

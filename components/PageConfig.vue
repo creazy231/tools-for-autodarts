@@ -18,6 +18,20 @@
           <div class="space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
+                Tournaments
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Enables access to local tournaments creation and management.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.tournaments.enabled" />
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
                 Discord Webhooks
               </h2>
               <p class="max-w-2xl text-white/40">
@@ -746,6 +760,14 @@ function goBack() {
   window.history.back();
   window.history.back();
 }
+
+onBeforeMount(async () => {
+  config.value = await AutodartsToolsConfig.getValue();
+  await AutodartsToolsConfig.setValue({
+    ...JSON.parse(JSON.stringify(defaultConfig)),
+    ...JSON.parse(JSON.stringify(config.value)),
+  });
+});
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();

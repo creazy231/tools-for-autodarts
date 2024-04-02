@@ -18,9 +18,15 @@ export default defineConfig({
   },
   manifest: {
     host_permissions: [ "*://play.autodarts.io/*" ],
-    permissions: [ "storage" ],
+    permissions: [ "storage", "cookies" ],
     name: "Autodarts Tools",
     description: "Autodarts Tools enhances the gaming experience on autodarts.io",
+    web_accessible_resources: [
+      {
+        matches: [ "*://play.autodarts.io/*" ],
+        resources: [ "tournaments/*.js", "tournaments/*.css" ],
+      },
+    ],
   },
   dev: {
     reloadCommand: "Alt+T",

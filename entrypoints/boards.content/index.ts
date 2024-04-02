@@ -40,7 +40,7 @@ async function initExternalBoards(ctx: any) {
   if (!boardsParentElement) return;
 
   externalBoardsUI = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-recent-local-players",
+    name: "autodarts-tools-external-boards",
     position: "inline",
     anchor: boardsParentElement.parentElement,
     onMount: (container: any) => {

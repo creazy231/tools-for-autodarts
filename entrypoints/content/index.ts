@@ -12,6 +12,9 @@ export default defineContentScript({
     if (window.location.href.includes("/tools")) {
       document.querySelector("#root")?.remove();
       window.location.href = "/settings";
+    } else if (window.location.href.includes("/adt-tournaments")) {
+      document.querySelector("#root")?.remove();
+      window.location.href = "/tournaments";
     } else {
       if (isiOS()) {
         document.querySelector("body")!.style!.minHeight = "calc(100vh + 1px)";
