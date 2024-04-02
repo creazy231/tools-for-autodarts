@@ -153,7 +153,7 @@ export const defaultConfig: IConfig = {
     boards: [],
   },
   menuDisabled: false,
-  legsSetsLarger: { enabled: false, value: 3 },
+  legsSetsLarger: { enabled: false, value: 2.5 },
   playerMatchData: { enabled: false, value: 1.5 },
   automaticNextLeg: {
     enabled: false,
