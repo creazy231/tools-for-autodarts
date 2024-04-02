@@ -271,10 +271,10 @@
           <div class="space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
-                Legs / Sets larger
+                Larger Legs & Sets
               </h2>
               <p class="max-w-2xl text-white/40">
-                Shows the legs and sets larger on the match page.
+                Increases the font-size of the legs and sets on the match page.
               </p>
             </div>
             <div class="grid grid-cols-[5rem_5rem_5rem] items-center gap-4">
@@ -292,10 +292,10 @@
           <div class="space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
-                Player match data larger
+                Larger Player Match Data
               </h2>
               <p class="max-w-2xl text-white/40">
-                Shows the player match data larger on the match page.
+                Increases the font-size of the player match data on the match page.
               </p>
             </div>
             <div class="grid grid-cols-[5rem_5rem_5rem] items-center gap-4">
@@ -345,6 +345,7 @@
               <div />
               <button
                 @click="callerConfig = defaultCallerConfig"
+                v-if="config.caller.enabled"
                 class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
               >
                 <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
@@ -432,6 +433,7 @@
               <div />
               <button
                 @click="soundsConfig = defaultSoundsConfig"
+                v-if="config.sounds.enabled"
                 class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
               >
                 <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
