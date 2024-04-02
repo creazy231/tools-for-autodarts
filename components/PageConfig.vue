@@ -1024,35 +1024,6 @@ onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
   callerConfig.value = await AutodartsToolsCallerConfig.getValue();
   soundsConfig.value = await AutodartsToolsSoundsConfig.getValue();
-  // console.log("soundsConfig", soundsConfig.value);
-  if (typeof soundsConfig.value?.T === "string") {
-    console.log("convert");
-    const newSoundConfig = { ...defaultSoundsConfig };
-    for (const [ key, objvalue ] of Object.entries(soundsConfig.value)) {
-      if (key === "miss") {
-        for (const [ index, sound ] of objvalue.entries()) {
-          console.log(`miss ${key}[${index}]: ${sound}`);
-        }
-      } else if (key === "winner") {
-        for (const [ index, sound ] of objvalue.entries()) {
-          console.log(`winner ${key}[${index}]: ${sound}`);
-          console.log(sound);
-        }
-      } else {
-        newSoundConfig[key].info = objvalue;
-      }
-      soundsConfig.value = { ...newSoundConfig };
-    }
-
-    // if (Array.isArray(objvalue)) {
-    //   for (const [ index, sound ] of objvalue.entries()) {
-    //     console.log(`${key}[${index}]: ${sound}`);
-    //   }
-    //   continue;
-    // }
-    // console.log("objvalue", objvalue);
-    // console.log(`${key}: ${objvalue}`);
-  }
 });
 
 watch(config, async () => {
