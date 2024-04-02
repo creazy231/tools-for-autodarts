@@ -23,6 +23,7 @@ import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
+import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -94,6 +95,7 @@ async function initMatch() {
   }
 
   await hideMenu();
+  await playerMatchDataLarger();
 
   throwsChange().catch(console.error);
 }

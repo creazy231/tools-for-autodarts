@@ -1,8 +1,10 @@
 import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsBoardStatus, AutodartsToolsConfig } from "@/utils/storage";
 import { BoardStatus } from "@/utils/types";
+import { waitForElement } from "@/utils";
 
 export async function automaticNextLeg() {
+  await waitForElement("#ad-ext-turn");
   try {
     const config: IConfig = await AutodartsToolsConfig.getValue();
     if (!config.automaticNextLeg.enabled) return;

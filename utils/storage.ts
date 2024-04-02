@@ -63,7 +63,15 @@ export interface IConfig {
       name: string;
     }[];
   };
-  menuDisabled?: boolean;
+  menuDisabled: boolean;
+  legsSetsLarger: {
+    enabled: boolean;
+    value: number;
+  };
+  playerMatchData: {
+    enabled: boolean;
+    value: number;
+  };
   automaticNextLeg: {
     enabled: boolean;
     sec: number;
@@ -139,6 +147,8 @@ export const defaultConfig: IConfig = {
     boards: [],
   },
   menuDisabled: false,
+  legsSetsLarger: { enabled: false, value: 3 },
+  playerMatchData: { enabled: false, value: 1.5 },
   automaticNextLeg: {
     enabled: false,
     sec: 5,
