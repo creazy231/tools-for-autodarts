@@ -58,9 +58,9 @@ export async function sounds() {
     if (curThrowPointsBed === "T") curThrowPointsMultiplier = 3;
   }
 
-  console.log("curThrowPointsNumber", curThrowPointsNumber);
-  console.log("curThrowPointsBed", curThrowPointsBed);
-  console.log("curThrowPointsMultiplier", curThrowPointsMultiplier);
+  // console.log("curThrowPointsNumber", curThrowPointsNumber);
+  // console.log("curThrowPointsBed", curThrowPointsBed);
+  // console.log("curThrowPointsMultiplier", curThrowPointsMultiplier);
 
   const isBot = curThrowPointsName?.length && playerName && playerName.startsWith("BOT LEVEL");
   if (isBot) {
