@@ -254,6 +254,112 @@
             </div>
           </div>
 
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Hide Menu in Match
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Hide the menu during the match to have more space.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.menuDisabled" />
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Larger Legs & Sets
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Increases the font-size of the legs and sets on the match page.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_5rem] items-center gap-4">
+              <AppToggle v-model="config.legsSetsLarger.enabled" />
+              <span v-if="config.legsSetsLarger.enabled" class="text-right">size</span>
+              <input
+                v-if="config.legsSetsLarger.enabled"
+                v-model="config.legsSetsLarger.value"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Larger Player Match Data
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Increases the font-size of the player match data on the match page.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_5rem] items-center gap-4">
+              <AppToggle v-model="config.playerMatchData.enabled" />
+              <span v-if="config.playerMatchData.enabled" class="text-right">size</span>
+              <input
+                v-if="config.playerMatchData.enabled"
+                v-model="config.playerMatchData.value"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Automatic next Leg
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Automatically starts the next leg x seconds <span class="font-semibold text-white/60">after takeout</span>.<br>
+                Disabled while playing against logged in opponents.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.automaticNextLeg.enabled" />
+              <input
+                v-if="config.automaticNextLeg.enabled"
+                v-model="config.automaticNextLeg.sec"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+              <span v-if="config.automaticNextLeg.enabled">seconds</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Winner animation
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows an animation around player card when a player wins a leg.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.winnerAnimation.enabled" />
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Show thrown darts
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows number of thrown darts after a player wins a leg.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.thrownDartsOnWin.enabled" />
+            </div>
+          </div>
+
           <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">
@@ -268,6 +374,7 @@
               <div />
               <button
                 @click="callerConfig = defaultCallerConfig"
+                v-if="config.caller.enabled"
                 class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
               >
                 <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
@@ -350,136 +457,211 @@
                 Sounds
               </h2>
             </div>
-            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+            <div class="grid grid-cols-[5rem_auto_50px] items-center gap-4">
               <AppToggle v-model="config.sounds.enabled" />
+              <div />
+              <button
+                @click="soundsConfig = defaultSoundsConfig"
+                v-if="config.sounds.enabled"
+                class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+              >
+                <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+              </button>
             </div>
             <div v-if="config.sounds.enabled && soundsConfig" class="grid gap-4">
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Triple</div>
                 <input
-                  v-model="soundsConfig.T"
+                  v-model="soundsConfig.T.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.T.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.T.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.T)"
+                  @click="playSound('T')"
+                  title="Play sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.T = defaultSoundsConfig.T"
+                  @click="handleSoundUpload('T')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('T')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.T = ''"
+                  @click="handleSoundRemove('T')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div v-for="tripleCount in tripleCountArr" :key="tripleCount" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div v-for="tripleCount in tripleCountArr" :key="tripleCount" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>T{{ tripleCount }}</div>
                 <input
-                  v-model="soundsConfig[`T${tripleCount}`]"
+                  v-model="soundsConfig[`T${tripleCount}`].info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig[`T${tripleCount}`].data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig[`T${tripleCount}`].data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig[`T${tripleCount}`])"
+                  @click="playSound(`T${tripleCount}`)"
+                  title="Play sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig[`T${tripleCount}`] = defaultSoundsConfig[`T${tripleCount}`]"
+                  @click="handleSoundUpload(`T${tripleCount}`)"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset(`T${tripleCount}`)"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig[`T${tripleCount}`] = ''"
+                  @click="handleSoundRemove(`T${tripleCount}`)"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Bull</div>
                 <input
-                  v-model="soundsConfig.bull"
+                  v-model="soundsConfig.bull.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.bull.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.bull.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.bull)"
+                  @click="playSound('bull')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bull = defaultSoundsConfig.bull"
+                  @click="handleSoundUpload('bull')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('bull')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bull = ''"
+                  @click="handleSoundRemove('bull')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Bust</div>
                 <input
-                  v-model="soundsConfig.bust"
+                  v-model="soundsConfig.bust.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.bust.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.bust.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.bust)"
+                  @click="playSound('bust')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bust = defaultSoundsConfig.bust"
+                  @click="handleSoundUpload('bust')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('bust')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bust = ''"
+                  @click="handleSoundRemove('bust')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Ready. Throw!</div>
                 <input
-                  v-model="soundsConfig.playerStart"
+                  v-model="soundsConfig.playerStart.info"
                   placeholder="sound to play when it's time to throw"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.playerStart.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.playerStart.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.playerStart)"
+                  @click="playSound('playerStart')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.playerStart = defaultSoundsConfig.playerStart"
+                  @click="handleSoundUpload('playerStart')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('playerStart')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.playerStart = ''"
+                  @click="handleSoundRemove('playerStart')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
@@ -493,27 +675,42 @@
                   &nbsp;(random)
                 </span>
               </div>
-              <div v-for="(_, index) in soundsConfig.miss" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div v-for="(_, index) in soundsConfig.miss" :key="index" class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Miss {{ index + 1 }}</div>
                 <input
-                  v-model="soundsConfig.miss[index]"
+                  v-model="soundsConfig.miss[index].info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.miss[index].data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.miss[index].data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.miss[index])"
+                  @click="playSound('miss', 1, index)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.miss[index] = defaultSoundsConfig.miss[index]"
+                  @click="handleSoundUpload('miss', index)"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('miss', index)"
+                  v-if="index <= 2"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
+                <div v-else />
                 <button
                   @click="soundsConfig.miss.splice(index, 1)"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
@@ -521,7 +718,7 @@
               </div>
               <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
                 <button
-                  @click="soundsConfig.miss.push('')"
+                  @click="soundsConfig.miss.push({ info: '' })"
                   class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
                 >
                   <span class="icon-[mdi-light--plus]" />
@@ -530,53 +727,79 @@
               <div class="mt-1.5">
                 <span class="font-semibold">Bot throw sound</span>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Hit</div>
                 <input
-                  v-model="soundsConfig.bot"
+                  v-model="soundsConfig.bot.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.bot.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.bot.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.bot)"
+                  @click="playSound('bot')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bot = defaultSoundsConfig.bot"
+                  @click="handleSoundUpload('bot')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('bot')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bot = ''"
+                  @click="handleSoundRemove('bot')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Miss</div>
                 <input
-                  v-model="soundsConfig.botOutside"
+                  v-model="soundsConfig.botOutside.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.botOutside.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.botOutside.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.botOutside)"
+                  @click="playSound('botOutside')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.botOutside = defaultSoundsConfig.botOutside"
+                  @click="handleSoundUpload('botOutside')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('botOutside')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.botOutside = ''"
+                  @click="handleSoundRemove('botOutside')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
@@ -585,53 +808,79 @@
               <div class="mt-1.5">
                 <span class="font-semibold">Cricket sounds</span>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Hit</div>
                 <input
-                  v-model="soundsConfig.cricketHit"
+                  v-model="soundsConfig.cricketHit.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.cricketHit.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.cricketHit.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.cricketHit)"
+                  @click="playSound('cricketHit')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.bot = defaultSoundsConfig.cricketHit"
+                  @click="handleSoundUpload('cricketHit')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('cricketHit')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.cricketHit = ''"
+                  @click="handleSoundRemove('cricketHit')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Miss</div>
                 <input
-                  v-model="soundsConfig.cricketMiss"
+                  v-model="soundsConfig.cricketMiss.info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.cricketMiss.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.cricketMiss.data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.cricketMiss)"
+                  @click="playSound('cricketMiss')"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.cricketMiss = defaultSoundsConfig.cricketMiss"
+                  @click="handleSoundUpload('cricketMiss')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('cricketMiss')"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.cricketMiss = ''"
+                  @click="handleSoundRemove('cricketMiss')"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
@@ -640,7 +889,7 @@
               <div class="mt-1.5">
                 <span class="font-semibold">Winner sounds</span>
               </div>
-              <div v-for="(_, index) in soundsConfig.winner.slice(1)" :key="index" class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px] lg:grid-rows-1">
+              <div v-for="(_, index) in soundsConfig.winner.slice(1)" :key="index" class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <input
                   v-model="soundsConfig.winner[index + 1].name"
                   placeholder="Player name"
@@ -648,16 +897,27 @@
                   class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
                 >
                 <input
-                  v-model="soundsConfig.winner[index + 1].url"
+                  v-model="soundsConfig.winner[index + 1].info"
                   placeholder="URL of sound file"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.winner[index + 1].data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.winner[index + 1].data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.winner[index + 1].url)"
+                  @click="playSound('winner', 1, index + 1)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="handleSoundUpload('winner', index + 1)"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
                 </button>
                 <div />
                 <button
@@ -667,27 +927,40 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px] lg:grid-rows-1">
+              <div class="grid items-center gap-4 lg:grid-cols-[200px_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Fallback</div>
                 <input
-                  v-model="soundsConfig.winner[0].url"
+                  v-model="soundsConfig.winner[0].info"
                   type="text"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+                  :disabled="!!soundsConfig.winner[0].data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.winner[0].data && 'text-white/40',
+                  )"
                 >
                 <button
-                  @click="playSound1(soundsConfig.winner[0].url)"
+                  @click="playSound('winner', 1, 0)"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--play] text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.winner[0] = defaultSoundsConfig.winner[0]"
+                  @click="handleSoundUpload('winner', 0)"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('winner', 0)"
+                  title="Reset sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
                 >
                   <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
                 </button>
                 <button
-                  @click="soundsConfig.winner[0].url = ''"
+                  @click="handleSoundRemove('winner', 0)"
+                  title="Remove sound"
                   class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
                 >
                   <span class="icon-[mdi-light--delete] text-lg" />
@@ -695,7 +968,7 @@
               </div>
               <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
                 <button
-                  @click="soundsConfig.winner.push({ name: '', url: '' })"
+                  @click="soundsConfig.winner.push({ name: '', info: '' })"
                   class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
                 >
                   <span class="icon-[mdi-light--plus]" />
@@ -717,9 +990,9 @@ import type { ICallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsCallerConfig, defaultCallerConfig } from "@/utils/callerStorage";
-import type { ISoundsConfig } from "@/utils/soundsStorage";
+import type { ISoundsConfig, TSoundData } from "@/utils/soundsStorage";
 import { AutodartsToolsSoundsConfig, defaultSoundsConfig } from "@/utils/soundsStorage";
-import { playPointsSound, playSound1 } from "@/utils/playSound";
+import { playPointsSound, playSound } from "@/utils/playSound";
 
 const config = ref<IConfig>();
 const callerConfig = ref<ICallerConfig>();
@@ -794,6 +1067,47 @@ function handleStreamingModeBackgroundFileSelected() {
 
 function handleStreamingModeBackgroundReset() {
   config.value!.streamingMode.image = "";
+}
+
+function getSoundConfig(configKey: string, arrIndex?: number): TSoundData | null {
+  let soundConfig = soundsConfig.value![configKey];
+  if (typeof arrIndex === "number") soundConfig = soundConfig[arrIndex];
+  if (!soundConfig) return null;
+  return soundConfig;
+}
+
+function handleSoundUpload(configKey: string, arrIndex?: number) {
+  const soundConfig = getSoundConfig(configKey, arrIndex);
+  if (!soundConfig) return;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "audio/*";
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    const fileName = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      soundConfig.data = reader.result as string;
+      soundConfig.info = fileName;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function handleSoundRemove(configKey: string, arrIndex?: number) {
+  const soundConfig = getSoundConfig(configKey, arrIndex);
+  if (!soundConfig) return;
+  soundConfig.info = "";
+  soundConfig.data = "";
+}
+
+function handleSoundReset(configKey: string, arrIndex?: number) {
+  const soundConfig = getSoundConfig(configKey, arrIndex);
+  if (!soundConfig) return;
+  soundConfig.info = defaultSoundsConfig[configKey].info;
+  soundConfig.data = "";
 }
 </script>
 

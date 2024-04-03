@@ -1,32 +1,22 @@
-import { soundEffect1, soundEffect2, soundEffect3 } from "@/utils/helpers";
+import { soundEffectArray } from "@/utils/helpers";
 import { AutodartsToolsConfig } from "@/utils/storage";
+import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 
-soundEffect1.autoplay = true;
-soundEffect2.autoplay = true;
-soundEffect3.autoplay = true;
+soundEffectArray[0].autoplay = true;
+soundEffectArray[1].autoplay = true;
+soundEffectArray[2].autoplay = true;
 
-export async function playSound1(fileName) {
+export async function playSound(configKey: string, slot: number = 1, arrIndex?: number) {
+  let soundConfig = (await AutodartsToolsSoundsConfig.getValue())[configKey];
+  if (typeof arrIndex === "number") soundConfig = soundConfig[arrIndex];
   const isSoundsEnabled = (await AutodartsToolsConfig.getValue()).sounds.enabled;
+  const fileName = soundConfig.info;
   if (!isSoundsEnabled || !fileName) return;
-  // console.log("fileName1", fileName);
-  soundEffect1.src = fileName;
+  const fileData = soundConfig.data;
+  soundEffectArray[slot - 1].src = fileData || fileName;
 }
 
-export async function playSound2(fileName) {
-  const isSoundsEnabled = (await AutodartsToolsConfig.getValue()).sounds.enabled;
-  if (!isSoundsEnabled || !fileName) return;
-  // console.log('fileName2', fileName);
-  soundEffect2.src = fileName;
-}
-
-export async function playSound3(fileName) {
-  const isSoundsEnabled = (await AutodartsToolsConfig.getValue()).sounds.enabled;
-  if (!isSoundsEnabled || !fileName) return;
-  // console.log('fileName3', fileName);
-  soundEffect3.src = fileName;
-}
-
-export function playPointsSound(callerServerUrl: string, callerFileExt: string, turnPoints?: string) {
+export function playPointsSound(callerServerUrl: string, callerFileExt: string, turnPoints?: string, slot: number = 1) {
   if (!turnPoints) return;
-  if (callerServerUrl?.length) soundEffect1.src = callerServerUrl + turnPoints + callerFileExt;
+  if (callerServerUrl?.length) soundEffectArray[slot - 1].src = callerServerUrl + turnPoints + callerFileExt;
 }

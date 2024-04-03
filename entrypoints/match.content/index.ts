@@ -16,11 +16,15 @@ import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/matc
 import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 
 import { sounds } from "@/entrypoints/match.content/sounds";
-import { getMenuBar } from "@/utils/getElements";
+import { getMenu, getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
 import { isBullOff, isCricket, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
+import { hideMenu } from "@/entrypoints/match.content/hideMenu";
+import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
+import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
+import { removeWinnerAnimation, winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -53,6 +57,8 @@ export default defineContentScript({
         takeoutUI?.remove();
         takeoutUI = null;
         await onRemoveColorChange();
+        const menu = getMenu();
+        if (menu) menu.style.display = "flex";
       }
     });
   },
@@ -89,6 +95,9 @@ async function initMatch() {
     await colorChange();
   }
 
+  await hideMenu();
+  await playerMatchDataLarger();
+
   throwsChange().catch(console.error);
 }
 
@@ -115,6 +124,15 @@ async function initStreamingMode(ctx) {
 
 async function throwsChange() {
   const hasWinner = document.querySelector(".ad-ext-player-winner");
+  const isValidGameMode = isX01() || isCricket();
+
+  if (isValidGameMode) {
+    if (hasWinner) {
+      await winnerAnimation();
+    } else {
+      await removeWinnerAnimation();
+    }
+  }
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
@@ -124,7 +142,7 @@ async function throwsChange() {
 
   if (isBullOff() && hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isX01()) {
+      if (isValidGameMode) {
         clearInterval(bullOffInterval);
         initMatch().catch(console.error);
       }
@@ -149,7 +167,7 @@ async function throwsChange() {
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
-  hasWinner && (await soundsWinner());
+  hasWinner && isValidGameMode && (await soundsWinner());
 }
 
 function startThrowsObserver() {
@@ -177,6 +195,12 @@ function startBoardStatusObserver() {
     m.forEach((record) => {
       if (record.type === "characterData" && record.target.textContent && Object.values(BoardStatus).includes(record.target.textContent as BoardStatus)) {
         AutodartsToolsBoardStatus.setValue(record.target.textContent as BoardStatus).catch(console.error);
+        // automatic next leg if board status is throw (so it starts counting after takeout)
+        if (record.target.textContent === BoardStatus.THROW) {
+          AutodartsToolsMatchStatus.getValue().then((matchStatus) => {
+            if (matchStatus.hasWinner) automaticNextLeg().catch(console.error);
+          });
+        }
       }
     });
   });

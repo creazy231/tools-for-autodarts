@@ -6,6 +6,8 @@ export const soundEffect1 = new Audio();
 export const soundEffect2 = new Audio();
 export const soundEffect3 = new Audio();
 
+export const soundEffectArray = [ soundEffect1, soundEffect2, soundEffect3 ];
+
 export function isiOS() {
   return [
     "iPad Simulator", "iPhone Simulator", "iPod Simulator", "iPad", "iPhone", "iPod" ].includes(navigator.platform) // iPad on iOS 13 detection

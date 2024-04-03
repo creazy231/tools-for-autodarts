@@ -2,7 +2,7 @@ import { AutodartsToolsConfig, AutodartsToolsCricketClosedPoints, AutodartsTools
 import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 
-import { playPointsSound, playSound1, playSound2, playSound3 } from "@/utils/playSound";
+import { playPointsSound, playSound } from "@/utils/playSound";
 import { isCricket } from "@/utils/helpers";
 
 export async function sounds() {
@@ -31,7 +31,7 @@ export async function sounds() {
   const turnContainerEl = document.getElementById("ad-ext-turn");
   const letsGo = [ ...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement> ].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
 
-  if (letsGo) playSound1(soundConfig.playerStart);
+  if (letsGo) playSound("playerStart");
 
   // console.log("curThrowPointsName", curThrowPointsName);
 
@@ -65,32 +65,32 @@ export async function sounds() {
   const isBot = curThrowPointsName?.length && playerName && playerName.startsWith("BOT LEVEL");
   if (isBot) {
     if (curThrowPointsBed === "Outside") {
-      playSound3(soundConfig.botOutside);
+      playSound("botOutside", 3);
     } else {
-      playSound3(soundConfig.bot);
+      playSound("bot", 3);
     }
   }
 
   setTimeout(async () => {
     if (turnPoints === "BUST") {
-      if (soundConfig.bust?.length) {
-        playSound2(soundConfig.bust);
+      if (soundConfig.bust?.data || soundConfig.bust?.info) {
+        playSound("bust", 2);
       } else if (callerServerUrl.length && isCallerEnabled) {
-        playSound2(`${callerServerUrl}` + `0${callerFileExt}`);
+        playPointsSound(callerServerUrl, callerFileExt, "0");
       }
     } else {
       if (curThrowPointsName === "BULL") {
-        playSound2(soundConfig.bull);
+        playSound("bull", 2);
       } else if (curThrowPointsBed === "Outside") {
         const missLength = soundConfig.miss.length;
         const randomMissCount = Math.floor(Math.random() * missLength);
-        playSound2(soundConfig.miss[randomMissCount]);
+        playSound("miss", 2, randomMissCount);
       } else if (curThrowPointsMultiplier === 3) { // Triple
         if (!(isCricket() && curThrowPointsNumber < 15)) {
           if (curThrowPointsNumber >= 15 && soundConfig[`T${curThrowPointsNumber}`].length) {
-            playSound2(soundConfig[`T${curThrowPointsNumber}`]);
+            playSound(`T${curThrowPointsNumber}`, 2);
           } else {
-            playSound2(soundConfig.T);
+            playSound("T", 2);
           }
         }
       }
@@ -100,9 +100,9 @@ export async function sounds() {
         if (curThrowPointsNumber >= 0) {
           if (curThrowPointsNumber >= 15 && !cricketClosedPoints.includes(curThrowPointsNumber)) {
             // setCricketClosedPoints();
-            playSound3(soundConfig.cricketHit);
+            playSound("cricketHit", 3);
           } else {
-            playSound3(soundConfig.cricketMiss);
+            playSound("cricketMiss", 3);
           }
         }
       }

@@ -63,6 +63,25 @@ export interface IConfig {
       name: string;
     }[];
   };
+  menuDisabled: boolean;
+  legsSetsLarger: {
+    enabled: boolean;
+    value: number;
+  };
+  playerMatchData: {
+    enabled: boolean;
+    value: number;
+  };
+  automaticNextLeg: {
+    enabled: boolean;
+    sec: number;
+  };
+  winnerAnimation: {
+    enabled: boolean;
+  };
+  thrownDartsOnWin: {
+    enabled: boolean;
+  };
 }
 
 export interface IMatchStatus {
@@ -133,6 +152,15 @@ export const defaultConfig: IConfig = {
     enabled: false,
     boards: [],
   },
+  menuDisabled: false,
+  legsSetsLarger: { enabled: false, value: 2.5 },
+  playerMatchData: { enabled: false, value: 1.5 },
+  automaticNextLeg: {
+    enabled: false,
+    sec: 5,
+  },
+  winnerAnimation: { enabled: false },
+  thrownDartsOnWin: { enabled: false },
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(

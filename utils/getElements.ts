@@ -10,3 +10,9 @@ export function getMenuBar(): Element | null {
 }
 
 export const getResetBtn = () => [ ...getMenuBar()?.querySelectorAll("button") as NodeListOf<HTMLButtonElement> ].find(el => el.textContent === "Reset");
+
+export const getMenu = () => document.querySelector("#root > div > div") as HTMLElement | null;
+
+export const getWinnerPlayerCard = () => document.querySelector(".ad-ext-player-winner");
+
+export const getDartsThrown = (playerCard: HTMLElement) => playerCard?.nextElementSibling?.querySelectorAll("p")[1]?.textContent?.split("|")[0].trim().split("#")[1].trim();
