@@ -58,9 +58,9 @@ export async function sounds() {
     if (curThrowPointsBed === "T") curThrowPointsMultiplier = 3;
   }
 
-  // console.log("curThrowPointsNumber", curThrowPointsNumber);
-  // console.log("curThrowPointsBed", curThrowPointsBed);
-  // console.log("curThrowPointsMultiplier", curThrowPointsMultiplier);
+  console.log("curThrowPointsNumber", curThrowPointsNumber);
+  console.log("curThrowPointsBed", curThrowPointsBed);
+  console.log("curThrowPointsMultiplier", curThrowPointsMultiplier);
 
   const isBot = curThrowPointsName?.length && playerName && playerName.startsWith("BOT LEVEL");
   if (isBot) {
@@ -87,7 +87,7 @@ export async function sounds() {
         playSound("miss", 2, randomMissCount);
       } else if (curThrowPointsMultiplier === 3) { // Triple
         if (!(isCricket() && curThrowPointsNumber < 15)) {
-          if (curThrowPointsNumber >= 15 && soundConfig[`T${curThrowPointsNumber}`].length) {
+          if (curThrowPointsNumber >= 15 && soundConfig[`T${curThrowPointsNumber}`].info.length) {
             playSound(`T${curThrowPointsNumber}`, 2);
           } else {
             playSound("T", 2);
