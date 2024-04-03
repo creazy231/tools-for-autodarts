@@ -38,7 +38,7 @@ export default defineContentScript({
   async main(ctx: any) {
     matchReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
       const config: IConfig = await AutodartsToolsConfig.getValue();
-      if (/\/matches\/|\/boards\//.test(url)) {
+      if (/(?<!history)(\/matches\/|\/boards\/)/.test(url)) {
         await waitForElement("#ad-ext-turn");
         console.log("Autodarts Tools: Match Ready");
 
@@ -99,6 +99,11 @@ async function initMatch() {
   await playerMatchDataLarger();
 
   throwsChange().catch(console.error);
+}
+
+async function endMatch() {
+  console.log("endmatch");
+  await hideMenu(false);
 }
 
 async function initStreamingMode(ctx) {
@@ -163,6 +168,7 @@ async function throwsChange() {
   });
 
   await scoreSmaller();
+  await sounds();
   await sounds();
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
