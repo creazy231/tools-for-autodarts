@@ -25,7 +25,12 @@
 - Smaller font size for inactive players
 - External Boards to easily follow them
 - Caller to announce scores
-- Various sounds for different events
+- Various sounds for different events (with upload feature)
+- Hide Menu to have more space for game view
+- Automatically next leg & set
+- Fancy Gameshot Animation
+- Adjust size of legs, sets and match information
+- Display thrown darts at the end of a game
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
