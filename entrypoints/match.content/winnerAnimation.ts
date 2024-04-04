@@ -15,6 +15,7 @@ export async function removeWinnerAnimation() {
 
     const winnerScoreEl = winnerAnimationContainer.querySelector(".ad-ext-player-score");
     if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.fontSize = "";
+    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.lineHeight = "";
 
     const winnerScoreWrapperEl = winnerAnimationContainer?.querySelector(".ad-ext_winner-score-wrapper");
     if (winnerScoreWrapperEl) (winnerScoreWrapperEl as HTMLElement).style.height = "";
