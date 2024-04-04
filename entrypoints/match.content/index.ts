@@ -29,6 +29,7 @@ import {
   removeWinnerAnimationOnEdit,
   winnerAnimation,
 } from "@/entrypoints/match.content/winnerAnimation";
+import { soundsStart } from "@/entrypoints/match.content/soundsStart";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -102,12 +103,8 @@ async function initMatch() {
   await hideMenu();
   await playerMatchDataLarger();
 
+  await soundsStart();
   throwsChange().catch(console.error);
-}
-
-async function endMatch() {
-  console.log("endmatch");
-  await hideMenu(false);
 }
 
 async function initStreamingMode(ctx) {

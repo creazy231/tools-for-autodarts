@@ -627,6 +627,48 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+
+              <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
+                <div>Game on!</div>
+                <input
+                  v-model="soundsConfig.gameOn.info"
+                  placeholder="sound to play when the game starts"
+                  type="text"
+                  :disabled="!!soundsConfig.gameOn.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.gameOn.data && 'text-white/40',
+                  )"
+                >
+                <button
+                  @click="playSound('gameOn')"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="handleSoundUpload('gameOn')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('gameOn')"
+                  title="Reset sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
+                <button
+                  @click="handleSoundRemove('gameOn')"
+                  title="Remove sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
+
               <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Ready. Throw!</div>
                 <input
@@ -667,6 +709,7 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+
               <div class="mt-1.5">
                 <span class="font-semibold">
                   Miss sounds
