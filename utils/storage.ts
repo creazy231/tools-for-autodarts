@@ -84,6 +84,10 @@ export interface IConfig {
   };
 }
 
+export interface IGlobalStatus {
+  isFirstStart: boolean;
+}
+
 export interface IMatchStatus {
   playerCount: number;
   throws: string[];
@@ -167,6 +171,17 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
   "local:config",
   {
     defaultValue: defaultConfig,
+  },
+);
+
+export const defaultGlobalStatus: IGlobalStatus = {
+  isFirstStart: false,
+};
+
+export const AutodartsToolsGlobalStatus: WxtStorageItem<IGlobalStatus, any> = storage.defineItem(
+  "local:globalstatus",
+  {
+    defaultValue: defaultGlobalStatus,
   },
 );
 

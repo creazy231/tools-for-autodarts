@@ -6,6 +6,7 @@ import type { IConfig, IMatchStatus } from "@/utils/storage";
 import {
   AutodartsToolsBoardStatus,
   AutodartsToolsConfig,
+  AutodartsToolsGlobalStatus,
   AutodartsToolsMatchStatus,
   AutodartsToolsUrlStatus,
   defaultMatchStatus,
@@ -18,7 +19,7 @@ import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 import { sounds } from "@/entrypoints/match.content/sounds";
 import { getMenu, getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
-import { isBullOff, isCricket, isX01 } from "@/utils/helpers";
+import { isBullOff, isCricket, isValidGameMode } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
@@ -96,6 +97,8 @@ async function initMatch() {
   const config = await AutodartsToolsConfig.getValue();
   await AutodartsToolsMatchStatus.setValue(defaultMatchStatus);
 
+  const globalStatus = await AutodartsToolsGlobalStatus.getValue();
+
   if (config.colors.enabled) {
     await colorChange();
   }
@@ -103,7 +106,11 @@ async function initMatch() {
   await hideMenu();
   await playerMatchDataLarger();
 
-  await soundsStart();
+  if (isValidGameMode() && globalStatus.isFirstStart) {
+    await soundsStart();
+    await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
+  }
+
   throwsChange().catch(console.error);
 }
 
@@ -130,11 +137,10 @@ async function initStreamingMode(ctx) {
 
 async function throwsChange() {
   const hasWinner = document.querySelector(".ad-ext-player-winner");
-  const isValidGameMode = isX01() || isCricket();
 
   const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
 
-  if (isValidGameMode) {
+  if (isValidGameMode()) {
     if (hasWinner) {
       if (editPlayerThrowActive) {
         await removeWinnerAnimationOnEdit();
@@ -153,7 +159,7 @@ async function throwsChange() {
 
   if (isBullOff() && hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isValidGameMode) {
+      if (isValidGameMode()) {
         clearInterval(bullOffInterval);
         initMatch().catch(console.error);
       }
@@ -179,7 +185,7 @@ async function throwsChange() {
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
-  hasWinner && isValidGameMode && (await soundsWinner());
+  hasWinner && isValidGameMode() && (await soundsWinner());
 }
 
 function startThrowsObserver() {
