@@ -16,6 +16,7 @@ const currentUrl = ref();
 const configVisible = ref(false);
 const isConfigPage = ref(true);
 const navigationCheckInterval = ref();
+const isMobileNav = ref();
 
 watch(currentUrl, async (newURL, oldURL) => {
   await AutodartsToolsUrlStatus.setValue(newURL.split("#")[0]);
@@ -46,6 +47,12 @@ watch(configVisible, async () => {
   }
 });
 
+watch(isMobileNav, (value, oldValue) => {
+  if (oldValue === null || oldValue === undefined) return;
+  console.log("Mobile Nav changed", value, oldValue);
+  initMenu();
+});
+
 onMounted(async () => {
   const url = await AutodartsToolsUrlStatus.getValue();
   currentUrl.value = "";
@@ -62,6 +69,28 @@ onMounted(async () => {
   }
 
   startObserver();
+
+  initMenu().catch(console.error);
+
+  await waitForElement("#root > div > div > .chakra-stack");
+
+  const collapseButton = document.querySelector("button[aria-label='Collapse side bar']") as HTMLButtonElement | null;
+  if (collapseButton) collapseButton.addEventListener("click", initMenu);
+});
+
+onBeforeUnmount(() => {
+  observer.disconnect();
+  clearInterval(navigationCheckInterval.value);
+  const collapseButton = document.querySelector("button[aria-label='Collapse side bar']") as HTMLButtonElement | null;
+  if (collapseButton) collapseButton.removeEventListener("click", initMenu);
+});
+
+async function initMenu() {
+  if (navigationCheckInterval.value) clearInterval(navigationCheckInterval.value);
+
+  // check if element with id "autodarts-tools-menu-item" is already present. if yes, delete it
+  const existingMenuItem = document.getElementById("autodarts-tools-menu-item");
+  if (existingMenuItem) existingMenuItem.remove();
 
   const menu = await waitForElement("#root > div > div > .chakra-stack");
   // get last element of the menu
@@ -94,12 +123,7 @@ onMounted(async () => {
   menu.appendChild(menuItem);
 
   navigationCheckInterval.value = setInterval(checkNavigation, 1000);
-});
-
-onBeforeUnmount(() => {
-  observer.disconnect();
-  clearInterval(navigationCheckInterval.value);
-});
+}
 
 function startObserver() {
   const targetNode = document.getElementById("root");
@@ -131,17 +155,20 @@ function checkNavigation() {
     if (menuItem) {
       menuItem.innerHTML = menuIcon;
     }
+    isMobileNav.value = false;
   } else if (width && width > 200) {
     const menuItem = document.getElementById("autodarts-tools-menu-item");
     if (menuItem) {
       menuItem.innerHTML = menuIcon;
     }
+    isMobileNav.value = true;
   } else {
     const menuItem = document.getElementById("autodarts-tools-menu-item");
     if (menuItem) {
       menuItem.innerHTML = `${menuIcon} Tools`;
       menuItem.querySelector("svg")!.style.marginRight = "0.5rem";
     }
+    isMobileNav.value = false;
   }
 }
 </script>
