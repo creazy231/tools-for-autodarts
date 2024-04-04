@@ -22,7 +22,23 @@ export async function removeWinnerAnimation() {
 
     document.querySelector(".ad-ext_winner-animation")?.classList.remove("ad-ext_winner-animation");
   } catch (e) {
-    console.error("Autodarts Tools: Winner Animation - Error: ", e);
+    console.error("Autodarts Tools: Remove Winner Animation - Error: ", e);
+  }
+}
+
+export async function removeWinnerAnimationOnEdit() {
+  const config: IConfig = await AutodartsToolsConfig.getValue();
+  if (!config.winnerAnimation.enabled && !config.thrownDartsOnWin.enabled) return;
+  try {
+    removeWinnerAnimation().then(() => {
+      if (config.thrownDartsOnWin.enabled) {
+        const winnerPlayerCard = getWinnerPlayerCard();
+        const winnerScoreEl = winnerPlayerCard?.querySelector(".ad-ext-player-score");
+        (winnerScoreEl as HTMLElement).innerText = "0";
+      }
+    });
+  } catch (e) {
+    console.error("Autodarts Tools: Remove Winner Animation on Edit  - Error: ", e);
   }
 }
 

@@ -24,7 +24,11 @@ import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPo
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
 import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
-import { removeWinnerAnimation, winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
+import {
+  removeWinnerAnimation,
+  removeWinnerAnimationOnEdit,
+  winnerAnimation,
+} from "@/entrypoints/match.content/winnerAnimation";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -131,15 +135,20 @@ async function throwsChange() {
   const hasWinner = document.querySelector(".ad-ext-player-winner");
   const isValidGameMode = isX01() || isCricket();
 
+  const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
+
   if (isValidGameMode) {
     if (hasWinner) {
-      await winnerAnimation();
+      if (editPlayerThrowActive) {
+        await removeWinnerAnimationOnEdit();
+      } else {
+        await winnerAnimation();
+      }
     } else {
       await removeWinnerAnimation();
     }
   }
 
-  const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
 
   const turnContainerEl = document.getElementById("ad-ext-turn");
