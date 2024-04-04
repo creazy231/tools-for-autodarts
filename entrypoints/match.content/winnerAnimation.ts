@@ -10,9 +10,15 @@ export async function removeWinnerAnimation() {
   try {
     const winnerAnimationContainer = document.querySelector(".ad-ext_winner-animation");
     if (!winnerAnimationContainer) return;
+
     document.getElementById("ad-ext_winner-animation--message")?.remove();
+
     const winnerScoreEl = winnerAnimationContainer.querySelector(".ad-ext-player-score");
     if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.fontSize = "";
+
+    const winnerScoreWrapperEl = winnerAnimationContainer?.querySelector(".ad-ext_winner-score-wrapper");
+    if (winnerScoreWrapperEl) (winnerScoreWrapperEl as HTMLElement).style.height = "";
+
     document.querySelector(".ad-ext_winner-animation")?.classList.remove("ad-ext_winner-animation");
   } catch (e) {
     console.error("Autodarts Tools: Winner Animation - Error: ", e);
@@ -96,15 +102,11 @@ export async function winnerAnimation() {
 
     const dartsThrown = getDartsThrown(winnerPlayerCard as HTMLElement);
 
-    if (config.thrownDartsOnWin.enabled) (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`;
-
-    if (!config.winnerAnimation.enabled) return;
-
     const winnerPlayerCardContainer = winnerPlayerCard?.parentElement;
-    winnerPlayerCardContainer?.classList.add("ad-ext_winner-animation");
-
-    const winnerScoreElHeight = winnerScoreEl.clientHeight;
     let winnerScoreWrapperEl = winnerPlayerCard?.querySelector(".ad-ext_winner-score-wrapper");
+
+    const winnerScoreElHeight = winnerScoreWrapperEl?.clientHeight || winnerScoreEl.clientHeight;
+    const winnerScoreElWidth = winnerScoreWrapperEl?.parentElement?.clientWidth || winnerScoreEl?.parentElement?.clientWidth;
 
     if (!winnerScoreWrapperEl) {
       winnerScoreWrapperEl = document.createElement("div");
@@ -115,13 +117,30 @@ export async function winnerAnimation() {
       (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
     }
 
+    if (config.thrownDartsOnWin.enabled) {
+      (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`;
+      // set font size of dart thrown text to 48pt on smaller screens because of longer text
+      if (!winnerScoreElWidth || winnerScoreElWidth < 615) (winnerScoreEl as HTMLElement).style.fontSize = "48pt";
+      (winnerScoreEl as HTMLElement).style.lineHeight = `${winnerScoreElHeight}px`;
+    }
+
+    if (!config.winnerAnimation.enabled) return;
+
+    winnerPlayerCardContainer?.classList.add("ad-ext_winner-animation");
+
+    document.getElementById("ad-ext_winner-animation--message")?.remove();
     const winnerAnimationMessageElement = document.createElement("p");
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
     winnerAnimationMessageElement.textContent = "Game Shot!";
-    winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.2}px`;
+    if (winnerScoreElWidth && winnerScoreElWidth > 360 && winnerScoreElWidth < 420) {
+      winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 1.9}px`;
+    } else {
+      winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.2}px`;
+    }
     winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.6}px`;
 
     (winnerScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 1.4}px`;
+    (winnerScoreEl as HTMLElement).style.lineHeight = `${winnerScoreElHeight / 5 * 1.4}px`;
     winnerScoreWrapperEl.appendChild(winnerAnimationMessageElement);
 
     if (!isX01()) return;
