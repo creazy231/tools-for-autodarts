@@ -24,6 +24,7 @@ export interface ISoundsConfig {
   playerStart: TSoundData;
   gameOn: TSoundData;
   winner: { name: string; data?: string; info: string }[];
+  winnerSoundOnLegWin?: boolean;
 }
 
 export const defaultSoundsConfig: ISoundsConfig = {
@@ -50,6 +51,7 @@ export const defaultSoundsConfig: ISoundsConfig = {
   winner: [
     { name: "Fallback", info: "https://www.myinstants.com/media/sounds/dart-winner.mp3" },
   ],
+  winnerSoundOnLegWin: false,
 };
 
 export const AutodartsToolsSoundsConfig: WxtStorageItem<ISoundsConfig, any> = storage.defineItem(

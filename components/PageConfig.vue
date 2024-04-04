@@ -1009,13 +1009,17 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
+
+              <div class="grid items-center gap-4 lg:grid-cols-[50px_138px_300px_50px_auto] lg:grid-rows-1">
                 <button
                   @click="soundsConfig.winner.push({ name: '', info: '' })"
                   class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
                 >
                   <span class="icon-[mdi-light--plus]" />
                 </button>
+                <div />
+                <div>Play winner sound after every leg</div>
+                <AppToggle v-model="soundsConfig.winnerSoundOnLegWin" />
               </div>
             </div>
           </div>
