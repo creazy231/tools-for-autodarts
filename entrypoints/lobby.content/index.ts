@@ -17,7 +17,7 @@ export default defineContentScript({
   async main(ctx: any) {
     lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
       const config: IConfig = await AutodartsToolsConfig.getValue();
-      if (/\/lobbies\/(?!.*\/new\/)/.test(url)) {
+      if (/\/lobbies\/(?!.*new\/)/.test(url)) {
         console.log("Autodarts Tools: Lobby Ready");
 
         if (config.discord.enabled) {
