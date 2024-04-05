@@ -360,6 +360,38 @@
             </div>
           </div>
 
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Show ring
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows a ring with numbers around the live view.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.liveViewRing.enabled" />
+            </div>
+            <div v-if="config.liveViewRing.enabled" class="grid grid-cols-[5rem_5rem_5rem_auto] items-center gap-4">
+              <p>Ring color</p>
+              <AppToggle v-model="config.liveViewRing.colorEnabled" />
+              <input
+                v-if="config.liveViewRing.colorEnabled"
+                v-model="config.liveViewRing.color"
+                type="color"
+                class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
+              >
+            </div>
+            <div v-if="config.liveViewRing.enabled" class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <p>Ring size</p>
+              <input
+                v-model="config.liveViewRing.size"
+                type="number"
+                class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+              >
+            </div>
+          </div>
+
           <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">

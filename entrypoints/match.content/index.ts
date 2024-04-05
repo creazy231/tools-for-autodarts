@@ -31,6 +31,7 @@ import {
   winnerAnimation,
 } from "@/entrypoints/match.content/winnerAnimation";
 import { soundsStart } from "@/entrypoints/match.content/soundsStart";
+import { liveViewRing } from "@/entrypoints/match.content/liveViewRing";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -91,13 +92,17 @@ async function initTakeout(ctx) {
 }
 
 async function initMatch() {
-  startThrowsObserver();
-  startBoardStatusObserver();
-
   const config = await AutodartsToolsConfig.getValue();
   await AutodartsToolsMatchStatus.setValue(defaultMatchStatus);
-
   const globalStatus = await AutodartsToolsGlobalStatus.getValue();
+
+  startThrowsObserver();
+  if (config.takeout.enabled) startBoardStatusObserver();
+
+  if (isValidGameMode() && config.liveViewRing.enabled) {
+    await liveViewRing();
+    startViewObserver();
+  }
 
   if (config.colors.enabled) {
     await colorChange();
@@ -223,4 +228,20 @@ function startBoardStatusObserver() {
     });
   });
   boardStatusObserver.observe(targetNode, { characterData: true, subtree: true });
+}
+
+function startViewObserver() {
+  const targetNode = document.getElementById("ad-ext-turn")?.nextElementSibling;
+  if (!targetNode) {
+    console.error("Target node not found");
+    return;
+  }
+  throwsObserver = new MutationObserver((m) => {
+    m.forEach(async (record) => {
+      if (record.addedNodes.length > 0 && record.addedNodes[0] && (record.addedNodes[0] as HTMLElement).childElementCount === 2 && (record.addedNodes[0] as HTMLElement).children[1].childElementCount === 2) {
+        await liveViewRing();
+      }
+    });
+  });
+  throwsObserver.observe(targetNode, { childList: true, subtree: true, attributes: false });
 }

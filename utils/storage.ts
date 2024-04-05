@@ -82,6 +82,13 @@ export interface IConfig {
   thrownDartsOnWin: {
     enabled: boolean;
   };
+  liveViewRing: {
+    enabled: boolean;
+    size: number;
+    colorEnabled: boolean;
+    color: string;
+  };
+
 }
 
 export interface IGlobalStatus {
@@ -165,6 +172,7 @@ export const defaultConfig: IConfig = {
   },
   winnerAnimation: { enabled: false },
   thrownDartsOnWin: { enabled: false },
+  liveViewRing: { enabled: false, size: 2, colorEnabled: true, color: "#000000" },
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
