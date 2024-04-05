@@ -206,7 +206,7 @@ function startThrowsObserver() {
 function startBoardStatusObserver() {
   const targetNode = (getMenuBar()?.lastChild?.lastChild as Element)?.querySelector("a");
   if (!targetNode) {
-    console.error("Target node not found");
+    console.log("Autodarts Tools: No board status found");
     return;
   }
   boardStatusObserver = new MutationObserver((m) => {
