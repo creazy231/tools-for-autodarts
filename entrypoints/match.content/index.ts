@@ -19,7 +19,7 @@ import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 import { sounds } from "@/entrypoints/match.content/sounds";
 import { getMenu, getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
-import { isBullOff, isCricket, isValidGameMode } from "@/utils/helpers";
+import { isBullOff, isCricket, isValidGameMode, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
@@ -99,7 +99,7 @@ async function initMatch() {
   startThrowsObserver();
   if (config.takeout.enabled) startBoardStatusObserver();
 
-  if (isValidGameMode() && config.liveViewRing.enabled) {
+  if (isX01() && config.liveViewRing.enabled) {
     await liveViewRing();
     startViewObserver();
   }

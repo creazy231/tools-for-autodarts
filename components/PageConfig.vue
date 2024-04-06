@@ -387,6 +387,8 @@
               <input
                 v-model="config.liveViewRing.size"
                 type="number"
+                min="1"
+                max="9"
                 class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
               >
             </div>

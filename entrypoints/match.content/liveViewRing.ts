@@ -6,7 +6,7 @@ const canTrig = CSS.supports("(top: calc(sin(1) * 1px))");
 function getSizes(size: number): { imgCircle: number; svgCircle: number; addVal: number } {
   switch (size) {
     case 1:
-      return { imgCircle: 0.345, svgCircle: 0.44, addVal: 0 };
+      return { imgCircle: 0.34, svgCircle: 0.43, addVal: -0.04 };
     case 2:
       return { imgCircle: 0.35, svgCircle: 0.44, addVal: 0 };
     case 3:
