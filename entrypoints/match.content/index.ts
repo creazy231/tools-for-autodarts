@@ -6,6 +6,7 @@ import type { IConfig, IMatchStatus } from "@/utils/storage";
 import {
   AutodartsToolsBoardStatus,
   AutodartsToolsConfig,
+  AutodartsToolsGlobalStatus,
   AutodartsToolsMatchStatus,
   AutodartsToolsUrlStatus,
   defaultMatchStatus,
@@ -18,13 +19,19 @@ import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 import { sounds } from "@/entrypoints/match.content/sounds";
 import { getMenu, getMenuBar } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
-import { isBullOff, isCricket, isX01 } from "@/utils/helpers";
+import { isBullOff, isCricket, isValidGameMode, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
 import { setCricketClosedPoints } from "@/entrypoints/match.content/setCricketPoints";
 import { hideMenu } from "@/entrypoints/match.content/hideMenu";
 import { automaticNextLeg } from "@/entrypoints/match.content/automaticNextLeg";
 import { playerMatchDataLarger } from "@/entrypoints/match.content/playerMatchDataLarger";
-import { removeWinnerAnimation, winnerAnimation } from "@/entrypoints/match.content/winnerAnimation";
+import {
+  removeWinnerAnimation,
+  removeWinnerAnimationOnEdit,
+  winnerAnimation,
+} from "@/entrypoints/match.content/winnerAnimation";
+import { soundsStart } from "@/entrypoints/match.content/soundsStart";
+import { liveViewRing } from "@/entrypoints/match.content/liveViewRing";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -85,11 +92,17 @@ async function initTakeout(ctx) {
 }
 
 async function initMatch() {
-  startThrowsObserver();
-  startBoardStatusObserver();
-
   const config = await AutodartsToolsConfig.getValue();
   await AutodartsToolsMatchStatus.setValue(defaultMatchStatus);
+  const globalStatus = await AutodartsToolsGlobalStatus.getValue();
+
+  startThrowsObserver();
+  if (config.takeout.enabled) startBoardStatusObserver();
+
+  if (isX01() && config.liveViewRing.enabled) {
+    await liveViewRing();
+    startViewObserver();
+  }
 
   if (config.colors.enabled) {
     await colorChange();
@@ -98,12 +111,12 @@ async function initMatch() {
   await hideMenu();
   await playerMatchDataLarger();
 
-  throwsChange().catch(console.error);
-}
+  if (isValidGameMode() && globalStatus.isFirstStart) {
+    await soundsStart();
+    await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
+  }
 
-async function endMatch() {
-  console.log("endmatch");
-  await hideMenu(false);
+  throwsChange().catch(console.error);
 }
 
 async function initStreamingMode(ctx) {
@@ -129,17 +142,21 @@ async function initStreamingMode(ctx) {
 
 async function throwsChange() {
   const hasWinner = document.querySelector(".ad-ext-player-winner");
-  const isValidGameMode = isX01() || isCricket();
 
-  if (isValidGameMode) {
+  const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
+
+  if (isValidGameMode()) {
     if (hasWinner) {
-      await winnerAnimation();
+      if (editPlayerThrowActive) {
+        await removeWinnerAnimationOnEdit();
+      } else {
+        await winnerAnimation();
+      }
     } else {
       await removeWinnerAnimation();
     }
   }
 
-  const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
   const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
 
   const turnContainerEl = document.getElementById("ad-ext-turn");
@@ -147,7 +164,7 @@ async function throwsChange() {
 
   if (isBullOff() && hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isValidGameMode) {
+      if (isValidGameMode()) {
         clearInterval(bullOffInterval);
         initMatch().catch(console.error);
       }
@@ -173,7 +190,7 @@ async function throwsChange() {
 
   if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
 
-  hasWinner && isValidGameMode && (await soundsWinner());
+  hasWinner && isValidGameMode() && (await soundsWinner());
 }
 
 function startThrowsObserver() {
@@ -194,7 +211,7 @@ function startThrowsObserver() {
 function startBoardStatusObserver() {
   const targetNode = (getMenuBar()?.lastChild?.lastChild as Element)?.querySelector("a");
   if (!targetNode) {
-    console.error("Target node not found");
+    console.log("Autodarts Tools: No board status found");
     return;
   }
   boardStatusObserver = new MutationObserver((m) => {
@@ -211,4 +228,20 @@ function startBoardStatusObserver() {
     });
   });
   boardStatusObserver.observe(targetNode, { characterData: true, subtree: true });
+}
+
+function startViewObserver() {
+  const targetNode = document.getElementById("ad-ext-turn")?.nextElementSibling;
+  if (!targetNode) {
+    console.error("Target node not found");
+    return;
+  }
+  throwsObserver = new MutationObserver((m) => {
+    m.forEach(async (record) => {
+      if (record.addedNodes.length > 0 && record.addedNodes[0] && (record.addedNodes[0] as HTMLElement).childElementCount === 2 && (record.addedNodes[0] as HTMLElement).children[1].childElementCount === 2) {
+        await liveViewRing();
+      }
+    });
+  });
+  throwsObserver.observe(targetNode, { childList: true, subtree: true, attributes: false });
 }

@@ -360,6 +360,40 @@
             </div>
           </div>
 
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Show ring
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Shows a ring with numbers around the live view.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.liveViewRing.enabled" />
+            </div>
+            <div v-if="config.liveViewRing.enabled" class="grid grid-cols-[5rem_5rem_5rem_auto] items-center gap-4">
+              <p>Ring color</p>
+              <AppToggle v-model="config.liveViewRing.colorEnabled" />
+              <input
+                v-if="config.liveViewRing.colorEnabled"
+                v-model="config.liveViewRing.color"
+                type="color"
+                class="size-full overflow-hidden rounded border-none border-transparent p-0 outline-none"
+              >
+            </div>
+            <div v-if="config.liveViewRing.enabled" class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <p>Ring size</p>
+              <input
+                v-model="config.liveViewRing.size"
+                type="number"
+                min="1"
+                max="9"
+                class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
+              >
+            </div>
+          </div>
+
           <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">
@@ -627,6 +661,48 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+
+              <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
+                <div>Game on!</div>
+                <input
+                  v-model="soundsConfig.gameOn.info"
+                  placeholder="sound to play when the game starts"
+                  type="text"
+                  :disabled="!!soundsConfig.gameOn.data"
+                  :class="twMerge(
+                    'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                    !!soundsConfig.gameOn.data && 'text-white/40',
+                  )"
+                >
+                <button
+                  @click="playSound('gameOn')"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--play] text-xl" />
+                </button>
+                <button
+                  @click="handleSoundUpload('gameOn')"
+                  title="Upload sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                >
+                  <span class="icon-[mdi-light--upload] text-lg" />
+                </button>
+                <button
+                  @click="handleSoundReset('gameOn')"
+                  title="Reset sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--refresh] -scale-x-100 text-xl" />
+                </button>
+                <button
+                  @click="handleSoundRemove('gameOn')"
+                  title="Remove sound"
+                  class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                >
+                  <span class="icon-[mdi-light--delete] text-lg" />
+                </button>
+              </div>
+
               <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                 <div>Ready. Throw!</div>
                 <input
@@ -667,6 +743,7 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
+
               <div class="mt-1.5">
                 <span class="font-semibold">
                   Miss sounds
@@ -966,13 +1043,17 @@
                   <span class="icon-[mdi-light--delete] text-lg" />
                 </button>
               </div>
-              <div class="grid items-center gap-4 lg:grid-cols-[50px_auto] lg:grid-rows-1">
+
+              <div class="grid items-center gap-4 lg:grid-cols-[50px_138px_300px_50px_auto] lg:grid-rows-1">
                 <button
                   @click="soundsConfig.winner.push({ name: '', info: '' })"
                   class="flex flex-nowrap items-center  justify-center rounded-md border border-white/10 bg-white/5 p-2 outline-none"
                 >
                   <span class="icon-[mdi-light--plus]" />
                 </button>
+                <div />
+                <div>Play winner sound after every leg</div>
+                <AppToggle v-model="soundsConfig.winnerSoundOnLegWin" />
               </div>
             </div>
           </div>

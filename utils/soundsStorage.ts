@@ -22,7 +22,9 @@ export interface ISoundsConfig {
   cricketHit: TSoundData;
   cricketMiss: TSoundData;
   playerStart: TSoundData;
+  gameOn: TSoundData;
   winner: { name: string; data?: string; info: string }[];
+  winnerSoundOnLegWin?: boolean;
 }
 
 export const defaultSoundsConfig: ISoundsConfig = {
@@ -45,9 +47,11 @@ export const defaultSoundsConfig: ISoundsConfig = {
   cricketHit: { info: "https://autodarts-plus.x10.mx/bonus-points.mp3" },
   cricketMiss: { info: "https://autodarts-plus.x10.mx/sound_double_windart.wav" },
   playerStart: { info: "" },
+  gameOn: { info: "" },
   winner: [
     { name: "Fallback", info: "https://www.myinstants.com/media/sounds/dart-winner.mp3" },
   ],
+  winnerSoundOnLegWin: false,
 };
 
 export const AutodartsToolsSoundsConfig: WxtStorageItem<ISoundsConfig, any> = storage.defineItem(

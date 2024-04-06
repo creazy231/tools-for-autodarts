@@ -2,7 +2,7 @@ import "~/assets/tailwind.css";
 import { createApp } from "vue";
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import type { IConfig } from "@/utils/storage";
-import { AutodartsToolsConfig, AutodartsToolsUrlStatus } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsUrlStatus } from "@/utils/storage";
 import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
@@ -17,7 +17,7 @@ export default defineContentScript({
   async main(ctx: any) {
     lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
       const config: IConfig = await AutodartsToolsConfig.getValue();
-      if (/\/lobbies\/(?!.*\/new\/)/.test(url)) {
+      if (/\/lobbies\/(?!.*new\/)/.test(url)) {
         console.log("Autodarts Tools: Lobby Ready");
 
         if (config.discord.enabled) {
@@ -36,6 +36,9 @@ export default defineContentScript({
           const div = document.querySelector("autodarts-tools-recent-local-players");
           if (!div) initRecentLocalPlayers(ctx).catch(console.error);
         }
+
+        const globalStatus = await AutodartsToolsGlobalStatus.getValue();
+        await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: true });
       } else {
         await onAutoStartRemove();
         await onShufflePlayersRemove();
