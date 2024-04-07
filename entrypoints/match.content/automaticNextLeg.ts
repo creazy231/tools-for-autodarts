@@ -9,7 +9,7 @@ export async function automaticNextLeg() {
     const config: IConfig = await AutodartsToolsConfig.getValue();
     if (!config.automaticNextLeg.enabled) return;
 
-    const playerWithAccount = document.querySelectorAll(".ad-ext-player a[href^='/users']");
+    const playerWithAccount = document.querySelectorAll(".ad-ext-player a[href^='/users']:not([href^='/users/null'])");
     if (playerWithAccount.length > 1) return;
 
     const boardStatus = await AutodartsToolsBoardStatus.getValue();
