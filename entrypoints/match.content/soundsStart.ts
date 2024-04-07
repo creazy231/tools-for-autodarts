@@ -8,6 +8,6 @@ export async function soundsStart() {
   if (!config.sounds.enabled) return;
 
   if (soundConfig.gameOn?.data || soundConfig.gameOn?.info) {
-    await playSound("gameOn");
+    await playSound("gameOn", 2);
   }
 }
