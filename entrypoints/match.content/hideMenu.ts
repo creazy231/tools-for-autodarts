@@ -36,7 +36,7 @@ export async function hideMenu() {
 
   menuHideBtn.addEventListener("click", () => {
     menuActive = !menuActive;
-    menuActive ? menuHideBtn.setAttribute("data-active", "") : menuHideBtn.removeAttribute("data-active");
+    menuHideBtn.toggleAttribute("data-active", menuActive);
     menu.style.display = menuActive ? "" : "none";
   });
 }
