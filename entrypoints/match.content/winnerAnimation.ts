@@ -133,7 +133,6 @@ export async function winnerAnimation() {
 
       (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
     }
-    console.log("winnerScoreElWidth", winnerScoreElWidth);
     if (config.thrownDartsOnWin.enabled) {
       (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`;
       // set font size of dart thrown text to 48pt on smaller screens because of longer text
