@@ -64,6 +64,8 @@ export default defineContentScript({
         boardStatusObserver?.disconnect();
         takeoutUI?.remove();
         takeoutUI = null;
+        streamingModeUI?.remove();
+        streamingModeUI = null;
         await onRemoveColorChange();
         const menu = getMenu();
         if (menu) menu.style.display = "flex";
