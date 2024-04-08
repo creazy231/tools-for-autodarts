@@ -95,12 +95,23 @@ export interface IGlobalStatus {
   isFirstStart: boolean;
 }
 
+export interface IPlayerInfo {
+  name: string;
+  score: string;
+  isActive: boolean;
+  legs?: string;
+  sets?: string;
+  darts?: string;
+  stats?: string;
+}
+
 export interface IMatchStatus {
   playerCount: number;
   throws: string[];
   turnPoints?: string ;
   isInEditMode: boolean;
   hasWinner: boolean;
+  playerInfo: IPlayerInfo[];
 }
 
 export type TBoardStatus = BoardStatus | undefined;
@@ -199,6 +210,7 @@ export const defaultMatchStatus: IMatchStatus = {
   turnPoints: undefined,
   isInEditMode: false,
   hasWinner: false,
+  playerInfo: [],
 };
 
 export const AutodartsToolsMatchStatus: WxtStorageItem<IMatchStatus, any> = storage.defineItem(
@@ -233,5 +245,12 @@ export const AutodartsToolsCricketClosedPoints: WxtStorageItem<number[], any> = 
   "local:cricketpointsstatus",
   {
     defaultValue: [],
+  },
+);
+
+export const AutodartsToolsStreamingModeStatus: WxtStorageItem<boolean, any> = storage.defineItem(
+  "local:streamingmodestatus",
+  {
+    defaultValue: false,
   },
 );
