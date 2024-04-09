@@ -91,6 +91,10 @@ export interface IConfig {
   nextPlayerAfter3darts: {
     enabled: boolean;
   };
+  nextPlayerOnTakeOutStuck: {
+    enabled: boolean;
+    sec: number;
+  };
 }
 
 export interface IGlobalStatus {
@@ -188,6 +192,10 @@ export const defaultConfig: IConfig = {
   thrownDartsOnWin: { enabled: false },
   liveViewRing: { enabled: false, size: 2, colorEnabled: true, color: "#000000" },
   nextPlayerAfter3darts: { enabled: false },
+  nextPlayerOnTakeOutStuck: {
+    enabled: false,
+    sec: 10,
+  },
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(

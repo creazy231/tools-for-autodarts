@@ -17,7 +17,7 @@ import { colorChange, onRemove as onRemoveColorChange } from "@/entrypoints/matc
 import StreamingMode from "@/entrypoints/match.content/StreamingMode.vue";
 
 import { sounds } from "@/entrypoints/match.content/sounds";
-import { getMenu, getMenuBar } from "@/utils/getElements";
+import { getBoardStatusEl, getMenu } from "@/utils/getElements";
 import { BoardStatus } from "@/utils/types";
 import { isBullOff, isCricket, isValidGameMode, isX01 } from "@/utils/helpers";
 import { soundsWinner } from "@/entrypoints/match.content/soundsWinner";
@@ -35,6 +35,7 @@ import { liveViewRing } from "@/entrypoints/match.content/liveViewRing";
 import { setPlayerInfo } from "@/entrypoints/match.content/setPlayerInfo";
 import { nextPlayerAfter3darts } from "@/entrypoints/match.content/nextPlayerAfter3darts";
 import { handleUndoMode } from "@/entrypoints/match.content/handleUndoMode";
+import { nextPlayerOnTakeOutStuck } from "@/entrypoints/match.content/nextPlayerOnTakeOutStuck";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -102,7 +103,7 @@ async function initMatch() {
   const globalStatus = await AutodartsToolsGlobalStatus.getValue();
 
   startThrowsObserver();
-  if (config.takeout.enabled || config.automaticNextLeg.enabled) startBoardStatusObserver();
+  if (getBoardStatusEl() && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) startBoardStatusObserver();
 
   if (isX01() && config.liveViewRing.enabled) {
     await liveViewRing();
@@ -116,6 +117,7 @@ async function initMatch() {
   await hideMenu();
   await playerMatchDataLarger();
   await handleUndoMode();
+  await nextPlayerOnTakeOutStuck();
 
   if (isValidGameMode() && globalStatus.isFirstStart) {
     await soundsStart();
@@ -202,7 +204,7 @@ function startThrowsObserver() {
 }
 
 function startBoardStatusObserver() {
-  const targetNode = (getMenuBar()?.lastChild?.lastChild as Element)?.querySelector("a");
+  const targetNode = getBoardStatusEl();
   if (!targetNode) {
     console.log("Autodarts Tools: No board status found");
     return;
