@@ -32,6 +32,7 @@ import {
 } from "@/entrypoints/match.content/winnerAnimation";
 import { soundsStart } from "@/entrypoints/match.content/soundsStart";
 import { liveViewRing } from "@/entrypoints/match.content/liveViewRing";
+import { setPlayerInfo } from "@/entrypoints/match.content/setPlayerInfo";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -63,6 +64,8 @@ export default defineContentScript({
         boardStatusObserver?.disconnect();
         takeoutUI?.remove();
         takeoutUI = null;
+        streamingModeUI?.remove();
+        streamingModeUI = null;
         await onRemoveColorChange();
         const menu = getMenu();
         if (menu) menu.style.display = "flex";
@@ -141,13 +144,13 @@ async function initStreamingMode(ctx) {
 }
 
 async function throwsChange() {
-  const hasWinner = document.querySelector(".ad-ext-player-winner");
+  await setPlayerInfo();
 
-  const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
+  const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
 
   if (isValidGameMode()) {
-    if (hasWinner) {
-      if (editPlayerThrowActive) {
+    if (matchStatus.hasWinner) {
+      if (matchStatus.isInEditMode) {
         await removeWinnerAnimationOnEdit();
       } else {
         await winnerAnimation();
@@ -157,12 +160,7 @@ async function throwsChange() {
     }
   }
 
-  const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
-
-  const turnContainerEl = document.getElementById("ad-ext-turn");
-  const throws = [ ...turnContainerEl?.querySelectorAll(".ad-ext-turn-throw") as NodeListOf<HTMLElement> ].map(el => el.innerText);
-
-  if (isBullOff() && hasWinner) {
+  if (isBullOff() && matchStatus.hasWinner) {
     const bullOffInterval = setInterval(() => {
       if (isValidGameMode()) {
         clearInterval(bullOffInterval);
@@ -171,26 +169,13 @@ async function throwsChange() {
     }, 1000);
   }
 
-  const playerCount = document.getElementById("ad-ext-player-display")?.children.length || 0;
-
-  const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
-
-  await AutodartsToolsMatchStatus.setValue({
-    ...matchStatus,
-    playerCount,
-    throws,
-    turnPoints,
-    isInEditMode: !!editPlayerThrowActive,
-    hasWinner: !!hasWinner,
-  });
-
   await scoreSmaller();
   await sounds();
   await sounds();
 
-  if (isCricket()) await setCricketClosedPoints(playerCount).catch(console.error);
+  if (isCricket()) await setCricketClosedPoints(matchStatus.playerCount).catch(console.error);
 
-  hasWinner && isValidGameMode() && (await soundsWinner());
+  matchStatus.hasWinner && isValidGameMode() && (await soundsWinner());
 }
 
 function startThrowsObserver() {
