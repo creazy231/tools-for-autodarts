@@ -88,7 +88,9 @@ export interface IConfig {
     colorEnabled: boolean;
     color: string;
   };
-
+  nextPlayerAfter3darts: {
+    enabled: boolean;
+  };
 }
 
 export interface IGlobalStatus {
@@ -110,6 +112,7 @@ export interface IMatchStatus {
   throws: string[];
   turnPoints?: string ;
   isInEditMode: boolean;
+  isInUndoMode: boolean;
   hasWinner: boolean;
   playerInfo: IPlayerInfo[];
 }
@@ -184,6 +187,7 @@ export const defaultConfig: IConfig = {
   winnerAnimation: { enabled: false },
   thrownDartsOnWin: { enabled: false },
   liveViewRing: { enabled: false, size: 2, colorEnabled: true, color: "#000000" },
+  nextPlayerAfter3darts: { enabled: false },
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
@@ -209,6 +213,7 @@ export const defaultMatchStatus: IMatchStatus = {
   throws: [],
   turnPoints: undefined,
   isInEditMode: false,
+  isInUndoMode: false,
   hasWinner: false,
   playerInfo: [],
 };

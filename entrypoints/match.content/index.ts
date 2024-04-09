@@ -33,6 +33,8 @@ import {
 import { soundsStart } from "@/entrypoints/match.content/soundsStart";
 import { liveViewRing } from "@/entrypoints/match.content/liveViewRing";
 import { setPlayerInfo } from "@/entrypoints/match.content/setPlayerInfo";
+import { nextPlayerAfter3darts } from "@/entrypoints/match.content/nextPlayerAfter3darts";
+import { handleUndoMode } from "@/entrypoints/match.content/handleUndoMode";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -113,6 +115,7 @@ async function initMatch() {
 
   await hideMenu();
   await playerMatchDataLarger();
+  await handleUndoMode();
 
   if (isValidGameMode() && globalStatus.isFirstStart) {
     await soundsStart();
@@ -170,12 +173,17 @@ async function throwsChange() {
   }
 
   await scoreSmaller();
-  await sounds();
+  await nextPlayerAfter3darts();
   await sounds();
 
   if (isCricket()) await setCricketClosedPoints(matchStatus.playerCount).catch(console.error);
 
   matchStatus.hasWinner && isValidGameMode() && (await soundsWinner());
+
+  await AutodartsToolsMatchStatus.setValue({
+    ...matchStatus,
+    isInUndoMode: false,
+  });
 }
 
 function startThrowsObserver() {
