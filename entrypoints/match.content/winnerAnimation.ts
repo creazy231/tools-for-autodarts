@@ -8,14 +8,14 @@ export async function removeWinnerAnimation() {
   await waitForElement("#ad-ext-turn");
 
   try {
+    const winnerScoreEl = document.querySelector(".ad-ext-player-score");
+    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.fontSize = "";
+    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.lineHeight = "";
+
     const winnerAnimationContainer = document.querySelector(".ad-ext_winner-animation");
     if (!winnerAnimationContainer) return;
 
     document.getElementById("ad-ext_winner-animation--message")?.remove();
-
-    const winnerScoreEl = winnerAnimationContainer.querySelector(".ad-ext-player-score");
-    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.fontSize = "";
-    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.lineHeight = "";
 
     const winnerScoreWrapperEl = winnerAnimationContainer?.querySelector(".ad-ext_winner-score-wrapper");
     if (winnerScoreWrapperEl) (winnerScoreWrapperEl as HTMLElement).style.height = "";
@@ -133,7 +133,6 @@ export async function winnerAnimation() {
 
       (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
     }
-
     if (config.thrownDartsOnWin.enabled) {
       (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`;
       // set font size of dart thrown text to 48pt on smaller screens because of longer text

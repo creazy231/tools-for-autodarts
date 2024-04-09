@@ -2,6 +2,9 @@ import { AutodartsToolsConfig } from "@/utils/storage";
 import { addStyles } from "@/utils";
 
 export async function scoreSmaller() {
+  const { inactiveSmall } = await AutodartsToolsConfig.getValue();
+  if (!inactiveSmall.enabled) return;
+
   addStyles(`
         .adp_points-small { font-size: 3em!important; }
         `);
@@ -15,8 +18,6 @@ export async function scoreSmaller() {
     inactivePlayerCardPointsElArr.push(...bustedPlayerElArr);
   }
 
-  const { inactiveSmall } = await AutodartsToolsConfig.getValue();
-  if (!inactiveSmall.enabled) return;
   if (inactivePlayerCardPointsElArr.length && activePlayerCardPointsEl) {
     activePlayerCardPointsEl.classList.remove("adp_points-small");
     [ ...inactivePlayerCardPointsElArr ].forEach(el => el.classList.add("adp_points-small"));

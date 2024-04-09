@@ -97,7 +97,7 @@ async function initMatch() {
   const globalStatus = await AutodartsToolsGlobalStatus.getValue();
 
   startThrowsObserver();
-  if (config.takeout.enabled) startBoardStatusObserver();
+  if (config.takeout.enabled || config.automaticNextLeg.enabled) startBoardStatusObserver();
 
   if (isX01() && config.liveViewRing.enabled) {
     await liveViewRing();
