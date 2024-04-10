@@ -8,9 +8,10 @@ export async function removeWinnerAnimation() {
   await waitForElement("#ad-ext-turn");
 
   try {
-    const winnerScoreEl = document.querySelector(".ad-ext-player-score");
-    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.fontSize = "";
-    if (winnerScoreEl) (winnerScoreEl as HTMLElement).style.lineHeight = "";
+    document.querySelectorAll(".ad-ext-player-score")?.forEach((el) => {
+      (el as HTMLElement).style.fontSize = "";
+      (el as HTMLElement).style.lineHeight = "";
+    });
 
     const winnerAnimationContainer = document.querySelector(".ad-ext_winner-animation");
     if (!winnerAnimationContainer) return;
