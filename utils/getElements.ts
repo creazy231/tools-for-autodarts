@@ -17,7 +17,7 @@ export const getMenu = () => document.querySelector("#root > div > div") as HTML
 
 export const getWinnerPlayerCard = () => document.querySelector(".ad-ext-player-winner");
 
-export const getDartsThrown = (playerCard: HTMLElement) => playerCard?.nextElementSibling?.querySelectorAll("p")[1]?.textContent?.split("|")[0].trim().split("#")[1].trim();
+export const getDartsThrown = (playerCard: HTMLElement) => playerCard?.nextElementSibling?.querySelector(":scope > div > p")?.textContent?.split("|")[0].trim().split("#")[1];
 
 export const getUndoBtn = () => [ ...document.getElementById("ad-ext-turn")?.nextElementSibling?.querySelectorAll("button") as NodeListOf<HTMLButtonElement> ].find(el => el.textContent === "Undo");
 export const getNextBtn = () => [ ...document.getElementById("ad-ext-turn")?.nextElementSibling?.querySelectorAll("button") as NodeListOf<HTMLButtonElement> ].find(el => el.textContent === "Next");
