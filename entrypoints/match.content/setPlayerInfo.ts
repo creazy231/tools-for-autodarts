@@ -28,7 +28,7 @@ export async function setPlayerInfo() {
         ...(matchhasLegs && { legs: playerStatsEl?.children[0]?.children[matchhasSets ? 1 : 0]?.textContent?.trim() }),
         ...(matchhasSets && { sets: playerStatsEl?.children[0]?.children[0]?.textContent?.trim() }),
         darts: getDartsThrown(playerCardEl as HTMLElement),
-        stats: playerStatsEl?.querySelectorAll("p")[1]?.textContent?.split("|")[1].trim(),
+        stats: playerStatsEl?.querySelector(":scope > div > p")?.textContent?.split("|")[1].trim(),
       };
     });
 
