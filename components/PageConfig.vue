@@ -135,6 +135,27 @@
           <div class="space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
+                Automatic next player on takeout
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Automatically reset board and switch to next player if takeout stucks for x seconds.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.nextPlayerOnTakeOutStuck.enabled" />
+              <input
+                v-if="config.nextPlayerOnTakeOutStuck.enabled"
+                v-model="config.nextPlayerOnTakeOutStuck.sec"
+                type="text"
+                class="rounded-md border border-white/10 bg-transparent px-2 py-1 text-center outline-none"
+              >
+              <span v-if="config.nextPlayerOnTakeOutStuck.enabled">seconds</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
                 Smaller Scores
               </h2>
               <p class="max-w-2xl text-white/40">
@@ -391,6 +412,20 @@
                 max="9"
                 class="w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none"
               >
+            </div>
+          </div>
+
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Automatic next player after 3 darts
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                After 3 darts the game automatically switches to the next player. So you can throw 6 darts in a row. Only for 1 or 2 player games.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.nextPlayerAfter3darts.enabled" />
             </div>
           </div>
 

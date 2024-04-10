@@ -6,6 +6,7 @@ import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsUrlStat
 import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
+import { nextPlayerAfter3dartsButton } from "@/entrypoints/lobby.content/nextPlayerAfter3dartsButton";
 import RecentLocalPlayers from "@/entrypoints/lobby.content/RecentLocalPlayers.vue";
 
 let recentLocalPlayersUI: any;
@@ -35,6 +36,11 @@ export default defineContentScript({
         if (config.recentLocalPlayers.enabled) {
           const div = document.querySelector("autodarts-tools-recent-local-players");
           if (!div) initRecentLocalPlayers(ctx).catch(console.error);
+        }
+
+        if (config.nextPlayerAfter3darts.enabled) {
+          await waitForElementWithTextContent("h2", "Lobby");
+          await initScript(nextPlayerAfter3dartsButton, url);
         }
 
         const globalStatus = await AutodartsToolsGlobalStatus.getValue();
