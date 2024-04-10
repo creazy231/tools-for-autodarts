@@ -429,6 +429,21 @@
             </div>
           </div>
 
+          <div class="space-y-4 rounded border border-white/10 p-4">
+            <div>
+              <h2 class="text-lg font-semibold">
+                Team lobby
+              </h2>
+              <p class="max-w-2xl text-white/40">
+                Removes first player from the lobby and adds every following player to the board.
+                Works only in private Lobbies.
+              </p>
+            </div>
+            <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
+              <AppToggle v-model="config.teamLobby.enabled" />
+            </div>
+          </div>
+
           <div class="col-span-1 space-y-4 rounded border border-white/10 p-4 md:col-span-2">
             <div>
               <h2 class="text-lg font-semibold">
