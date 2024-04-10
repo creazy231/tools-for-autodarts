@@ -7,7 +7,7 @@ export async function disableTakeout() {
 
   try {
     AutodartsToolsMatchStatus.watch(async (matchStatus) => {
-      if (matchStatus.isInEditMode || matchStatus.isInUndoMode) {
+      if (matchStatus.isInUndoMode) {
         getStartBtn()?.click();
       }
       if (matchStatus.throws.length === 3) {
