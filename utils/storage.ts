@@ -95,6 +95,9 @@ export interface IConfig {
     enabled: boolean;
     sec: number;
   };
+  disableTakeout: {
+    enabled: boolean;
+  };
 }
 
 export interface IGlobalStatus {
@@ -195,6 +198,9 @@ export const defaultConfig: IConfig = {
   nextPlayerOnTakeOutStuck: {
     enabled: false,
     sec: 10,
+  },
+  disableTakeout: {
+    enabled: false,
   },
 };
 

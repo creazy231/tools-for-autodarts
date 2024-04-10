@@ -36,6 +36,7 @@ import { setPlayerInfo } from "@/entrypoints/match.content/setPlayerInfo";
 import { nextPlayerAfter3darts } from "@/entrypoints/match.content/nextPlayerAfter3darts";
 import { handleUndoMode } from "@/entrypoints/match.content/handleUndoMode";
 import { nextPlayerOnTakeOutStuck } from "@/entrypoints/match.content/nextPlayerOnTakeOutStuck";
+import { disableTakeout } from "@/entrypoints/match.content/disableTakeout";
 
 let takeoutUI: any;
 let streamingModeUI: any;
@@ -53,8 +54,10 @@ export default defineContentScript({
         await waitForElement("#ad-ext-turn");
         console.log("Autodarts Tools: Match Ready");
 
-        const takeoutDiv = document.querySelector("autodarts-tools-takeout");
-        if (!takeoutDiv) initTakeout(ctx).catch(console.error);
+        if (!config.disableTakeout.enabled) {
+          const takeoutDiv = document.querySelector("autodarts-tools-takeout");
+          if (!takeoutDiv) initTakeout(ctx).catch(console.error);
+        }
 
         if (config.streamingMode.enabled) {
           const div = document.querySelector("autodarts-tools-streaming-mode");
@@ -103,7 +106,7 @@ async function initMatch() {
   const globalStatus = await AutodartsToolsGlobalStatus.getValue();
 
   startThrowsObserver();
-  if (getBoardStatusEl() && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) startBoardStatusObserver();
+  if (!config.disableTakeout.enabled && getBoardStatusEl() && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) startBoardStatusObserver();
 
   if (isX01() && config.liveViewRing.enabled) {
     await liveViewRing();
@@ -117,11 +120,17 @@ async function initMatch() {
   await hideMenu();
   await playerMatchDataLarger();
   await handleUndoMode();
-  await nextPlayerOnTakeOutStuck();
+  if (!config.disableTakeout.enabled) {
+    await nextPlayerOnTakeOutStuck();
+  }
 
-  if (isValidGameMode() && globalStatus.isFirstStart) {
-    await soundsStart();
-    await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
+  if (isValidGameMode()) {
+    if (globalStatus.isFirstStart) {
+      await soundsStart();
+      await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
+    }
+
+    await disableTakeout();
   }
 
   throwsChange().catch(console.error);
@@ -163,6 +172,8 @@ async function throwsChange() {
     } else {
       await removeWinnerAnimation();
     }
+
+    await nextPlayerAfter3darts();
   }
 
   if (isBullOff() && matchStatus.hasWinner) {
@@ -175,7 +186,6 @@ async function throwsChange() {
   }
 
   await scoreSmaller();
-  await nextPlayerAfter3darts();
   await sounds();
 
   if (isCricket()) await setCricketClosedPoints(matchStatus.playerCount).catch(console.error);
