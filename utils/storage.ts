@@ -95,10 +95,16 @@ export interface IConfig {
     enabled: boolean;
     sec: number;
   };
+  teamLobby: {
+    enabled: boolean;
+  };
 }
 
 export interface IGlobalStatus {
   isFirstStart: boolean;
+  user: {
+    name: string;
+  };
 }
 
 export interface IPlayerInfo {
@@ -119,6 +125,10 @@ export interface IMatchStatus {
   isInUndoMode: boolean;
   hasWinner: boolean;
   playerInfo: IPlayerInfo[];
+}
+
+export interface ILobbyStatus {
+  isPrivate: boolean;
 }
 
 export type TBoardStatus = BoardStatus | undefined;
@@ -196,6 +206,10 @@ export const defaultConfig: IConfig = {
     enabled: false,
     sec: 10,
   },
+  teamLobby: {
+    enabled: false,
+  },
+
 };
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
@@ -207,6 +221,9 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
 
 export const defaultGlobalStatus: IGlobalStatus = {
   isFirstStart: false,
+  user: {
+    name: "",
+  },
 };
 
 export const AutodartsToolsGlobalStatus: WxtStorageItem<IGlobalStatus, any> = storage.defineItem(
@@ -226,10 +243,21 @@ export const defaultMatchStatus: IMatchStatus = {
   playerInfo: [],
 };
 
+export const defaultLobbyStatus: ILobbyStatus = {
+  isPrivate: false,
+};
+
 export const AutodartsToolsMatchStatus: WxtStorageItem<IMatchStatus, any> = storage.defineItem(
   "local:matchstatus",
   {
     defaultValue: defaultMatchStatus,
+  },
+);
+
+export const AutodartsToolsLobbyStatus: WxtStorageItem<ILobbyStatus, any> = storage.defineItem(
+  "local:lobbystatus",
+  {
+    defaultValue: defaultLobbyStatus,
   },
 );
 
