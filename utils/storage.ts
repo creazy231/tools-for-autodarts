@@ -95,6 +95,9 @@ export interface IConfig {
     enabled: boolean;
     sec: number;
   };
+  disableTakeout: {
+    enabled: boolean;
+  };
   teamLobby: {
     enabled: boolean;
   };
@@ -205,6 +208,9 @@ export const defaultConfig: IConfig = {
   nextPlayerOnTakeOutStuck: {
     enabled: false,
     sec: 10,
+  },
+  disableTakeout: {
+    enabled: false,
   },
   teamLobby: {
     enabled: false,
