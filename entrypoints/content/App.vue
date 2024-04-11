@@ -33,7 +33,7 @@ watch(currentUrl, async (newURL, oldURL) => {
 });
 
 watch(configVisible, async () => {
-  const pageContentElement = await waitForElement("#root > div > div:nth-of-type(2)");
+  const pageContentElement = await waitForElement("#root > div > div:nth-of-type(2)", 15000);
   const contentElements = Array.from(pageContentElement.children).filter(el => el.tagName !== "AUTODARTS-TOOLS-WXT") as HTMLElement[];
 
   if (configVisible.value) {
@@ -72,7 +72,7 @@ onMounted(async () => {
 
   initMenu().catch(console.error);
 
-  await waitForElement("#root > div > div > .chakra-stack");
+  await waitForElement("#root > div > div > .chakra-stack", 15000);
 
   const collapseButton = document.querySelector("button[aria-label='Collapse side bar']") as HTMLButtonElement | null;
   if (collapseButton) collapseButton.addEventListener("click", initMenu);
@@ -92,7 +92,7 @@ async function initMenu() {
   const existingMenuItem = document.getElementById("autodarts-tools-menu-item");
   if (existingMenuItem) existingMenuItem.remove();
 
-  const menu = await waitForElement("#root > div > div > .chakra-stack");
+  const menu = await waitForElement("#root > div > div > .chakra-stack", 15000);
   // get last element of the menu
   const menuItemTemplate = menu.lastElementChild;
   if (!menuItemTemplate) return;

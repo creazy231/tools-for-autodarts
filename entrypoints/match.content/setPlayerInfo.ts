@@ -23,7 +23,7 @@ export async function setPlayerInfo() {
 
       return {
         name: playerCardEl.querySelector(".ad-ext-player-name")?.textContent || "",
-        score: playerCardEl.querySelector(".ad-ext-player-score")?.textContent?.trim() || "",
+        score: playerCardEl.querySelector(".ad-ext-player-score")?.textContent?.trim() ?? "0",
         isActive: playerCardEl.classList.contains("ad-ext-player-active"),
         ...(matchhasLegs && { legs: playerStatsEl?.children[0]?.children[matchhasSets ? 1 : 0]?.textContent?.trim() }),
         ...(matchhasSets && { sets: playerStatsEl?.children[0]?.children[0]?.textContent?.trim() }),

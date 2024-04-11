@@ -2,8 +2,9 @@ import "~/assets/tailwind.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import { waitForElement } from "@/utils";
-import { AutodartsToolsSoundAutoplayStatus } from "@/utils/storage";
+import { AutodartsToolsGlobalStatus, AutodartsToolsSoundAutoplayStatus } from "@/utils/storage";
 import { isiOS } from "@/utils/helpers";
+import { getMenu } from "@/utils/getElements";
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
@@ -17,6 +18,13 @@ export default defineContentScript({
         document.querySelector("body")!.style!.minHeight = "calc(100vh + 1px)";
       }
       await waitForElement("#root > div:nth-of-type(1)");
+
+      const username = getMenu()?.lastElementChild?.querySelector("button")?.lastElementChild?.textContent?.trim();
+      if (username?.length) {
+        const globalStatus = await AutodartsToolsGlobalStatus.getValue();
+        await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, user: { name: username } });
+      }
+
       await AutodartsToolsSoundAutoplayStatus.setValue(false);
       const ui = await createShadowRootUi(ctx, {
         name: "autodarts-tools-wxt",

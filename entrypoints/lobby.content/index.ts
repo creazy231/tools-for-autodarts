@@ -2,7 +2,12 @@ import "~/assets/tailwind.css";
 import { createApp } from "vue";
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import type { IConfig } from "@/utils/storage";
-import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsUrlStatus } from "@/utils/storage";
+import {
+  AutodartsToolsConfig,
+  AutodartsToolsGlobalStatus,
+  AutodartsToolsLobbyStatus,
+  AutodartsToolsUrlStatus,
+} from "@/utils/storage";
 import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
@@ -11,6 +16,8 @@ import RecentLocalPlayers from "@/entrypoints/lobby.content/RecentLocalPlayers.v
 
 let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
+
+let playerToBoardObserver: MutationObserver;
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
@@ -43,11 +50,26 @@ export default defineContentScript({
           await initScript(nextPlayerAfter3dartsButton, url);
         }
 
+        if (config.teamLobby.enabled) {
+          const lobbyStatus = await AutodartsToolsLobbyStatus.getValue();
+          if (lobbyStatus.isPrivate) {
+            await waitForElement("table a p");
+            const username = (await AutodartsToolsGlobalStatus.getValue())?.user?.name;
+            const userEl = [ ...document.querySelectorAll("table a p") ].filter(el => el.textContent === username);
+            if (userEl.length) {
+              const removeBtn = userEl[0].closest("tr")?.querySelector("button:last-of-type") as HTMLButtonElement;
+              removeBtn?.click();
+              startPlayerToBoardObserver();
+            }
+          }
+        }
+
         const globalStatus = await AutodartsToolsGlobalStatus.getValue();
         await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: true });
       } else {
         await onAutoStartRemove();
         await onShufflePlayersRemove();
+        playerToBoardObserver?.disconnect();
       }
     });
   },
@@ -81,4 +103,19 @@ async function initRecentLocalPlayers(ctx: any) {
     },
   });
   recentLocalPlayersUI.mount();
+}
+
+function startPlayerToBoardObserver() {
+  const targetNode = document.querySelectorAll("table")[1];
+  if (!targetNode) {
+    console.error("Target node not found");
+    return;
+  }
+  playerToBoardObserver = new MutationObserver((m) => {
+    if (m.length <= 1) return;
+    const playerRow = (m[0].target as HTMLElement)?.closest("tr");
+    if (!playerRow) return;
+    [ ...playerRow.querySelectorAll("button") ].filter(el => el.textContent === "Use my board")[0]?.click();
+  });
+  playerToBoardObserver.observe(targetNode, { childList: true, subtree: true, attributes: false });
 }
