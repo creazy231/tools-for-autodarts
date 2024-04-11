@@ -337,8 +337,7 @@
                 Automatic next Leg
               </h2>
               <p class="max-w-2xl text-white/40">
-                Automatically starts the next leg x seconds <span class="font-semibold text-white/60">after takeout</span>.<br>
-                Disabled while playing against logged in opponents.
+                Automatically starts the next leg x seconds <span class="font-semibold text-white/60">after takeout</span>.
               </p>
             </div>
             <div class="grid grid-cols-[5rem_5rem_auto] items-center gap-4">
