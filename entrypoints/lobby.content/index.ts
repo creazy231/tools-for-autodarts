@@ -55,9 +55,15 @@ export default defineContentScript({
           if (lobbyStatus.isPrivate) {
             await waitForElement("table a p");
             const username = (await AutodartsToolsGlobalStatus.getValue())?.user?.name;
+            console.log("Autodarts Tools: get username: ", username);
+            console.log("Autodarts Tools: lobbyuser elements: ", document.querySelectorAll("table a p"));
             const userEl = [ ...document.querySelectorAll("table a p") ].filter(el => el.textContent === username);
+            console.log("Autodarts Tools: lobbyuser names: ", userEl);
+
             if (userEl.length) {
+              console.log("Autodarts Tools: found user in lobby");
               const removeBtn = userEl[0].closest("tr")?.querySelector("button:last-of-type") as HTMLButtonElement;
+              console.log("Autodarts Tools: found removeBtn");
               removeBtn?.click();
               startPlayerToBoardObserver();
             }
