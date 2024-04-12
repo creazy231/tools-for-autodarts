@@ -118,13 +118,13 @@ async function initMatch() {
   }
 
   await hideMenu();
-  await playerMatchDataLarger();
-  await handleUndoMode();
-  if (!config.disableTakeout.enabled) {
-    await nextPlayerOnTakeOutStuck();
-  }
 
   if (isValidGameMode()) {
+    await playerMatchDataLarger();
+    if (!config.disableTakeout.enabled) {
+      await nextPlayerOnTakeOutStuck();
+    }
+
     if (globalStatus.isFirstStart) {
       await soundsStart();
       await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
@@ -132,6 +132,8 @@ async function initMatch() {
 
     await disableTakeout();
   }
+
+  await handleUndoMode();
 
   throwsChange().catch(console.error);
 }
@@ -178,10 +180,8 @@ async function throwsChange() {
 
   if (isBullOff() && matchStatus.hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isValidGameMode()) {
-        clearInterval(bullOffInterval);
-        initMatch().catch(console.error);
-      }
+      clearInterval(bullOffInterval);
+      initMatch().catch(console.error);
     }, 1000);
   }
 
