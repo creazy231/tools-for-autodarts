@@ -106,7 +106,13 @@ async function initMatch() {
   const globalStatus = await AutodartsToolsGlobalStatus.getValue();
 
   startThrowsObserver();
-  if (!config.disableTakeout.enabled && getBoardStatusEl() && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) startBoardStatusObserver();
+
+  if (isValidGameMode()
+      && !config.disableTakeout.enabled
+      && getBoardStatusEl()
+      && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) {
+    startBoardStatusObserver();
+  }
 
   if (isX01() && config.liveViewRing.enabled) {
     await liveViewRing();
