@@ -1,6 +1,6 @@
 import { AutodartsToolsMatchStatus } from "@/utils/storage";
 import type { IMatchStatus, IPlayerInfo } from "@/utils/storage";
-import { getDartsThrown } from "@/utils/getElements";
+import { getDartsThrown, getStats } from "@/utils/getElements";
 
 export async function setPlayerInfo() {
   try {
@@ -28,7 +28,7 @@ export async function setPlayerInfo() {
         ...(matchhasLegs && { legs: playerStatsEl?.children[0]?.children[matchhasSets ? 1 : 0]?.textContent?.trim() }),
         ...(matchhasSets && { sets: playerStatsEl?.children[0]?.children[0]?.textContent?.trim() }),
         darts: getDartsThrown(playerCardEl as HTMLElement),
-        stats: playerStatsEl?.querySelector(":scope > div > p")?.textContent?.split("|")[1].trim(),
+        stats: getStats(playerCardEl as HTMLElement),
       };
     });
 
