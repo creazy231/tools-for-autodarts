@@ -198,6 +198,11 @@ async function throwsChange() {
 
   matchStatus.hasWinner && isValidGameMode() && (await soundsWinner());
 
+  if (matchStatus.hasWinner) {
+    const isBot = document.querySelector(".ad-ext-player-winner .ad-ext-player-name")?.textContent?.startsWith("BOT LEVEL");
+    if (isBot) await automaticNextLeg();
+  }
+
   await AutodartsToolsMatchStatus.setValue({
     ...matchStatus,
     isInUndoMode: false,
