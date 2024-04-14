@@ -106,7 +106,13 @@ async function initMatch() {
   const globalStatus = await AutodartsToolsGlobalStatus.getValue();
 
   startThrowsObserver();
-  if (!config.disableTakeout.enabled && getBoardStatusEl() && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) startBoardStatusObserver();
+
+  if (isValidGameMode()
+      && !config.disableTakeout.enabled
+      && getBoardStatusEl()
+      && (config.takeout.enabled || config.automaticNextLeg.enabled || config.nextPlayerOnTakeOutStuck.enabled)) {
+    startBoardStatusObserver();
+  }
 
   if (isX01() && config.liveViewRing.enabled) {
     await liveViewRing();
@@ -118,13 +124,13 @@ async function initMatch() {
   }
 
   await hideMenu();
-  await playerMatchDataLarger();
-  await handleUndoMode();
-  if (!config.disableTakeout.enabled) {
-    await nextPlayerOnTakeOutStuck();
-  }
 
   if (isValidGameMode()) {
+    await playerMatchDataLarger();
+    if (!config.disableTakeout.enabled) {
+      await nextPlayerOnTakeOutStuck();
+    }
+
     if (globalStatus.isFirstStart) {
       await soundsStart();
       await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
@@ -132,6 +138,8 @@ async function initMatch() {
 
     await disableTakeout();
   }
+
+  await handleUndoMode();
 
   throwsChange().catch(console.error);
 }
@@ -178,10 +186,8 @@ async function throwsChange() {
 
   if (isBullOff() && matchStatus.hasWinner) {
     const bullOffInterval = setInterval(() => {
-      if (isValidGameMode()) {
-        clearInterval(bullOffInterval);
-        initMatch().catch(console.error);
-      }
+      clearInterval(bullOffInterval);
+      initMatch().catch(console.error);
     }, 1000);
   }
 
@@ -191,6 +197,11 @@ async function throwsChange() {
   if (isCricket()) await setCricketClosedPoints(matchStatus.playerCount).catch(console.error);
 
   matchStatus.hasWinner && isValidGameMode() && (await soundsWinner());
+
+  if (matchStatus.hasWinner) {
+    const isBot = document.querySelector(".ad-ext-player-winner .ad-ext-player-name")?.textContent?.startsWith("BOT LEVEL");
+    if (isBot) await automaticNextLeg();
+  }
 
   await AutodartsToolsMatchStatus.setValue({
     ...matchStatus,

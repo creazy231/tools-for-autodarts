@@ -3,10 +3,10 @@ import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 
 import { playPointsSound, playSound } from "@/utils/playSound";
-import { isCricket } from "@/utils/helpers";
+import { isCricket, isValidGameMode } from "@/utils/helpers";
 
 export async function sounds() {
-  const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled;
+  const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled && isValidGameMode();
   const callerActive = (await AutodartsToolsCallerConfig.getValue()).caller.filter(caller => caller.isActive)[0];
 
   const soundConfig = await AutodartsToolsSoundsConfig.getValue();

@@ -19,11 +19,23 @@ export default defineContentScript({
       }
       await waitForElement("#root > div:nth-of-type(1)");
 
-      const username = getMenu()?.lastElementChild?.querySelector("button")?.lastElementChild?.textContent?.trim();
-      if (username?.length) {
-        const globalStatus = await AutodartsToolsGlobalStatus.getValue();
-        await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, user: { name: username } });
-      }
+      // wait until avatar image is loaded
+      setTimeout(async () => {
+        const userNameWithAvatar = getMenu()?.lastElementChild?.querySelector("button img")?.getAttribute("alt")?.trim();
+        const userNameWithoutAvatar = getMenu()?.lastElementChild?.querySelector("button div[role='img']")?.getAttribute("aria-label")?.trim();
+
+        const username = userNameWithAvatar || userNameWithoutAvatar;
+
+        console.log("Autodarts Tools: set username: ", username);
+
+        if (username?.length) {
+          const globalStatus = await AutodartsToolsGlobalStatus.getValue();
+          await AutodartsToolsGlobalStatus.setValue({
+            ...globalStatus,
+            user: { name: username },
+          });
+        }
+      }, 2000);
 
       await AutodartsToolsSoundAutoplayStatus.setValue(false);
       const ui = await createShadowRootUi(ctx, {
