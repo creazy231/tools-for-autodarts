@@ -31,6 +31,10 @@
 - Fancy Gameshot Animation
 - Adjust size of legs, sets and match information
 - Display thrown darts at the end of a game
+- Virtual Board-Surround
+- Automatic Next Player
+- "Team Lobby" - Remove initial player & auto-select board
+- Disable Takeout
 
 _Please create an issue if you feel some feature is missing or could be improved._
 
