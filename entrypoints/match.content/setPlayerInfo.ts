@@ -11,7 +11,7 @@ export async function setPlayerInfo() {
 
     const turnContainerEl = document.getElementById("ad-ext-turn");
     const throws = [ ...turnContainerEl?.querySelectorAll(".ad-ext-turn-throw") as NodeListOf<HTMLElement> ].map(el => el.innerText);
-    const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText.trim();
+    const turnPoints = document.querySelector<HTMLElement>(".ad-ext-turn-points")?.innerText?.trim();
 
     const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
 
