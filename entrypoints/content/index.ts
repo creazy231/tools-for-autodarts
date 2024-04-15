@@ -17,7 +17,7 @@ export default defineContentScript({
       if (isiOS()) {
         document.querySelector("body")!.style!.minHeight = "calc(100vh + 1px)";
       }
-      await waitForElement("#root > div:nth-of-type(1)");
+      await waitForElement("#root > div:nth-of-type(1)", 15000);
 
       // wait until avatar image is loaded
       setTimeout(async () => {
@@ -38,6 +38,7 @@ export default defineContentScript({
       }, 2000);
 
       await AutodartsToolsSoundAutoplayStatus.setValue(false);
+      await waitForElement("#root > div > div:nth-of-type(2)", 15000);
       const ui = await createShadowRootUi(ctx, {
         name: "autodarts-tools-wxt",
         position: "inline",
