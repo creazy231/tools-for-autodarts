@@ -18,7 +18,10 @@ export default defineConfig({
   },
   manifest: {
     host_permissions: [ "*://play.autodarts.io/*" ],
-    permissions: [ "storage" ],
+    permissions: [
+      "storage",
+      "*://discord.com/api/webhooks/*",
+    ],
     name: "Autodarts Tools",
     description: "Autodarts Tools enhances the gaming experience on autodarts.io",
   },
