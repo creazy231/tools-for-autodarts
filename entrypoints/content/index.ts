@@ -26,8 +26,6 @@ export default defineContentScript({
 
         const username = userNameWithAvatar || userNameWithoutAvatar;
 
-        console.log("Autodarts Tools: set username: ", username);
-
         if (username?.length) {
           const globalStatus = await AutodartsToolsGlobalStatus.getValue();
           await AutodartsToolsGlobalStatus.setValue({
