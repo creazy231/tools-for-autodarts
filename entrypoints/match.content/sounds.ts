@@ -107,7 +107,14 @@ export async function sounds() {
         }
       }
 
-      if (isCallerEnabled && throwPointsArr.length === 3 && !(isCricket() && turnPoints === "0") && !matchStatus.isInEditMode && turnPoints !== "BUST" && callerServerUrl.length && callerFileExt.length) {
+      if (isCallerEnabled
+          && throwPointsArr.length === 3
+          && !(isCricket() && turnPoints === "0")
+          && !matchStatus.hasWinner
+          && !matchStatus.isInEditMode
+          && turnPoints !== "BUST"
+          && callerServerUrl.length
+          && callerFileExt.length) {
         playPointsSound(callerServerUrl, callerFileExt, turnPoints);
       }
     }
