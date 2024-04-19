@@ -5,16 +5,16 @@ import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 import { playPointsSound, playSound } from "@/utils/playSound";
 import { isCricket, isValidGameMode } from "@/utils/helpers";
 
+let isFirstStartHandled = false; // Flag to track if the IsFirstStart event has been handled
+
 export async function sounds() {
-  const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled && isValidGameMode();
-  const callerActive = (await AutodartsToolsCallerConfig.getValue()).caller.filter(caller => caller.isActive)[0];
+  const config = await AutodartsToolsConfig.getValue();
+  const isCallerEnabled = config.caller.enabled && isValidGameMode();
+  const callerActive = (await AutodartsToolsCallerConfig.getValue()).caller.find(caller => caller.isActive);
 
   const soundConfig = await AutodartsToolsSoundsConfig.getValue();
-  const matchStatus = (await AutodartsToolsMatchStatus.getValue());
-
+  const matchStatus = await AutodartsToolsMatchStatus.getValue();
   const cricketClosedPoints = await AutodartsToolsCricketClosedPoints.getValue();
-
-  // if (!isCallerEnabled || !callerActive) return;
 
   let callerServerUrl = callerActive?.url || "";
   if (callerServerUrl.at(-1) !== "/") callerServerUrl += "/";
@@ -22,18 +22,21 @@ export async function sounds() {
 
   const turnPoints = matchStatus.turnPoints;
   const throwPointsArr = matchStatus.throws;
-
   const curThrowPointsName = throwPointsArr.slice(-1)[0];
 
-  const playerEl: HTMLElement | null = document.querySelector(".ad-ext-player-active .ad-ext-player-name");
+  const playerEl = document.querySelector(".ad-ext-player-active .ad-ext-player-name");
   const playerName = playerEl && playerEl.innerText;
 
   const turnContainerEl = document.getElementById("ad-ext-turn");
-  const letsGo = [ ...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement> ].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
+  const letsGo = [...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement>].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
 
-  if (letsGo) playSound("playerStart");
+  // Play the player's name sound before scheduling "playerStart"
+  if (letsGo && isFirstStartHandled) {
+    await playPlayerNameSound(callerServerUrl, callerFileExt, playerName, 1);
+  }
 
-  // console.log("curThrowPointsName", curThrowPointsName);
+  // Set isFirstStartHandled to true after the IsFirstStart event has occurred
+  isFirstStartHandled = true;
 
   let curThrowPointsNumber: number = -1;
   let curThrowPointsBed: string = "";
@@ -57,10 +60,6 @@ export async function sounds() {
     if (curThrowPointsBed === "D") curThrowPointsMultiplier = 2;
     if (curThrowPointsBed === "T") curThrowPointsMultiplier = 3;
   }
-
-  // console.log("curThrowPointsNumber", curThrowPointsNumber);
-  // console.log("curThrowPointsBed", curThrowPointsBed);
-  // console.log("curThrowPointsMultiplier", curThrowPointsMultiplier);
 
   const isBot = curThrowPointsName?.length && playerName && playerName.startsWith("BOT LEVEL");
   if (isBot) {
@@ -112,4 +111,29 @@ export async function sounds() {
       }
     }
   }, isBot ? 500 : 0);
+}
+
+async function playPlayerNameSound(callerServerUrl: string, callerFileExt: string, playerName: string | undefined, volume: number): Promise<void> {
+  if (!playerName) return; // No player name found
+
+  const soundUrl = `${callerServerUrl}${playerName.toLowerCase()}${callerFileExt}`;
+
+  try {
+    const response = await fetch(soundUrl, { method: 'HEAD' });
+    if (response.ok) {
+      const audio = new Audio(soundUrl);
+      setTimeout(() => {
+        playSound("playerStart");
+      }, 1200); // Delay the "playerStart" sound by 1.2 seconds
+
+      audio.volume = volume;
+      audio.play();
+    } else {
+      console.log(`The file ${soundUrl} does not exist.`);
+      playSound("playerStart"); // Play "playerStart" sound if player's name sound does not exist
+    }
+  } catch (error) {
+    console.error(`Error loading player name sound: ${error}`);
+    playSound("playerStart"); // Play "playerStart" sound if there is an error loading player's name sound
+  }
 }
