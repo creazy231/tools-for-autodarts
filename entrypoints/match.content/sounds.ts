@@ -30,9 +30,14 @@ export async function sounds() {
   const turnContainerEl = document.getElementById("ad-ext-turn");
   const letsGo = [...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement>].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
 
-  // Play the player's name sound before scheduling "playerStart"
   if (letsGo && isFirstStartHandled) {
-    await playPlayerNameSound(callerServerUrl, callerFileExt, playerName, 1);
+    if (!config.sounds.enabled) {
+      return;
+    } else if (soundConfig.playerStart?.data || !soundConfig.playerStart?.info) {  
+      return;
+    } else {
+      await playPlayerNameSound(callerServerUrl, callerFileExt, playerName, 1);
+   }
   }
 
   // Set isFirstStartHandled to true after the IsFirstStart event has occurred

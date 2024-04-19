@@ -6,20 +6,26 @@ import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 export async function soundsStart() {
   const config = await AutodartsToolsConfig.getValue();
   const soundConfig = await AutodartsToolsSoundsConfig.getValue();
-  const callerConfig = await AutodartsToolsCallerConfig.getValue();
+  const callerConfig = await AutodartsToolsCallerConfig.getValue();  
+  
+  if (!config.sounds.enabled) {
+    return;
+    } else { 
+       if (soundConfig.gameOn?.data || !soundConfig.gameOn?.info) {
+        return;
+       } else {
+      const playerNameSoundExists = await playPlayerNameSound(callerConfig);
 
-  if (!config.sounds.enabled) return;
-
-  const playerNameSoundExists = await playPlayerNameSound(callerConfig);
-
-  if (playerNameSoundExists) {
-    setTimeout(() => {
-      playGameOnSound(soundConfig);
-    }, 1200); // Delay the "gameOn" sound by 1.2 seconds
-  } else {
-    playGameOnSound(soundConfig);
+      if (playerNameSoundExists) {
+        setTimeout(() => {
+          playGameOnSound(soundConfig);
+        }, 1200); // Delay the "gameOn" sound by 1.2 seconds
+      } else {
+       playGameOnSound(soundConfig);
+      }
+    }
+    }  
   }
-}
 
 async function playPlayerNameSound(callerConfig: ReturnType<typeof AutodartsToolsCallerConfig.getValue>): Promise<boolean> {
   const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled;
