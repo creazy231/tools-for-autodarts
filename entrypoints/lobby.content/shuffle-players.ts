@@ -7,7 +7,7 @@ let shuffledPlayerNames: string[] = [];
 export async function shufflePlayers() {
   try {
     const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
-    const button = buttonsContainer.children[0].cloneNode(true) as HTMLButtonElement;
+    const button = buttonsContainer.querySelector("button")?.cloneNode(true) as HTMLButtonElement;
 
     if (button.innerText !== "Start") return;
 
