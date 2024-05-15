@@ -16,8 +16,10 @@ async function handleChangeColor() {
 
     const playerDisplay = await waitForElement("#ad-ext-player-display") as HTMLElement;
     const playerScores = playerDisplay.querySelectorAll(".ad-ext-player");
+    const playerInfos = playerDisplay.querySelectorAll("div:nth-of-type(2)");
 
     playerScores.forEach(element => elements.push(element as HTMLElement));
+    playerInfos.forEach(element => elements.push(element as HTMLElement));
 
     const playerNames = playerDisplay.querySelectorAll("a");
     playerNames.forEach(element => elements.push(element as HTMLElement));
@@ -25,9 +27,13 @@ async function handleChangeColor() {
     const turnThrows = document.querySelector("#ad-ext-turn")?.childNodes;
     if (turnThrows) turnThrows.forEach(element => elements.push(element as HTMLElement));
 
+    const turnScoreElement = turnThrows![0] as HTMLElement;
+    const turnScore = turnScoreElement.querySelector("p");
+    if (turnScore) elements.push(turnScore as HTMLElement);
+
     // for each in elements set variable: `--chakra-colors-blue-500: red;`
     elements.forEach((element) => {
-      element.style.setProperty("--chakra-colors-blue-500", config.colors.background);
+      element.style.setProperty("background", config.colors.background);
       element.style.color = `${config.colors.text}`;
     });
   } catch (e) {

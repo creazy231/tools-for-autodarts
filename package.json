@@ -62,7 +62,7 @@
     "unplugin-vue-components": "^0.26.0",
     "vue-eslint-parser": "^9.4.2",
     "vue-tsc": "^2.0.6",
-    "wxt": "^0.17.7",
+    "wxt": "^0.18.2",
     "zx": "^7.2.3"
   }
 }
