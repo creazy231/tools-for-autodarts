@@ -13,10 +13,10 @@ export async function removeWinnerAnimation() {
       (el as HTMLElement).style.lineHeight = "";
     });
 
+    document.getElementById("ad-ext_winner-animation--message")?.remove();
+
     const winnerAnimationContainer = document.querySelector(".ad-ext_winner-animation");
     if (!winnerAnimationContainer) return;
-
-    document.getElementById("ad-ext_winner-animation--message")?.remove();
 
     const winnerScoreWrapperEl = winnerAnimationContainer?.querySelector(".ad-ext_winner-score-wrapper");
     if (winnerScoreWrapperEl) (winnerScoreWrapperEl as HTMLElement).style.height = "";
@@ -44,68 +44,72 @@ export async function removeWinnerAnimationOnEdit() {
 }
 
 export async function winnerAnimation() {
-  addStyles(`
+  addStyles(
+    `
       .ad-ext-player-winner .ad-ext-player-score {
         text-align: center;
         line-height: 1;
       }
-        #ad-ext_winner-animation--message {
-            text-align: center;
-            line-height: 1;
-          }
+      
+      #ad-ext_winner-animation--message {
+        text-align: center;
+        line-height: 1;
+      }
 
-          .ad-ext_winner-animation {
-            position: relative;
-            z-index: 1;
-          }
+      .ad-ext_winner-animation {
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+      }
 
-          .ad-ext_winner-animation > div:first-child {
-            background: linear-gradient(0deg, #000, #272727);
-          }
+      .ad-ext_winner-animation > div:first-child {
+        border-radius: 5px;
+        background: linear-gradient(0deg, #000000, #212121);
+      }
 
-          .ad-ext_winner-animation:before,
-          .ad-ext_winner-animation:after {
-            content: "";
-            position: absolute;
-            left: -2px;
-            top: -2px;
-            background: linear-gradient(
-              45deg,
-              #fb0094,
-              #0000ff,
-              #00ff00,
-              #ffff00,
-              #ff0000,
-              #fb0094,
-              #0000ff,
-              #00ff00,
-              #ffff00,
-              #ff0000
-            );
-            background-size: 400%;
-            width: calc(100% + 4px);
-            height: calc(100% + 4px);
-            z-index: -1;
-            animation: steam 20s linear infinite;
-            border-radius: 5px;
-          }
-          @keyframes steam {
-            0% {
-              background-position: 0 0;
-            }
-            50% {
-              background-position: 400% 0;
-            }
-            100% {
-              background-position: 0 0;
-            }
-          }
+      .ad-ext_winner-animation:before,
+      .ad-ext_winner-animation:after {
+        content: "";
+        position: absolute;
+        left: -2px;
+        top: -2px;
+        background: linear-gradient(
+          45deg,
+          #fb0094,
+          #0000ff,
+          #00ff00,
+          #ffff00,
+          #ff0000,
+          #fb0094,
+          #0000ff,
+          #00ff00,
+          #ffff00,
+          #ff0000
+        );
+        background-size: 400%;
+        width: calc(100% + 4px);
+        height: calc(100% + 4px);
+        z-index: -1;
+        animation: steam 20s linear infinite;
+        border-radius: 5px;
+      }
+      
+      @keyframes steam {
+        0% {
+          background-position: 0 0;
+        }
+        50% {
+          background-position: 400% 0;
+        }
+        100% {
+          background-position: 0 0;
+        }
+      }
 
-          .ad-ext_winner-animation:after {
-            filter: blur(50px);
-          }
-
-        `);
+      .ad-ext_winner-animation:after {
+        filter: blur(50px);
+      }
+    `);
 
   await waitForElement("#ad-ext-turn");
 
@@ -149,11 +153,9 @@ export async function winnerAnimation() {
     const winnerAnimationMessageElement = document.createElement("p");
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
     winnerAnimationMessageElement.textContent = "Game Shot!";
-    if (winnerScoreElWidth && winnerScoreElWidth > 360 && winnerScoreElWidth < 420) {
-      winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 1.9}px`;
-    } else {
-      winnerAnimationMessageElement.style.fontSize = `${winnerScoreElHeight / 5 * 2.2}px`;
-    }
+    // winnerAnimationMessageElement.style.fontSize = "3cqw";
+    // winnerAnimationMessageElement.style.lineHeight = "10cqh";
+    winnerAnimationMessageElement.style.fontSize = "4.85cqmin";
     winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.6}px`;
 
     (winnerScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 1.4}px`;

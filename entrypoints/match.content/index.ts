@@ -29,7 +29,7 @@ import {
   removeWinnerAnimation,
   removeWinnerAnimationOnEdit,
   winnerAnimation,
-} from "@/entrypoints/match.content/winnerAnimation";
+} from "@/entrypoints/match.content/winner-animation";
 import { soundsStart } from "@/entrypoints/match.content/soundsStart";
 import { liveViewRing } from "@/entrypoints/match.content/liveViewRing";
 import { setPlayerInfo } from "@/entrypoints/match.content/setPlayerInfo";

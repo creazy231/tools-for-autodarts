@@ -4,7 +4,7 @@ import { getDartsThrown, getStats } from "@/utils/getElements";
 
 export async function setPlayerInfo() {
   try {
-    const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-6pn4tf");
+    const editPlayerThrowActive = document.querySelector(".ad-ext-turn-throw.css-891a5e");
     const hasWinner = document.querySelector(".ad-ext-player-winner");
 
     const playerCount = document.getElementById("ad-ext-player-display")?.children.length || 0;
