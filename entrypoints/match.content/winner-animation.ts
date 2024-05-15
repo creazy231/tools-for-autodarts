@@ -153,8 +153,6 @@ export async function winnerAnimation() {
     const winnerAnimationMessageElement = document.createElement("p");
     winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
     winnerAnimationMessageElement.textContent = "Game Shot!";
-    // winnerAnimationMessageElement.style.fontSize = "3cqw";
-    // winnerAnimationMessageElement.style.lineHeight = "10cqh";
     winnerAnimationMessageElement.style.fontSize = "4.85cqmin";
     winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.6}px`;
 
