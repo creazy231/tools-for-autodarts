@@ -64,8 +64,15 @@ export function waitForElementWithTextContent(selector: string | string[], textC
   });
 }
 
-export function addStyles(css: string) {
+/**
+ * @param css {string} - CSS rules string to be added
+ * @param componentName {string} - Name of the component
+ */
+export function addStyles(css: string, componentName: string = "") {
   const style = document.createElement("style");
+  style.id = `ad-ext_style_${componentName}`;
   style.innerHTML = css;
-  document.getElementsByTagName("head")[0].appendChild(style);
+  if (!document.querySelector(`#${style.id}`)) {
+    document.getElementsByTagName("head")[0].appendChild(style);
+  }
 }
