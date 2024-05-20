@@ -73,6 +73,6 @@ export function addStyles(css: string, componentName: string = "") {
   style.id = `ad-ext_style_${componentName}`;
   style.innerHTML = css;
   if (!document.querySelector(`#${style.id}`)) {
-    document.getElementsByTagName("head")[0].appendChild(style);
+    document.head.appendChild(style);
   }
 }
