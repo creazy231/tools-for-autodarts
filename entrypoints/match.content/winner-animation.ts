@@ -144,8 +144,9 @@ export async function winnerAnimation() {
 
       (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
     }
+
     if (config.thrownDartsOnWin.enabled && dartsThrown.length > 0) {
-      (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`;
+      // (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`; // TODO: Add darts thrown to winner animation in other way that does not break the confetti animation
       // set font size of dart thrown text to 48pt on smaller screens because of longer text
       if (!winnerScoreElWidth || winnerScoreElWidth < 615) (winnerScoreEl as HTMLElement).style.fontSize = "48pt";
       (winnerScoreEl as HTMLElement).style.lineHeight = `${winnerScoreElHeight}px`;

@@ -380,7 +380,7 @@
             </div>
           </div>
 
-          <div class="space-y-4 rounded border border-white/10 p-4">
+          <div v-if="false" class="space-y-4 rounded border border-white/10 p-4">
             <div>
               <h2 class="text-lg font-semibold">
                 Show thrown darts
