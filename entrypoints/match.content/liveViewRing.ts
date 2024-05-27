@@ -64,7 +64,7 @@ export async function liveViewRing() {
         .ad-ext_boardview-container .ad-ext_boardview-numbers {
             display: block;
         }
-        `);
+        `, "live-view-ring");
 
   const config = await AutodartsToolsConfig.getValue();
   const ringSize = config.liveViewRing.size;

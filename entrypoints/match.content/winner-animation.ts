@@ -93,6 +93,12 @@ export async function winnerAnimation() {
         animation: steam 20s linear infinite;
         border-radius: 5px;
       }
+
+      .ad-ext-player-winner + div {
+        border-radius: 5px;
+        background: black;
+        margin-top: 2px;
+      }
       
       @keyframes steam {
         0% {
@@ -109,7 +115,7 @@ export async function winnerAnimation() {
       .ad-ext_winner-animation:after {
         filter: blur(50px);
       }
-    `);
+    `, "winner-animation");
 
   await waitForElement("#ad-ext-turn");
 

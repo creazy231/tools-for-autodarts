@@ -8,7 +8,7 @@ export async function scoreSmaller() {
   try {
     addStyles(`
         .adp_points-small { font-size: 3em!important; }
-        `);
+        `, "score-smaller");
 
     const activePlayerCardPointsEl = document.querySelector(".ad-ext-player-active .ad-ext-player-score") || document.querySelector(".ad-ext-player-winner .ad-ext-player-score");
     const inactivePlayerCardPointsElArr = [ ...document.querySelectorAll(".ad-ext-player-inactive .ad-ext-player-score") ];
