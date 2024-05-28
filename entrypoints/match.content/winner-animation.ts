@@ -44,16 +44,21 @@ export async function removeWinnerAnimationOnEdit() {
 }
 
 export async function winnerAnimation() {
-  addStyles(
+  addStyles(/* css */
     `
       .ad-ext-player-winner .ad-ext-player-score {
         text-align: center;
         line-height: 1;
+        margin-bottom: 0;
       }
       
       #ad-ext_winner-animation--message {
         text-align: center;
         line-height: 1;
+      }
+
+      .ad-ext_winner-score-wrapper + div{
+        margin-bottom: var(--chakra-space-4);
       }
 
       .ad-ext_winner-animation {
@@ -94,7 +99,7 @@ export async function winnerAnimation() {
         border-radius: 5px;
       }
 
-      .ad-ext-player-winner + div {
+      .ad-ext_winner-animation .ad-ext-player-winner + div {
         border-radius: 5px;
         background: black;
         margin-top: 2px;
@@ -145,8 +150,8 @@ export async function winnerAnimation() {
       (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
     }
 
-    if (config.thrownDartsOnWin.enabled && dartsThrown.length > 0) {
-      // (winnerScoreEl as HTMLElement).innerText = `${dartsThrown} Darts`; // TODO: Add darts thrown to winner animation in other way that does not break the confetti animation
+    if (config.thrownDartsOnWin.enabled && dartsThrown.length > 0) { // TODO: move to seprate file
+      (winnerScoreEl.firstChild as HTMLElement).textContent = `${dartsThrown} Darts`; //
       // set font size of dart thrown text to 48pt on smaller screens because of longer text
       if (!winnerScoreElWidth || winnerScoreElWidth < 615) (winnerScoreEl as HTMLElement).style.fontSize = "48pt";
       (winnerScoreEl as HTMLElement).style.lineHeight = `${winnerScoreElHeight}px`;
