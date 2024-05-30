@@ -133,7 +133,6 @@ async function initMatch() {
 
     if (globalStatus.isFirstStart) {
       await soundsStart();
-      await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
     }
 
     await disableTakeout();
