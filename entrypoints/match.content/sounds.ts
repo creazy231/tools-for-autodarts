@@ -1,4 +1,4 @@
-import { AutodartsToolsConfig, AutodartsToolsCricketClosedPoints, AutodartsToolsMatchStatus,AutodartsToolsGlobalStatus } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsCricketClosedPoints, AutodartsToolsGlobalStatus, AutodartsToolsMatchStatus } from "@/utils/storage";
 import { AutodartsToolsCallerConfig } from "@/utils/callerStorage";
 import { AutodartsToolsSoundsConfig } from "@/utils/soundsStorage";
 import { playPointsSound, playSound } from "@/utils/playSound";
@@ -27,7 +27,7 @@ export async function sounds() {
   const playerName = playerEl && playerEl.innerText;
 
   const turnContainerEl = document.getElementById("ad-ext-turn");
-  const letsGo = [...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement>].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
+  const letsGo = [ ...turnContainerEl?.querySelectorAll("div") as NodeListOf<HTMLElement> ].filter(el => !el.classList.contains("ad-ext-turn-throw")).length === 4;
 
   if (!globalStatus.isFirstStart && letsGo && config.sounds.enabled && (soundConfig.playerStart?.data || soundConfig.playerStart?.info)) {
     const playerNameSoundPlayed = await soundsPlayer();
@@ -38,7 +38,7 @@ export async function sounds() {
   }
 
   await AutodartsToolsGlobalStatus.setValue({ ...globalStatus, isFirstStart: false });
-  
+
   let curThrowPointsNumber: number = -1;
   let curThrowPointsBed: string = "";
   let curThrowPointsMultiplier: number = 1;
@@ -107,7 +107,14 @@ export async function sounds() {
         }
       }
 
-      if (isCallerEnabled && throwPointsArr.length === 3 && !(isCricket() && turnPoints === "0") && !matchStatus.isInEditMode && turnPoints !== "BUST" && callerServerUrl.length && callerFileExt.length) {
+      if (isCallerEnabled
+        && throwPointsArr.length === 3
+        && !(isCricket() && turnPoints === "0")
+        && !matchStatus.hasWinner
+        && !matchStatus.isInEditMode
+        && turnPoints !== "BUST"
+        && callerServerUrl.length
+        && callerFileExt.length) {
         playPointsSound(callerServerUrl, callerFileExt, turnPoints);
       }
     }

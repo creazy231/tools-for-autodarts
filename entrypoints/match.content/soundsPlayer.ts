@@ -20,12 +20,12 @@ export async function soundsPlayer(): Promise<boolean> {
 
 async function playPlayerNameSound(callerConfig: ReturnType<typeof AutodartsToolsCallerConfig.getValue>): Promise<boolean> {
   const isCallerEnabled = (await AutodartsToolsConfig.getValue()).caller.enabled;
-  const activeCallerIndex = callerConfig.caller.findIndex((caller) => caller.isActive);
-  
+  const activeCallerIndex = (await callerConfig).caller.findIndex(caller => caller.isActive);
+
   if (isCallerEnabled && activeCallerIndex !== -1) {
-    const activeCallerConfig = callerConfig.caller[activeCallerIndex];
+    const activeCallerConfig = (await callerConfig).caller[activeCallerIndex];
     let callerServerUrl = activeCallerConfig.url || "";
-    
+
     if (callerServerUrl.at(-1) !== "/") callerServerUrl += "/";
     const callerFileExt = activeCallerConfig.fileExt || ".mp3";
 
@@ -38,7 +38,7 @@ async function playPlayerNameSound(callerConfig: ReturnType<typeof AutodartsTool
       return soundExists;
     }
   }
-  
+
   return false;
 }
 
@@ -46,7 +46,7 @@ async function PlayPlayerSound(callerServerUrl, callerFileExt, playerName, volum
   const soundUrl = `${callerServerUrl}${playerName}${callerFileExt}`;
 
   // Check if the file exists may need to configure CORS to allow GET/FETCH/HEAD from https://play.autodarts.io to access the sound files
-  const response = await fetch(soundUrl, { method: 'HEAD' });
+  const response = await fetch(soundUrl, { method: "HEAD" });
 
   if (response.ok) {
     const audio = new Audio(soundUrl);
