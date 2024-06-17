@@ -21,6 +21,19 @@ export async function setPlayerInfo() {
       const matchhasLegs = playerStatsEl.children[0].children.length > 0;
       const matchhasSets = playerStatsEl.children[0].children.length > 1;
 
+      let playerLegs, playerSets;
+
+      const playerPTags = playerCardEl.querySelectorAll("p");
+
+      try {
+        playerLegs = playerPTags[playerPTags.length >= 4 ? 2 : 1].textContent?.trim();
+        if (playerPTags.length >= 4) {
+          playerSets = playerPTags[1].textContent?.trim();
+        }
+      } catch (e) {
+        console.error("Autodarts Tools: Set Player Info - Error: ", e);
+      }
+
       return {
         name: playerCardEl.querySelector(".ad-ext-player-name")?.textContent || "",
         score: playerCardEl.querySelector(".ad-ext-player-score")?.textContent?.trim() ?? "0",
@@ -29,8 +42,12 @@ export async function setPlayerInfo() {
         ...(matchhasSets && { sets: playerStatsEl?.children[0]?.children[0]?.textContent?.trim() }),
         darts: getDartsThrown(playerCardEl as HTMLElement),
         stats: getStats(playerCardEl as HTMLElement),
+        legs: playerLegs && Number.parseInt(playerLegs) ? Number.parseInt(playerLegs) : 0,
+        sets: playerSets && Number.parseInt(playerSets) ? Number.parseInt(playerSets) : undefined,
       };
     });
+
+    console.log(playerInfo);
 
     await AutodartsToolsMatchStatus.setValue({
       ...matchStatus,

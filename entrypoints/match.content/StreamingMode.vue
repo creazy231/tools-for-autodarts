@@ -319,7 +319,7 @@ async function setGameData(matchStatus: IMatchStatus) {
   try {
     game.players = matchStatus.playerInfo;
     game.throws = matchStatus.throws;
-    game.turnPoints = matchStatus.turnPoints;
+    game.turnPoints = matchStatus.turnPoints || "🎯";
 
     const gameSettingsContainerElement = document.querySelector("#ad-ext-game-variant")?.parentElement;
 

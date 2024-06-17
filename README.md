@@ -1,4 +1,4 @@
-# Autodarts Tools
+# Tools for Autodarts
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/creazy231/autodarts-tools/release.yml)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/creazy231/autodarts-tools)
@@ -11,7 +11,7 @@
 )](https://apps.apple.com/de/app/autodarts-tools/id6479754594)
 
 > [!CAUTION]
-> **Autodarts Tools** is developed by the community and is not an integral part of the actual Autodarts
+> **Tools for Autodarts** is developed by the community and is not an integral part of the actual Autodarts
 
 ## Features
 

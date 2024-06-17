@@ -13,8 +13,8 @@
 		691D3EDD2BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EDC2BABD13200CA29AF /* Base */; };
 		691D3EE62BABD13200CA29AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691D3EE52BABD13200CA29AF /* AppDelegate.swift */; };
 		691D3EE92BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EE82BABD13200CA29AF /* Base */; };
-		691D3EF12BABD13200CA29AF /* AD Tools Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 691D3EF02BABD13200CA29AF /* AD Tools Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		691D3EFB2BABD13200CA29AF /* AD Tools Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 691D3EFA2BABD13200CA29AF /* AD Tools Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		691D3EF12BABD13200CA29AF /* Tools for Autodarts Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 691D3EF02BABD13200CA29AF /* Tools for Autodarts Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		691D3EFB2BABD13200CA29AF /* Tools for Autodarts Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 691D3EFA2BABD13200CA29AF /* Tools for Autodarts Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		691D3F012BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC52BABD13100CA29AF /* Base */; };
 		691D3F022BABD13200CA29AF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC52BABD13100CA29AF /* Base */; };
 		691D3F032BABD13200CA29AF /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 691D3EC62BABD13100CA29AF /* Icon.png */; };
@@ -45,14 +45,14 @@
 			containerPortal = 691D3EBE2BABD13100CA29AF /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 691D3EEF2BABD13200CA29AF;
-			remoteInfo = "AD Tools Extension (iOS)";
+			remoteInfo = "Tools for Autodarts Extension (iOS)";
 		};
 		691D3EFC2BABD13200CA29AF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 691D3EBE2BABD13100CA29AF /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 691D3EF92BABD13200CA29AF;
-			remoteInfo = "AD Tools Extension (macOS)";
+			remoteInfo = "Tools for Autodarts Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -63,7 +63,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				691D3EF12BABD13200CA29AF /* AD Tools Extension.appex in Embed Foundation Extensions */,
+				691D3EF12BABD13200CA29AF /* Tools for Autodarts Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,7 +74,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				691D3EFB2BABD13200CA29AF /* AD Tools Extension.appex in Embed Foundation Extensions */,
+				691D3EFB2BABD13200CA29AF /* Tools for Autodarts Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -89,22 +89,22 @@
 		691D3EC92BABD13100CA29AF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		691D3ECA2BABD13200CA29AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		691D3ECC2BABD13200CA29AF /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		691D3ED12BABD13200CA29AF /* AD Tools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AD Tools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3ED12BABD13200CA29AF /* Tools for Autodarts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tools for Autodarts.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		691D3ED42BABD13200CA29AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		691D3ED62BABD13200CA29AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		691D3ED92BABD13200CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		691D3EDC2BABD13200CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		691D3EDE2BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		691D3EE32BABD13200CA29AF /* AD Tools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AD Tools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3EE32BABD13200CA29AF /* Tools for Autodarts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tools for Autodarts.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		691D3EE52BABD13200CA29AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		691D3EE82BABD13200CA29AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		691D3EEA2BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		691D3EEB2BABD13200CA29AF /* AD Tools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "AD Tools.entitlements"; sourceTree = "<group>"; };
-		691D3EF02BABD13200CA29AF /* AD Tools Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "AD Tools Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3EEB2BABD13200CA29AF /* Tools for Autodarts.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Tools for Autodarts.entitlements"; sourceTree = "<group>"; };
+		691D3EF02BABD13200CA29AF /* Tools for Autodarts Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Tools for Autodarts Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		691D3EF52BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		691D3EFA2BABD13200CA29AF /* AD Tools Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "AD Tools Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		691D3EFA2BABD13200CA29AF /* Tools for Autodarts Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Tools for Autodarts Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		691D3EFF2BABD13200CA29AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		691D3F002BABD13200CA29AF /* AD Tools.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "AD Tools.entitlements"; sourceTree = "<group>"; };
+		691D3F002BABD13200CA29AF /* Tools for Autodarts.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Tools for Autodarts.entitlements"; sourceTree = "<group>"; };
 		691D3F202BABD13200CA29AF /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = "../../.output/safari-mv2/background.js"; sourceTree = "<group>"; };
 		691D3F212BABD13200CA29AF /* content-scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "content-scripts"; path = "../../.output/safari-mv2/content-scripts"; sourceTree = "<group>"; };
 		691D3F222BABD13200CA29AF /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../.output/safari-mv2/manifest.json"; sourceTree = "<group>"; };
@@ -189,10 +189,10 @@
 		691D3ED22BABD13200CA29AF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				691D3ED12BABD13200CA29AF /* AD Tools.app */,
-				691D3EE32BABD13200CA29AF /* AD Tools.app */,
-				691D3EF02BABD13200CA29AF /* AD Tools Extension.appex */,
-				691D3EFA2BABD13200CA29AF /* AD Tools Extension.appex */,
+				691D3ED12BABD13200CA29AF /* Tools for Autodarts.app */,
+				691D3EE32BABD13200CA29AF /* Tools for Autodarts.app */,
+				691D3EF02BABD13200CA29AF /* Tools for Autodarts Extension.appex */,
+				691D3EFA2BABD13200CA29AF /* Tools for Autodarts Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -215,7 +215,7 @@
 				691D3EE52BABD13200CA29AF /* AppDelegate.swift */,
 				691D3EE72BABD13200CA29AF /* Main.storyboard */,
 				691D3EEA2BABD13200CA29AF /* Info.plist */,
-				691D3EEB2BABD13200CA29AF /* AD Tools.entitlements */,
+				691D3EEB2BABD13200CA29AF /* Tools for Autodarts.entitlements */,
 			);
 			path = "macOS (App)";
 			sourceTree = "<group>";
@@ -232,7 +232,7 @@
 			isa = PBXGroup;
 			children = (
 				691D3EFF2BABD13200CA29AF /* Info.plist */,
-				691D3F002BABD13200CA29AF /* AD Tools.entitlements */,
+				691D3F002BABD13200CA29AF /* Tools for Autodarts.entitlements */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
@@ -252,9 +252,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		691D3ED02BABD13200CA29AF /* AD Tools (iOS) */ = {
+		691D3ED02BABD13200CA29AF /* Tools for Autodarts (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 691D3F152BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools (iOS)" */;
+			buildConfigurationList = 691D3F152BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts (iOS)" */;
 			buildPhases = (
 				691D3ECD2BABD13200CA29AF /* Sources */,
 				691D3ECE2BABD13200CA29AF /* Frameworks */,
@@ -266,14 +266,14 @@
 			dependencies = (
 				691D3EF32BABD13200CA29AF /* PBXTargetDependency */,
 			);
-			name = "AD Tools (iOS)";
-			productName = "AD Tools (iOS)";
-			productReference = 691D3ED12BABD13200CA29AF /* AD Tools.app */;
+			name = "Tools for Autodarts (iOS)";
+			productName = "Tools for Autodarts (iOS)";
+			productReference = 691D3ED12BABD13200CA29AF /* Tools for Autodarts.app */;
 			productType = "com.apple.product-type.application";
 		};
-		691D3EE22BABD13200CA29AF /* AD Tools (macOS) */ = {
+		691D3EE22BABD13200CA29AF /* Tools for Autodarts (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 691D3F1C2BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools (macOS)" */;
+			buildConfigurationList = 691D3F1C2BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts (macOS)" */;
 			buildPhases = (
 				691D3EDF2BABD13200CA29AF /* Sources */,
 				691D3EE02BABD13200CA29AF /* Frameworks */,
@@ -285,14 +285,14 @@
 			dependencies = (
 				691D3EFD2BABD13200CA29AF /* PBXTargetDependency */,
 			);
-			name = "AD Tools (macOS)";
-			productName = "AD Tools (macOS)";
-			productReference = 691D3EE32BABD13200CA29AF /* AD Tools.app */;
+			name = "Tools for Autodarts (macOS)";
+			productName = "Tools for Autodarts (macOS)";
+			productReference = 691D3EE32BABD13200CA29AF /* Tools for Autodarts.app */;
 			productType = "com.apple.product-type.application";
 		};
-		691D3EEF2BABD13200CA29AF /* AD Tools Extension (iOS) */ = {
+		691D3EEF2BABD13200CA29AF /* Tools for Autodarts Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 691D3F112BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools Extension (iOS)" */;
+			buildConfigurationList = 691D3F112BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts Extension (iOS)" */;
 			buildPhases = (
 				691D3EEC2BABD13200CA29AF /* Sources */,
 				691D3EED2BABD13200CA29AF /* Frameworks */,
@@ -302,14 +302,14 @@
 			);
 			dependencies = (
 			);
-			name = "AD Tools Extension (iOS)";
-			productName = "AD Tools Extension (iOS)";
-			productReference = 691D3EF02BABD13200CA29AF /* AD Tools Extension.appex */;
+			name = "Tools for Autodarts Extension (iOS)";
+			productName = "Tools for Autodarts Extension (iOS)";
+			productReference = 691D3EF02BABD13200CA29AF /* Tools for Autodarts Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		691D3EF92BABD13200CA29AF /* AD Tools Extension (macOS) */ = {
+		691D3EF92BABD13200CA29AF /* Tools for Autodarts Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 691D3F182BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools Extension (macOS)" */;
+			buildConfigurationList = 691D3F182BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts Extension (macOS)" */;
 			buildPhases = (
 				691D3EF62BABD13200CA29AF /* Sources */,
 				691D3EF72BABD13200CA29AF /* Frameworks */,
@@ -319,9 +319,9 @@
 			);
 			dependencies = (
 			);
-			name = "AD Tools Extension (macOS)";
-			productName = "AD Tools Extension (macOS)";
-			productReference = 691D3EFA2BABD13200CA29AF /* AD Tools Extension.appex */;
+			name = "Tools for Autodarts Extension (macOS)";
+			productName = "Tools for Autodarts Extension (macOS)";
+			productReference = 691D3EFA2BABD13200CA29AF /* Tools for Autodarts Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -348,7 +348,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 691D3EC12BABD13100CA29AF /* Build configuration list for PBXProject "AD Tools" */;
+			buildConfigurationList = 691D3EC12BABD13100CA29AF /* Build configuration list for PBXProject "Tools for Autodarts" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -361,10 +361,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				691D3ED02BABD13200CA29AF /* AD Tools (iOS) */,
-				691D3EE22BABD13200CA29AF /* AD Tools (macOS) */,
-				691D3EEF2BABD13200CA29AF /* AD Tools Extension (iOS) */,
-				691D3EF92BABD13200CA29AF /* AD Tools Extension (macOS) */,
+				691D3ED02BABD13200CA29AF /* Tools for Autodarts (iOS) */,
+				691D3EE22BABD13200CA29AF /* Tools for Autodarts (macOS) */,
+				691D3EEF2BABD13200CA29AF /* Tools for Autodarts Extension (iOS) */,
+				691D3EF92BABD13200CA29AF /* Tools for Autodarts Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -462,12 +462,12 @@
 /* Begin PBXTargetDependency section */
 		691D3EF32BABD13200CA29AF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 691D3EEF2BABD13200CA29AF /* AD Tools Extension (iOS) */;
+			target = 691D3EEF2BABD13200CA29AF /* Tools for Autodarts Extension (iOS) */;
 			targetProxy = 691D3EF22BABD13200CA29AF /* PBXContainerItemProxy */;
 		};
 		691D3EFD2BABD13200CA29AF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 691D3EF92BABD13200CA29AF /* AD Tools Extension (macOS) */;
+			target = 691D3EF92BABD13200CA29AF /* Tools for Autodarts Extension (macOS) */;
 			targetProxy = 691D3EFC2BABD13200CA29AF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -630,7 +630,7 @@
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Tools for Autodarts Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -644,7 +644,7 @@
 					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
-				PRODUCT_NAME = "AD Tools Extension";
+				PRODUCT_NAME = "Tools for Autodarts Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -661,7 +661,7 @@
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Tools for Autodarts Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -675,7 +675,7 @@
 					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
-				PRODUCT_NAME = "AD Tools Extension";
+				PRODUCT_NAME = "Tools for Autodarts Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -692,11 +692,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools";
+				INFOPLIST_KEY_CFBundleDisplayName = Tools;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -708,7 +708,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.11;
+				MARKETING_VERSION = 1.4.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -716,7 +716,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
-				PRODUCT_NAME = "AD Tools";
+				PRODUCT_NAME = "Tools for Autodarts";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -731,11 +731,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools";
+				INFOPLIST_KEY_CFBundleDisplayName = Tools;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -747,7 +747,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.11;
+				MARKETING_VERSION = 1.4.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -755,7 +755,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
-				PRODUCT_NAME = "AD Tools";
+				PRODUCT_NAME = "Tools for Autodarts";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -767,14 +767,14 @@
 		691D3F192BABD13200CA29AF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/AD Tools.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Tools for Autodarts.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Tools for Autodarts Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -788,7 +788,7 @@
 					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
-				PRODUCT_NAME = "AD Tools Extension";
+				PRODUCT_NAME = "Tools for Autodarts Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -799,14 +799,14 @@
 		691D3F1A2BABD13200CA29AF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/AD Tools.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Tools for Autodarts.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Tools for Autodarts Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -820,7 +820,7 @@
 					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools.extension";
-				PRODUCT_NAME = "AD Tools Extension";
+				PRODUCT_NAME = "Tools for Autodarts Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -834,14 +834,14 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/AD Tools.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Tools for Autodarts.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools";
+				INFOPLIST_KEY_CFBundleDisplayName = Tools;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -850,7 +850,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.3.11;
+				MARKETING_VERSION = 1.4.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -858,7 +858,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
-				PRODUCT_NAME = "AD Tools";
+				PRODUCT_NAME = "Tools for Autodarts";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -871,14 +871,14 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/AD Tools.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Tools for Autodarts.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = BXYGXAJ99T;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "AD Tools";
+				INFOPLIST_KEY_CFBundleDisplayName = Tools;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -887,7 +887,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.3.11;
+				MARKETING_VERSION = 1.4.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -895,7 +895,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.boltapi.autodarts-tools";
-				PRODUCT_NAME = "AD Tools";
+				PRODUCT_NAME = "Tools for Autodarts";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -905,7 +905,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		691D3EC12BABD13100CA29AF /* Build configuration list for PBXProject "AD Tools" */ = {
+		691D3EC12BABD13100CA29AF /* Build configuration list for PBXProject "Tools for Autodarts" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				691D3F0F2BABD13200CA29AF /* Debug */,
@@ -914,7 +914,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		691D3F112BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools Extension (iOS)" */ = {
+		691D3F112BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				691D3F122BABD13200CA29AF /* Debug */,
@@ -923,7 +923,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		691D3F152BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools (iOS)" */ = {
+		691D3F152BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				691D3F162BABD13200CA29AF /* Debug */,
@@ -932,7 +932,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		691D3F182BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools Extension (macOS)" */ = {
+		691D3F182BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				691D3F192BABD13200CA29AF /* Debug */,
@@ -941,7 +941,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		691D3F1C2BABD13200CA29AF /* Build configuration list for PBXNativeTarget "AD Tools (macOS)" */ = {
+		691D3F1C2BABD13200CA29AF /* Build configuration list for PBXNativeTarget "Tools for Autodarts (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				691D3F1D2BABD13200CA29AF /* Debug */,
