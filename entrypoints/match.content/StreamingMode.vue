@@ -167,7 +167,7 @@
               index === 0 ? 'border-t-2' : 'border-t-0',
             )"
           >
-            {{ player.sets }}
+            {{ player.sets || 0 }}
           </div>
           <div
             :class="twMerge(

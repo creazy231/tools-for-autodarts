@@ -16,7 +16,7 @@ export async function setPlayerInfo() {
     const matchStatus: IMatchStatus = await AutodartsToolsMatchStatus.getValue();
 
     const playerInfo: IPlayerInfo[] = [ ...document.querySelectorAll(".ad-ext-player") ].map((playerCardEl) => {
-      const playerStatsEl = playerCardEl.nextElementSibling?.children[0] as HTMLElement;
+      const playerStatsEl = playerCardEl?.children[0] as HTMLElement;
 
       const matchhasLegs = playerStatsEl.children[0].children.length > 0;
       const matchhasSets = playerStatsEl.children[0].children.length > 1;
