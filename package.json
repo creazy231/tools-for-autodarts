@@ -60,7 +60,7 @@
     "typescript": "^5.5.3",
     "undici": "^6.19.2",
     "unplugin-auto-import": "^0.17.6",
-    "unplugin-vue-components": "^0.26.0",
+    "unplugin-vue-components": "^0.27.0",
     "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.0.24",
     "wxt": "^0.18.10",
