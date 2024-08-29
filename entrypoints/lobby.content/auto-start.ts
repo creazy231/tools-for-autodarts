@@ -8,15 +8,16 @@ export async function autoStart() {
     const hasAutoStartButton = document.getElementById("adt-autostart-button");
     if (hasAutoStartButton) return;
 
-    const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
+    const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:last-of-type") as HTMLDivElement;
     const button = buttonsContainer.querySelector("button")?.cloneNode(true) as HTMLButtonElement;
-
-    if (button.innerText !== "Start") return;
 
     button.id = "adt-autostart-button";
     button.innerText = "Autostart OFF";
     button.style.color = "var(--chakra-colors-green-500)";
     button.style.color = "var(--chakra-colors-red-500)";
+    button.style.background = "var(--chakra-colors-whiteAlpha-200)";
+    button.style.borderColor = "var(--chakra-colors-whiteAlpha-200)";
+    button.style.maxWidth = "10rem";
 
     button.addEventListener("click", () => {
       button.textContent = button.textContent === "Autostart ON" ? "Autostart OFF" : "Autostart ON";
@@ -42,7 +43,7 @@ export async function onRemove() {
 }
 
 async function checkAutoStart() {
-  const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) > div > table > tbody > tr");
+  const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) table > tbody > tr");
   if (rows.length > 1) {
     await new Promise(resolve => setTimeout(resolve, 3000));
 

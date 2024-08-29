@@ -1,6 +1,6 @@
 <template>
   <div v-if="config?.recentLocalPlayers?.players?.length">
-    <div class="flex flex-wrap gap-2">
+    <div class="mt-4 flex flex-wrap gap-2">
       <div
         @click="addUserToLobby(player)"
         v-for="player in config.recentLocalPlayers.players"

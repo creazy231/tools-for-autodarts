@@ -6,14 +6,15 @@ let shuffledPlayerNames: string[] = [];
 
 export async function shufflePlayers() {
   try {
-    const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(3) > div") as HTMLDivElement;
+    const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:last-of-type") as HTMLDivElement;
     const button = buttonsContainer.querySelector("button")?.cloneNode(true) as HTMLButtonElement;
 
-    if (button.innerText !== "Start") return;
-
-    button.setAttribute("id", "autodarts-tools-shuffle-button");
+    button.id = "autodarts-tools-shuffle-button";
     button.innerText = "Shuffle";
     button.style.color = "var(--chakra-colors-white)";
+    button.style.background = "var(--chakra-colors-whiteAlpha-200)";
+    button.style.borderColor = "var(--chakra-colors-whiteAlpha-200)";
+    button.style.maxWidth = "7rem";
 
     button.addEventListener("click", handleShuffle);
 
@@ -26,7 +27,7 @@ export async function shufflePlayers() {
 }
 
 async function checkPlayers() {
-  const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) > div > table > tbody > tr");
+  const rows = document.querySelectorAll("#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) table > tbody > tr");
   playerRows = rows as unknown as HTMLTableRowElement[];
 }
 
