@@ -47,8 +47,6 @@ export async function setPlayerInfo() {
       };
     });
 
-    console.log(playerInfo);
-
     await AutodartsToolsMatchStatus.setValue({
       ...matchStatus,
       playerCount,

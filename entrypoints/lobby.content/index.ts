@@ -59,7 +59,7 @@ export default defineContentScript({
             const userEl = userElements?.filter(el => el.textContent?.trim() === username);
 
             if (userEl.length) {
-              const removeBtn = userEl[0].closest("tr")?.querySelector("button:last-of-type") as HTMLButtonElement;
+              const removeBtn = userEl[1].closest("tr")?.querySelector("button:last-of-type") as HTMLButtonElement;
               removeBtn?.click();
               startPlayerToBoardObserver();
             } else {

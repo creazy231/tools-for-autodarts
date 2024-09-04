@@ -9,15 +9,13 @@ export async function playerMatchDataLarger() {
     const legsSetsLargerSize = config.legsSetsLarger.value || 3;
     const playerMatchDataSize = config.playerMatchData.value || 1.5;
     document.querySelectorAll(".ad-ext-player").forEach((playerCardEl) => {
-      playerCardEl?.nextElementSibling?.querySelectorAll(":scope > div > div > div").forEach((playerMatchDataEl) => {
+      playerCardEl?.querySelectorAll("div > div > div > span").forEach((playerMatchDataEl) => {
         if (config.legsSetsLarger.enabled && playerMatchDataEl) {
-          (playerMatchDataEl as HTMLElement).style.height = `${legsSetsLargerSize}rem`;
-          (playerMatchDataEl as HTMLElement).style.width = `${legsSetsLargerSize}rem`;
           playerMatchDataEl.querySelector("p")!.style.fontSize = `${legsSetsLargerSize}rem`;
         }
       });
       if (config.playerMatchData.enabled) {
-        (playerCardEl?.nextElementSibling?.querySelector(":scope > div > p") as HTMLElement | null)!.style.fontSize = `${playerMatchDataSize}rem`;
+        (playerCardEl?.querySelector("div:last-of-type > p") as HTMLElement | null)!.style.fontSize = `${playerMatchDataSize}rem`;
       }
     });
   } catch (e) {
