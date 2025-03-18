@@ -559,6 +559,45 @@
                     <span class="icon-[pixelarticons--trash] text-lg" />
                   </button>
                 </div>
+                <div class="grid items-center gap-4 lg:grid-cols-[5rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
+                  <div>Breakfast</div>
+                  <input
+                    v-model="soundsConfig.breakfast.info"
+                    type="text"
+                    :disabled="!!soundsConfig.breakfast.data"
+                    :class="twMerge(
+                      'w-full rounded-md border border-white/10 bg-transparent px-2 py-1 outline-none',
+                      !!soundsConfig.breakfast.data && 'text-white/40',
+                    )"
+                  >
+                  <button
+                    @click="playSound('breakfast')"
+                    class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                  >
+                    <span class="icon-[pixelarticons--play] text-xl" />
+                  </button>
+                  <button
+                    @click="handleSoundUpload('breakfast')"
+                    title="Upload sound"
+                    class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none hover:bg-white/10"
+                  >
+                    <span class="icon-[pixelarticons--upload] text-lg" />
+                  </button>
+                  <button
+                    @click="handleSoundReset('breakfast')"
+                    title="Reset sound"
+                    class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                  >
+                    <span class="icon-[pixelarticons--reload] -scale-x-100 text-xl" />
+                  </button>
+                  <button
+                    @click="handleSoundRemove('breakfast')"
+                    title="Remove sound"
+                    class="flex h-full flex-nowrap items-center justify-center rounded-md border border-white/10 bg-white/5 outline-none"
+                  >
+                    <span class="icon-[pixelarticons--trash] text-lg" />
+                  </button>
+                </div>
 
                 <div class="grid items-center gap-4 lg:grid-cols-[7rem_auto_50px_50px_50px_50px] lg:grid-rows-1">
                   <div>Game on!</div>

@@ -94,12 +94,21 @@ export async function sounds() {
     }
   }
 
+  const breakfastValues = new Set(["S1", "S5", "S20"]);
+  const isBreakfast = turnPoints === "26" 
+    && throwPointsArr.length === 3
+    && throwPointsArr.every(value => breakfastValues.has(value));
+
   setTimeout(async () => {
     if (turnPoints === "BUST") {
       if (soundConfig.bust?.data || soundConfig.bust?.info) {
         playSound("bust", 2);
       } else if (callerServerUrl.length && isCallerEnabled) {
         playPointsSound(callerServerUrl, callerFileExt, "0");
+      }
+    } else if (isBreakfast) {
+      if (soundConfig.breakfast?.data || soundConfig.breakfast?.info) {
+        playSound("breakfast", 2);
       }
     } else {
       if (curThrowPointsName === "BULL") {

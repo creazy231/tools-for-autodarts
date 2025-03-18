@@ -15,6 +15,7 @@ export interface ISoundsConfig {
   T18: TSoundData;
   T19: TSoundData;
   T20: TSoundData;
+  breakfast: TSoundData;
   bull: TSoundData;
   miss: TSoundData[];
   bot: TSoundData;
@@ -36,6 +37,7 @@ export const defaultSoundsConfig: ISoundsConfig = {
   T18: { info: "https://autodarts.x10.mx/beep_2_18.wav" },
   T19: { info: "https://autodarts.x10.mx/beep_2_19.wav" },
   T20: { info: "https://autodarts.x10.mx/beep_2_20.wav" },
+  breakfast: { info: "" },
   bull: { info: "https://autodarts.x10.mx/beep_2_bullseye.mp3" },
   miss: [
     { info: "https://autodarts.x10.mx/miss_1.mp3" },
