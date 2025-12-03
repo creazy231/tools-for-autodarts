@@ -485,7 +485,23 @@ yarn zip
 ## 🔔 External Webhooks Feature
 
 The external webhooks feature adds the ability to send autodarts match's data to an external server. You can receive this data on your own server, parse it your own way, build your own statistics or whatever you want to do. 
-You can specify the URL where the webhooks containing autodarts data should be send to. Optional you can specify a Bearer Token which will be added as Authentication-Header to the outgoing request.
+You can specify the URL where the webhooks containing autodarts data should be send to. Optional you can specify a Bearer Token which will be added as Authentication-Header to the outgoing request. 
+  
+The outgoing requests also have an custom Header "X-Autodarts-Tools" set to 1.
+You can use this header to identify the requests on your backend. Here's an example how to rewrite the incoming requests on your backend to your desired api endpoint using traefik with docker labels. With this configuration you can use https://foo.bar as Webhook-URL in the Settings and the webhooks will be passed to https://foo.bar/api/webhooks on your backend-service so your users do not have to handle enpoints:
+<details>
+<summary>Click to expand traefik docker labels example</summary>
+
+```yaml
+# Rewrite tools-for-autodarts-webhooks to /api/webhook
+- "traefik.http.routers.foo-router.rule=Host(`foo.bar`) && Headers(`X-Tools-For-Autodarts`, `1`)"
+- "traefik.http.routers.foo-router.entrypoints=https"
+- "traefik.http.middlewares.tools-rewrite.replacepath.path=/api/webhooks"
+- "traefik.http.routers.foo-router.middlewares=tools-rewrite"
+- "traefik.http.routers.foo-router.service=my-backend-service"
+```
+</details>
+  
 
 There are two different payloads that can be sent:
 - "Each Dart" will send a webhook for each dart thrown. It contains only data about the thrown dart (much less data transfer). A sample payload would look like this:

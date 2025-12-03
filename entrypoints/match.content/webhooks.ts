@@ -104,6 +104,7 @@ async function dispatchWebhook(event: string, data: Record<string, any>, webhook
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "X-TARGET-URL": webhookConfig.url,
   };
 
   if (webhookConfig.token) {
@@ -111,8 +112,10 @@ async function dispatchWebhook(event: string, data: Record<string, any>, webhook
     headers["X-Autodarts-Tools-Webhook-Token"] = webhookConfig.token;
   }
 
+  const proxyUrl = "https://adt-proxy.tobias-thiele.de/webhook";
+
   try {
-    const response = await backgroundFetch(webhookConfig.url, {
+    const response = await backgroundFetch(proxyUrl, {
       method: "POST",
       headers,
       body: JSON.stringify(payload),

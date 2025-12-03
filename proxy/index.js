@@ -26,6 +26,10 @@ app.post('/webhook', async (req, res) => {
     const response = await axios.post(targetUrl, req.body, {
       headers: {
         'Content-Type': 'application/json',
+        // Forward Authorization header if present
+        ...(req.headers.authorization && { 'Authorization': req.headers.authorization }),
+        // Set custom header to identify the requests on the target server
+        'X-Tools-For-Autodarts': 1,
         // Forwarding User-Agent or other headers might be useful but risking CORS or other issues.
         // For now keeping it simple.
       }
