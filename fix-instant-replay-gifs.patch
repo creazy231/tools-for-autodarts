@@ -1,0 +1,26 @@
+From aa99d2b1dc464bd8ca43361c43825767e6af0fd5 Mon Sep 17 00:00:00 2001
+From: OpenClaw Agent <eagerkey849@agentmail.to>
+Date: Mon, 9 Feb 2026 19:29:39 +0000
+Subject: [PATCH] fix(styles): increase z-index of animations to ensure
+ visibility over instant replay
+
+---
+ entrypoints/match.content/Animations.vue | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/entrypoints/match.content/Animations.vue b/entrypoints/match.content/Animations.vue
+index 84393c2..40ff02a 100644
+--- a/entrypoints/match.content/Animations.vue
++++ b/entrypoints/match.content/Animations.vue
+@@ -2,7 +2,7 @@
+   <div
+     @click="hideAnimation"
+     v-if="isShowingAnimation"
+-    class="fixed z-[180]"
++    class="fixed z-[200]"
+     :class="animationContainerClasses"
+     :style="animationContainerStyle"
+   >
+-- 
+2.39.5
+

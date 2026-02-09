@@ -1,0 +1,113 @@
+From aa99d2b1dc464bd8ca43361c43825767e6af0fd5 Mon Sep 17 00:00:00 2001
+From: OpenClaw Agent <eagerkey849@agentmail.to>
+Date: Mon, 9 Feb 2026 19:29:39 +0000
+Subject: [PATCH 1/2] fix(styles): increase z-index of animations to ensure
+ visibility over instant replay
+
+---
+ entrypoints/match.content/Animations.vue | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/entrypoints/match.content/Animations.vue b/entrypoints/match.content/Animations.vue
+index 84393c2..40ff02a 100644
+--- a/entrypoints/match.content/Animations.vue
++++ b/entrypoints/match.content/Animations.vue
+@@ -2,7 +2,7 @@
+   <div
+     @click="hideAnimation"
+     v-if="isShowingAnimation"
+-    class="fixed z-[180]"
++    class="fixed z-[200]"
+     :class="animationContainerClasses"
+     :style="animationContainerStyle"
+   >
+-- 
+2.39.5
+
+
+From b55e8c3daacd80268f140f155e5c3e322e49bc90 Mon Sep 17 00:00:00 2001
+From: OpenClaw Agent <eagerkey849@agentmail.to>
+Date: Mon, 9 Feb 2026 19:33:06 +0000
+Subject: [PATCH 2/2] perf(replay): optimize frame buffering using ImageBitmap
+ to reduce main thread blocking
+
+---
+ entrypoints/match.content/InstantReplay.vue | 27 +++++++++++----------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/entrypoints/match.content/InstantReplay.vue b/entrypoints/match.content/InstantReplay.vue
+index 43ea69d..de8bc45 100644
+--- a/entrypoints/match.content/InstantReplay.vue
++++ b/entrypoints/match.content/InstantReplay.vue
+@@ -35,7 +35,7 @@ let transitionTimeout: NodeJS.Timeout | null = null;
+ 
+ // For storing the delayed playback components
+ let sourceVideo: HTMLVideoElement | null = null;
+-let buffer: HTMLVideoElement[] = [];
++let buffer: ImageBitmap[] = [];
+ let animationFrameId: number | null = null;
+ let sourceCanvas: HTMLCanvasElement | null = null;
+ let ctx: CanvasRenderingContext2D | null = null;
+@@ -194,6 +194,7 @@ function cleanup() {
+   }
+ 
+   // Clear the buffer
++  buffer.forEach(bitmap => bitmap.close());
+   buffer = [];
+   ctx = null;
+ 
+@@ -353,13 +354,15 @@ function startDelayedPlayback() {
+ 
+   // Calculate frame buffer size based on delay using detected FPS
+   const bufferSize = delaySeconds.value * detectedFPS.value;
+-  const frameBuffer: ImageData[] = [];
++  // Reset buffer
++  buffer.forEach(b => b.close());
++  buffer = [];
+   let shouldOutput = false;
+ 
+   console.log(`Starting delayed playback with buffer size: ${bufferSize} (${detectedFPS.value} FPS)`);
+ 
+   // Function to capture frames and create the delay
+-  const captureFrame = () => {
++  const captureFrame = async () => {
+     if (!sourceVideo || !ctx || !sourceCanvas) {
+       console.log("Stopping capture: components no longer available");
+       return;
+@@ -371,25 +374,23 @@ function startDelayedPlayback() {
+         detectFPS();
+       }
+ 
+-      // Draw the current frame from the source video to the canvas
+-      ctx.drawImage(sourceVideo, 0, 0, sourceCanvas.width, sourceCanvas.height);
+-
+-      // Get the frame data
+-      const frameData = ctx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
++      // Create a bitmap from the current video frame (efficient, async, avoids main thread block)
++      const bitmap = await createImageBitmap(sourceVideo);
+ 
+       // Add the frame to our buffer
+-      frameBuffer.push(frameData);
++      buffer.push(bitmap);
+ 
+       // If buffer is full, start showing the delayed frames
+-      if (frameBuffer.length >= bufferSize) {
++      if (buffer.length >= bufferSize) {
+         shouldOutput = true;
+ 
+         // Get the oldest frame
+-        const delayedFrame = frameBuffer.shift();
++        const delayedFrame = buffer.shift();
+ 
+-        // Put that frame back on the canvas
++        // Draw that frame to the canvas
+         if (delayedFrame) {
+-          ctx.putImageData(delayedFrame, 0, 0);
++          ctx.drawImage(delayedFrame, 0, 0, sourceCanvas.width, sourceCanvas.height);
++          delayedFrame.close(); // Important: release GPU memory
+         }
+       }
+ 
+-- 
+2.39.5
+

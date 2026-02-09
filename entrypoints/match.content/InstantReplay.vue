@@ -35,7 +35,7 @@ let transitionTimeout: NodeJS.Timeout | null = null;
 
 // For storing the delayed playback components
 let sourceVideo: HTMLVideoElement | null = null;
-let buffer: HTMLVideoElement[] = [];
+let buffer: ImageBitmap[] = [];
 let animationFrameId: number | null = null;
 let sourceCanvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
@@ -194,6 +194,7 @@ function cleanup() {
   }
 
   // Clear the buffer
+  buffer.forEach(bitmap => bitmap.close());
   buffer = [];
   ctx = null;
 
@@ -353,13 +354,13 @@ function startDelayedPlayback() {
 
   // Calculate frame buffer size based on delay using detected FPS
   const bufferSize = delaySeconds.value * detectedFPS.value;
-  const frameBuffer: ImageData[] = [];
+  const frameBuffer: ImageBitmap[] = [];
   let shouldOutput = false;
 
   console.log(`Starting delayed playback with buffer size: ${bufferSize} (${detectedFPS.value} FPS)`);
 
   // Function to capture frames and create the delay
-  const captureFrame = () => {
+  const captureFrame = async () => {
     if (!sourceVideo || !ctx || !sourceCanvas) {
       console.log("Stopping capture: components no longer available");
       return;
@@ -371,14 +372,11 @@ function startDelayedPlayback() {
         detectFPS();
       }
 
-      // Draw the current frame from the source video to the canvas
-      ctx.drawImage(sourceVideo, 0, 0, sourceCanvas.width, sourceCanvas.height);
-
-      // Get the frame data
-      const frameData = ctx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+      // Create a bitmap from the current video frame (efficient, async, avoids main thread block)
+      const bitmap = await createImageBitmap(sourceVideo);
 
       // Add the frame to our buffer
-      frameBuffer.push(frameData);
+      frameBuffer.push(bitmap);
 
       // If buffer is full, start showing the delayed frames
       if (frameBuffer.length >= bufferSize) {
@@ -387,9 +385,10 @@ function startDelayedPlayback() {
         // Get the oldest frame
         const delayedFrame = frameBuffer.shift();
 
-        // Put that frame back on the canvas
+        // Draw that frame to the canvas
         if (delayedFrame) {
-          ctx.putImageData(delayedFrame, 0, 0);
+          ctx.drawImage(delayedFrame, 0, 0, sourceCanvas.width, sourceCanvas.height);
+          delayedFrame.close(); // Important: release GPU memory
         }
       }
 
