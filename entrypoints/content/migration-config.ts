@@ -174,6 +174,25 @@ async function migrateConfig(currentConfigVersion: number) {
           effect.json_api = '';
         });
         break;
+      case 20:
+        // Migration from version 20 to version 21
+        // Add triggerTiming field to existing sounds and animations for backward compatibility
+        config.version = 21;
+        if (config.soundFx && config.soundFx.sounds) {
+          config.soundFx.sounds.forEach((sound) => {
+            if (!sound.triggerTiming) {
+              sound.triggerTiming = "every-dart";
+            }
+          });
+        }
+        if (config.animations && config.animations.data) {
+          config.animations.data.forEach((animation) => {
+            if (!animation.triggerTiming) {
+              animation.triggerTiming = "every-dart";
+            }
+          });
+        }
+        break;
     }
 
     await AutodartsToolsConfig.setValue(config);
