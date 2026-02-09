@@ -167,7 +167,7 @@ async function processGameData(gameData: IGameData): Promise<void> {
   playAnimation(throwName.toLowerCase());
   if (winner) playAnimation("gameshot");
   if (busted) playAnimation("busted");
-  if (isLastThrow) {
+  if (isLastThrow && !busted) {
     playAnimation(points.toString());
     await new Promise(resolve => setTimeout(resolve, 500));
     playAnimation(combinedThrows);

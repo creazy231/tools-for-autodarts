@@ -78,7 +78,7 @@ async function processX01Data(
   if (winner && triggerPresentCB("gameshot+" + throwName)) return "gameshot+" + throwName;
   if (busted && triggerPresentCB("busted")) return "busted";
   if (isLastThrow && triggerPresentCB(combinedThrows)) return combinedThrows;
-  if (isLastThrow && triggerPresentCB(points)) return points;
+  if (isLastThrow && !busted && triggerPresentCB(points)) return points;
   if (triggerPresentCB(throwName)) return throwName;
 
   return null;
