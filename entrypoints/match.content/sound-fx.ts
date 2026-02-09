@@ -741,15 +741,15 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
           ),
         );
         if (hasS25Sound) {
-          playSound("ambient_s25");
+          playSound("ambient_s25", 1, isLastThrow);
         } else {
-          playSound(`ambient_${throwName.toLowerCase()}`);
+          playSound(`ambient_${throwName.toLowerCase()}`, 1, isLastThrow);
         }
       } else {
-        playSound(`ambient_${throwName.toLowerCase()}`);
+        playSound(`ambient_${throwName.toLowerCase()}`, 1, isLastThrow);
       }
-      playSound(`ambient_${points}`);
-      playSound(`ambient_${combinedThrows}`);
+      playSound(`ambient_${points}`, 1, isLastThrow);
+      playSound(`ambient_${combinedThrows}`, 1, isLastThrow);
     } else {
       // Special case: if throwName is "25" and throwBed is "Single", check for "ambient_s25" first
       if (throwName.toLowerCase() === "25" && throwBed === "Single") {
@@ -760,12 +760,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
           ),
         );
         if (hasS25Sound) {
-          playSound("ambient_s25");
+          playSound("ambient_s25", 1, isLastThrow);
         } else {
-          playSound(`ambient_${throwName.toLowerCase()}`);
+          playSound(`ambient_${throwName.toLowerCase()}`, 1, isLastThrow);
         }
       } else {
-        playSound(`ambient_${throwName.toLowerCase()}`);
+        playSound(`ambient_${throwName.toLowerCase()}`, 1, isLastThrow);
       }
     }
   } else {
@@ -819,12 +819,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
           ),
         );
         if (hasS25Sound) {
-          playSound("ambient_s25");
+          playSound("ambient_s25", 1, isLastThrow);
         } else {
-          playSound(`ambient_${throwName.toLowerCase()}`);
+          playSound(`ambient_${throwName.toLowerCase()}`, 1, isLastThrow);
         }
       } else {
-        playSound(`ambient_${throwName.toLowerCase()}`);
+        playSound(`ambient_${throwName.toLowerCase()}`, 1, isLastThrow);
       }
     }
   }
@@ -834,7 +834,7 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
  * Play a sound based on the trigger
  * Adds the sound to a queue to be played sequentially
  */
-function playSound(trigger: string, soundChannel: number = 1): void {
+function playSound(trigger: string, soundChannel: number = 1, isLastThrow: boolean = false): void {
   if (!config?.soundFx?.sounds || !config.soundFx.sounds.length) {
     console.log("Autodarts Tools: No sounds configured");
     return;
@@ -845,7 +845,19 @@ function playSound(trigger: string, soundChannel: number = 1): void {
     if (!sound.enabled || !sound.triggers) return false;
 
     // Check for direct match
-    if (sound.triggers.includes(trigger)) return true;
+    if (sound.triggers.includes(trigger)) {
+      // For direct matches, check trigger timing:
+      // - 'last-throw' or 'score-total': only play on last throw
+      // - 'every-dart' or undefined: always play (default)
+      const timing = sound.triggerTiming;
+      if (timing === "last-throw" || timing === "score-total") {
+        if (!isLastThrow) {
+          console.log(`Autodarts Tools: Skipping sound "${sound.name}" - triggerTiming is ${timing} but not last throw`);
+          return false;
+        }
+      }
+      return true;
+    }
 
     // Validate range triggers of sound
     // Extract number from trigger (handle ambient_ prefix)
@@ -872,7 +884,21 @@ function playSound(trigger: string, soundChannel: number = 1): void {
         return matches;
       });
 
-      if (hasMatchingRange) return true;
+      if (hasMatchingRange) {
+        // FIX #178: Point ranges only trigger on last throw unless explicitly set to 'every-dart'
+        // Default behavior for range triggers is now 'score-total' (only on last throw)
+        const timing = sound.triggerTiming;
+        if (timing === "every-dart") {
+          // Explicitly set to trigger on every dart
+          return true;
+        }
+        else if (!isLastThrow) {
+          // Default or 'score-total' or 'last-throw': only on last throw
+          console.log(`Autodarts Tools: Skipping range-matched sound "${sound.name}" - not last throw (use triggerTiming='every-dart' to change)`);
+          return false;
+        }
+        return true;
+      }
     }
 
     return false;

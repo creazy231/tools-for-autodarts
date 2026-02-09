@@ -219,6 +219,29 @@
             :max-rows="10"
           />
         </div>
+
+        <!-- Trigger Timing -->
+        <div>
+          <label for="trigger-timing" class="mb-1 block text-sm font-medium text-white">
+            Trigger Timing
+            <span
+              class="icon-[pixelarticons--info-box] ml-1 inline-block cursor-help text-white/50"
+              title="Every dart: Animation triggers on each dart if conditions match. Last throw: Only triggers after the 3rd dart. Score total: For point ranges (e.g., 0-10), only evaluates final turn score."
+            />
+          </label>
+          <AppSelect
+            id="trigger-timing"
+            v-model="newAnimation.triggerTiming"
+            :options="[
+              { value: 'every-dart', label: 'Every dart (default)' },
+              { value: 'last-throw', label: 'Only on last throw' },
+              { value: 'score-total', label: 'Score total (ranges only on last throw)' },
+            ]"
+          />
+          <p class="mt-1 text-xs text-white/60">
+            <span class="font-semibold">Note:</span> Point ranges (e.g., 0-10) now default to "Score total" behavior.
+          </p>
+        </div>
       </div>
 
       <template #footer>
@@ -433,10 +456,16 @@ const config = ref<IConfig>();
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
-const newAnimation = ref<{ url: string; text: string; animationId: string | null }>({
+const newAnimation = ref<{
+  url: string;
+  text: string;
+  animationId: string | null;
+  triggerTiming: "every-dart" | "last-throw" | "score-total";
+}>({
   url: "",
   text: "",
   animationId: null,
+  triggerTiming: "every-dart",
 });
 const allowAdd = ref(false);
 const editingIndex = ref<number | null>(null);
@@ -689,6 +718,7 @@ async function editAnimation(index: number) {
       ? animation.triggers.join("\n")
       : "",
     animationId: animation.animationId || null,
+    triggerTiming: animation.triggerTiming || "every-dart",
   };
   isEditMode.value = true;
   editingIndex.value = index;
@@ -745,6 +775,7 @@ function saveAnimation() {
     triggers: validTriggers, // Use the validated triggers
     enabled: true, // New animations are enabled by default
     animationId: newAnimation.value.animationId ?? undefined,
+    triggerTiming: newAnimation.value.triggerTiming,
   };
 
   if (isEditMode.value && editingIndex.value !== null) {
@@ -758,7 +789,7 @@ function saveAnimation() {
   }
 
   // Reset form and close modal
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", text: "", animationId: null, triggerTiming: "every-dart" };
   showAnimationModal.value = false;
   editingIndex.value = null;
 
@@ -767,7 +798,7 @@ function saveAnimation() {
 }
 
 function closeAnimationModal() {
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", text: "", animationId: null, triggerTiming: "every-dart" };
   showAnimationModal.value = false;
   editingIndex.value = null;
   isUploadedGif.value = false;
@@ -791,7 +822,7 @@ function removeAnimation(index: number) {
 }
 
 function openAddAnimationModal() {
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", text: "", animationId: null, triggerTiming: "every-dart" };
   isEditMode.value = false;
   editingIndex.value = null;
   showAnimationModal.value = true;

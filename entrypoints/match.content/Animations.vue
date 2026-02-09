@@ -164,27 +164,44 @@ async function processGameData(gameData: IGameData): Promise<void> {
   const miss: boolean = throwName.toLocaleLowerCase().startsWith("m");
   const combinedThrows: string = gameData.match.turns[0].throws.map(t => t.segment.name.toLowerCase()).join("_");
 
-  playAnimation(throwName.toLowerCase());
-  if (winner) playAnimation("gameshot");
-  if (busted) playAnimation("busted");
+  playAnimation(throwName.toLowerCase(), isLastThrow);
+  if (winner) playAnimation("gameshot", isLastThrow);
+  if (busted) playAnimation("busted", isLastThrow);
   if (isLastThrow) {
-    playAnimation(points.toString());
+    playAnimation(points.toString(), isLastThrow);
     await new Promise(resolve => setTimeout(resolve, 500));
-    playAnimation(combinedThrows);
+    playAnimation(combinedThrows, isLastThrow);
   }
-  if (miss) playAnimation("outside");
+  if (miss) playAnimation("outside", isLastThrow);
 }
 
 /**
  * Get animation URL for a trigger, selecting randomly from matching animations
+ * @param trigger The trigger string
+ * @param isLastThrow Whether this is the last dart of the turn (for trigger timing)
  */
-async function getAnimationUrl(trigger: string): Promise<string | null> {
+async function getAnimationUrl(trigger: string, isLastThrow: boolean = false): Promise<string | null> {
   if (!config.value?.animations?.data || config.value.animations.data.length === 0) {
     return null;
   }
 
   const satisfiesTrigger = (animation: IAnimation, trigger: string) => {
     if (!Array.isArray(animation.triggers)) return false;
+
+    // Check for direct match first
+    if (animation.triggers.includes(trigger)) {
+      // For direct matches, check trigger timing:
+      // - 'last-throw' or 'score-total': only play on last throw
+      // - 'every-dart' or undefined: always play (default)
+      const timing = animation.triggerTiming;
+      if (timing === "last-throw" || timing === "score-total") {
+        if (!isLastThrow) {
+          console.log(`Autodarts Tools: Skipping animation - triggerTiming is ${timing} but not last throw`);
+          return false;
+        }
+      }
+      return true;
+    }
 
     // validate range triggers of animation
     const triggerNum = Number(trigger);
@@ -199,10 +216,22 @@ async function getAnimationUrl(trigger: string): Promise<string | null> {
         return triggerNum >= min && triggerNum <= max;
       });
 
-      if (hasMatchingRange) return true;
+      if (hasMatchingRange) {
+        // FIX #178: Point ranges only trigger on last throw unless explicitly set to 'every-dart'
+        // Default behavior for range triggers is now 'score-total' (only on last throw)
+        const timing = animation.triggerTiming;
+        if (timing === "every-dart") {
+          return true;
+        }
+        if (!isLastThrow) {
+          console.log(`Autodarts Tools: Skipping range-matched animation - not last throw (use triggerTiming='every-dart' to change)`);
+          return false;
+        }
+        return true;
+      }
     }
 
-    return animation.triggers.includes(trigger);
+    return false;
   };
 
   // Find animations that match this trigger
@@ -255,12 +284,14 @@ async function loadAnimationFromOPFS(animationId: string): Promise<string | null
 
 /**
  * Play animation for a trigger
+ * @param trigger The trigger string
+ * @param isLastThrow Whether this is the last dart of the turn (for trigger timing)
  */
-async function playAnimation(trigger: string): Promise<void> {
+async function playAnimation(trigger: string, isLastThrow: boolean = false): Promise<void> {
   console.log("Autodarts Tools: Playing animation", trigger);
 
   try {
-    const animationUrl = await getAnimationUrl(trigger);
+    const animationUrl = await getAnimationUrl(trigger, isLastThrow);
     if (!animationUrl) return;
 
     // Update the board position before showing animation

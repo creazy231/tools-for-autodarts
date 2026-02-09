@@ -164,6 +164,13 @@ export interface ISound {
   enabled: boolean;
   triggers: string[];
   soundId?: string;
+  /**
+   * Controls when the sound triggers:
+   * - 'every-dart': Trigger on every dart throw (default)
+   * - 'last-throw': Only trigger after the last dart of a turn
+   * - 'score-total': Only for point ranges; evaluate against final turn total (fixes #178)
+   */
+  triggerTiming?: "every-dart" | "last-throw" | "score-total";
 }
 
 export interface IAnimation {
@@ -171,6 +178,13 @@ export interface IAnimation {
   triggers: string[];
   enabled: boolean;
   animationId?: string;
+  /**
+   * Controls when the animation triggers:
+   * - 'every-dart': Trigger on every dart throw (default)
+   * - 'last-throw': Only trigger after the last dart of a turn
+   * - 'score-total': Only for point ranges; evaluate against final turn total (fixes #178)
+   */
+  triggerTiming?: "every-dart" | "last-throw" | "score-total";
 }
 
 export interface IGlobalStatus {
