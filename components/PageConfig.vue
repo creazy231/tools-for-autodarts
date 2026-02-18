@@ -188,6 +188,9 @@
 
             <!-- Eleventh row of feature cards -->
             <InstantReplay @toggle="openSettingsModal('instant-replay')" @setting-change="updateConfig" class="feature-card" data-feature-index="23" />
+
+            <!-- Twelfth row of feature cards -->
+            <NoAverageDisplay @toggle="openSettingsModal('no-average-display')" @setting-change="updateConfig" class="feature-card" data-feature-index="24" />
           </div>
 
           <!-- Feature cards grid for Boards tab -->
@@ -268,6 +271,7 @@ import Zoom from "./Settings/Zoom.vue";
 import QuickCorrection from "./Settings/QuickCorrection.vue";
 import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
+import NoAverageDisplay from "./Settings/NoAverageDisplay.vue";
 
 import type { IConfig, ISound } from "@/utils/storage";
 
@@ -319,8 +323,9 @@ const featureGroups = [
       { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true },
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true },
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
+      { id: "no-average-display", title: "No Average Display Settings", component: NoAverageDisplay, hasSettings: false },
     ],
-    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay" ],
+    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay", "no-average-display" ],
   },
   // Boards (Tab 2)
   {

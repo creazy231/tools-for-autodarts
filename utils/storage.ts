@@ -155,6 +155,9 @@ export interface IConfig {
     boardIds: string[];
     effects: IWled[];
   };
+  noAverageDisplay: {
+    enabled: boolean;
+  };
 }
 
 export interface ISound {
@@ -322,7 +325,7 @@ export interface IWled {
   preset: string;
   json_api: string;
   enabled: boolean;
-  triggers: string|string[];
+  triggers: string | string[];
 }
 
 export type TBoardStatus = BoardStatus | undefined;
@@ -434,7 +437,6 @@ export const defaultConfig: IConfig = {
   teamLobby: {
     enabled: false,
   },
-
   zoom: {
     enabled: false,
     position: "bottom-right",
@@ -697,8 +699,11 @@ export const defaultConfig: IConfig = {
         json_api: "",
         enabled: true,
         triggers: [ "gameshot" ],
-      }
+      },
     ],
+  },
+  noAverageDisplay: {
+    enabled: false,
   },
 };
 

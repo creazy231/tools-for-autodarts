@@ -31,6 +31,7 @@ import {
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { noAverageDisplay } from "./no-average-display";
 
 let matchInitialized = false;
 let activeMatchObserver: MutationObserver;
@@ -199,6 +200,8 @@ async function initMatch(ctx, url: string, matchId?: string) {
   if (config.enhancedScoringDisplay.enabled) {
     await initScript(enhancedScoringDisplay, url).catch(console.error);
   }
+
+  await initScript(noAverageDisplay, url).catch(console.error);
 
   // ****************************************************************
 
