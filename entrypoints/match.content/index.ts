@@ -201,7 +201,9 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initScript(enhancedScoringDisplay, url).catch(console.error);
   }
 
-  await initScript(noAverageDisplay, url).catch(console.error);
+  if (config.noAverageDisplay.enabled) {
+    await initScript(noAverageDisplay, url).catch(console.error);
+  }
 
   // ****************************************************************
 
