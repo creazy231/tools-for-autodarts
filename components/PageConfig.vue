@@ -188,6 +188,7 @@
 
             <!-- Eleventh row of feature cards -->
             <InstantReplay @toggle="openSettingsModal('instant-replay')" @setting-change="updateConfig" class="feature-card" data-feature-index="23" />
+            <HideBoardInCricket @setting-change="updateConfig" class="feature-card" data-feature-index="24" />
           </div>
 
           <!-- Feature cards grid for Boards tab -->
@@ -254,6 +255,7 @@ import AutomaticNextLeg from "./Settings/AutomaticNextLeg.vue";
 import SmallerScores from "./Settings/SmallerScores.vue";
 import StreamingMode from "./Settings/StreamingMode.vue";
 import HideMenuInMatch from "./Settings/HideMenuInMatch.vue";
+import HideBoardInCricket from "./Settings/HideBoardInCricket.vue";
 import AutomaticFullscreen from "./Settings/AutomaticFullscreen.vue";
 import LargerLegsSets from "./Settings/LargerLegsSets.vue";
 import LargerPlayerMatchData from "./Settings/LargerPlayerMatchData.vue";
@@ -308,6 +310,7 @@ const featureGroups = [
       { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true },
       { id: "smaller-scores", title: "Smaller Scores Settings", component: SmallerScores, hasSettings: false },
       { id: "hide-menu-in-match", title: "Hide Menu In Match Settings", component: HideMenuInMatch, hasSettings: false },
+      { id: "hide-board-in-cricket", title: "Hide Board in Cricket Settings", component: HideBoardInCricket, hasSettings: false },
       { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false },
       { id: "streaming-mode", title: "Streaming Mode Settings", component: StreamingMode, hasSettings: true },
       { id: "larger-legs-sets", title: "Larger Legs Sets Settings", component: LargerLegsSets, hasSettings: true },

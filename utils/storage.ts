@@ -75,6 +75,9 @@ export interface IConfig {
   hideMenuInMatch: {
     enabled: boolean;
   };
+  hideBoardInCricket: {
+    enabled: boolean;
+  };
   automaticFullscreen: {
     enabled: boolean;
   };
@@ -322,7 +325,7 @@ export interface IWled {
   preset: string;
   json_api: string;
   enabled: boolean;
-  triggers: string|string[];
+  triggers: string | string[];
 }
 
 export type TBoardStatus = BoardStatus | undefined;
@@ -403,6 +406,9 @@ export const defaultConfig: IConfig = {
     boards: [],
   },
   hideMenuInMatch: {
+    enabled: false,
+  },
+  hideBoardInCricket: {
     enabled: false,
   },
   automaticFullscreen: {
@@ -697,7 +703,7 @@ export const defaultConfig: IConfig = {
         json_api: "",
         enabled: true,
         triggers: [ "gameshot" ],
-      }
+      },
     ],
   },
 };

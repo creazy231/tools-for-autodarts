@@ -7,6 +7,7 @@ import { nextPlayerOnTakeOutStuck, nextPlayerOnTakeOutStuckOnRemove } from "./ne
 import { automaticNextLeg, automaticNextLegOnRemove } from "./automatic-next-leg";
 import { smallerScores } from "./smaller-scores";
 import { hideMenuInMatch, hideMenuInMatchOnRemove } from "./hide-menu-in-match";
+import { hideBoardInCricket, hideBoardInCricketOnRemove } from "./hide-board-in-cricket";
 import { automaticFullscreen, automaticFullscreenOnRemove } from "./automatic-fullscreen";
 import { largerPlayerMatchData } from "./larger-player-match-data";
 import { largerLegsSets } from "./larger-legs-sets";
@@ -33,7 +34,7 @@ import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 
 let matchInitialized = false;
-let activeMatchObserver: MutationObserver;
+let activeMatchObserver: MutationObserver | null;
 let gameDataWatcher: any;
 
 const tools = {
@@ -132,6 +133,10 @@ async function initMatch(ctx, url: string, matchId?: string) {
 
   if (config.hideMenuInMatch.enabled) {
     await initScript(hideMenuInMatch, url).catch(console.error);
+  }
+
+  if (config.hideBoardInCricket.enabled) {
+    await initScript(hideBoardInCricket, url).catch(console.error);
   }
 
   if (config.automaticFullscreen.enabled) {
@@ -240,6 +245,7 @@ function clearMatch(fromBullOff: boolean = false) {
   tools.instantReplay?.remove();
   colorChangeOnRemove();
   if (!fromBullOff) hideMenuInMatchOnRemove();
+  if (!fromBullOff) hideBoardInCricketOnRemove();
   if (!fromBullOff) automaticFullscreenOnRemove();
   winnerAnimationOnRemove();
   callerOnRemove();

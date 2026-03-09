@@ -14,6 +14,9 @@ export default defineConfig({
   // },
   webExt: {
     startUrls: [ "https://play.autodarts.io/" ],
+    chromiumArgs: [
+      "--user-data-dir=./.wxt/chrome-data",
+    ],
   },
   modules: [ "@wxt-dev/webextension-polyfill" ],
   imports: {
