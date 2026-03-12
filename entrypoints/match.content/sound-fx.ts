@@ -101,7 +101,7 @@ export async function soundFx() {
 
         // Check if "Time to ready up" text appears in the DOM
         const bodyText = document.body.textContent || document.body.innerText;
-        if (bodyText.includes("Time to ready up")) {
+        if (bodyText.includes("Time to ready up") || bodyText.includes("Zeit zum bereitmachen") || bodyText.includes("Tijd om je klaar te maken")) {
           console.log("Autodarts Tools: Found 'Time to ready up' text, playing tournament ready sound");
           playSound("ambient_tournament_ready");
 

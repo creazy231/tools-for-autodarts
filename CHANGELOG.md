@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.7] - 2026-03-06
+
+### Fixed
+- Fixed authentication token capture: completely rewrote `auth-cookie.ts` to intercept the Keycloak OIDC token endpoint response via `fetch` override instead of reading a cookie value
+  - Added a secondary fallback that intercepts outgoing `Authorization` request headers via `XMLHttpRequest.prototype.setRequestHeader`
+  - Token is deduplicated so the custom event is only dispatched when the token actually changes
+- Fixed missing `Bearer ` prefix in all Authorization headers used by Quick Correction API calls
+- Fixed `fetchWithAuth` helper to send a proper `Authorization: Bearer <token>` header instead of incorrectly setting a `Cookie` header; also removed unnecessary `credentials: "include"`
+- Fixed Zoom Live mode button selector: removed `:not([data-active])` constraint so the button click always fires regardless of its current state
+- Fixed Automatic Fullscreen button SVG construction: now uses `createElementNS` to build the icon from scratch instead of cloning an existing button's icon, preventing failures when the reference element is unavailable
+- Fixed Automatic Fullscreen CSS selector to match the updated Autodarts DOM structure (`.chakra-wrap` lookup)
+- Fixed Automatic Fullscreen button placement for Bull-off game variant: button is now prepended correctly instead of using the generic `insertBefore` path
+
+### Added
+- Added multilingual support for tournament ready sound trigger — now also detects the German ("Zeit zum bereitmachen") and Dutch ("Tijd om je klaar te maken") variants of the ready-up message
+- Added `*://login.autodarts.io/*` to host permissions and the `cookies` permission in the extension manifest to support the new auth token capture mechanism
+
 ## [2.2.5] - 2026-01-22
 
 ### Fixed

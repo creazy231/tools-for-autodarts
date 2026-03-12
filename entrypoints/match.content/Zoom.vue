@@ -288,7 +288,7 @@ onMounted(async () => {
   // Click Live mode button if zoom mode is set to live
   if (config.value?.zoom?.mode === "live") {
     try {
-      const liveModeButton = await waitForElement("button[aria-label='Live mode']:not([data-active])", 5000) as HTMLButtonElement;
+      const liveModeButton = await waitForElement("button[aria-label='Live mode']", 5000) as HTMLButtonElement;
       liveModeButton.click();
       console.log("Autodarts Tools: Clicked Live mode button");
     } catch (e) {
