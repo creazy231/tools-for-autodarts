@@ -185,6 +185,29 @@
             :max-rows="10"
           />
         </div>
+
+        <!-- Trigger Timing -->
+        <div>
+          <label for="trigger-timing" class="mb-1 block text-sm font-medium text-white">
+            Trigger Timing
+            <span
+              class="icon-[pixelarticons--info-box] ml-1 inline-block cursor-help text-white/50"
+              title="Every dart: Sound triggers on each dart if conditions match. Last throw: Only triggers after the 3rd dart. Score total: For point ranges (e.g., 0-10), only evaluates final turn score."
+            />
+          </label>
+          <AppSelect
+            id="trigger-timing"
+            v-model="newSound.triggerTiming"
+            :options="[
+              { value: 'every-dart', label: 'Every dart (default)' },
+              { value: 'last-throw', label: 'Only on last throw' },
+              { value: 'score-total', label: 'Score total (ranges only on last throw)' },
+            ]"
+          />
+          <p class="mt-1 text-xs text-white/60">
+            <span class="font-semibold">Note:</span> Point ranges (e.g., 0-10) now default to "Score total" behavior.
+          </p>
+        </div>
       </div>
 
       <template #footer>
@@ -412,6 +435,7 @@ const newSound = ref({
   text: "",
   name: "",
   base64: "",
+  triggerTiming: "every-dart" as "every-dart" | "last-throw" | "score-total",
 });
 const editingIndex = ref<number | null>(null);
 const urlError = ref("");
@@ -507,14 +531,14 @@ function initSortable() {
 
 // Modal handling
 function openAddSoundModal() {
-  newSound.value = { name: "", text: "", base64: "", url: "" };
+  newSound.value = { name: "", text: "", base64: "", url: "", triggerTiming: "every-dart" };
   isEditMode.value = false;
   editingIndex.value = null;
   showSoundModal.value = true;
 }
 
 function closeSoundModal() {
-  newSound.value = { name: "", text: "", base64: "", url: "" };
+  newSound.value = { name: "", text: "", base64: "", url: "", triggerTiming: "every-dart" };
   showSoundModal.value = false;
   editingIndex.value = null;
   urlError.value = "";
@@ -529,6 +553,7 @@ function editSound(index: number) {
     text: Array.isArray(sound.triggers) ? sound.triggers.join("\n") : "",
     base64: "", // We'll load this below if needed
     url: sound.url || "",
+    triggerTiming: sound.triggerTiming || "every-dart",
   };
 
   // If we have a soundId, load from IndexedDB
@@ -619,6 +644,7 @@ async function saveSound() {
     soundId: soundId || "", // Store the IndexedDB ID if available
     enabled: true, // New sounds are enabled by default
     triggers,
+    triggerTiming: newSound.value.triggerTiming,
   };
 
   if (isEditMode.value && editingIndex.value !== null) {

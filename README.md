@@ -212,6 +212,11 @@ The Sound FX feature adds ambient sound effects to your gameplay experience:
 Add sound effects for various game events:
 - **Point Triggers**: Sounds can be triggered for any score from `ambient_0` to `ambient_180`
 - **Point Ranges**: A range between `0` and `180`, e.g. `0-20` or `100-180` (point totals). Format: `ambient_100-180` or `100-180` (with or without the `ambient_` prefix)
+  - **Note**: Point ranges now trigger only on the last dart of a turn by default (fixes #178). This ensures a sound for `ambient_0-10` only plays once at the end of the turn, not after each dart.
+  - Use the **Trigger Timing** setting to customize this:
+    - `Every dart`: Sound triggers on each dart if conditions match (old behavior)
+    - `Last throw`: Only triggers after the 3rd dart
+    - `Score total` (default for ranges): Only evaluates final turn score for ranges
 - **Individual Throws**: Sounds for specific throws like `ambient_s20`, `ambient_d16`, `ambient_t19`, etc.
 - **Combined Throws**: Trigger sounds based on a sequence of throws using format `s20_t19_d12`
 - **Special Events**: Dedicated sounds for `ambient_gameon`, `gameshot`, `busted`, and more
@@ -269,6 +274,16 @@ The Sound FX feature includes a sophisticated multi-level fallback system:
   - Generic matchshot: `ambient_matchshot`
   - Generic gameshot: `ambient_gameshot`
 - If no match is found after all fallback attempts, no sound is played
+
+#### Trigger Timing (New)
+Fine-tune when sounds trigger during gameplay:
+- **Every dart**: Sound plays whenever a dart is thrown and conditions match (legacy behavior)
+- **Last throw**: Sound only plays after the third dart
+- **Score total**: For point ranges, evaluates only the final turn score (default for ranges)
+
+**Examples:**
+- Set a 180 sound to "Last throw" if you only want it after the third dart
+- Set a meme sound for scores 0-10 to "Score total" so it only triggers on low final scores, not on individual misses
 
 #### Bulk Upload with Trigger Assignment
 - **Multi-File Upload**: Upload multiple sound files at once for faster setup
