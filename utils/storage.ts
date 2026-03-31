@@ -331,7 +331,7 @@ export interface IWled {
 export type TBoardStatus = BoardStatus | undefined;
 
 export const defaultConfig: IConfig = {
-  version: 20,
+  version: 22,
   discord: {
     enabled: false,
     manually: false,
