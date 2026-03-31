@@ -1,3 +1,6 @@
+import { AutodartsToolsConfig } from "@/utils/storage";
+import { addStyles } from "@/utils";
+
 export async function noAverageDisplay() {
   try {
     const config = await AutodartsToolsConfig.getValue();
@@ -9,8 +12,8 @@ export async function noAverageDisplay() {
     console.log("Autodarts Tools: No Average Display activated");
     addStyles(`
         .ad-ext-player > div > div:nth-of-type(2) { display: none!important; }
-        `);
+        `, "no-average-display");
   } catch (e) {
-    console.error("Autodarts Tools: Next player on takeout stuck - Error: ", e);
+    console.error("Autodarts Tools: No Average Display - Error: ", e);
   }
 }
