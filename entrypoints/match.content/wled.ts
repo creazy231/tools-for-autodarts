@@ -19,36 +19,51 @@ let currentBoardId: string;
 let debounceTimer: number | null = null;
 const DEBOUNCE_DELAY = 200;
 
-async function checkStatus(boardData: IBoard) {
+function eventTrigger(trigger: string) {
+  if (isTriggerPresent(trigger) &&
+    (
+      config!.wledFx.boardIds.length === 0 ||
+      (
+        config!.wledFx.boardIds.length > 0 &&
+        config!.wledFx.boardIds.includes(currentBoardId)
+      )
+    )
+  )
+    setEffectByTrigger(trigger);
+}
+
+async function checkStatus(boardData: IBoard): Promise<void> {
   const boardEvent: string | undefined = boardData.event;
   const boardStatus: string | undefined = boardData.status;
 
   console.log(`Autodarts Tools: WLED: Board: event '${boardEvent}', status '${boardStatus}'`);
-
-  if (
-    boardStatus === "Takeout in progress"
-    && isTriggerPresent("takeout")
-    && (config!.wledFx.boardIds.length === 0
-      || (config!.wledFx.boardIds.length > 0 && config!.wledFx.boardIds.includes(currentBoardId)))
-  ) { setEffectByTrigger("takeout"); }
-  else if (
-    boardStatus === "Stopped"
-    && isTriggerPresent("board_stopped")
-    && (config!.wledFx.boardIds.length === 0
-      || (config!.wledFx.boardIds.length > 0 && config!.wledFx.boardIds.includes(currentBoardId)))
-  ) { setEffectByTrigger("board_stopped"); }
-  else if (
-    boardEvent === "Calibration started"
-    && isTriggerPresent("calibration_started")
-    && (config!.wledFx.boardIds.length === 0
-      || (config!.wledFx.boardIds.length > 0 && config!.wledFx.boardIds.includes(currentBoardId)))
-  ) { setEffectByTrigger("calibration_started"); }
-  else if (
-    boardEvent === "Calibration finished"
-    && isTriggerPresent("calibration_finished")
-    && (config!.wledFx.boardIds.length === 0
-      || (config!.wledFx.boardIds.length > 0 && config!.wledFx.boardIds.includes(currentBoardId)))
-  ) { setEffectByTrigger("calibration_finished"); }
+  if ((boardEvent === "Starting" && (boardStatus === "" || boardStatus === "Starting")) ||
+    (boardEvent === "start" && boardStatus === ""))
+    eventTrigger("board_starting");
+  else if (boardEvent === "Started" && boardStatus === "Throw")
+    eventTrigger("board_started");
+  else if (boardEvent === "Stopping" && boardStatus === "Stopping")
+    eventTrigger("board_stopping");
+  else if (boardEvent === "Stopped" && boardStatus === "Stopped")
+    eventTrigger("board_stopped");
+  else if (boardEvent === "Disconnected" && (boardStatus === "Offline" || boardStatus === ""))
+    eventTrigger("board_stopped");
+  else if (boardEvent === "Manual reset" && boardStatus === "Throw")
+    eventTrigger("manual_reset_done");
+  else if (boardEvent === "Throw detected" && boardStatus === "Throw")
+    eventTrigger("throw");
+  else if (boardEvent === "Throw detected" && boardStatus === "Takeout")
+    eventTrigger("last_throw");
+  else if (boardEvent === "Takeout started" && boardStatus === "Takeout in progress")
+    eventTrigger("takeout");
+  else if (boardEvent === "Takeout finished" && boardStatus === "Throw")
+    eventTrigger("takeout_finished");
+  else if (boardEvent === "Calibration started")
+    eventTrigger("calibration_started");
+  else if (boardEvent === "Calibration finished")
+    eventTrigger("calibration_finished");
+  else
+    console.log(`Autodarts Tools: WLED: Board: event '${boardEvent}' with status '${boardStatus}' was unhandled`);
 }
 
 export async function wledFx() {

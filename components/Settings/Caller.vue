@@ -18,6 +18,10 @@
                 <span class="icon-[pixelarticons--trash] mr-1" />
                 <span class="whitespace-nowrap">Delete All</span>
               </AppButton>
+              <AppButton @click="openTTSModal()" size="sm" class="!py-1 text-xs md:text-sm" auto type="warning" :disabled="!isTTSAvailable" title="Generate sound from text-to-speech">
+                <span class="icon-[pixelarticons--chat] mr-1" />
+                <span class="whitespace-nowrap">Generate TTS</span>
+              </AppButton>
               <AppButton @click="openImportURLModal" size="sm" class="!py-1 text-xs md:text-sm" auto type="success">
                 <span class="icon-[pixelarticons--download] mr-1" />
                 <span class="whitespace-nowrap">Import from URL</span>
@@ -108,7 +112,7 @@
                 <!-- Edit button -->
                 <div class="absolute right-2 top-2 z-20">
                   <button
-                    @click.stop="editSound(index)"
+                    @click.stop="sound.tts ? openTTSModal(sound, index) : editSound(index)"
                     class="flex size-8 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20"
                   >
                     <span class="icon-[pixelarticons--edit] text-sm" />
@@ -119,8 +123,8 @@
                 <div
                   class="absolute inset-x-0 bottom-0 cursor-move bg-black/70 p-2 text-xs"
                 >
-                  <div class="truncate border-b border-white/30 pb-1 font-mono text-xxs" :title="sound.url">
-                    {{ sound.url || "Uploaded" }}
+                  <div class="truncate border-b border-white/30 pb-1 font-mono text-xxs" :title="sound.tts ? `TTS: ${sound.tts.text}` : sound.url">
+                    {{ sound.tts ? `TTS: "${sound.tts.text}"` : (sound.url || "Uploaded") }}
                   </div>
                   <div class="mt-1 truncate font-mono uppercase">
                     {{ Array.isArray(sound.triggers) ? sound.triggers.join(', ') : 'No triggers' }}
@@ -513,6 +517,99 @@
         </AppButton>
       </template>
     </AppModal>
+
+    <!-- TTS Generate Modal -->
+    <AppModal
+      @close="closeTTSModal"
+      :show="showTTSModal"
+      title="Generate TTS Sound"
+    >
+      <div class="space-y-4">
+        <div>
+          <label for="tts-text-caller" class="mb-1 block text-sm font-medium text-white">Text to speak</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+              <span class="icon-[pixelarticons--chat]" />
+            </span>
+            <AppInput
+              id="tts-text-caller"
+              v-model="ttsForm.text"
+              type="text"
+              placeholder="e.g., One hundred and eighty!"
+              class="pl-9"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-white">Voice</label>
+          <AppSelect
+            v-model="ttsForm.voiceURI"
+            :options="ttsVoiceOptions"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-white">
+            Speed <span class="text-xs text-white/60">({{ ttsForm.rate.toFixed(1) }}x)</span>
+          </label>
+          <AppSlider
+            v-model="ttsForm.rate"
+            :min="0.5"
+            :max="2"
+            :step="0.1"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-white">
+            Pitch <span class="text-xs text-white/60">({{ ttsForm.pitch.toFixed(1) }})</span>
+          </label>
+          <AppSlider
+            v-model="ttsForm.pitch"
+            :min="0"
+            :max="2"
+            :step="0.1"
+          />
+        </div>
+
+        <hr class="border-white/20">
+
+        <div>
+          <label for="tts-triggers-caller" class="mb-1 flex items-center justify-between text-sm font-medium text-white">
+            <span>Triggers <span class="text-xs text-white/60">(one per line)</span></span>
+            <a
+              href="https://github.com/creazy231/tools-for-autodarts?tab=readme-ov-file#%EF%B8%8F-caller-feature"
+              target="_blank"
+              class="text-blue-400 hover:text-blue-300"
+            >
+              View supported triggers
+            </a>
+          </label>
+          <AppTextarea
+            id="tts-triggers-caller"
+            v-model="ttsLowercaseTriggers"
+            :placeholder="textareaPlaceholder"
+            monospace
+            :rows="4"
+            :max-rows="8"
+          />
+        </div>
+      </div>
+
+      <template #footer>
+        <AppButton @click="closeTTSModal">
+          Cancel
+        </AppButton>
+        <AppButton @click="prelistenTTS" :disabled="!ttsForm.text" :loading="isSpeaking">
+          <span class="icon-[pixelarticons--play] mr-1" />
+          Prelisten
+        </AppButton>
+        <AppButton @click="saveTTSSound" type="success" :disabled="!ttsForm.text || !ttsForm.triggers">
+          Save
+        </AppButton>
+      </template>
+    </AppModal>
   </template>
 
   <template v-else>
@@ -558,8 +655,10 @@ import AppInput from "../AppInput.vue";
 import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppToggle from "../AppToggle.vue";
+import AppSlider from "../AppSlider.vue";
 import { AutodartsToolsConfig, type IConfig, type ISound } from "@/utils/storage";
 import { useNotification } from "@/composables/useNotification";
+import { useTTS } from "@/composables/useTTS";
 import {
   backgroundFetch,
   base64toBlob,
@@ -625,6 +724,34 @@ const importedCount = ref(0);
 const isImporting = ref(false);
 const generateTriggersFromURLFilenames = ref(true);
 const { notification, showNotification, hideNotification } = useNotification();
+
+// TTS related
+const { voices, isTTSAvailable, isSpeaking, lastVoiceURI, lastRate, lastPitch, preview, stopPreview, saveDefaults } = useTTS();
+const showTTSModal = ref(false);
+const ttsEditingIndex = ref<number | null>(null);
+const ttsForm = ref({
+  text: "",
+  name: "",
+  voiceURI: "",
+  lang: "",
+  rate: 1,
+  pitch: 1,
+  triggers: "",
+});
+
+const ttsVoiceOptions = computed(() => {
+  return [
+    { value: "", label: "Default voice" },
+    ...voices.value,
+  ];
+});
+
+const ttsLowercaseTriggers = computed({
+  get: () => ttsForm.value.triggers,
+  set: (val: string) => {
+    ttsForm.value.triggers = val.toLowerCase();
+  },
+});
 
 // Zip Import related refs
 const isZipFile = ref(false);
@@ -1139,6 +1266,12 @@ async function deleteAllSounds() {
 }
 
 async function playSound(sound: ISound) {
+  // Handle TTS sounds
+  if (sound.tts) {
+    preview(sound.tts.text, sound.tts.voiceURI, sound.tts.rate, sound.tts.pitch);
+    return;
+  }
+
   // Stop current audio if it exists
   if (currentPlayer) {
     currentPlayer.pause();
@@ -1830,5 +1963,89 @@ function checkAllowedDomain(url: string): boolean {
   } catch (error) {
     return false;
   }
+}
+
+// TTS functions
+function openTTSModal(sound?: ISound, index?: number) {
+  stopPreview();
+  if (sound?.tts && index !== undefined) {
+    // Edit mode
+    ttsEditingIndex.value = index;
+    ttsForm.value = {
+      text: sound.tts.text,
+      name: sound.name || sound.tts.text,
+      voiceURI: sound.tts.voiceURI || "",
+      lang: sound.tts.lang || "",
+      rate: sound.tts.rate ?? 1,
+      pitch: sound.tts.pitch ?? 1,
+      triggers: Array.isArray(sound.triggers) ? sound.triggers.join("\n") : "",
+    };
+  } else {
+    // New mode — use last-used settings from localStorage
+    ttsEditingIndex.value = null;
+    ttsForm.value = {
+      text: "",
+      name: "",
+      voiceURI: lastVoiceURI.value,
+      lang: "",
+      rate: lastRate.value,
+      pitch: lastPitch.value,
+      triggers: "",
+    };
+  }
+  showTTSModal.value = true;
+}
+
+function closeTTSModal() {
+  stopPreview();
+  showTTSModal.value = false;
+  ttsEditingIndex.value = null;
+}
+
+function prelistenTTS() {
+  if (!ttsForm.value.text) return;
+  preview(ttsForm.value.text, ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
+}
+
+function saveTTSSound() {
+  if (!config.value || !ttsForm.value.text || !ttsForm.value.triggers) return;
+
+  stopPreview();
+  saveDefaults(ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
+
+  const triggers = ttsForm.value.triggers
+    .split("\n")
+    .map(l => l.trim().toLowerCase())
+    .filter(Boolean);
+
+  const selectedVoice = voices.value.find(v => v.value === ttsForm.value.voiceURI);
+
+  const sound: ISound = {
+    name: ttsForm.value.text,
+    url: "",
+    base64: "",
+    enabled: true,
+    triggers,
+    tts: {
+      text: ttsForm.value.text,
+      voiceURI: ttsForm.value.voiceURI,
+      lang: selectedVoice?.lang || ttsForm.value.lang || "",
+      rate: ttsForm.value.rate,
+      pitch: ttsForm.value.pitch,
+    },
+  };
+
+  if (ttsEditingIndex.value !== null) {
+    // Update existing
+    const existing = config.value.caller.sounds[ttsEditingIndex.value];
+    sound.enabled = existing.enabled;
+    config.value.caller.sounds[ttsEditingIndex.value] = sound;
+  } else {
+    // Add new
+    config.value.caller.sounds.unshift(sound);
+  }
+
+  closeTTSModal();
+  showNotification(ttsEditingIndex.value !== null ? "TTS sound updated" : "TTS sound added");
 }
 </script>

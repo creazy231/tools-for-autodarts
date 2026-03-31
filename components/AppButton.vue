@@ -15,6 +15,9 @@
       // Danger style
       type === 'danger' && 'border border-solid border-[var(--chakra-colors-borderRed)] bg-[var(--chakra-colors-glassRed)] text-[var(--chakra-colors-white)] enabled:hover:bg-[rgba(255,0,0,0.3)] enabled:active:bg-[rgba(255,0,0,0.3)]',
 
+      // Warning style
+      type === 'warning' && 'border border-solid border-amber-500/50 bg-amber-500/20 text-[var(--chakra-colors-white)] enabled:hover:bg-amber-500/30 enabled:active:bg-amber-500/30',
+
       // Default size (md)
       size === 'md' && 'h-[var(--chakra-sizes-10)] min-w-[var(--chakra-sizes-10)] pe-[var(--chakra-space-4)] ps-[var(--chakra-space-4)]',
 
@@ -68,7 +71,7 @@ const props = withDefaults(defineProps<{
   disabled?: boolean;
   auto?: boolean;
   centered?: boolean;
-  type?: "default" | "danger" | "success";
+  type?: "default" | "danger" | "success" | "warning";
 }>(), {
   size: "md",
   centered: true,

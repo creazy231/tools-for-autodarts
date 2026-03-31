@@ -1,9 +1,10 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
-import { AutodartsToolsConfig, type IConfig, type ISound } from "@/utils/storage";
+import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from "@/utils/storage";
 import { getSoundFxFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 
 let gameDataWatcherUnwatch: any;
 let lobbyDataWatcherUnwatch: any;
+let boardDataWatcherUnwatch: any;
 let tournamentReadyObserver: MutationObserver | null = null;
 let config: IConfig;
 
@@ -11,8 +12,8 @@ let config: IConfig;
 let audioPlayer: HTMLAudioElement | null = null;
 let audioPlayer2: HTMLAudioElement | null = null;
 // Queue for sounds to be played
-const soundQueue: { url?: string; base64?: string; name?: string; soundId?: string }[] = [];
-const soundQueue2: { url?: string; base64?: string; name?: string; soundId?: string }[] = [];
+const soundQueue: { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS }[] = [];
+const soundQueue2: { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS }[] = [];
 // Flag to track if we're currently playing a sound
 let isPlaying = false;
 let isPlaying2 = false;
@@ -41,6 +42,26 @@ let currentAudioIndex = 0;
 let currentAudioIndex2 = 0;
 // Tracking URLs that need to be revoked
 const blobUrlsToRevoke: string[] = [];
+
+function checkBoardStatus(boardData: IBoard): void {
+  const boardEvent = boardData.event;
+  const boardStatus = boardData.status;
+
+  if (boardEvent === "Started" && boardStatus === "Throw")
+    playSound("ambient_board_started", 2);
+  else if (boardEvent === "Stopped" && boardStatus === "Stopped")
+    playSound("ambient_board_stopped", 2);
+  else if (boardEvent === "Disconnected" && (boardStatus === "Offline" || boardStatus === ""))
+    playSound("ambient_board_stopped", 2);
+  else if (boardEvent === "Manual reset" && boardStatus === "Throw")
+    playSound("ambient_manual_reset_done", 2);
+  else if (boardEvent === "Takeout finished" && boardStatus === "Throw")
+    playSound("ambient_takeout_finished", 2);
+  else if (boardEvent === "Calibration started")
+    playSound("ambient_calibration_started", 2);
+  else if (boardEvent === "Calibration finished")
+    playSound("ambient_calibration_finished", 2);
+}
 
 export async function soundFx() {
   console.log("Autodarts Tools: Sound FX");
@@ -95,13 +116,20 @@ export async function soundFx() {
       });
     }
 
+    if (!boardDataWatcherUnwatch) {
+      boardDataWatcherUnwatch = AutodartsToolsBoardData.watch((boardData: IBoard) => {
+        if (!config?.soundFx?.enabled) return;
+        checkBoardStatus(boardData);
+      });
+    }
+
     if (!tournamentReadyObserver) {
       tournamentReadyObserver = new MutationObserver((mutations) => {
         if (!config?.soundFx?.enabled) return;
 
         // Check if "Time to ready up" text appears in the DOM
         const bodyText = document.body.textContent || document.body.innerText;
-        if (bodyText.includes("Time to ready up")) {
+        if (bodyText.includes("Time to ready up") || bodyText.includes("Zeit zum bereitmachen") || bodyText.includes("Tijd om je klaar te maken")) {
           console.log("Autodarts Tools: Found 'Time to ready up' text, playing tournament ready sound");
           playSound("ambient_tournament_ready");
 
@@ -137,6 +165,11 @@ export function soundFxOnRemove() {
     lobbyDataWatcherUnwatch = null;
   }
 
+  if (boardDataWatcherUnwatch) {
+    boardDataWatcherUnwatch();
+    boardDataWatcherUnwatch = null;
+  }
+
   if (tournamentReadyObserver) {
     tournamentReadyObserver.disconnect();
     tournamentReadyObserver = null;
@@ -150,6 +183,11 @@ export function soundFxOnRemove() {
 
   // Reset gameshot cooldown timestamp
   lastGameshotTimestamp = 0;
+
+  // Cancel any ongoing TTS
+  if (window.speechSynthesis) {
+    speechSynthesis.cancel();
+  }
 
   // Clean up audio players
   if (audioPlayer) {
@@ -619,6 +657,14 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
         playSound("cricket_miss");
       }
     }
+  } else if (gameData.match.variant === 'Gotcha') {
+    const currentScores = gameData.match.gameScores;
+    const previousScores = oldGameData?.match?.gameScores;
+    if (previousScores && previousScores.length === currentScores.length
+      && currentScores[gameData.match.player] > 0
+      && currentScores.some((score, i) => score === 0 && previousScores[i] > 0)) {
+      playSound("ambient_gotcha");
+    }
   }
 
   const currentThrow = gameData.match.turns[0].throws[gameData.match.turns[0].throws.length - 1];
@@ -930,7 +976,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             const randomIndex = Math.floor(Math.random() * wordSounds.length);
             const soundToPlay = wordSounds[randomIndex];
 
-            if (soundToPlay.url || soundToPlay.base64 || soundToPlay.soundId) {
+            if (soundToPlay.url || soundToPlay.base64 || soundToPlay.soundId || soundToPlay.tts) {
               // Add to queue
               if (soundChannel === 2) {
                 soundQueue2.push({
@@ -938,6 +984,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  tts: soundToPlay.tts,
                 });
 
                 // Start playing if not already playing
@@ -950,6 +997,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  tts: soundToPlay.tts,
                 });
 
                 // Start playing if not already playing
@@ -988,7 +1036,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             const randomIndex = Math.floor(Math.random() * nonAmbientWordSounds.length);
             const soundToPlay = nonAmbientWordSounds[randomIndex];
 
-            if (soundToPlay.url || soundToPlay.base64 || soundToPlay.soundId) {
+            if (soundToPlay.url || soundToPlay.base64 || soundToPlay.soundId || soundToPlay.tts) {
               // Add to queue
               if (soundChannel === 2) {
                 soundQueue2.push({
@@ -996,6 +1044,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  tts: soundToPlay.tts,
                 });
 
                 // Start playing if not already playing
@@ -1008,6 +1057,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  tts: soundToPlay.tts,
                 });
 
                 // Start playing if not already playing
@@ -1157,12 +1207,13 @@ function playSound(trigger: string, soundChannel: number = 1): void {
           const randomTripleIndex = Math.floor(Math.random() * tripleSounds.length);
           const tripleSoundToPlay = tripleSounds[randomTripleIndex];
 
-          if (tripleSoundToPlay.url || tripleSoundToPlay.base64 || tripleSoundToPlay.soundId) {
+          if (tripleSoundToPlay.url || tripleSoundToPlay.base64 || tripleSoundToPlay.soundId || tripleSoundToPlay.tts) {
             soundQueue.push({
               url: tripleSoundToPlay.url,
               base64: tripleSoundToPlay.base64,
               soundId: tripleSoundToPlay.soundId,
               name: tripleSoundToPlay.name,
+              tts: tripleSoundToPlay.tts,
             });
 
             // Start playing if not already playing
@@ -1204,12 +1255,13 @@ function playSound(trigger: string, soundChannel: number = 1): void {
           const randomTripleIndex = Math.floor(Math.random() * tripleSounds.length);
           const tripleSoundToPlay = tripleSounds[randomTripleIndex];
 
-          if (tripleSoundToPlay.url || tripleSoundToPlay.base64 || tripleSoundToPlay.soundId) {
+          if (tripleSoundToPlay.url || tripleSoundToPlay.base64 || tripleSoundToPlay.soundId || tripleSoundToPlay.tts) {
             soundQueue.push({
               url: tripleSoundToPlay.url,
               base64: tripleSoundToPlay.base64,
               soundId: tripleSoundToPlay.soundId,
               name: tripleSoundToPlay.name,
+              tts: tripleSoundToPlay.tts,
             });
 
             // Start playing if not already playing
@@ -1388,25 +1440,27 @@ function playSound(trigger: string, soundChannel: number = 1): void {
     const wordSoundToPlay = wordSounds[randomWordIndex];
 
     // Add word to queue
-    if (wordSoundToPlay.url || wordSoundToPlay.base64 || wordSoundToPlay.soundId) {
+    if (wordSoundToPlay.url || wordSoundToPlay.base64 || wordSoundToPlay.soundId || wordSoundToPlay.tts) {
       if (soundChannel === 2) {
         soundQueue2.push({
           url: wordSoundToPlay.url,
           base64: wordSoundToPlay.base64,
           soundId: wordSoundToPlay.soundId,
           name: wordSoundToPlay.name,
+          tts: wordSoundToPlay.tts,
         });
 
         // Add number to queue
         const randomNumberIndex = Math.floor(Math.random() * numberSounds.length);
         const numberSoundToPlay = numberSounds[randomNumberIndex];
 
-        if (numberSoundToPlay.url || numberSoundToPlay.base64 || numberSoundToPlay.soundId) {
+        if (numberSoundToPlay.url || numberSoundToPlay.base64 || numberSoundToPlay.soundId || numberSoundToPlay.tts) {
           soundQueue2.push({
             url: numberSoundToPlay.url,
             base64: numberSoundToPlay.base64,
             soundId: numberSoundToPlay.soundId,
             name: numberSoundToPlay.name,
+            tts: numberSoundToPlay.tts,
           });
           console.log("Autodarts Tools: Added number sound to queue (channel 2)");
         } else {
@@ -1423,18 +1477,20 @@ function playSound(trigger: string, soundChannel: number = 1): void {
           base64: wordSoundToPlay.base64,
           soundId: wordSoundToPlay.soundId,
           name: wordSoundToPlay.name,
+          tts: wordSoundToPlay.tts,
         });
 
         // Add number to queue
         const randomNumberIndex = Math.floor(Math.random() * numberSounds.length);
         const numberSoundToPlay = numberSounds[randomNumberIndex];
 
-        if (numberSoundToPlay.url || numberSoundToPlay.base64 || numberSoundToPlay.soundId) {
+        if (numberSoundToPlay.url || numberSoundToPlay.base64 || numberSoundToPlay.soundId || numberSoundToPlay.tts) {
           soundQueue.push({
             url: numberSoundToPlay.url,
             base64: numberSoundToPlay.base64,
             soundId: numberSoundToPlay.soundId,
             name: numberSoundToPlay.name,
+            tts: numberSoundToPlay.tts,
           });
           console.log("Autodarts Tools: Added number sound to queue");
         } else {
@@ -1550,14 +1606,15 @@ function playSound(trigger: string, soundChannel: number = 1): void {
           }
         });
     } else {
-      // Use URL or base64 directly from the sound object
+      // Use URL, base64, or TTS directly from the sound object
       // Add to queue
-      if (soundToPlay.url || soundToPlay.base64) {
+      if (soundToPlay.url || soundToPlay.base64 || soundToPlay.tts) {
         if (soundChannel === 2) {
           soundQueue2.push({
             url: soundToPlay.url,
             base64: soundToPlay.base64,
             name: soundToPlay.name,
+            tts: soundToPlay.tts,
           });
 
           // Start playing if not already playing
@@ -1569,6 +1626,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             url: soundToPlay.url,
             base64: soundToPlay.base64,
             name: soundToPlay.name,
+            tts: soundToPlay.tts,
           });
 
           // Start playing if not already playing
@@ -1586,6 +1644,51 @@ function playSound(trigger: string, soundChannel: number = 1): void {
 /**
  * Play the next sound in the queue
  */
+/**
+ * Play a TTS sound using the Web Speech API
+ */
+function playTTSSound(tts: ISoundTTS, channel: number): void {
+  if (!window.speechSynthesis) {
+    console.error("Autodarts Tools: speechSynthesis not available");
+    playNextSound(channel);
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(tts.text);
+  const voices = speechSynthesis.getVoices();
+
+  // Try exact voice match by URI
+  let voice = voices.find(v => v.voiceURI === tts.voiceURI);
+  // Fallback: match by language
+  if (!voice && tts.lang) {
+    voice = voices.find(v => v.lang === tts.lang);
+  }
+  if (voice) utterance.voice = voice;
+
+  utterance.rate = tts.rate;
+  utterance.pitch = tts.pitch;
+
+  // Safety timeout for iOS (10 seconds)
+  const safetyTimeout = setTimeout(() => {
+    console.warn("Autodarts Tools: TTS safety timeout reached");
+    speechSynthesis.cancel();
+    playNextSound(channel);
+  }, 10000);
+
+  utterance.onend = () => {
+    clearTimeout(safetyTimeout);
+    console.log("Autodarts Tools: TTS playback ended");
+    playNextSound(channel);
+  };
+  utterance.onerror = (e) => {
+    clearTimeout(safetyTimeout);
+    console.error("Autodarts Tools: TTS playback error", e);
+    playNextSound(channel);
+  };
+
+  speechSynthesis.speak(utterance);
+}
+
 function playNextSound(channel: number = 1): void {
   if (channel === 2) {
     console.log("Autodarts Tools: playNextSound called for channel 2, queue length:", soundQueue2.length);
@@ -1607,10 +1710,16 @@ function playNextSound(channel: number = 1): void {
       return;
     }
 
-    if (!nextSound.url && !nextSound.base64 && !nextSound.soundId) {
-      console.error("Autodarts Tools: Sound for channel 2 has neither URL, base64 data, nor soundId");
+    if (!nextSound.url && !nextSound.base64 && !nextSound.soundId && !nextSound.tts) {
+      console.error("Autodarts Tools: Sound for channel 2 has neither URL, base64 data, soundId, nor TTS");
       // Move to next sound
       playNextSound(2);
+      return;
+    }
+
+    // Handle TTS sounds on channel 2
+    if (nextSound.tts) {
+      playTTSSound(nextSound.tts, 2);
       return;
     }
 
@@ -1660,10 +1769,16 @@ function playNextSound(channel: number = 1): void {
       return;
     }
 
-    if (!nextSound.url && !nextSound.base64 && !nextSound.soundId) {
-      console.error("Autodarts Tools: Sound for channel 1 has neither URL, base64 data, nor soundId");
+    if (!nextSound.url && !nextSound.base64 && !nextSound.soundId && !nextSound.tts) {
+      console.error("Autodarts Tools: Sound for channel 1 has neither URL, base64 data, soundId, nor TTS");
       // Move to next sound
       playNextSound(1);
+      return;
+    }
+
+    // Handle TTS sounds on channel 1
+    if (nextSound.tts) {
+      playTTSSound(nextSound.tts, 1);
       return;
     }
 

@@ -8,7 +8,7 @@ Tools for Autodarts
 
 <p align="center"><img src="https://img.shields.io/github/actions/workflow/status/creazy231/tools-for-autodarts/release.yml" alt="GitHub Actions Workflow Status">&nbsp;<img src="https://img.shields.io/github/package-json/v/creazy231/tools-for-autodarts" alt="GitHub package.json version">&nbsp;<a href="https://github.com/creazy231/tools-for-autodarts/releases"><img src="https://img.shields.io/github/v/release/creazy231/tools-for-autodarts" alt="GitHub Release"></a></p>
 
-<p align="center"><a href="https://chromewebstore.google.com/detail/tools-for-autodarts/oolfddhehmbpdnlmoljmllcdggmkgihh"><img src="https://img.shields.io/chrome-web-store/v/oolfddhehmbpdnlmoljmllcdggmkgihh?logo=google-chrome&logoColor=%23FFFFFF&label=Chrome" alt="Chrome Web Store Version"></a>&nbsp;<a href="https://addons.mozilla.org/de/firefox/addon/tools-for-autodarts"><img src="https://img.shields.io/amo/v/tools-for-autodarts?logo=firefox&logoColor=%23FFFFFF&label=Firefox" alt="Mozilla Add-on Version"></a>&nbsp;<a href="https://intradeus.github.io/http-protocol-redirector?r=altstore://source?url=https://raw.githubusercontent.com/creazy231/tools-for-autodarts/refs/heads/main/Autodarts_Tools_Source.json"><img src="https://img.shields.io/github/v/release/creazy231/tools-for-autodarts?logo=apple&logoColor=%23FFFFFF&label=AltStore%20iOS&color=007AFF" alt="AltStore iOS Version"></a></p>
+<p align="center"><a href="https://chromewebstore.google.com/detail/tools-for-autodarts/oolfddhehmbpdnlmoljmllcdggmkgihh"><img src="https://img.shields.io/chrome-web-store/v/oolfddhehmbpdnlmoljmllcdggmkgihh?logo=google-chrome&logoColor=%23FFFFFF&label=Chrome" alt="Chrome Web Store Version"></a>&nbsp;<a href="https://addons.mozilla.org/de/firefox/addon/tools-for-autodarts"><img src="https://img.shields.io/amo/v/tools-for-autodarts?logo=firefox&logoColor=%23FFFFFF&label=Firefox" alt="Mozilla Add-on Version"></a>&nbsp;<a href="https://apps.apple.com/de/app/tools-for-autodarts/id6479754594"><img src="https://img.shields.io/itunes/v/6479754594?logo=apple&logoColor=%23FFFFFF&label=MacOS%20%26%20iOS" alt="App Store Version"></a>&nbsp;<a href="https://intradeus.github.io/http-protocol-redirector?r=altstore://source?url=https://raw.githubusercontent.com/creazy231/tools-for-autodarts/refs/heads/main/Autodarts_Tools_Source.json"><img src="https://img.shields.io/github/v/release/creazy231/tools-for-autodarts?logo=apple&logoColor=%23FFFFFF&label=AltStore%20iOS&color=007AFF" alt="AltStore iOS Version"></a></p>
 
 <p align="center"><a href="https://chromewebstore.google.com/detail/tools-for-autodarts/oolfddhehmbpdnlmoljmllcdggmkgihh"><img src="https://img.shields.io/chrome-web-store/users/oolfddhehmbpdnlmoljmllcdggmkgihh?logo=google-chrome&logoColor=%23FFFFFF&label=Chrome%20Users" alt="Chrome Web Store Users"></a>&nbsp;<a href="https://addons.mozilla.org/de/firefox/addon/tools-for-autodarts"><img src="https://img.shields.io/amo/users/tools-for-autodarts?logo=firefox&logoColor=%23FFFFFF&label=Firefox%20Users&color=4c1" alt="Mozilla Add-on Users"></a>&nbsp;<a href="https://ko-fi.com/creazy231"><img src="https://img.shields.io/badge/Ko--fi-Support%20me%20on%20Ko--fi-FF5E5B?logo=ko-fi&logoColor=white" alt="Support me on Ko-fi"></a></p>
 
@@ -97,11 +97,14 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Color-coded buttons matching dart board segments
   - Keyboard shortcuts for accessing throws (/, *, -) and making corrections
 - **Instant Replay**: Records webcam footage and automatically shows replays of winning throws
+- **Gotcha Helper**: Shows how many points the other players are ahead in Gotcha game variant
+  - Displays dart throws needed to catch up
 
 ### 🔊 Audio Features
 - **Caller**: Voice announcements for scores, checkouts, and each dart thrown during gameplay
 - **Sound FX**: Ambient sound effects for different game events
 - **Sound Upload**: Add your own custom sounds for personalized feedback
+- **Text-to-Speech (TTS)**: Generate custom caller and sound FX audio directly from text using your device's built-in voices
 - **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events
 
 ### 🗣️ Caller Feature
@@ -111,6 +114,7 @@ The Caller feature provides voice announcements during your darts gameplay, simi
 - **Call Every Dart**: Announces each dart as it's thrown, rather than waiting for the end of a turn
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
 - **Custom Sound Library**: Add, edit, and organize voice clips for different game events
+- **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text using the built-in "Generate TTS" button — no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.
 - **Bulk Upload with Trigger Assignment**: When uploading multiple files, you can assign the same trigger to all files at once, making it easy to set up larger sound sets without manually assigning triggers to each file individually
 
 #### Supported Triggers
@@ -131,6 +135,13 @@ You can assign sounds to be played based on these triggers:
   - `next_player`: Plays when switching to the next player (fallback if no player name sound is found)
   - `bot`: Plays instead of player name when the player is a CPU/bot player
   - `playername`: Player name sounds play automatically when it's their turn. Example: If your name is `creazy.eth` on Autodarts, simply use `creazy.eth` (supports spaces or `_` like `player_name` or `player name`)
+- **Board Status**:
+  - `board_started`: When the board has started
+  - `board_stopped`: When the board has stopped or disconnected
+  - `manual_reset_done`: After a manual reset (also triggered when a new round starts)
+  - `takeout_finished`: When takeout has finished
+  - `calibration_started`: When calibration is started
+  - `calibration_finished`: When calibration has finished
 - **Cricket-Specific**:
   - `cricket_hit`: When a player hits a Cricket target (15-20 and Bull)
   - `cricket_miss`: When a player hits a non-Cricket target (Miss-14)
@@ -225,6 +236,13 @@ Add sound effects for various game events:
   - `ambient_lobby_out`: Plays when a player leaves the lobby
 - **Tournament Sounds**:
   - `ambient_tournament_ready`: Plays when "Time to ready up" text appears in tournaments
+- **Board Status Sounds** (only during a game):
+  - `ambient_board_started`: Plays when the board has started
+  - `ambient_board_stopped`: Plays when the board has stopped or disconnected
+  - `ambient_manual_reset_done`: Plays after a manual reset (also triggered when a new round starts)
+  - `ambient_takeout_finished`: Plays when takeout has finished
+  - `ambient_calibration_started`: Plays when calibration is started
+  - `ambient_calibration_finished`: Plays when calibration has finished
 - **Player-Specific Gameshot**: Create personalized winning sounds for specific players using the following formats:
   - `gameshot_player name` (spaces preserved)
   - `gameshot_player_name` (with underscores replacing spaces)
@@ -270,6 +288,19 @@ The Sound FX feature includes a sophisticated multi-level fallback system:
   - Generic gameshot: `ambient_gameshot`
 - If no match is found after all fallback attempts, no sound is played
 
+#### Text-to-Speech (TTS) Generation
+Generate sound effects directly from text without needing external audio files:
+- **Generate TTS Button**: Available in the Sound FX settings toolbar alongside Upload and Delete buttons
+- **Voice Selection**: Choose from any voice installed on your operating system (varies by platform)
+- **Speed & Pitch Control**: Adjust speech rate (0.5x–2x) and pitch (0–2) with sliders
+- **Prelisten**: Preview the generated speech before saving
+- **Persistent Settings**: Your last-used voice, speed, and pitch are remembered across sessions
+- **Cross-Platform**: Works on Desktop (Chrome, Firefox, Edge, Safari), iOS Safari, and Android Chrome using the Web Speech API
+- **Trigger Assignment**: Assign triggers to TTS sounds just like any other sound
+
+> [!NOTE]
+> TTS sounds use your device's built-in speech synthesis and are generated live during playback. Voice availability and quality depend on your operating system. Short phrases work best for dart calling use cases.
+
 #### Bulk Upload with Trigger Assignment
 - **Multi-File Upload**: Upload multiple sound files at once for faster setup
 - **Bulk Trigger Assignment**: When "Generate triggers from filenames" is disabled, you can assign the same trigger to all uploaded files at once
@@ -277,7 +308,7 @@ The Sound FX feature includes a sophisticated multi-level fallback system:
 
 #### Technical Features
 - **Queue Management**: Enhanced sound queue management to prevent overlapping and ensure proper playback order (improved in v2.0.3)
-- **Format Support**: Plays both URL-based sounds and base64-encoded audio
+- **Format Support**: Plays both URL-based sounds, base64-encoded audio, and TTS (text-to-speech) sounds
 - **IndexedDB Storage**: Efficiently stores sound files in browser database to improve performance
 - **Error Handling**: Automatically falls back to alternative sources if a sound fails to play
 - **Safari Compatible**: Works with all major browsers including Safari's strict audio policies
@@ -299,8 +330,15 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 Effects can be triggered by various game events using these triggers:
 
 ##### Board Status (only during a game)
-- **board_stopped**: when the board gets stopped
-- **calibration_Started**: when calibration is started
+- **board_starting**: when the board is going to start
+- **board_started**: when the board has started
+- **board_stopping**: when the board is going to stop
+- **board_stopped**: when the board has stopped
+- **manual_reset_done**: after a manual reset (is also triggered when a new round starts)
+- **throw**: when a throw is detected
+- **last_throw**: when the last throw is detected
+- **takeout_finished**: when takeout has finished
+- **calibration_started**: when calibration is started
 - **calibration_finished**: when calibration has finished
 
 ##### Game Events

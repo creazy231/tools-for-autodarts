@@ -77,9 +77,10 @@ function updateValue(clientX: number) {
   const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
   const rawValue = (percentage / 100) * (props.max - props.min) + props.min;
 
-  // Apply step
+  // Apply step and round to avoid floating point artifacts (e.g. 1.4000000000000001)
+  const decimals = (props.step.toString().split(".")[1] || "").length;
   const steppedValue = Math.round(rawValue / props.step) * props.step;
-  const clampedValue = Math.min(props.max, Math.max(props.min, steppedValue));
+  const clampedValue = Number(Math.min(props.max, Math.max(props.min, steppedValue)).toFixed(decimals));
 
   emit("update:modelValue", clampedValue);
 }

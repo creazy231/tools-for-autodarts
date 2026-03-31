@@ -78,7 +78,7 @@ async function processX01Data(
   if (winner && triggerPresentCB("gameshot+" + throwName)) return "gameshot+" + throwName;
   if (busted && triggerPresentCB("busted")) return "busted";
   if (isLastThrow && triggerPresentCB(combinedThrows)) return combinedThrows;
-  if (isLastThrow && triggerPresentCB(points)) return points;
+  if (!busted && isLastThrow && triggerPresentCB(points)) return points;
   if (triggerPresentCB(throwName)) return throwName;
 
   return null;
@@ -124,6 +124,8 @@ async function processAtcRtwShanghaiData(
       targetField = round
       break;
   }
+  const trigger = `target${targetField}`
   console.log(`Autodarts Tools: WLED: current target ${targetField}`)
-  return `target${targetField}`
+  if (triggerPresentCB(trigger)) return trigger
+  return null
 }

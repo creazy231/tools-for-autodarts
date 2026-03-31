@@ -20,6 +20,7 @@ import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
 import InstantReplay from "./InstantReplay.vue";
+import Gotcha from "./Gotcha.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
 
@@ -45,6 +46,7 @@ const tools = {
   quickCorrection: null as any,
   enhancedScoringDisplay: null as any,
   instantReplay: null as any,
+  gotcha: null as any,
 };
 
 export default defineContentScript({
@@ -191,6 +193,10 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initInstantReplay(ctx).catch(console.error);
   }
 
+  if (config.gotcha?.enabled) {
+    await initGotcha(ctx).catch(console.error);
+  }
+
   if (matchId && config.discord.autoStartAfterTimer?.stream) {
     if (config.discord.autoStartAfterTimer?.matchId === matchId || config.discord.autoStartAfterTimer?.matchId?.includes(matchId)) await initScript(discordStream, url).catch(console.error);
   }
@@ -241,6 +247,7 @@ function clearMatch(fromBullOff: boolean = false) {
   tools.takeout?.remove();
   tools.animations?.remove();
   tools.zoom?.remove();
+  tools.gotcha?.forEach((e) =>  e.remove());
   tools.quickCorrection?.remove();
   tools.instantReplay?.remove();
   colorChangeOnRemove();
@@ -406,6 +413,41 @@ async function initZoom(ctx) {
   });
 
   tools.zoom.mount();
+}
+
+async function initGotcha(ctx) {
+  const selector = "div.ad-ext-player";
+  await waitForElement(selector);
+  const elements = document.querySelectorAll(selector);
+  const shadowRootPromises = Array.from(elements).map(async (e, index) => {
+    if (!e.id) {
+      e.id = `ad-ext-player-${index}`;
+    }
+    return await createShadowRootUi(
+      ctx,
+      {
+        name: "autodarts-tools-gotcha",
+        position: "inline",
+        anchor: `#${e.id} > div:first-of-type > p:first-of-type`,
+        append: 'after',
+        onMount: (container: any) => {
+          console.log("Autodarts Tools: Gotcha: initialized");
+          const app = createApp(Gotcha, { playerIndex: index });
+          app.mount(container);
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            container.classList.add("dark");
+          }
+          return app;
+        },
+        onRemove: (app: any) => {
+          app?.unmount();
+          console.log("Autodarts Tools: Gotcha: removed");
+        },
+      }
+    );
+  });
+  tools.gotcha = await Promise.all(shadowRootPromises);
+  tools.gotcha.forEach((e) =>  e.mount());
 }
 
 async function initQuickCorrection(ctx) {

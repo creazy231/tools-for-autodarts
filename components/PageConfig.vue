@@ -40,7 +40,7 @@
               <span class="icon-[pixelarticons--arrow-left]" />
             </AppButton>
             <h1 class="text-xl font-bold lg:text-2xl xl:text-3xl">
-              Autodarts Tools
+              Autodarts Tools {{ packageConfig.version }}
             </h1>
           </div>
           <div class="mt-2 grid grid-cols-2 items-center gap-2 sm:mt-0 sm:grid-cols-[1fr_1fr_1fr_1fr_auto]">
@@ -89,37 +89,60 @@
           :tabs="tabs"
         />
 
-        <!-- Danger Zone -->
-        <div v-if="showDangerZone" class="adt-container space-y-6">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-red-400">
-              Danger Zone
-            </h2>
-            <AppButton @click="toggleDangerZone" auto class="text-white/70 hover:text-white">
-              <span class="icon-[pixelarticons--close]" />
+        <!-- Advanced Settings -->
+        <div v-if="showDangerZone" class="space-y-5">
+          <!-- Ko-fi Support Section -->
+          <div class="adt-container space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold text-white">
+                Support the Project
+              </h2>
+              <AppButton @click="toggleDangerZone" auto class="text-white/70 hover:text-white">
+                <span class="icon-[pixelarticons--close]" />
+              </AppButton>
+            </div>
+            <p class="text-white/70">
+              Autodarts Tools is free and open source. If you enjoy using it, consider supporting the development to keep it going!
+            </p>
+            <AppButton
+              @click="openKofi"
+              type="success"
+              auto
+            >
+              <span class="icon-[pixelarticons--heart] mr-2" />
+              <span>Support on Ko-fi</span>
             </AppButton>
           </div>
-          <div class="space-y-4">
-            <p class="text-white/70">
-              These actions are destructive and cannot be undone. Please proceed with caution and may export your settings before proceeding.
-            </p>
-            <div class="rounded border border-red-500/30 bg-red-500/5 p-4">
-              <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                <div>
-                  <h3 class="font-semibold text-red-300">
+
+          <!-- Danger Zone -->
+          <div class="adt-container space-y-6">
+            <div class="flex items-center">
+              <h2 class="text-xl font-bold text-red-400">
+                Danger Zone
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <p class="text-white/70">
+                These actions are destructive and cannot be undone. Please proceed with caution and may export your settings before proceeding.
+              </p>
+              <div class="rounded border border-red-500/30 bg-red-500/5 p-4">
+                <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+                  <div>
+                    <h3 class="font-semibold text-red-300">
+                      Reset All Settings
+                    </h3>
+                    <p class="text-sm text-white/60">
+                      This will reset all settings to their default values. All your customizations will be lost.
+                    </p>
+                  </div>
+                  <AppButton
+                    @click="resetAllSettings"
+                    auto
+                    type="danger"
+                  >
                     Reset All Settings
-                  </h3>
-                  <p class="text-sm text-white/60">
-                    This will reset all settings to their default values. All your customizations will be lost.
-                  </p>
+                  </AppButton>
                 </div>
-                <AppButton
-                  @click="resetAllSettings"
-                  auto
-                  type="danger"
-                >
-                  Reset All Settings
-                </AppButton>
               </div>
             </div>
           </div>
@@ -165,31 +188,28 @@
 
             <!-- Fourth row of feature cards -->
             <StreamingMode @toggle="openSettingsModal('streaming-mode')" @setting-change="updateConfig" class="feature-card" data-feature-index="14" />
+            <LargerLegsSets @toggle="openSettingsModal('larger-legs-sets')" @setting-change="updateConfig" class="feature-card" data-feature-index="15" />
 
             <!-- Fifth row of feature cards -->
-            <LargerLegsSets @toggle="openSettingsModal('larger-legs-sets')" @setting-change="updateConfig" class="feature-card" data-feature-index="15" />
             <LargerPlayerNames @toggle="openSettingsModal('larger-player-names')" @setting-change="updateConfig" class="feature-card" data-feature-index="16" />
+            <LargerPlayerMatchData @toggle="openSettingsModal('larger-player-match-data')" @setting-change="updateConfig" class="feature-card" data-feature-index="17" />
 
             <!-- Sixth row of feature cards -->
-            <LargerPlayerMatchData @toggle="openSettingsModal('larger-player-match-data')" @setting-change="updateConfig" class="feature-card" data-feature-index="17" />
             <WinnerAnimation @setting-change="updateConfig" class="feature-card" data-feature-index="18" />
-
-            <!-- Seventh row of feature cards -->
             <AutomaticFullscreen @setting-change="updateConfig" class="feature-card" data-feature-index="19" />
 
-            <!-- Eighth row of feature cards -->
+            <!-- Seventh row of feature cards -->
             <Zoom @toggle="openSettingsModal('zoom')" @setting-change="updateConfig" class="feature-card" data-feature-index="20" />
-
-            <!-- Ninth row of feature cards -->
             <QuickCorrection @toggle="openSettingsModal('quick-correction')" @setting-change="updateConfig" class="feature-card" data-feature-index="21" />
 
-            <!-- Tenth row of feature cards -->
+            <!-- Eighth row of feature cards -->
             <EnhancedScoringDisplay @setting-change="updateConfig" class="feature-card" data-feature-index="22" />
-
-            <!-- Eleventh row of feature cards -->
             <InstantReplay @toggle="openSettingsModal('instant-replay')" @setting-change="updateConfig" class="feature-card" data-feature-index="23" />
 
-            <!-- Twelfth row of feature cards -->
+            <!-- Ninth row of feature cards -->
+            <Gotcha @setting-change="updateConfig" class="feature-card" data-feature-index="24" />
+
+            <!-- Tenth row of feature cards -->
             <NoAverageDisplay @toggle="openSettingsModal('no-average-display')" @setting-change="updateConfig" class="feature-card" data-feature-index="24" />
           </div>
 
@@ -271,7 +291,10 @@ import Zoom from "./Settings/Zoom.vue";
 import QuickCorrection from "./Settings/QuickCorrection.vue";
 import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
+import Gotcha from "./Settings/Gotcha.vue";
 import NoAverageDisplay from "./Settings/NoAverageDisplay.vue";
+
+import packageConfig from "../package.json";
 
 import type { IConfig, ISound } from "@/utils/storage";
 
@@ -658,6 +681,10 @@ function importSettings() {
 
 // State for danger zone
 const showDangerZone = ref(false);
+
+function openKofi() {
+  window.open("https://ko-fi.com/creazy231", "_blank", "noopener,noreferrer");
+}
 
 function toggleDangerZone() {
   showDangerZone.value = !showDangerZone.value;

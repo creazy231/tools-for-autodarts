@@ -474,7 +474,7 @@ async function openCorrection(throwElement?: HTMLElement) {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": await getAuthToken(),
+          "Authorization": `Bearer ${await getAuthToken()}`,
         },
         body: JSON.stringify({ activated: throwIndex }),
       },
@@ -497,7 +497,7 @@ async function openCorrection(throwElement?: HTMLElement) {
     // Account for scale when calculating actual rendered width
     const scaledWidth = baseWidth * correctionScale.value;
     const translateOffset = 3.5 * 16; // 3.5rem translateX offset
-    
+
     // With transform: translateX(-3.5rem) scale(scale) and transform-origin: top center
     // Transform order: translateX first, then scale from center
     // After translateX(-3.5rem): center moves to (initialX + baseWidth/2 - translateOffset)
@@ -664,7 +664,7 @@ async function applyCorrection(value: string) {
           mode: "cors",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": authToken,
+            "Authorization": `Bearer ${authToken}`,
           },
           body: JSON.stringify({ activated: throwIndex }),
         },
@@ -683,7 +683,7 @@ async function applyCorrection(value: string) {
               mode: "cors",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": await getAuthToken(),
+                "Authorization": `Bearer ${await getAuthToken()}`,
               },
               body: JSON.stringify({ activated: -1 }),
             },
@@ -702,7 +702,7 @@ async function applyCorrection(value: string) {
                   mode: "cors",
                   headers: {
                     "Content-Type": "application/json",
-                    "Authorization": await getAuthToken(),
+                    "Authorization": `Bearer ${await getAuthToken()}`,
                   },
                   body: JSON.stringify({ activated: -1 }),
                 },
@@ -729,7 +729,7 @@ async function applyCorrection(value: string) {
                       mode: "cors",
                       headers: {
                         "Content-Type": "application/json",
-                        "Authorization": await getAuthToken(),
+                        "Authorization": `Bearer ${await getAuthToken()}`,
                       },
                       body: JSON.stringify(throwsPayload),
                     },
@@ -813,6 +813,10 @@ async function applyCorrection(value: string) {
       },
     };
 
+    console.log(matchId);
+
+    console.log(authToken);
+
     // Send the correction
     const response = await browser.runtime.sendMessage({
       type: "fetch",
@@ -823,7 +827,7 @@ async function applyCorrection(value: string) {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": authToken,
+          "Authorization": `Bearer ${authToken}`,
         },
         body: JSON.stringify(payload),
       },
@@ -848,7 +852,7 @@ async function applyCorrection(value: string) {
             mode: "cors",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": await getAuthToken(),
+              "Authorization": `Bearer ${await getAuthToken()}`,
             },
             body: JSON.stringify({ activated: -1 }),
           },
@@ -867,7 +871,7 @@ async function applyCorrection(value: string) {
                 mode: "cors",
                 headers: {
                   "Content-Type": "application/json",
-                  "Authorization": await getAuthToken(),
+                  "Authorization": `Bearer ${await getAuthToken()}`,
                 },
                 body: JSON.stringify({ activated: -1 }),
               },
@@ -898,7 +902,7 @@ async function applyCorrection(value: string) {
                     mode: "cors",
                     headers: {
                       "Content-Type": "application/json",
-                      "Authorization": await getAuthToken(),
+                      "Authorization": `Bearer ${await getAuthToken()}`,
                     },
                     body: JSON.stringify(throwsPayload),
                   },

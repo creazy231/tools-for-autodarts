@@ -28,4 +28,12 @@ web-ext.config.ts
 .env.*
 !.env.example
 
+# Signing certificates and provisioning profiles
+*.p8
+*.p12
+*.cer
+*.provisionprofile
+*.mobileprovision
+*.certSigningRequest
+
 git2md

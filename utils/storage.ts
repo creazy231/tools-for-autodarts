@@ -155,9 +155,20 @@ export interface IConfig {
     boardIds: string[];
     effects: IWled[];
   };
+  gotcha: {
+    enabled: boolean;
+  };
   noAverageDisplay: {
     enabled: boolean;
   };
+}
+
+export interface ISoundTTS {
+  text: string;
+  voiceURI: string;
+  lang: string;
+  rate: number;
+  pitch: number;
 }
 
 export interface ISound {
@@ -167,6 +178,7 @@ export interface ISound {
   enabled: boolean;
   triggers: string[];
   soundId?: string;
+  tts?: ISoundTTS;
 }
 
 export interface IAnimation {
@@ -701,6 +713,9 @@ export const defaultConfig: IConfig = {
         triggers: [ "gameshot" ],
       },
     ],
+  },
+  gotcha: {
+    enabled: false,
   },
   noAverageDisplay: {
     enabled: false,

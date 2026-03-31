@@ -1,0 +1,105 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with Tools for Autodarts
+title: "[BUG] "
+labels: ["bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible to help us fix the issue quickly.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "Describe what happened and what you expected to happen..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser are you using?
+      placeholder: "e.g., Chrome, Firefox, Edge, Safari"
+    validations:
+      required: true
+
+  - type: input
+    id: browser_version
+    attributes:
+      label: Browser Version
+      description: What is your exact browser version?
+      placeholder: "e.g., 122.0.6261.112"
+    validations:
+      required: true
+
+  - type: input
+    id: extension_version
+    attributes:
+      label: Tools for Autodarts Version
+      description: What version of Tools for Autodarts do you have installed? (Check in your browser's extension settings)
+      placeholder: "e.g., 2.2.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Windows 10
+        - Windows 11
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+        - Linux (specify in "Other" field)
+        - Other (specify below)
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS Version / Distribution
+      description: If you selected "Other" or want to provide more details, specify your OS version orLinux distribution.
+      placeholder: "e.g., Ubuntu 22.04, macOS 14.3, Windows 10 Pro 22H2"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console Logs / Error Messages
+      description: |
+        If applicable, paste any relevant console logs or error messages.
+        To access browser console: Press F12 → Console tab
+      placeholder: "Paste error messages or logs here..."
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+      placeholder: "Drag and drop images here..."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
+      placeholder: "Any other information that might be helpful..."

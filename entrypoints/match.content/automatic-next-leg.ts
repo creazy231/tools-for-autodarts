@@ -8,6 +8,16 @@ let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
 
 let gameData: IGameData;
+let nextLegInterval: NodeJS.Timeout | undefined;
+
+function cleanupCountdown() {
+  if (nextLegInterval) {
+    clearInterval(nextLegInterval);
+    nextLegInterval = undefined;
+  }
+  const existingEl = document.getElementById("ad-ext_next-leg-text");
+  existingEl?.remove();
+}
 
 export async function automaticNextLeg() {
   console.warn("Autodarts Tools: Automatic Next Leg - TEST THIS WITH LIVE BOARD");
@@ -21,6 +31,8 @@ export async function automaticNextLeg() {
     });
 
     boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (_boardData: IBoard, _oldBoardData: IBoard) => {
+      cleanupCountdown();
+
       if (_boardData.event === "Takeout finished" && (gameData.match?.gameWinner ?? -1) >= 0) {
         const nextLegBtn = await waitForElementWithTextContent("button", ["Next Leg", "Nächstes Leg", "Volgende leg"]);
         if (!nextLegBtn) return;
@@ -32,12 +44,12 @@ export async function automaticNextLeg() {
         nextLegBtnTextEl.textContent = ` (${startSec})`;
         nextLegBtn.appendChild(nextLegBtnTextEl);
 
-        const nextLegInterval = setInterval(() => {
+        nextLegInterval = setInterval(() => {
           startSec--;
           nextLegBtnTextEl.textContent = ` (${startSec})`;
 
           if (startSec <= 0) {
-            clearInterval(nextLegInterval);
+            cleanupCountdown();
             (nextLegBtn as HTMLElement).click();
           }
         }, 1000);
@@ -49,6 +61,7 @@ export async function automaticNextLeg() {
 }
 
 export function automaticNextLegOnRemove() {
+  cleanupCountdown();
   gameDataWatcherUnwatch?.();
   boardDataWatcherUnwatch?.();
 }

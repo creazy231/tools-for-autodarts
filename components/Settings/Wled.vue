@@ -460,6 +460,7 @@ const csvData = ref("");
 const csvError = ref("");
 const csvImportPlaceholder = ref(
   "[name];URL;[url];[trigger][;[trigger]...]\n" +
+  "[name];PRESET;[url];[preset_id];[trigger][;[trigger]...]\n" +
   "[name];API;[api_url];[json];[trigger][;[trigger]...]"
 );
 
@@ -725,7 +726,7 @@ async function saveEffect() {
       presetError.value = "please select a preset";
       return;
     }
-  } else if (newEffect.value.type == WledType.JSON) {
+  } else if (newEffect.value.type == WledType.API) {
     // Check if json is valid
     try {
       JSON.parse(newEffect.value.json_api)

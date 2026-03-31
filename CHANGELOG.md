@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.8] - 2026-03-23
+
+### Added
+- Added Gotcha Helper feature that shows how many points the other players are ahead in Gotcha game variant
+  - Displays dart throws needed to catch up (e.g. `+15`, `D10`, `T20`, `BULL`)
+  - Contributed by @MeisterBob
+- Added Text-to-Speech (TTS) generation for Caller and Sound FX
+  - Generate caller and sound effect audio directly from text using your device's built-in voices
+  - Voice selection, adjustable speed (0.5x–2x) and pitch (0–2), and preview before saving
+  - Last-used voice, speed, and pitch settings are remembered across sessions
+- Added board event triggers to Caller and Sound FX features
+  - `board_started`, `board_stopped`, `manual_reset_done`, `takeout_finished`, `calibration_started`, `calibration_finished` triggers now available for both Caller and Sound FX
+- Added additional WLED board event triggers
+  - New triggers: `board_starting`, `board_stopping`, `throw`, `last_throw`, `takeout_finished`
+  - Refactored board event handling for cleaner trigger logic
+  - Contributed by @MeisterBob
+- Added version information display in the Tools settings header
+
+### Fixed
+- Fixed animation trigger conditions for last throw — animations no longer play points/combination triggers when busted
+- Fixed Automatic Next Leg countdown not being cleaned up properly
+  - Added cleanup logic for countdown intervals and text elements on new board events
+  - Prevents stale countdown timers from persisting across legs
+- Fixed WLED CSV import parsing
+  - Contributed by @MeisterBob
+
+## [2.2.7] - 2026-03-06
+
+### Fixed
+- Fixed authentication token capture: completely rewrote `auth-cookie.ts` to intercept the Keycloak OIDC token endpoint response via `fetch` override instead of reading a cookie value
+  - Added a secondary fallback that intercepts outgoing `Authorization` request headers via `XMLHttpRequest.prototype.setRequestHeader`
+  - Token is deduplicated so the custom event is only dispatched when the token actually changes
+- Fixed missing `Bearer ` prefix in all Authorization headers used by Quick Correction API calls
+- Fixed `fetchWithAuth` helper to send a proper `Authorization: Bearer <token>` header instead of incorrectly setting a `Cookie` header; also removed unnecessary `credentials: "include"`
+- Fixed Zoom Live mode button selector: removed `:not([data-active])` constraint so the button click always fires regardless of its current state
+- Fixed Automatic Fullscreen button SVG construction: now uses `createElementNS` to build the icon from scratch instead of cloning an existing button's icon, preventing failures when the reference element is unavailable
+- Fixed Automatic Fullscreen CSS selector to match the updated Autodarts DOM structure (`.chakra-wrap` lookup)
+- Fixed Automatic Fullscreen button placement for Bull-off game variant: button is now prepended correctly instead of using the generic `insertBefore` path
+
+### Added
+- Added multilingual support for tournament ready sound trigger — now also detects the German ("Zeit zum bereitmachen") and Dutch ("Tijd om je klaar te maken") variants of the ready-up message
+- Added `*://login.autodarts.io/*` to host permissions and the `cookies` permission in the extension manifest to support the new auth token capture mechanism
+
 ## [2.2.5] - 2026-01-22
 
 ### Fixed
