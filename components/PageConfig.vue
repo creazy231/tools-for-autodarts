@@ -325,7 +325,7 @@ const featureGroups = [
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
       { id: "no-average-display", title: "No Average Display Settings", component: NoAverageDisplay, hasSettings: false },
     ],
-    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay", "no-average-display" ],
+    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay" ],
   },
   // Boards (Tab 2)
   {
