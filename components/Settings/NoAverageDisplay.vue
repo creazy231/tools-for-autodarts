@@ -35,7 +35,7 @@
             No Average Display
           </h3>
           <p class="w-2/3 text-white/70">
-            Deactivates the Average Display in the score card so you dont get distracted by it
+            Deactivates the Average Display in the score card so you don`t get distracted by it
           </p>
         </div>
         <div class="flex">
@@ -63,6 +63,7 @@ const imageUrl = browser.runtime.getURL("/images/no-average-display.png");
 
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
+  if (!config.value?.noAverageDisplay) config.value.noAverageDisplay = defaultConfig.noAverageDisplay;
 });
 
 watch(config, async (_, oldValue) => {
