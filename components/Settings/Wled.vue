@@ -62,13 +62,20 @@
               </div>
             </div>
 
-            <div>
+            <div class="flex flex-col gap-20 sm:flex-row">
               <div class="mt-2 flex items-center gap-2">
                 <div class="flex items-center gap-2">
                   <span>trigger Effects only once</span>
                 </div>
                 <AppToggle @update:model-value="config.wledFx.onlyOnce = !config.wledFx.onlyOnce"
                   v-model="config.wledFx.onlyOnce" />
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex items-center gap-2">
+                  <span>trigger `opponent_turn` Effects</span>
+                </div>
+                <AppToggle @update:model-value="config.wledFx.opponentTurnEffectEnabled = !config.wledFx.opponentTurnEffectEnabled"
+                  v-model="config.wledFx.opponentTurnEffectEnabled" />
               </div>
             </div>
 

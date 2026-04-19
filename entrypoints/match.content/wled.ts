@@ -200,8 +200,9 @@ async function processGameData(
   currentBoardId = currentPlayer?.boardId;
 
   const isOpponentTurn = isBot || (config.wledFx.boardIds.length > 0 && !config.wledFx.boardIds.includes(currentBoardId));
+  const opponentTurnEffectEnabled = config.wledFx.opponentTurnEffectEnabled;
 
-  if (isOpponentTurn && isTriggerPresent("opponent_turn")) {
+  if (opponentTurnEffectEnabled && isOpponentTurn && isTriggerPresent("opponent_turn")) {
     nextEffect = "opponent_turn";
   }
 
