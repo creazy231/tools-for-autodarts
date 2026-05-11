@@ -117,6 +117,7 @@ export interface IConfig {
     enabled: boolean;
     callEveryDart: boolean;
     callCheckout: boolean;
+    preferCombinedThrows: boolean;
     sounds: ISound[];
   };
   soundFx: {
@@ -405,6 +406,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
     callEveryDart: false,
     callCheckout: false,
+    preferCombinedThrows: false,
     sounds: [],
   },
   sounds: {
