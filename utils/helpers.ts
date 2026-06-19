@@ -978,7 +978,7 @@ export const triggerPatterns = {
   triples: /^t(1[0-9]|20|[1-9])$/,
 
   // Special events
-  specialEvents: /^(bull|outside|busted|gameshot)$/,
+  specialEvents: /^(bull|outside|busted|gameshot|luckynumber)$/,
 
   // Combination tags: Format: [first dart]_[second dart]_[third dart]
   // Each dart can be a single, double, triple, or bull

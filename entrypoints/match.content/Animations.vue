@@ -161,6 +161,7 @@ async function processGameData(gameData: IGameData): Promise<void> {
   const winner: boolean = gameData.match.gameWinner >= 0;
   const busted: boolean = gameData.match.turns[0].busted;
   const points: number = gameData.match.turns[0].points;
+  const score: number = gameData.match.turns[0].score;
   const miss: boolean = throwName.toLocaleLowerCase().startsWith("m");
   const combinedThrows: string = gameData.match.turns[0].throws.map(t => t.segment.name.toLowerCase()).join("_");
 
@@ -171,6 +172,8 @@ async function processGameData(gameData: IGameData): Promise<void> {
     playAnimation(points.toString());
     await new Promise(resolve => setTimeout(resolve, 500));
     playAnimation(combinedThrows);
+    if (points > 0 && score > 10 && score.toString().split("").every((char) => char === score.toString()[0]))
+      playAnimation("luckynumber");
   }
   if (miss) playAnimation("outside");
 }

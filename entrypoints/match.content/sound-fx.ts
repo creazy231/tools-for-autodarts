@@ -677,12 +677,21 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
   const winner: boolean = gameData.match.gameWinner >= 0; // use this for ambient_gameshot_match later || (gameData.match.variant === "X01" && gameData.match.gameScores[currentPlayerIndex] === 0);
   const winnerMatch: boolean = gameData.match.winner >= 0;
   const busted: boolean = gameData.match.turns[0].busted;
+  const score: number = gameData.match.turns[0].score;
   const points: number = gameData.match.turns[0].points;
   const combinedThrows: string = gameData.match.turns[0].throws.map(t => t.segment.name.toLowerCase()).join("_");
 
   if (isBot && gameData.match.turns[0].throws.length > 0 && oldGameData?.match?.turns?.[0]?.throws?.length !== gameData.match.turns[0].throws.length) {
     playSound("bot_throw", 2);
   }
+
+  if (
+    isLastThrow &&
+    points > 0 &&
+    score > 10 &&
+    score.toString().split("").every((char) => char === score.toString()[0])
+  )
+    playSound("ambient_luckynumber");
 
   // For non-Cricket variants, use normal sound logic
   if (gameData.match.variant !== "Cricket") {
