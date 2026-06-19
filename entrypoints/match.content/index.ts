@@ -29,6 +29,7 @@ import {
   AutodartsToolsConfig,
   AutodartsToolsUrlStatus,
 } from "@/utils/storage";
+import i18next from "@/utils/translate";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
@@ -92,7 +93,7 @@ export default defineContentScript({
           }
         }
 
-        const activeMatch = window.location.href.includes("boards") ? !(await waitForElementWithTextContent("h2", [ "Board has no active match", "Board hat kein aktives Spiel", "Bord heeft geen actieve wedstrijd" ], 1000).catch(() => undefined)) : true;
+        const activeMatch = window.location.href.includes("boards") ? !(await waitForElementWithTextContent("h2", i18next.t('board_no_match'), 1000).catch(() => undefined)) : true;
 
         if (activeMatch) {
           console.log("Autodarts Tools: Match found, initializing match");
@@ -272,7 +273,7 @@ function startActiveMatchObserver(ctx) {
     if (!(/\/(matches|boards)\/([0-9a-f-]+)/.test(url)) || url.includes("history")) return;
 
     // Check if the "Board has no active match" element no longer exists
-    const activeMatch = window.location.href.includes("boards") ? !(await waitForElementWithTextContent("h2", [ "Board has no active match", "Board hat kein aktives Spiel", "Bord heeft geen actieve wedstrijd" ], 1000).catch(() => undefined)) : true;
+    const activeMatch = window.location.href.includes("boards") ? !(await waitForElementWithTextContent("h2", i18next.t('board_no_match'), 1000).catch(() => undefined)) : true;
 
     if (!activeMatch) {
       console.log("Autodarts Tools Observer: No Active Match found, waiting for match to start");

@@ -3,6 +3,7 @@ import type { IBoard } from "@/utils/board-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { waitForElementWithTextContent } from "@/utils";
 import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
+import i18next from "@/utils/translate";
 
 let boardDataWatcherUnwatch: any;
 
@@ -80,7 +81,7 @@ export async function nextPlayerOnTakeOutStuck() {
 
         // Use a more robust selector that works in both normal and fullscreen modes
         // Increase timeout to allow more time for DOM to settle in fullscreen mode
-        let nextBtn = await waitForElementWithTextContent("button", "Next", 2000);
+        let nextBtn = await waitForElementWithTextContent("button", i18next.t('next'), 2000);
         if (!nextBtn) {
           console.warn("Autodarts Tools: Next button not found, retrying with different approach");
           // Try another approach if the button wasn't found

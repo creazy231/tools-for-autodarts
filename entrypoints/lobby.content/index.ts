@@ -20,6 +20,7 @@ import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobbynew.conte
 import RecentLocalPlayers from "@/entrypoints/lobby.content/RecentLocalPlayers.vue";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
+import i18next from '@/utils/translate';
 
 let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
@@ -61,22 +62,22 @@ export default defineContentScript({
         }
 
         if (config.discord.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(discordWebhooks, url).catch(console.error);
         }
 
         if (config.autoStart.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(autoStart, url).catch(console.error);
         }
 
         if (config.shufflePlayers.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(shufflePlayers, url).catch(console.error);
         }
 
         if (config.qrCode.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(qrCode, url).catch(console.error);
         }
 
@@ -86,17 +87,17 @@ export default defineContentScript({
         }
 
         if (config.teamLobby.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(teamLobby, url).catch(console.error);
         }
 
         if (config.soundFx.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(soundFx, url).catch(console.error);
         }
 
         if (config.wledFx.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+          await waitForElementWithTextContent("h2", i18next.t('lobby'));
           await initScript(wledFx, url).catch(console.error);
         }
       } else if (/\/tournaments\//.test(url)) {

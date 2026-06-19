@@ -3,6 +3,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
+import i18next from '@/utils/translate';
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
@@ -34,7 +35,7 @@ export async function automaticNextLeg() {
       cleanupCountdown();
 
       if (_boardData.event === "Takeout finished" && (gameData.match?.gameWinner ?? -1) >= 0) {
-        const nextLegBtn = await waitForElementWithTextContent("button", ["Next Leg", "Nächstes Leg", "Volgende leg"]);
+        const nextLegBtn = await waitForElementWithTextContent("button", i18next.t('next_leg'));
         if (!nextLegBtn) return;
         let startSec = config.automaticNextLeg.sec;
 

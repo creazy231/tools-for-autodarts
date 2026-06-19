@@ -11,6 +11,7 @@ import {
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import { isSafari, isiOS } from "@/utils/helpers";
+import i18next from "@/utils/translate";
 
 export default defineContentScript({
   matches: [ "*://play.autodarts.io/*" ],
@@ -25,8 +26,8 @@ export default defineContentScript({
 
         const gameData: IGameData = await AutodartsToolsGameData.getValue();
         const gameModeTitle = await waitForElement("h2");
-        const buttonPublic = await waitForElementWithTextContent("button", "Public");
-        const buttonPrivate = await waitForElementWithTextContent("button", "Private");
+        const buttonPublic = await waitForElementWithTextContent("button", i18next.t("public"));
+        const buttonPrivate = await waitForElementWithTextContent("button", i18next.t("private"));
 
         await AutodartsToolsGameData.setValue({
           ...gameData,

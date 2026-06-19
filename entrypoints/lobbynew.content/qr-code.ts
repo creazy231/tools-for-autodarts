@@ -1,11 +1,12 @@
 import QRCodeStyling from "qr-code-styling";
 
 import { QR_CODE_OPTIONS } from "./qr-code-options";
+import i18next from '@/utils/translate';
 
 export async function qrCode() {
   console.log("Autodarts Tools: QR Code feature initializing");
 
-  await waitForElementWithTextContent("p", [ "or share link:", "Link teilen:", "Deel link:" ]);
+  await waitForElementWithTextContent("p", i18next.t('share_link'));
 
   // get input with placeholder "Lobby invite url"
   const shareLinkInput = document.querySelector("input[placeholder=\"Lobby invite url\"]") as HTMLInputElement;

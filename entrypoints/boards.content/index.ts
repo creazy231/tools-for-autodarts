@@ -5,6 +5,7 @@ import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsConfig, AutodartsToolsUrlStatus } from "@/utils/storage";
 import ExternalBoards from "@/entrypoints/boards.content/ExternalBoards.vue";
 import { isSafari, isiOS } from "@/utils/helpers";
+import i18next from "@/utils/translate";
 
 let externalBoardsUI: any;
 let boardsReadyUnwatch: any;
@@ -36,7 +37,7 @@ async function initScript(fn: any, url: string) {
 }
 
 async function initExternalBoards(ctx: any) {
-  const boardsContent = await waitForElementWithTextContent("h2", "My Boards");
+  const boardsContent = await waitForElementWithTextContent("h2",  i18next.t('my_boards'));
   if (!boardsContent) return;
   const boardsParentElement = boardsContent.parentElement?.parentElement;
 

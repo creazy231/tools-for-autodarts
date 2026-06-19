@@ -29,6 +29,7 @@
 import { twMerge } from "tailwind-merge";
 import { waitForElementWithTextContent } from "@/utils";
 import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage";
+import i18next from "@/utils/translate";
 
 const show = ref<boolean>(false);
 let boardDataWatcherUnwatch: any;
@@ -52,7 +53,7 @@ async function checkStatus(boardData: IBoard) {
 
 async function handleBackdropClick() {
   show.value = false;
-  (await waitForElementWithTextContent("button", ["Reset", "Zurücksetzen"]))?.click();
+  (await waitForElementWithTextContent("button", i18next.t("reset")))?.click();
 }
 </script>
 

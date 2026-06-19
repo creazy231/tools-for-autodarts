@@ -25,6 +25,7 @@
     "@vueuse/components": "^10.11.0",
     "@vueuse/core": "^10.11.0",
     "@wxt-dev/webextension-polyfill": "^1.0.0",
+    "i18next": "^25.7.3",
     "idb": "^8.0.2",
     "jszip": "^3.10.1",
     "lodash": "^4.17.21",
