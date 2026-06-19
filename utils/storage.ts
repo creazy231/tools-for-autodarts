@@ -158,6 +158,9 @@ export interface IConfig {
   gotcha: {
     enabled: boolean;
   };
+  noAverageDisplay: {
+    enabled: boolean;
+  };
 }
 
 export interface ISoundTTS {
@@ -334,13 +337,13 @@ export interface IWled {
   preset: string;
   json_api: string;
   enabled: boolean;
-  triggers: string|string[];
+  triggers: string | string[];
 }
 
 export type TBoardStatus = BoardStatus | undefined;
 
 export const defaultConfig: IConfig = {
-  version: 21,
+  version: 22,
   discord: {
     enabled: false,
     manually: false,
@@ -446,7 +449,6 @@ export const defaultConfig: IConfig = {
   teamLobby: {
     enabled: false,
   },
-
   zoom: {
     enabled: false,
     position: "bottom-right",
@@ -709,10 +711,13 @@ export const defaultConfig: IConfig = {
         json_api: "",
         enabled: true,
         triggers: [ "gameshot" ],
-      }
+      },
     ],
   },
   gotcha: {
+    enabled: false,
+  },
+  noAverageDisplay: {
     enabled: false,
   },
 };

@@ -208,6 +208,9 @@
 
             <!-- Ninth row of feature cards -->
             <Gotcha @setting-change="updateConfig" class="feature-card" data-feature-index="24" />
+
+            <!-- Tenth row of feature cards -->
+            <NoAverageDisplay @toggle="openSettingsModal('no-average-display')" @setting-change="updateConfig" class="feature-card" data-feature-index="24" />
           </div>
 
           <!-- Feature cards grid for Boards tab -->
@@ -289,6 +292,7 @@ import QuickCorrection from "./Settings/QuickCorrection.vue";
 import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
 import Gotcha from "./Settings/Gotcha.vue";
+import NoAverageDisplay from "./Settings/NoAverageDisplay.vue";
 
 import packageConfig from "../package.json";
 
@@ -342,6 +346,7 @@ const featureGroups = [
       { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true },
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true },
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
+      { id: "no-average-display", title: "No Average Display Settings", component: NoAverageDisplay, hasSettings: false },
     ],
     settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay" ],
   },
