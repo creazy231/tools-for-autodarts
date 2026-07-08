@@ -54,6 +54,7 @@ const boardPosition = ref({
   height: 0,
 });
 let updateInterval: NodeJS.Timeout | null = null;
+let gameDataUnwatch: (() => void) | null = null;
 
 // Computed properties for camera settings
 const zoomLevel = computed(() => config.value?.instantReplay?.zoom || 1);
@@ -102,6 +103,10 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  // Stop listening for game data updates
+  gameDataUnwatch?.();
+  gameDataUnwatch = null;
+
   // Clean up camera and all resources first
   cleanup();
 
@@ -224,7 +229,8 @@ async function loadConfig() {
 }
 
 function setupGameDataWatcher() {
-  AutodartsToolsGameData.watch(async (gameData) => {
+  gameDataUnwatch?.();
+  gameDataUnwatch = AutodartsToolsGameData.watch(async (gameData) => {
     // Check if there's a winner
     if (gameData?.match && (gameData.match.winner !== -1 || gameData.match.gameWinner !== -1)) {
       // Clear any existing timeouts

@@ -1,6 +1,8 @@
 import { waitForElement } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 
+let fullscreenChangeHandler: (() => void) | null = null;
+
 export async function automaticFullscreen() {
   console.log("Autodarts Tools: Setting up automatic fullscreen");
 
@@ -92,10 +94,14 @@ export async function automaticFullscreen() {
     }
   };
 
-  fullscreenBtn.addEventListener("click", () => toggleFullscreen());
+  fullscreenBtn.onclick = () => toggleFullscreen();
 
-  // Listen for fullscreen change event to update button icon
-  document.addEventListener("fullscreenchange", () => {
+  // Listen for fullscreen change event to update button icon,
+  // replacing any handler left over from a previous init
+  if (fullscreenChangeHandler) {
+    document.removeEventListener("fullscreenchange", fullscreenChangeHandler);
+  }
+  fullscreenChangeHandler = () => {
     if (!document.fullscreenElement) {
       // Update SVG to show enter fullscreen icon when exiting fullscreen
       fullscreenBtnSVG.children[0].setAttribute(
@@ -111,7 +117,8 @@ export async function automaticFullscreen() {
       );
       isFullscreen = true;
     }
-  });
+  };
+  document.addEventListener("fullscreenchange", fullscreenChangeHandler);
 
   // Initial fullscreen activation when the feature is enabled
   toggleFullscreen(true);
@@ -122,6 +129,11 @@ export async function automaticFullscreenOnRemove() {
 
   const fullscreenBtn = document.querySelector("#adt-fullscreen-toggle");
   fullscreenBtn?.remove();
+
+  if (fullscreenChangeHandler) {
+    document.removeEventListener("fullscreenchange", fullscreenChangeHandler);
+    fullscreenChangeHandler = null;
+  }
 
   // Exit fullscreen mode if active
   if (document.fullscreenElement) {

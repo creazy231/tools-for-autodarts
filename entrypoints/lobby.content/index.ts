@@ -4,7 +4,7 @@ import { createApp } from "vue";
 import { soundFx, soundFxOnRemove } from "../match.content/sound-fx";
 import { wledFx, wledFxOnRemove } from "../match.content/wled";
 
-import { teamLobby } from "./team-lobby";
+import { teamLobby, teamLobbyOnRemove } from "./team-lobby";
 
 import type { IConfig } from "@/utils/storage";
 
@@ -13,7 +13,7 @@ import {
   AutodartsToolsConfig,
   AutodartsToolsUrlStatus,
 } from "@/utils/storage";
-import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
+import { discordWebhooks, discordWebhooksOnRemove } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
 import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobbynew.content/qr-code";
@@ -115,6 +115,8 @@ export default defineContentScript({
         await onQrCodeRemove();
         await soundFxOnRemove();
         await wledFxOnRemove();
+        discordWebhooksOnRemove();
+        await teamLobbyOnRemove();
       }
     });
   },

@@ -16,6 +16,7 @@ export async function teamLobby() {
     const lobbyData = await AutodartsToolsLobbyData.getValue();
     if (lobbyData?.isPrivate) {
       processTeamLobby(lobbyData).catch(console.error);
+      lobbyDataWatcherUnwatch?.();
       lobbyDataWatcherUnwatch = AutodartsToolsLobbyData.watch((data: ILobbies | undefined) => {
         if (!data) return;
         processTeamLobby(data).catch(console.error);
@@ -73,6 +74,7 @@ async function processTeamLobby(lobbyStatus: ILobbyStatus) {
 
 export async function teamLobbyOnRemove() {
   lobbyDataWatcherUnwatch?.();
+  lobbyDataWatcherUnwatch = null;
   // Reset the flag when the lobby is removed
   hostAlreadyRemoved = false;
 }

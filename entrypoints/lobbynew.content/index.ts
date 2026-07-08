@@ -35,21 +35,27 @@ export default defineContentScript({
 
         console.log("Autodarts Tools: Game Mode", gameModeTitle.textContent);
 
-        buttonPublic?.addEventListener("click", async () => {
-          await AutodartsToolsGameData.setValue({
-            ...gameData,
-            private: false,
+        if (buttonPublic && !buttonPublic.hasAttribute("data-adt-visibility-listener")) {
+          buttonPublic.setAttribute("data-adt-visibility-listener", "true");
+          buttonPublic.addEventListener("click", async () => {
+            await AutodartsToolsGameData.setValue({
+              ...gameData,
+              private: false,
+            });
+            console.log("Autodarts Tools: Lobby is Public");
           });
-          console.log("Autodarts Tools: Lobby is Public");
-        });
+        }
 
-        buttonPrivate?.addEventListener("click", async () => {
-          await AutodartsToolsGameData.setValue({
-            ...gameData,
-            private: true,
+        if (buttonPrivate && !buttonPrivate.hasAttribute("data-adt-visibility-listener")) {
+          buttonPrivate.setAttribute("data-adt-visibility-listener", "true");
+          buttonPrivate.addEventListener("click", async () => {
+            await AutodartsToolsGameData.setValue({
+              ...gameData,
+              private: true,
+            });
+            console.log("Autodarts Tools: Lobby is Private");
           });
-          console.log("Autodarts Tools: Lobby is Private");
-        });
+        }
 
         // check if buttonPublic or buttonPrivate has data-active attribute and set the private state accordingly
         if (buttonPublic?.hasAttribute("data-active")) {

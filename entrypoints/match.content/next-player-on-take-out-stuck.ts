@@ -5,28 +5,13 @@ import { waitForElementWithTextContent } from "@/utils";
 import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
 
 let boardDataWatcherUnwatch: any;
+let takeOutTimout: NodeJS.Timeout | undefined;
+let clickListenerAttached = false;
 
-// Create a map to store event listeners
-const eventListenersMap = new Map();
-
-// Create a wrapper around addEventListener
-// @ts-expect-error
-Document.prototype.realAddEventListener = Document.prototype.addEventListener;
-Document.prototype.addEventListener = function (eventName, callback) {
-// @ts-expect-error
-  this.realAddEventListener(eventName, callback);
-
-  if (!eventListenersMap.has(eventName)) {
-    eventListenersMap.set(eventName, []);
-  }
-
-  eventListenersMap.get(eventName).push(callback);
-};
-
-// Create a function to check if an event listener has been defined
-function hasEventListener(eventName, callback) {
-  const listeners = eventListenersMap.get(eventName);
-  return listeners && listeners.includes(callback);
+function removeCountdown() {
+  const element = document.getElementById("ad-ext_next-text");
+  element?.remove();
+  if (takeOutTimout) clearInterval(takeOutTimout);
 }
 
 export async function nextPlayerOnTakeOutStuck() {
@@ -35,33 +20,10 @@ export async function nextPlayerOnTakeOutStuck() {
 
     const config = await AutodartsToolsConfig.getValue();
 
-    let takeOutTimout: NodeJS.Timeout;
-
-    function remove() {
-      const element = document.getElementById("ad-ext_next-text");
-      element?.remove();
-      if (takeOutTimout) clearInterval(takeOutTimout);
-    }
-
-    // Make sure event listeners are properly registered and maintained in fullscreen mode
-    if (!hasEventListener("click", remove)) {
-      document.addEventListener("click", remove);
-    }
-
-    // Handle fullscreen changes
-    function handleFullscreenChange() {
-      if (document.fullscreenElement) {
-        console.log("Autodarts Tools: Fullscreen mode detected, ensuring next player on takeout stuck still works");
-        // Re-register click event if needed in fullscreen
-        if (!hasEventListener("click", remove)) {
-          document.addEventListener("click", remove);
-        }
-      }
-    }
-
-    // Add fullscreen change handler if not already present
-    if (!hasEventListener("fullscreenchange", handleFullscreenChange)) {
-      document.addEventListener("fullscreenchange", handleFullscreenChange);
+    // Document-level listeners keep working in fullscreen, so a single registration is enough
+    if (!clickListenerAttached) {
+      document.addEventListener("click", removeCountdown);
+      clickListenerAttached = true;
     }
 
     boardDataWatcherUnwatch?.();
@@ -121,7 +83,7 @@ export async function nextPlayerOnTakeOutStuck() {
         }, 1000);
       } else {
         if (takeOutTimout) clearInterval(takeOutTimout);
-        remove();
+        removeCountdown();
       }
     });
   } catch (e) {
@@ -132,23 +94,13 @@ export async function nextPlayerOnTakeOutStuck() {
 export function nextPlayerOnTakeOutStuckOnRemove() {
   if (boardDataWatcherUnwatch) {
     boardDataWatcherUnwatch();
+    boardDataWatcherUnwatch = null;
   }
 
-  // Clean up fullscreen event listener
-  const fullscreenHandler = eventListenersMap.get("fullscreenchange")?.find(
-    callback => callback.name === "handleFullscreenChange",
-  );
+  removeCountdown();
 
-  if (fullscreenHandler) {
-    document.removeEventListener("fullscreenchange", fullscreenHandler);
-  }
-
-  // Clean up click handler
-  const clickHandler = eventListenersMap.get("click")?.find(
-    callback => callback.name === "remove",
-  );
-
-  if (clickHandler) {
-    document.removeEventListener("click", clickHandler);
+  if (clickListenerAttached) {
+    document.removeEventListener("click", removeCountdown);
+    clickListenerAttached = false;
   }
 }

@@ -35,6 +35,7 @@ const FADE_DURATION = 300; // ms
 const FADE_IN_DELAY = 50; // ms
 
 let updateInterval: NodeJS.Timeout | null = null;
+let gameDataUnwatch: (() => void) | null = null;
 
 // State
 const isShowingAnimation = ref(false);
@@ -83,7 +84,7 @@ onMounted(async () => {
 
   try {
     config.value = await AutodartsToolsConfig.getValue();
-    AutodartsToolsGameData.watch((gameData: IGameData) => {
+    gameDataUnwatch = AutodartsToolsGameData.watch((gameData: IGameData) => {
       processGameData(gameData);
     });
 
@@ -102,6 +103,9 @@ onMounted(async () => {
 
 // Clean up interval on unmount
 onUnmounted(() => {
+  gameDataUnwatch?.();
+  gameDataUnwatch = null;
+
   if (updateInterval) clearInterval(updateInterval);
   window.removeEventListener("resize", updateBoardPosition);
 

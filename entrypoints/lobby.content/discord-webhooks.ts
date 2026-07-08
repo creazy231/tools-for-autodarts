@@ -15,6 +15,8 @@ let webhookUrl: string | null = null;
 let storedLobbyFields: Array<{ name: string; value: string; inline: boolean }> = [];
 // Flag to prevent duplicate message updates
 let messageUpdated = false;
+// Observer watching for the Start Game button
+let startButtonObserver: MutationObserver | null = null;
 
 export async function discordWebhooks() {
   console.log("Autodarts Tools: Discord Webhooks - Starting");
@@ -33,9 +35,12 @@ export async function discordWebhooks() {
 
     if (!refreshButton) return;
 
+    if (lobbyBoardSelectParentElement.querySelector("#adt-discord-webhook-button")) return;
+
     // create a copy of the refresh button and add "D" as text content
     // then add the new button to the parent element
     const discordButton = refreshButton.cloneNode() as HTMLButtonElement;
+    discordButton.id = "adt-discord-webhook-button";
     discordButton.innerHTML = iconDiscord;
     discordButton.title = "Send Discord Webhook";
 
@@ -116,6 +121,9 @@ export async function discordWebhooks() {
 
 // Function to set up a mutation observer to watch for the Start Game button
 function setupStartButtonListener() {
+  // Disconnect any observer from a previous lobby before creating a new one
+  startButtonObserver?.disconnect();
+
   // Create a MutationObserver to watch for button additions to the DOM
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
@@ -140,6 +148,7 @@ function setupStartButtonListener() {
 
   // Start observing the document body for changes
   observer.observe(document.body, { childList: true, subtree: true });
+  startButtonObserver = observer;
 
   // Check for existing buttons
   const existingStartButtons = Array.from(document.querySelectorAll("button")).filter(
@@ -154,6 +163,18 @@ function setupStartButtonListener() {
         console.log("Autodarts Tools: Discord Webhooks - Added listener to existing Start Game button");
       }
     });
+  }
+}
+
+export function discordWebhooksOnRemove() {
+  if (startButtonObserver) {
+    startButtonObserver.disconnect();
+    startButtonObserver = null;
+  }
+
+  if (autoStartTimer !== null) {
+    clearTimeout(autoStartTimer);
+    autoStartTimer = null;
   }
 }
 

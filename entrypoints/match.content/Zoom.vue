@@ -182,6 +182,9 @@ function setupResizeObserver() {
 }
 
 let resizeObserver: ResizeObserver | null = null;
+let boardImagesUnwatch: (() => void) | null = null;
+let gameDataUnwatch: (() => void) | null = null;
+let centerResizeHandler: (() => void) | null = null;
 
 function updateZoomDivs() {
   if (position.value !== "center") return;
@@ -301,7 +304,7 @@ onMounted(async () => {
   });
 
   if (config.value.zoom.mode === "live") {
-    AutodartsToolsBoardImages.watch((_boardImages: IBoardImages) => {
+    boardImagesUnwatch = AutodartsToolsBoardImages.watch((_boardImages: IBoardImages) => {
       const lastImage = _boardImages.images[_boardImages.images.length - 1];
       if (lastImage && throws.value > 0) boardImages.value[throws.value - 1] = lastImage;
 
@@ -313,7 +316,7 @@ onMounted(async () => {
   }
 
   // Also update the AutodartsToolsGameData.watch to call updateZoomDivs
-  AutodartsToolsGameData.watch(async (_gameData: IGameData, _previousGameData: IGameData) => {
+  gameDataUnwatch = AutodartsToolsGameData.watch(async (_gameData: IGameData, _previousGameData: IGameData) => {
     if (!_gameData.match?.turns?.length) return;
 
     // Store the game data for checkout availability checking
@@ -390,10 +393,23 @@ onUnmounted(() => {
   // Clean up event listeners and observers
   window.removeEventListener("resize", checkNavigationWidth);
 
+  if (centerResizeHandler) {
+    window.removeEventListener("resize", centerResizeHandler);
+    centerResizeHandler = null;
+  }
+
+  boardImagesUnwatch?.();
+  boardImagesUnwatch = null;
+
+  gameDataUnwatch?.();
+  gameDataUnwatch = null;
+
   if (resizeObserver) {
     resizeObserver.disconnect();
     resizeObserver = null;
   }
+
+  document.querySelector("#autodarts-tools-zoom-center")?.remove();
 });
 
 async function initCenterZoom() {
@@ -458,13 +474,17 @@ async function initCenterZoom() {
     leftPosition.value = rect.left;
 
     // Listen for window resize to update the position
-    window.addEventListener("resize", () => {
+    if (centerResizeHandler) {
+      window.removeEventListener("resize", centerResizeHandler);
+    }
+    centerResizeHandler = () => {
       const updatedTurnElement = document.querySelector("#ad-ext-turn");
       if (updatedTurnElement) {
         const updatedRect = updatedTurnElement.getBoundingClientRect();
         leftPosition.value = updatedRect.left;
       }
-    });
+    };
+    window.addEventListener("resize", centerResizeHandler);
   }
 }
 

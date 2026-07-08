@@ -7,6 +7,9 @@ let shuffledPlayerNames: string[] = [];
 export async function shufflePlayers() {
   try {
     const buttonsContainer = await waitForElement("#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:last-of-type") as HTMLDivElement;
+
+    if (document.querySelector("#autodarts-tools-shuffle-button")) return;
+
     const button = buttonsContainer.querySelector("button")?.cloneNode(true) as HTMLButtonElement;
 
     button.id = "autodarts-tools-shuffle-button";
@@ -18,6 +21,7 @@ export async function shufflePlayers() {
 
     button.addEventListener("click", handleShuffle);
 
+    if (checkPlayersInterval) clearInterval(checkPlayersInterval);
     checkPlayersInterval = setInterval(checkPlayers, 500);
 
     buttonsContainer.appendChild(button);
