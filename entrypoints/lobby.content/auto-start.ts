@@ -38,14 +38,14 @@ export async function autoStart() {
 function updateButtonStyle(button: HTMLButtonElement, isSuccess: boolean) {
   if (isSuccess) {
     // Success style
-    button.style.border = "1px solid var(--chakra-colors-borderGreen)";
-    button.style.background = "var(--chakra-colors-glassGreen)";
-    button.style.color = "var(--chakra-colors-white)";
+    button.style.border = "1px solid var(--adt-success-border)";
+    button.style.background = "var(--adt-success-surface)";
+    button.style.color = "var(--adt-text)";
   } else {
     // Danger style
-    button.style.border = "1px solid var(--chakra-colors-borderRed)";
-    button.style.background = "var(--chakra-colors-glassRed)";
-    button.style.color = "var(--chakra-colors-white)";
+    button.style.border = "1px solid var(--adt-error-border)";
+    button.style.background = "var(--adt-error-surface)";
+    button.style.color = "var(--adt-text)";
   }
 }
 

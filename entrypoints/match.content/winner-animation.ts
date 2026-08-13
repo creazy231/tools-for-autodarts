@@ -18,7 +18,7 @@ const WINNER_ANIMATION_STYLES = `
   }
 
   .ad-ext_winner-score-wrapper + div{
-    margin-bottom: var(--chakra-space-4);
+    margin-bottom: 1rem;
   }
 
   .ad-ext_winner-animation {

@@ -10,7 +10,7 @@
     <div
       v-if="open"
       ref="correctionRef"
-      class="correction-bg rounded-[var(--chakra-radii-md)] p-3 text-[var(--chakra-colors-white)] shadow-lg"
+      class="correction-bg rounded-[var(--adt-radius-md)] p-3 text-[var(--adt-text)] shadow-lg"
       :style="{
         position: 'absolute',
         left: `${correctionContainerX}px`,
@@ -30,7 +30,7 @@
             @click="applyCorrection(cell)"
             v-for="(cell, cellIndex) in row"
             :key="cellIndex"
-            class="relative overflow-hidden rounded-[var(--chakra-radii-md)]"
+            class="relative overflow-hidden rounded-[var(--adt-radius-md)]"
           >
             <AppButton
               size="md"
@@ -47,7 +47,7 @@
         </template>
         <div
           @click="applyCorrection('MISS')"
-          class="relative overflow-hidden rounded-[var(--chakra-radii-md)]"
+          class="relative overflow-hidden rounded-[var(--adt-radius-md)]"
         >
           <AppButton
             size="md"
@@ -63,7 +63,7 @@
         </div>
         <div
           @click="applyCorrection('25')"
-          class="relative overflow-hidden rounded-[var(--chakra-radii-md)]"
+          class="relative overflow-hidden rounded-[var(--adt-radius-md)]"
         >
           <AppButton
             size="md"
@@ -79,7 +79,7 @@
         </div>
         <div
           @click="applyCorrection('BULL')"
-          class="relative overflow-hidden rounded-[var(--chakra-radii-md)]"
+          class="relative overflow-hidden rounded-[var(--adt-radius-md)]"
         >
           <AppButton
             size="md"

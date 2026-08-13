@@ -5,7 +5,7 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3
-            class="mb-1 flex flex-col items-start gap-2 font-bold uppercase sm:flex-row sm:items-center sm:justify-between"
+            class="mb-1 flex flex-col items-start gap-2 adt-card-title sm:flex-row sm:items-center sm:justify-between"
           >
             <span>Settings - WLED</span>
             <div class="flex w-full flex-wrap gap-2 sm:w-auto">
@@ -157,14 +157,14 @@
                   <div class="mt-1 flex justify-between">
                     <button
                       @click.stop="setEffect(effect)"
-                      class="text-[var(--chakra-colors-borderGreen)] hover:text-[var(--chakra-colors-glassGreen)]"
+                      class="text-[var(--adt-success-border)] hover:text-[var(--adt-success-surface)]"
                       title="Play Effect"
                     >
                       <span class="icon-[pixelarticons--play] text-sm" />
                     </button>
                     <button
                       @click.stop="removeEffect(index)"
-                      class="text-[var(--chakra-colors-borderRed)] hover:text-[var(--chakra-colors-glassRed)]"
+                      class="text-[var(--adt-error-border)] hover:text-[var(--adt-error-surface)]"
                     >
                       <span class="icon-[pixelarticons--trash] text-sm" />
                     </button>
@@ -375,10 +375,10 @@
 
   <template v-else>
     <!-- Feature Card -->
-    <div v-if="config" class="adt-container h-56 transition-transform hover:-translate-y-0.5">
+    <div v-if="config" class="adt-container adt-interactive h-56">
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex items-center font-bold uppercase">
+          <h3 class="mb-1 flex items-center adt-card-title">
             WLED
             <span class="ml-2 rounded bg-amber-500/80 px-1.5 py-0.5 text-xs font-medium text-black">BETA</span>
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />

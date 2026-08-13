@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex overflow-hidden rounded-md bg-[var(--chakra-colors-whiteAlpha-200)]"
+    class="relative flex overflow-hidden rounded-md bg-[var(--adt-overlay)]"
     :class="{
       'h-6': props.size === 'xs',
       'h-8': props.size === 'sm',
@@ -10,12 +10,12 @@
     <button
       @click="setToOn"
       :class="twMerge(
-        'flex h-full items-center justify-center text-[var(--chakra-colors-whiteAlpha-900)] transition-colors',
+        'flex h-full items-center justify-center text-[var(--adt-text)] transition-colors',
         props.size === 'xs' ? 'px-3 text-xs font-medium'
         : props.size === 'sm' ? 'px-4 text-sm font-semibold' : 'px-4 font-semibold',
         props.modelValue
-          ? 'bg-[var(--chakra-colors-whiteAlpha-300)]'
-          : 'enabled:hover:bg-[var(--chakra-colors-whiteAlpha-200)]',
+          ? 'bg-[var(--adt-overlay-strong)]'
+          : 'enabled:hover:bg-[var(--adt-overlay)]',
       )"
     >
       On
@@ -23,12 +23,12 @@
     <button
       @click="setToOff"
       :class="twMerge(
-        'flex h-full items-center justify-center text-[var(--chakra-colors-whiteAlpha-900)] transition-colors',
+        'flex h-full items-center justify-center text-[var(--adt-text)] transition-colors',
         props.size === 'xs' ? 'px-3 text-xs font-medium'
         : props.size === 'sm' ? 'px-4 text-sm font-semibold' : 'px-4 font-semibold',
         !props.modelValue
-          ? 'bg-[var(--chakra-colors-whiteAlpha-300)]'
-          : 'enabled:hover:bg-[var(--chakra-colors-whiteAlpha-200)]',
+          ? 'bg-[var(--adt-overlay-strong)]'
+          : 'enabled:hover:bg-[var(--adt-overlay)]',
       )"
     >
       Off

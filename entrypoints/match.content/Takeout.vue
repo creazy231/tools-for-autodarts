@@ -15,7 +15,7 @@
           'z-10',
         )"
       >
-        <div class="w-96 rounded-md bg-[var(--chakra-colors-yellow-500)] px-6 py-3 text-3xl font-extrabold text-white">
+        <div class="w-96 rounded-md bg-[var(--adt-warning)] px-6 py-3 text-3xl font-extrabold text-white">
           <div class="adt-remove uppercase">
             Removing Darts
           </div>

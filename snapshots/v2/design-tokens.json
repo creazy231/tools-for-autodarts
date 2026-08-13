@@ -1,0 +1,1064 @@
+{
+  "capturedFrom": "https://play-v2.autodarts.com",
+  "pages": {
+    "/": {
+      "url": "/",
+      "slots": [
+        "avatar",
+        "avatar-image",
+        "button",
+        "drawer-trigger"
+      ],
+      "surfaces": {
+        "drawer-trigger": {
+          "tag": "button",
+          "dataSlot": "drawer-trigger",
+          "classes": "rounded-full transition-all ring-1 ring-transparent data-popup-open:ring-mono-white/80 data-popup-open:shadow-[0_0_12px_4px_rgba(11,85,223,0.8)]",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "avatar": {
+          "tag": "span",
+          "dataSlot": "avatar",
+          "classes": "bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-8",
+          "backgroundColor": "rgb(1, 4, 11)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "avatar-image": {
+          "tag": "img",
+          "dataSlot": "avatar-image",
+          "classes": "rounded-full aspect-square size-full object-cover",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "button": {
+          "tag": "button",
+          "dataSlot": "button",
+          "classes": "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 bg-clip-padding focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([class*='size-'])]:size-4 in",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "2px solid rgb(11, 85, 223)",
+          "borderColor": "rgb(11, 85, 223)",
+          "borderRadius": "8px",
+          "padding": "0px 10px",
+          "gap": "4px",
+          "fontSize": "12px",
+          "fontWeight": "700",
+          "display": "flex"
+        }
+      },
+      "cardOutlines": [],
+      "cardSurfaces": [],
+      "headings": [
+        {
+          "tag": "h2",
+          "text": "Quickplay",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Tournaments",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Friends",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "What's New",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        }
+      ]
+    },
+    "/play": {
+      "url": "/play",
+      "slots": [
+        "avatar",
+        "avatar-image",
+        "drawer-trigger"
+      ],
+      "surfaces": {
+        "drawer-trigger": {
+          "tag": "button",
+          "dataSlot": "drawer-trigger",
+          "classes": "rounded-full transition-all ring-1 ring-transparent data-popup-open:ring-mono-white/80 data-popup-open:shadow-[0_0_12px_4px_rgba(11,85,223,0.8)]",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "avatar": {
+          "tag": "span",
+          "dataSlot": "avatar",
+          "classes": "bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-8",
+          "backgroundColor": "rgb(1, 4, 11)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "avatar-image": {
+          "tag": "img",
+          "dataSlot": "avatar-image",
+          "classes": "rounded-full aspect-square size-full object-cover",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        }
+      },
+      "cardOutlines": [],
+      "cardSurfaces": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Select game mode",
+          "classes": "text-3xl expanded:text-5xl"
+        }
+      ]
+    },
+    "/tournaments": {
+      "url": "/tournaments",
+      "slots": [
+        "avatar",
+        "avatar-image",
+        "button",
+        "card",
+        "card-content",
+        "drawer-trigger",
+        "popover-trigger",
+        "tabs",
+        "tabs-list",
+        "tabs-trigger"
+      ],
+      "surfaces": {
+        "drawer-trigger": {
+          "tag": "button",
+          "dataSlot": "drawer-trigger",
+          "classes": "rounded-full transition-all ring-1 ring-transparent data-popup-open:ring-mono-white/80 data-popup-open:shadow-[0_0_12px_4px_rgba(11,85,223,0.8)]",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "avatar": {
+          "tag": "span",
+          "dataSlot": "avatar",
+          "classes": "bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-8",
+          "backgroundColor": "rgb(1, 4, 11)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "avatar-image": {
+          "tag": "img",
+          "dataSlot": "avatar-image",
+          "classes": "rounded-full aspect-square size-full object-cover",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "popover-trigger": {
+          "tag": "span",
+          "dataSlot": "popover-trigger",
+          "classes": "inline-flex",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "button": {
+          "tag": "button",
+          "dataSlot": "button",
+          "classes": "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-[12px] border-transparent bg-clip-padding text-sm focus-visible:ring-[3px] aria-invalid:ring-[3p",
+          "backgroundColor": "rgb(41, 44, 51)",
+          "color": "rgb(184, 188, 197)",
+          "border": "0px solid rgba(0, 0, 0, 0)",
+          "borderColor": "rgba(0, 0, 0, 0)",
+          "borderRadius": "12px",
+          "padding": "6px 16px",
+          "gap": "6px",
+          "fontSize": "14px",
+          "fontWeight": "700",
+          "display": "flex"
+        },
+        "tabs": {
+          "tag": "div",
+          "dataSlot": "tabs",
+          "classes": "gap-2 group/tabs flex flex-col data-vertical:flex-row",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "8px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "tabs-list": {
+          "tag": "div",
+          "dataSlot": "tabs-list",
+          "classes": "rounded-lg group-data-horizontal/tabs:h-9 data-[variant=line]:rounded-none group/tabs-list text-muted-foreground inline-flex items-center group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col gap-4 bg-transparent w-full justify-start p-0 h-auto border-b border-mono-white/20",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.708 0 0)",
+          "border": "",
+          "borderColor": "oklab(0.999994 0.0000455678 0.0000200868 / 0.2)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "16px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "tabs-trigger": {
+          "tag": "button",
+          "dataSlot": "tabs-trigger",
+          "classes": "font-heading text-base text-black-30 font-bold leading-none py-3 data-active:text-mono-white group-data-[variant=line]/tabs-list:mb-[-1px] group-data-[variant=line]/tabs-list:border-b-2 group-data-[variant=line]/tabs-list:border-transparent group-data-[variant=line]/tabs-list:data-active:border-mono",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "rgb(255, 255, 255)",
+          "border": "",
+          "borderColor": "rgb(255, 255, 255)",
+          "borderRadius": "0px",
+          "padding": "12px 0px",
+          "gap": "normal",
+          "fontSize": "16px",
+          "fontWeight": "700",
+          "display": "block"
+        },
+        "card": {
+          "tag": "div",
+          "dataSlot": "card",
+          "classes": "group/card flex flex-col gap-3 rounded-2xl bg-card py-5 text-sm text-card-foreground shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)] has-[>img:first-child]:pt-0 has-[>img:first-child]:overflow-hidden data-[size=sm]:gap-2 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-2xl *:[img:last-chil",
+          "backgroundColor": "rgb(27, 31, 41)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "18px",
+          "padding": "20px 0px",
+          "gap": "12px",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.08) 0px -0.5px 0px 0px inset",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "card-content": {
+          "tag": "div",
+          "dataSlot": "card-content",
+          "classes": "px-5 group-data-[size=sm]/card:px-4 flex flex-col gap-3",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px 20px",
+          "gap": "12px",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "flex"
+        }
+      },
+      "cardOutlines": [
+        {
+          "slot": "card",
+          "children": [
+            {
+              "slot": "card-content",
+              "text": "Avg 0-30Starting in 2m 6s0/32Lunchtime Launch501•F"
+            }
+          ]
+        },
+        {
+          "slot": "card",
+          "children": [
+            {
+              "slot": "card-content",
+              "text": "OpenStarting in 4m 6s3/32Rapid Ricky501•First to 1"
+            }
+          ]
+        },
+        {
+          "slot": "card",
+          "children": [
+            {
+              "slot": "card-content",
+              "text": "OpenStarting in 4m 6s0/32Rapid Ricky501•First to 1"
+            }
+          ]
+        }
+      ],
+      "cardSurfaces": [
+        {
+          "tag": "div",
+          "dataSlot": "card",
+          "classes": "group/card flex flex-col gap-3 rounded-2xl bg-card py-5 text-sm text-card-foreground shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)] has-[>img:first-child]:pt-0 has-[>img:first-child]:overflow-hidden data-[size=sm]:gap-2 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-2xl *:[img:last-chil",
+          "backgroundColor": "rgb(27, 31, 41)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "18px",
+          "padding": "20px 0px",
+          "gap": "12px",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.08) 0px -0.5px 0px 0px inset",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        {
+          "tag": "div",
+          "dataSlot": "card",
+          "classes": "group/card flex flex-col gap-3 rounded-2xl bg-card py-5 text-sm text-card-foreground shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)] has-[>img:first-child]:pt-0 has-[>img:first-child]:overflow-hidden data-[size=sm]:gap-2 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-2xl *:[img:last-chil",
+          "backgroundColor": "rgb(27, 31, 41)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "18px",
+          "padding": "20px 0px",
+          "gap": "12px",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.08) 0px -0.5px 0px 0px inset",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        {
+          "tag": "div",
+          "dataSlot": "card",
+          "classes": "group/card flex flex-col gap-3 rounded-2xl bg-card py-5 text-sm text-card-foreground shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)] has-[>img:first-child]:pt-0 has-[>img:first-child]:overflow-hidden data-[size=sm]:gap-2 data-[size=sm]:py-4 *:[img:first-child]:rounded-t-2xl *:[img:last-chil",
+          "backgroundColor": "rgb(27, 31, 41)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "18px",
+          "padding": "20px 0px",
+          "gap": "12px",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.08) 0px -0.5px 0px 0px inset",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "flex"
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Tournaments",
+          "classes": "text-3xl expanded:text-5xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Registration Open",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h3",
+          "text": "Lunchtime Launch",
+          "classes": "font-semibold text-foreground text-base leading-snug"
+        },
+        {
+          "tag": "h3",
+          "text": "Rapid Ricky",
+          "classes": "font-semibold text-foreground text-base leading-snug"
+        },
+        {
+          "tag": "h3",
+          "text": "Rapid Ricky",
+          "classes": "font-semibold text-foreground text-base leading-snug"
+        },
+        {
+          "tag": "h3",
+          "text": "Daytime Frenzy",
+          "classes": "font-semibold text-foreground text-base leading-snug"
+        },
+        {
+          "tag": "h2",
+          "text": "Upcoming",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h3",
+          "text": "Rapid Ricky",
+          "classes": "font-semibold text-foreground text-base leading-snug"
+        }
+      ]
+    },
+    "/statistics": {
+      "url": "/statistics",
+      "slots": [
+        "avatar",
+        "avatar-image",
+        "button",
+        "chart",
+        "drawer-trigger",
+        "table",
+        "table-body",
+        "table-cell",
+        "table-container",
+        "table-head",
+        "table-header",
+        "table-row",
+        "tabs",
+        "tabs-list",
+        "tabs-trigger"
+      ],
+      "surfaces": {
+        "drawer-trigger": {
+          "tag": "button",
+          "dataSlot": "drawer-trigger",
+          "classes": "rounded-full transition-all ring-1 ring-transparent data-popup-open:ring-mono-white/80 data-popup-open:shadow-[0_0_12px_4px_rgba(11,85,223,0.8)]",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "avatar": {
+          "tag": "span",
+          "dataSlot": "avatar",
+          "classes": "bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-8",
+          "backgroundColor": "rgb(1, 4, 11)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "avatar-image": {
+          "tag": "img",
+          "dataSlot": "avatar-image",
+          "classes": "rounded-full aspect-square size-full object-cover",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "3.35544e+07px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "tabs": {
+          "tag": "div",
+          "dataSlot": "tabs",
+          "classes": "gap-2 group/tabs flex flex-col data-vertical:flex-row",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "8px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "tabs-list": {
+          "tag": "div",
+          "dataSlot": "tabs-list",
+          "classes": "rounded-lg group-data-horizontal/tabs:h-9 data-[variant=line]:rounded-none group/tabs-list text-muted-foreground inline-flex items-center group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col gap-4 bg-transparent w-full justify-start p-0 h-auto border-b border-mono-white/20",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.708 0 0)",
+          "border": "",
+          "borderColor": "oklab(0.999994 0.0000455678 0.0000200868 / 0.2)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "16px",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "tabs-trigger": {
+          "tag": "button",
+          "dataSlot": "tabs-trigger",
+          "classes": "font-heading text-base text-black-30 font-bold leading-none py-3 data-active:text-mono-white group-data-[variant=line]/tabs-list:mb-[-1px] group-data-[variant=line]/tabs-list:border-b-2 group-data-[variant=line]/tabs-list:border-transparent group-data-[variant=line]/tabs-list:data-active:border-mono",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "rgb(255, 255, 255)",
+          "border": "",
+          "borderColor": "rgb(255, 255, 255)",
+          "borderRadius": "0px",
+          "padding": "12px 0px",
+          "gap": "normal",
+          "fontSize": "16px",
+          "fontWeight": "700",
+          "display": "block"
+        },
+        "button": {
+          "tag": "button",
+          "dataSlot": "button",
+          "classes": "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-[12px] bg-clip-padding text-sm focus-visible:ring-[3px] aria-invalid:ring-[3px] [&_svg:not([clas",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "2px solid rgb(11, 85, 223)",
+          "borderColor": "rgb(11, 85, 223)",
+          "borderRadius": "12px",
+          "padding": "6px 16px",
+          "gap": "8px",
+          "fontSize": "14px",
+          "fontWeight": "700",
+          "display": "inline-flex"
+        },
+        "chart": {
+          "tag": "div",
+          "dataSlot": "chart",
+          "classes": "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:ou",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "display": "flex"
+        },
+        "table-container": {
+          "tag": "div",
+          "dataSlot": "table-container",
+          "classes": "relative w-full overflow-x-auto",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "18px",
+          "fontWeight": "500",
+          "display": "block"
+        },
+        "table": {
+          "tag": "table",
+          "dataSlot": "table",
+          "classes": "w-full caption-bottom text-sm",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "table"
+        },
+        "table-header": {
+          "tag": "thead",
+          "dataSlot": "table-header",
+          "classes": "[&_tr]:border-b",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "table-header-group"
+        },
+        "table-row": {
+          "tag": "tr",
+          "dataSlot": "table-row",
+          "classes": "border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted border-border hover:bg-transparent",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "table-row"
+        },
+        "table-head": {
+          "tag": "th",
+          "dataSlot": "table-head",
+          "classes": "h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 text-muted-foreground",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.708 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px 8px",
+          "gap": "normal",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "table-cell"
+        },
+        "table-body": {
+          "tag": "tbody",
+          "dataSlot": "table-body",
+          "classes": "[&_tr:last-child]:border-0",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.985 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "0px",
+          "gap": "normal",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "table-row-group"
+        },
+        "table-cell": {
+          "tag": "td",
+          "dataSlot": "table-cell",
+          "classes": "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 w-6 pr-0 text-muted-foreground",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "color": "oklch(0.708 0 0)",
+          "border": "0px solid oklch(1 0 0 / 0.1)",
+          "borderColor": "oklch(1 0 0 / 0.1)",
+          "borderRadius": "0px",
+          "padding": "8px 0px 8px 8px",
+          "gap": "normal",
+          "fontSize": "14px",
+          "fontWeight": "500",
+          "display": "table-cell"
+        }
+      },
+      "cardOutlines": [],
+      "cardSurfaces": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Statistics",
+          "classes": "text-3xl expanded:text-5xl"
+        },
+        {
+          "tag": "h2",
+          "text": "X01 Performance",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Breakdown",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Advanced Statistics",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Activity",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h2",
+          "text": "Scoring",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        },
+        {
+          "tag": "h3",
+          "text": "Scoring Breakdown",
+          "classes": "mb-3 text-center text-sm font-semibold text-muted-foreground"
+        },
+        {
+          "tag": "h2",
+          "text": "Checkouts",
+          "classes": "text-heading-2 text-foreground font-display text-2xl"
+        }
+      ]
+    }
+  },
+  "tokens": {
+    "--accent": "oklch(37.1% 0 0)",
+    "--accent-foreground": "oklch(98.5% 0 0)",
+    "--background": "#01040b",
+    "--border": "oklch(100% 0 0/.1)",
+    "--card": "#1b1f29",
+    "--card-alt": "#1b1f29",
+    "--card-foreground": "oklch(98.5% 0 0)",
+    "--chart-1": "oklch(80.9% .105 251.813)",
+    "--chart-2": "oklch(62.3% .214 259.815)",
+    "--chart-3": "oklch(54.6% .245 262.881)",
+    "--chart-4": "oklch(48.8% .243 264.376)",
+    "--chart-5": "oklch(42.4% .199 265.638)",
+    "--destructive": "oklch(70.4% .191 22.216)",
+    "--drawer": "#0a0a23",
+    "--fa-font-brands": "normal 400 1em/1 'Font Awesome 7 Brands'",
+    "--fa-font-chisel-regular": "normal 400 1em/1 'Font Awesome 7 Chisel'",
+    "--fa-font-duotone": "normal 900 1em/1 'Font Awesome 7 Duotone'",
+    "--fa-font-duotone-light": "normal 300 1em/1 'Font Awesome 7 Duotone'",
+    "--fa-font-duotone-regular": "normal 400 1em/1 'Font Awesome 7 Duotone'",
+    "--fa-font-duotone-thin": "normal 100 1em/1 'Font Awesome 7 Duotone'",
+    "--fa-font-etch-solid": "normal 900 1em/1 'Font Awesome 7 Etch'",
+    "--fa-font-graphite-thin": "normal 100 1em/1 'Font Awesome 7 Graphite'",
+    "--fa-font-jelly-duo-regular": "normal 400 1em/1 'Font Awesome 7 Jelly Duo'",
+    "--fa-font-jelly-fill-regular": "normal 400 1em/1 'Font Awesome 7 Jelly Fill'",
+    "--fa-font-jelly-regular": "normal 400 1em/1 'Font Awesome 7 Jelly'",
+    "--fa-font-light": "normal 300 1em/1 'Font Awesome 7 Pro'",
+    "--fa-font-notdog-duo-solid": "normal 900 1em/1 'Font Awesome 7 Notdog Duo'",
+    "--fa-font-notdog-solid": "normal 900 1em/1 'Font Awesome 7 Notdog'",
+    "--fa-font-regular": "normal 400 1em/1 'Font Awesome 7 Free'",
+    "--fa-font-sharp-duotone-light": "normal 300 1em/1 'Font Awesome 7 Sharp Duotone'",
+    "--fa-font-sharp-duotone-regular": "normal 400 1em/1 'Font Awesome 7 Sharp Duotone'",
+    "--fa-font-sharp-duotone-solid": "normal 900 1em/1 'Font Awesome 7 Sharp Duotone'",
+    "--fa-font-sharp-duotone-thin": "normal 100 1em/1 'Font Awesome 7 Sharp Duotone'",
+    "--fa-font-sharp-light": "normal 300 1em/1 'Font Awesome 7 Sharp'",
+    "--fa-font-sharp-regular": "normal 400 1em/1 'Font Awesome 7 Sharp'",
+    "--fa-font-sharp-solid": "normal 900 1em/1 'Font Awesome 7 Sharp'",
+    "--fa-font-sharp-thin": "normal 100 1em/1 'Font Awesome 7 Sharp'",
+    "--fa-font-slab-press-regular": "normal 400 1em/1 'Font Awesome 7 Slab Press'",
+    "--fa-font-slab-regular": "normal 400 1em/1 'Font Awesome 7 Slab'",
+    "--fa-font-solid": "normal 900 1em/1 'Font Awesome 7 Free'",
+    "--fa-font-thin": "normal 100 1em/1 'Font Awesome 7 Pro'",
+    "--fa-font-thumbprint-light": "normal 300 1em/1 'Font Awesome 7 Thumbprint'",
+    "--fa-font-utility-duo-semibold": "normal 600 1em/1 'Font Awesome 7 Utility Duo'",
+    "--fa-font-utility-fill-semibold": "normal 600 1em/1 'Font Awesome 7 Utility Fill'",
+    "--fa-font-utility-semibold": "normal 600 1em/1 'Font Awesome 7 Utility'",
+    "--fa-font-whiteboard-semibold": "normal 600 1em/1 'Font Awesome 7 Whiteboard'",
+    "--foreground": "oklch(98.5% 0 0)",
+    "--input": "oklch(100% 0 0/.15)",
+    "--keyboard-height": "0px",
+    "--muted": "oklch(26.9% 0 0)",
+    "--muted-foreground": "oklch(70.8% 0 0)",
+    "--outline-high": "#0b55df",
+    "--outline-low": "#374c98",
+    "--outline-mid": "#374c9899",
+    "--outline-outline": "#585e65",
+    "--popover": "oklch(20.5% 0 0)",
+    "--popover-foreground": "oklch(98.5% 0 0)",
+    "--primary": "#f7f8fa",
+    "--primary-foreground": "#16181c",
+    "--primary-on": "#16181c",
+    "--quaternary": "#fff",
+    "--quaternary-on": "#fff",
+    "--radius": ".625rem",
+    "--ring": "oklch(55.6% 0 0)",
+    "--secondary": "#0b55df",
+    "--secondary-foreground": "#f0f5fd",
+    "--secondary-on": "#f0f5fd",
+    "--sidebar": "oklch(20.5% 0 0)",
+    "--sidebar-accent": "oklch(26.9% 0 0)",
+    "--sidebar-accent-foreground": "oklch(98.5% 0 0)",
+    "--sidebar-border": "oklch(100% 0 0/.1)",
+    "--sidebar-foreground": "oklch(98.5% 0 0)",
+    "--sidebar-primary": "oklch(48.8% .243 264.376)",
+    "--sidebar-primary-foreground": "oklch(98.5% 0 0)",
+    "--sidebar-ring": "oklch(55.6% 0 0)",
+    "--state-disabled": "#292c33",
+    "--state-outline-focused": "#003eb3",
+    "--state-outline-hovered": "#0b55df",
+    "--state-primary-focused": "#cacfd9",
+    "--state-primary-hovered": "#e3e5e9",
+    "--state-secondary-focused": "#002a77",
+    "--state-secondary-hovered": "#003eb3",
+    "--surface-alt": "#fff",
+    "--surface-alt-on": "#b8bcc5",
+    "--surface-container-accent": "#003eb3",
+    "--surface-container-accent-on": "#f7f8fa",
+    "--surface-container-primary": "#001849",
+    "--surface-container-primary-on": "#f7f8fa",
+    "--surface-container-quaternary": "#fff",
+    "--surface-container-quaternary-on": "#fff",
+    "--surface-container-tertiary": "#374c9880",
+    "--surface-container-tertiary-on": "#f7f8fa",
+    "--surface-surface": "#16181c",
+    "--surface-surface-on": "#f7f8fa",
+    "--surface-surface-on-hover": "#e3e5e9",
+    "--system-error": "#da3954",
+    "--system-error-on": "#f7f8fa",
+    "--system-success": "#49da9e",
+    "--system-success-on": "#f7f8fa",
+    "--system-warning": "#f7d458",
+    "--system-warning-on": "#01040b",
+    "--tertiary": "#fff",
+    "--tertiary-on": "#f0f5fd",
+    "--visual-viewport-height": "1000px"
+  },
+  "typography": {
+    "samples": [
+      {
+        "selector": "body",
+        "fontFamily": "\"Manrope Variable\", sans-serif",
+        "fontSize": "18px",
+        "fontWeight": "500",
+        "lineHeight": "21.6px",
+        "letterSpacing": "normal",
+        "textTransform": "none",
+        "color": "oklch(0.985 0 0)"
+      },
+      {
+        "selector": "h2",
+        "fontFamily": "\"Bebas Neue\", \"Manrope Variable\", sans-serif",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "lineHeight": "28.8px",
+        "letterSpacing": "0.6px",
+        "textTransform": "uppercase",
+        "color": "oklch(0.985 0 0)"
+      },
+      {
+        "selector": "[data-slot='button']",
+        "fontFamily": "\"Manrope Variable\", sans-serif",
+        "fontSize": "12px",
+        "fontWeight": "700",
+        "lineHeight": "16px",
+        "letterSpacing": "normal",
+        "textTransform": "none",
+        "color": "oklch(0.985 0 0)"
+      },
+      {
+        "selector": "p",
+        "fontFamily": "\"Bebas Neue\", \"Manrope Variable\", sans-serif",
+        "fontSize": "30px",
+        "fontWeight": "400",
+        "lineHeight": "37.5px",
+        "letterSpacing": "normal",
+        "textTransform": "none",
+        "color": "oklch(0.985 0 0)"
+      }
+    ],
+    "familiesByUsage": [
+      [
+        "\"Manrope Variable\", sans-serif",
+        789
+      ],
+      [
+        "\"Bebas Neue\", \"Manrope Variable\", sans-serif",
+        9
+      ],
+      [
+        "\"League Spartan Variable\", sans-serif",
+        3
+      ],
+      [
+        "Times",
+        1
+      ]
+    ]
+  },
+  "stateRules": [
+    {
+      "selector": "html:active-view-transition-type(page-push)::view-transition-new(root)",
+      "css": "animation-name: page-push-enter; box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 2rem;"
+    },
+    {
+      "selector": "html:active-view-transition-type(page-pop)::view-transition-old(root)",
+      "css": "z-index: 1; animation-name: page-pop-exit; box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 2rem;"
+    },
+    {
+      "selector": "[data-sonner-toast]:focus-visible",
+      "css": "box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px, rgba(0, 0, 0, 0.2) 0px 0px 0px 2px;"
+    },
+    {
+      "selector": "[data-sonner-toast][data-styled=\"true\"] [data-button]:focus-visible",
+      "css": "box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 0px 2px;"
+    },
+    {
+      "selector": "[data-sonner-toast][data-styled=\"true\"] [data-close-button]:focus-visible",
+      "css": "box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px, rgba(0, 0, 0, 0.2) 0px 0px 0px 2px;"
+    },
+    {
+      "selector": "[data-sonner-toast][data-styled=\"true\"]:hover [data-close-button]:hover",
+      "css": "background: var(--gray2); border-color: var(--gray5);"
+    },
+    {
+      "selector": "[data-sonner-toaster][data-sonner-theme=\"dark\"] [data-sonner-toast] [data-close-button]:hover",
+      "css": "background: var(--normal-bg-hover); border-color: var(--normal-border-hover);"
+    }
+  ],
+  "onlineModal": {
+    "found": true,
+    "slots": [
+      "button",
+      "field",
+      "field-group",
+      "field-label",
+      "toggle-group",
+      "toggle-group-item"
+    ],
+    "surface": {
+      "tag": "div",
+      "dataSlot": null,
+      "classes": "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 bg-drawer text-sm outline-none w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-xl ring-1 ring-foreground/10 data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom",
+      "backgroundColor": "rgb(10, 10, 35)",
+      "color": "oklch(0.985 0 0)",
+      "border": "0px solid oklch(1 0 0 / 0.1)",
+      "borderColor": "oklch(1 0 0 / 0.1)",
+      "borderRadius": "14px",
+      "padding": "0px",
+      "gap": "16px",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.985 0 0 / 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+      "fontSize": "14px",
+      "fontWeight": "500",
+      "display": "flex"
+    },
+    "outline": {
+      "slot": "div",
+      "children": [
+        {
+          "slot": "button",
+          "text": "Close"
+        },
+        {
+          "slot": "div",
+          "children": [
+            {
+              "slot": "h2",
+              "children": [
+                {
+                  "slot": "button",
+                  "text": "Create match instead"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slot": "div",
+          "children": [
+            {
+              "slot": "field-group",
+              "children": [
+                {
+                  "slot": "field",
+                  "children": [
+                    {
+                      "slot": "field-label",
+                      "text": "Match Legs"
+                    },
+                    {
+                      "slot": "toggle-group",
+                      "children": [
+                        {
+                          "slot": "toggle-group-item",
+                          "text": "Best of 3"
+                        },
+                        {
+                          "slot": "toggle-group-item",
+                          "text": "Best of 5"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slot": "field",
+                  "children": [
+                    {
+                      "slot": "field-label",
+                      "text": "Referee"
+                    },
+                    {
+                      "slot": "toggle-group",
+                      "children": [
+                        {
+                          "slot": "toggle-group-item",
+                          "text": "Off"
+                        },
+                        {
+                          "slot": "toggle-group-item",
+                          "text": "Enabled"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "slot": "field",
+                  "children": [
+                    {
+                      "slot": "field-label",
+                      "text": "Scoring"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slot": "button",
+              "text": "Find Match"
+            }
+          ]
+        }
+      ]
+    },
+    "backdrop": null
+  }
+}

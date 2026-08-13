@@ -43,8 +43,8 @@ export async function qrCodeTournament() {
   // Clone the parent element
   const qrCodeWrapper = parentElement.cloneNode(true) as HTMLElement;
   qrCodeWrapper.className = `${parentElement.className} ad-ext_qr-code-wrapper`;
-  qrCodeWrapper.style.marginTop = "calc(var(--chakra-space-6) * -1)";
-  qrCodeWrapper.style.marginBottom = "var(--chakra-space-6)";
+  qrCodeWrapper.style.marginTop = "calc(1.5rem * -1)";
+  qrCodeWrapper.style.marginBottom = "1.5rem";
   // Clear the content of the cloned element
   qrCodeWrapper.innerHTML = "";
 

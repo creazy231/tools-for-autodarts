@@ -20,7 +20,7 @@
         v-for="(image, index) in filteredBoardImages"
         :key="`zoom-${index}`"
         :style="{ height: `${zoomContainerHeight}px` }"
-        class="flex items-center justify-center overflow-hidden rounded-lg border border-[var(--chakra-colors-whiteAlpha-900)] transition-opacity duration-500"
+        class="flex items-center justify-center overflow-hidden rounded-lg border border-[var(--adt-text)] transition-opacity duration-500"
         :class="[
           index === throws - 1 ? 'animate-fade-in' : '',
         ]"

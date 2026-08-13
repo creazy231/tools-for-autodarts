@@ -11,7 +11,7 @@
     <div
       @click="$emit('update:modelValue', false)"
       v-if="modelValue"
-      class="fixed inset-0 z-40 bg-[var(--chakra-colors-whiteAlpha-200)] backdrop-blur-[var(--chakra-blur-sm)]"
+      class="fixed inset-0 z-40 bg-[var(--adt-overlay)] backdrop-blur-[4px]"
     />
   </Transition>
 
@@ -32,7 +32,7 @@
       <div class="border-b border-white/20 px-4 py-3">
         <div class="flex items-center justify-between">
           <slot v-if="$slots.title" name="title" />
-          <h2 v-else-if="title" class="text-lg font-bold text-[var(--chakra-colors-white)]">
+          <h2 v-else-if="title" class="text-lg font-bold text-[var(--adt-text)]">
             {{ title }}
           </h2>
           <AppButton
@@ -46,7 +46,7 @@
         </div>
         <p
           v-if="description"
-          class="mt-2 text-sm text-[var(--chakra-colors-whiteAlpha-900)]"
+          class="mt-2 text-sm text-[var(--adt-text)]"
         >
           {{ description }}
         </p>

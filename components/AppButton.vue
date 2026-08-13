@@ -4,32 +4,32 @@
     v-bind="_.omit($attrs, 'class')"
     :class="twMerge(
       'user-select-none position-relative white-space-nowrap vertical-align-middle line-height-1.2 transition-property-common transition-duration-normal group relative inline-flex appearance-none items-center justify-center border-none outline-offset-2 outline-transparent',
-      'rounded-[var(--chakra-radii-md)] font-[var(--chakra-fontWeights-semibold)]',
+      'rounded-[var(--adt-radius-md)] font-[600]',
 
       // Default style
-      type === 'default' && 'bg-[var(--chakra-colors-whiteAlpha-200)] text-[var(--chakra-colors-whiteAlpha-900)] enabled:hover:bg-[var(--chakra-colors-whiteAlpha-300)] enabled:active:bg-[var(--chakra-colors-whiteAlpha-300)]',
+      type === 'default' && 'bg-[var(--adt-overlay)] text-[var(--adt-text)] enabled:hover:bg-[var(--adt-overlay-strong)] enabled:active:bg-[var(--adt-overlay-strong)]',
 
       // Success style
-      type === 'success' && 'border border-solid border-[var(--chakra-colors-borderGreen)] bg-[var(--chakra-colors-glassGreen)] text-[var(--chakra-colors-white)] enabled:hover:bg-[rgba(58,255,0,0.3)] enabled:active:bg-[rgba(58,255,0,0.3)]',
+      type === 'success' && 'border border-solid border-[var(--adt-success-border)] bg-[var(--adt-success-surface)] text-[var(--adt-text)] enabled:hover:bg-[rgba(58,255,0,0.3)] enabled:active:bg-[rgba(58,255,0,0.3)]',
 
       // Danger style
-      type === 'danger' && 'border border-solid border-[var(--chakra-colors-borderRed)] bg-[var(--chakra-colors-glassRed)] text-[var(--chakra-colors-white)] enabled:hover:bg-[rgba(255,0,0,0.3)] enabled:active:bg-[rgba(255,0,0,0.3)]',
+      type === 'danger' && 'border border-solid border-[var(--adt-error-border)] bg-[var(--adt-error-surface)] text-[var(--adt-text)] enabled:hover:bg-[rgba(255,0,0,0.3)] enabled:active:bg-[rgba(255,0,0,0.3)]',
 
       // Warning style
-      type === 'warning' && 'border border-solid border-amber-500/50 bg-amber-500/20 text-[var(--chakra-colors-white)] enabled:hover:bg-amber-500/30 enabled:active:bg-amber-500/30',
+      type === 'warning' && 'border border-solid border-amber-500/50 bg-amber-500/20 text-[var(--adt-text)] enabled:hover:bg-amber-500/30 enabled:active:bg-amber-500/30',
 
       // Default size (md)
-      size === 'md' && 'h-[var(--chakra-sizes-10)] min-w-[var(--chakra-sizes-10)] pe-[var(--chakra-space-4)] ps-[var(--chakra-space-4)]',
+      size === 'md' && 'h-[2.5rem] min-w-[2.5rem] pe-[1rem] ps-[1rem]',
 
       // Small size
-      size === 'sm' && 'h-8 max-h-8 min-w-8 pe-[var(--chakra-space-3)] ps-[var(--chakra-space-3)] text-[14px]',
+      size === 'sm' && 'h-8 max-h-8 min-w-8 pe-[0.75rem] ps-[0.75rem] text-[14px]',
 
       // Extra small size
-      size === 'xs' && 'h-6 max-h-6 min-w-6 pe-[var(--chakra-space-2)] ps-[var(--chakra-space-2)] text-[14px]',
+      size === 'xs' && 'h-6 max-h-6 min-w-6 pe-[0.5rem] ps-[0.5rem] text-[14px]',
 
       // Large sizes
-      size === 'lg' && 'h-[var(--chakra-sizes-12)] min-w-[var(--chakra-sizes-12)] pe-[var(--chakra-space-6)] ps-[var(--chakra-space-6)]',
-      size === 'xl' && 'h-[var(--chakra-sizes-16)] min-w-[var(--chakra-sizes-16)] pe-[var(--chakra-space-8)] ps-[var(--chakra-space-8)]',
+      size === 'lg' && 'h-[3rem] min-w-[3rem] pe-[1.5rem] ps-[1.5rem]',
+      size === 'xl' && 'h-[4rem] min-w-[4rem] pe-[2rem] ps-[2rem]',
 
       'transition-colors',
       !auto && 'w-full',

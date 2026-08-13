@@ -2,11 +2,11 @@
   <!-- Feature Card -->
   <div
     v-if="config"
-    class="adt-container h-56 transition-transform hover:-translate-y-0.5"
+    class="adt-container adt-interactive h-56"
   >
     <div class="relative z-10 flex h-full flex-col justify-between">
       <div>
-        <h3 class="mb-1 flex items-center font-bold uppercase">
+        <h3 class="mb-1 flex items-center adt-card-title">
           QR Code
         </h3>
         <p class="w-2/3 text-white/70">

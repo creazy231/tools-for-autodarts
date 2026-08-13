@@ -7,11 +7,11 @@
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="show" class="fixed inset-0 z-[var(--chakra-zIndices-modal)] flex items-center justify-center">
+    <div v-if="show" class="fixed inset-0 z-[1400] flex items-center justify-center">
       <div
         @click="!disableBackdropClick && $emit('close')"
         v-if="!hideBackdrop"
-        class="absolute inset-0 bg-[var(--chakra-colors-whiteAlpha-200)] backdrop-blur-[var(--chakra-blur-sm)]"
+        class="absolute inset-0 bg-[var(--adt-overlay)] backdrop-blur-[4px]"
       />
       <div
         :class="twMerge(
@@ -34,7 +34,7 @@
         >
           <span class="icon-[pixelarticons--close]" />
         </AppButton>
-        <h3 v-if="title" class="mb-4 text-xl font-[var(--chakra-fontWeights-semibold)] text-[var(--chakra-colors-white)]">
+        <h3 v-if="title" class="mb-4 text-xl font-[600] text-[var(--adt-text)]">
           {{ title }}
         </h3>
 

@@ -1,7 +1,7 @@
 <template>
   <div
     :class="twMerge(
-      'relative flex overflow-hidden rounded-md bg-[var(--chakra-colors-whiteAlpha-200)]',
+      'relative flex overflow-hidden rounded-md bg-[var(--adt-overlay)]',
       vertical ? 'flex-col' : 'flex-row',
       className,
     )"
@@ -12,11 +12,11 @@
       :key="index"
       :disabled="option.disabled"
       :class="twMerge(
-        'flex h-10 items-center justify-center whitespace-nowrap px-4 font-semibold text-[var(--chakra-colors-whiteAlpha-900)] transition-colors',
+        'flex h-10 items-center justify-center whitespace-nowrap px-4 font-semibold text-[var(--adt-text)] transition-colors',
         buttonSize === 'sm' ? 'h-8 px-3 text-sm' : buttonSize === 'lg' ? 'h-12 px-5' : 'h-10 px-4',
         modelValue === option.value
-          ? 'bg-[var(--chakra-colors-whiteAlpha-300)]'
-          : 'enabled:hover:bg-[var(--chakra-colors-whiteAlpha-200)]',
+          ? 'bg-[var(--adt-overlay-strong)]'
+          : 'enabled:hover:bg-[var(--adt-overlay)]',
         option.disabled ? 'cursor-not-allowed opacity-50' : '',
       )"
     >

@@ -11,9 +11,9 @@ export async function shufflePlayers() {
 
     button.id = "autodarts-tools-shuffle-button";
     button.innerText = "Shuffle";
-    button.style.color = "var(--chakra-colors-white)";
-    button.style.background = "var(--chakra-colors-whiteAlpha-200)";
-    button.style.borderColor = "var(--chakra-colors-whiteAlpha-200)";
+    button.style.color = "var(--adt-text)";
+    button.style.background = "var(--adt-overlay)";
+    button.style.borderColor = "var(--adt-overlay)";
     button.style.maxWidth = "7rem";
 
     button.addEventListener("click", handleShuffle);

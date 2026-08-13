@@ -4,10 +4,10 @@
       @mousedown="handleTrackMouseDown"
       @touchstart="handleTrackTouchStart"
       ref="track"
-      class="relative h-2 w-full rounded-full bg-[var(--chakra-colors-whiteAlpha-200)]"
+      class="relative h-2 w-full rounded-full bg-[var(--adt-overlay)]"
     >
       <div
-        class="absolute h-full rounded-full bg-[var(--chakra-colors-whiteAlpha-300)]"
+        class="absolute h-full rounded-full bg-[var(--adt-overlay-strong)]"
         :style="{ width: `${percentage}%` }"
       />
       <div
@@ -18,7 +18,7 @@
         :aria-valuemin="min"
         :aria-valuemax="max"
         :aria-valuenow="modelValue"
-        class="absolute top-[-6px] size-5 rounded-full border border-[var(--chakra-colors-whiteAlpha-900)] bg-[var(--chakra-colors-whiteAlpha-300)] !outline-none transition-colors focus:outline-none focus:ring-offset-0 disabled:pointer-events-none disabled:opacity-50"
+        class="absolute top-[-6px] size-5 rounded-full border border-[var(--adt-text)] bg-[var(--adt-overlay-strong)] !outline-none transition-colors focus:outline-none focus:ring-offset-0 disabled:pointer-events-none disabled:opacity-50"
         :style="{ left: `calc(${percentage}% - 10px)` }"
         tabindex="0"
         role="slider"
@@ -26,14 +26,14 @@
     </div>
     <div
       v-if="showLabels"
-      class="flex justify-between px-1 pt-1 text-xs text-[var(--chakra-colors-whiteAlpha-700)]"
+      class="flex justify-between px-1 pt-1 text-xs text-[var(--adt-textAlpha-700)]"
     >
       <span>{{ formatLabel(min) }}</span>
       <span>{{ formatLabel(max) }}</span>
     </div>
     <div
       v-if="showValue"
-      class="absolute bottom-0 left-[calc(50%-20px)] w-10 text-center text-xs text-[var(--chakra-colors-whiteAlpha-700)]"
+      class="absolute bottom-0 left-[calc(50%-20px)] w-10 text-center text-xs text-[var(--adt-textAlpha-700)]"
     >
       {{ formatLabel(modelValue) }}
     </div>

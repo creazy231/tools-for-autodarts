@@ -7,7 +7,7 @@
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex flex-col items-start gap-2 font-bold uppercase sm:flex-row sm:items-center sm:justify-between">
+          <h3 class="mb-1 flex flex-col items-start gap-2 adt-card-title sm:flex-row sm:items-center sm:justify-between">
             <span>Settings - Sound FX</span>
             <div class="flex w-full flex-wrap gap-2 sm:w-auto">
               <AppButton @click="sortSoundsByTriggers" size="sm" class="!py-1 text-xs sm:text-sm" auto title="Sort sounds by their triggers">
@@ -105,14 +105,14 @@
                   <div class="mt-1 flex justify-between">
                     <button
                       @click.stop="playSound(sound)"
-                      class="text-[var(--chakra-colors-borderGreen)] hover:text-[var(--chakra-colors-glassGreen)]"
+                      class="text-[var(--adt-success-border)] hover:text-[var(--adt-success-surface)]"
                       title="Play sound"
                     >
                       <span class="icon-[pixelarticons--play] text-sm" />
                     </button>
                     <button
                       @click.stop="removeSound(index)"
-                      class="text-[var(--chakra-colors-borderRed)] hover:text-[var(--chakra-colors-glassRed)]"
+                      class="text-[var(--adt-error-border)] hover:text-[var(--adt-error-surface)]"
                     >
                       <span class="icon-[pixelarticons--trash] text-sm" />
                     </button>
@@ -442,11 +442,11 @@
     <!-- Feature Card -->
     <div
       v-if="config"
-      class="adt-container h-56 transition-transform hover:-translate-y-0.5"
+      class="adt-container adt-interactive h-56"
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex items-center font-bold uppercase">
+          <h3 class="mb-1 flex items-center adt-card-title">
             Sound FX
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>

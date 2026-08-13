@@ -1,6 +1,6 @@
 <template>
   <AppModal @close="closeModal" size="lg" :show="showModal" title="Update Available" :disable-backdrop-click="true" :hide-close-button="true">
-    <p class="mb-4 text-[var(--chakra-colors-whiteAlpha-900)]">
+    <p class="mb-4 text-[var(--adt-text)]">
       A new version of <b>Tools for Autodarts</b> is available. You can migrate your settings now or continue with default settings.
     </p>
 

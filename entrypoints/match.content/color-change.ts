@@ -33,7 +33,7 @@ async function handleChangeColor() {
     const turnScore = turnScoreElement.querySelector("p");
     if (turnScore) elements.push(turnScore as HTMLElement);
 
-    // for each in elements set variable: `--chakra-colors-blue-500: red;`
+    // for each in elements set variable: `--adt-accent-hover: red;`
     elements.forEach((element) => {
       element.style.setProperty("background", config.colors.background);
       element.style.color = `${config.colors.text}`;

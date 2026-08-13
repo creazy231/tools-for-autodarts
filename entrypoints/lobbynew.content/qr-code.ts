@@ -40,7 +40,7 @@ export async function qrCode() {
   // Add border radius to the QR code container
   const qrCodeElement = qrCodeContainer.querySelector("canvas");
   if (qrCodeElement) {
-    qrCodeElement.style.borderRadius = "var(--chakra-radii-md)";
+    qrCodeElement.style.borderRadius = "var(--adt-radius-md)";
   }
 }
 

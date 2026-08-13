@@ -49,19 +49,19 @@ export async function discordWebhooks() {
     );
 
     // Apply rounded corners and font weight
-    discordButton.style.borderRadius = "var(--chakra-radii-md)";
-    discordButton.style.fontWeight = "var(--chakra-fontWeights-semibold)";
+    discordButton.style.borderRadius = "var(--adt-radius-md)";
+    discordButton.style.fontWeight = "600";
 
     // Apply default style
-    discordButton.style.backgroundColor = "var(--chakra-colors-whiteAlpha-200)";
-    discordButton.style.color = "var(--chakra-colors-whiteAlpha-900)";
+    discordButton.style.backgroundColor = "var(--adt-overlay)";
+    discordButton.style.color = "var(--adt-text)";
 
     // Apply size (md)
-    discordButton.style.height = "var(--chakra-sizes-10)";
-    discordButton.style.minWidth = "var(--chakra-sizes-10)";
-    discordButton.style.paddingLeft = "var(--chakra-space-4)";
-    discordButton.style.paddingRight = "var(--chakra-space-4)";
-    discordButton.style.fontSize = "var(--chakra-fontSizes-md)";
+    discordButton.style.height = "2.5rem";
+    discordButton.style.minWidth = "2.5rem";
+    discordButton.style.paddingLeft = "1rem";
+    discordButton.style.paddingRight = "1rem";
+    discordButton.style.fontSize = "1rem";
 
     discordButton.addEventListener("click", () => {
       discordButton.setAttribute("disabled", "true");
@@ -74,9 +74,9 @@ export async function discordWebhooks() {
       discordButton.innerHTML = iconCheck;
 
       // Apply success style when clicked
-      discordButton.style.border = "1px solid var(--chakra-colors-borderGreen)";
-      discordButton.style.backgroundColor = "var(--chakra-colors-glassGreen)";
-      discordButton.style.color = "var(--chakra-colors-white)";
+      discordButton.style.border = "1px solid var(--adt-success-border)";
+      discordButton.style.backgroundColor = "var(--adt-success-surface)";
+      discordButton.style.color = "var(--adt-text)";
 
       setTimeout(() => {
         discordButton.innerHTML = iconDiscord;
@@ -84,27 +84,27 @@ export async function discordWebhooks() {
 
         // Restore default style
         discordButton.style.border = "none";
-        discordButton.style.backgroundColor = "var(--chakra-colors-whiteAlpha-200)";
-        discordButton.style.color = "var(--chakra-colors-whiteAlpha-900)";
+        discordButton.style.backgroundColor = "var(--adt-overlay)";
+        discordButton.style.color = "var(--adt-text)";
       }, 5000);
     });
 
     // Add hover and active states
     discordButton.addEventListener("mouseover", () => {
       if (!discordButton.hasAttribute("disabled")) {
-        discordButton.style.backgroundColor = "var(--chakra-colors-whiteAlpha-300)";
+        discordButton.style.backgroundColor = "var(--adt-overlay-strong)";
       }
     });
 
     discordButton.addEventListener("mouseout", () => {
       if (!discordButton.hasAttribute("disabled")) {
-        discordButton.style.backgroundColor = "var(--chakra-colors-whiteAlpha-200)";
+        discordButton.style.backgroundColor = "var(--adt-overlay)";
       }
     });
 
     discordButton.addEventListener("mousedown", () => {
       if (!discordButton.hasAttribute("disabled")) {
-        discordButton.style.backgroundColor = "var(--chakra-colors-whiteAlpha-300)";
+        discordButton.style.backgroundColor = "var(--adt-overlay-strong)";
       }
     });
 
