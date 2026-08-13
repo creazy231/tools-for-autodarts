@@ -2,19 +2,19 @@
  * Unlisted script injected into the page's main world to capture the JWT.
  *
  * The extension does not perform its own login — it piggybacks on the
- * autodarts.io page, capturing the access_token the page itself obtains so the
+ * autodarts.com page, capturing the access_token the page itself obtains so the
  * extension can make authenticated API calls (e.g. match corrections).
  *
- * As of the June 2026 auth migration, autodarts.io moved off Keycloak to a new
- * OAuth 2.0 server (https://api.autodarts.io) using the Authorization Code +
+ * As of the June 2026 auth migration, Autodarts moved off Keycloak to a new
+ * OAuth 2.0 server (https://api.autodarts.com) using the Authorization Code +
  * PKCE flow. The page exchanges the auth code at `/auth/v1/exchange` and
  * refreshes at `/auth/v1/refresh`; access tokens now live only ~15 minutes.
  *
  * Two complementary capture mechanisms keep us resilient to that change:
  *
  *  1. Token-endpoint response capture — read `access_token` from the response
- *     of the known token-issuing endpoints (new server + legacy Keycloak, kept
- *     for the transition window). Gives us the token the moment it is issued.
+ *     of the known token-issuing endpoints. Gives us the token the moment it
+ *     is issued.
  *
  *  2. Outgoing `Authorization: Bearer` capture — read the bearer token from any
  *     outgoing request the page makes (both fetch and XHR). This is
@@ -24,13 +24,11 @@
 
 // Token-issuing endpoints whose JSON response contains an `access_token`.
 const TOKEN_ENDPOINTS = [
-  // New OAuth 2.0 server (Authorization Code + PKCE)
-  "https://api.autodarts.io/auth/v1/exchange",
-  "https://api.autodarts.io/auth/v1/refresh",
-  "https://api.autodarts.io/auth/v1/token",
-  "https://api.autodarts.io/auth/v1/device/token",
-  // Legacy Keycloak — kept for the migration window (shutting down 2026-06-28)
-  "https://login.autodarts.io/realms/autodarts/protocol/openid-connect/token",
+  // OAuth 2.0 server (Authorization Code + PKCE)
+  "https://api.autodarts.com/auth/v1/exchange",
+  "https://api.autodarts.com/auth/v1/refresh",
+  "https://api.autodarts.com/auth/v1/token",
+  "https://api.autodarts.com/auth/v1/device/token",
 ];
 
 function isTokenEndpoint(url: string): boolean {

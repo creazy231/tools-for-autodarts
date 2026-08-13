@@ -64,7 +64,7 @@ This document outlines the development workflow for Autodarts Tools.
 
 ## Testing
 
-- Manual testing on autodarts.io is required for feature verification
+- Manual testing on autodarts.com is required for feature verification
 - Test on both Chrome and Firefox before releasing
 
 ## Release Process

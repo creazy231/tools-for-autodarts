@@ -10,8 +10,8 @@ This document outlines how the extension integrates with the Autodarts platform.
 ## API Integration
 
 - The extension interacts with Autodarts through its APIs, primarily:
-  - `api.autodarts.io` - Main API endpoint
-  - `play.autodarts.io` - Web interface
+  - `api.autodarts.com` - Main API endpoint
+  - `play.autodarts.com` - Web interface
 
 ## WebSocket Monitoring
 

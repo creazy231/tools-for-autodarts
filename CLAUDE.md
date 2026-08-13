@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A browser extension (Chrome, Firefox, Safari/iOS) that enhances the gaming experience on autodarts.io. Built with **Vue 3**, **TypeScript**, **TailwindCSS**, and **WXT** (Web Extension Toolkit). Distributed via Chrome Web Store, Firefox Add-ons, App Store, and AltStore.
+A browser extension (Chrome, Firefox, Safari/iOS) that enhances the gaming experience on autodarts.com. Built with **Vue 3**, **TypeScript**, **TailwindCSS**, and **WXT** (Web Extension Toolkit). Distributed via Chrome Web Store, Firefox Add-ons, App Store, and AltStore.
 
 ## Commands
 
 ```bash
 yarn install            # Install dependencies (runs wxt prepare via postinstall)
-yarn dev                # Dev mode for Chrome (opens play.autodarts.io, Alt+T to reload)
+yarn dev                # Dev mode for Chrome (opens play.autodarts.com, Alt+T to reload)
 yarn dev:firefox        # Dev mode for Firefox
 yarn build              # Production build for Chrome
 yarn build:firefox      # Production build for Firefox
@@ -20,7 +20,7 @@ yarn zip:firefox        # Create Firefox distribution zip
 yarn compile            # TypeScript type-check (vue-tsc --noEmit)
 ```
 
-No test framework is configured — testing is manual on autodarts.io across Chrome and Firefox.
+No test framework is configured — testing is manual on autodarts.com across Chrome and Firefox.
 
 ## Architecture
 

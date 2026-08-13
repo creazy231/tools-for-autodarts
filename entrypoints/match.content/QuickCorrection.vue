@@ -467,7 +467,7 @@ async function openCorrection(throwElement?: HTMLElement) {
   try {
     await browser.runtime.sendMessage({
       type: "fetch",
-      url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+      url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
       options: {
         method: "POST",
         credentials: "include",
@@ -657,7 +657,7 @@ async function applyCorrection(value: string) {
       // Step 1: Activate the throw
       await browser.runtime.sendMessage({
         type: "fetch",
-        url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+        url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
         options: {
           method: "POST",
           credentials: "include",
@@ -676,7 +676,7 @@ async function applyCorrection(value: string) {
         try {
           await browser.runtime.sendMessage({
             type: "fetch",
-            url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+            url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
             options: {
               method: "POST",
               credentials: "include",
@@ -695,7 +695,7 @@ async function applyCorrection(value: string) {
             try {
               await browser.runtime.sendMessage({
                 type: "fetch",
-                url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+                url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
                 options: {
                   method: "POST",
                   credentials: "include",
@@ -722,7 +722,7 @@ async function applyCorrection(value: string) {
 
                   await browser.runtime.sendMessage({
                     type: "fetch",
-                    url: `https://api.autodarts.io/gs/v0/matches/${matchId}/throws`,
+                    url: `https://api.autodarts.com/gs/v0/matches/${matchId}/throws`,
                     options: {
                       method: "PATCH",
                       credentials: "include",
@@ -820,7 +820,7 @@ async function applyCorrection(value: string) {
     // Send the correction
     const response = await browser.runtime.sendMessage({
       type: "fetch",
-      url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+      url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
       options: {
         method: "POST",
         credentials: "include",
@@ -845,7 +845,7 @@ async function applyCorrection(value: string) {
       try {
         await browser.runtime.sendMessage({
           type: "fetch",
-          url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+          url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
           options: {
             method: "POST",
             credentials: "include",
@@ -864,7 +864,7 @@ async function applyCorrection(value: string) {
           try {
             await browser.runtime.sendMessage({
               type: "fetch",
-              url: `https://api.autodarts.io/gs/v0/matches/${matchId}/corrections`,
+              url: `https://api.autodarts.com/gs/v0/matches/${matchId}/corrections`,
               options: {
                 method: "POST",
                 credentials: "include",
@@ -895,7 +895,7 @@ async function applyCorrection(value: string) {
 
                 await browser.runtime.sendMessage({
                   type: "fetch",
-                  url: `https://api.autodarts.io/gs/v0/matches/${matchId}/throws`,
+                  url: `https://api.autodarts.com/gs/v0/matches/${matchId}/throws`,
                   options: {
                     method: "PATCH",
                     credentials: "include",

@@ -25,7 +25,7 @@ let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.io/*" ],
+  matches: [ "*://play.autodarts.com/*" ],
   cssInjectionMode: "ui",
   async main(ctx: any) {
     lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
@@ -43,7 +43,7 @@ export default defineContentScript({
 
           try {
             console.log("Autodarts Tools: Fetching lobby data with cookie authentication...");
-            const apiUrl = `https://api.autodarts.io/gs/v0/lobbies/${lobbyId}`;
+            const apiUrl = `https://api.autodarts.com/gs/v0/lobbies/${lobbyId}`;
             const response = await fetchWithAuth(apiUrl);
 
             console.log("Autodarts Tools: Response status:", response.status);

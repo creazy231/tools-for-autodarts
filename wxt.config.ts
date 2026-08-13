@@ -10,10 +10,10 @@ import { ViteMcp } from "vite-plugin-mcp";
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   // runner: { // Deprecated in v0.20
-  //   startUrls: [ "https://play.autodarts.io/" ],
+  //   startUrls: [ "https://play.autodarts.com/" ],
   // },
   webExt: {
-    startUrls: [ "https://play.autodarts.io/" ],
+    startUrls: [ "https://play.autodarts.com/" ],
   },
   modules: [ "@wxt-dev/webextension-polyfill" ],
   imports: {
@@ -24,8 +24,8 @@ export default defineConfig({
   },
   manifest: {
     host_permissions: [
-      "*://play.autodarts.io/*",
-      "*://api.autodarts.io/*",
+      "*://play.autodarts.com/*",
+      "*://api.autodarts.com/*",
       "*://darts-downloads.peschi.org/*",
       "*://autodarts.x10.mx/*",
       "*://adt-socket.tobias-thiele.de/*",
@@ -41,10 +41,10 @@ export default defineConfig({
       persistent: false,
     },
     name: "Tools for Autodarts",
-    description: "Tools for Autodarts enhances the gaming experience on autodarts.io",
+    description: "Tools for Autodarts enhances the gaming experience on autodarts.com",
     // content_scripts: [
     //   {
-    //     matches: [ "*://play.autodarts.io/*" ],
+    //     matches: [ "*://play.autodarts.com/*" ],
     //     js: [ "dart-zoom.js" ],
     //   },
     // ],
@@ -55,11 +55,11 @@ export default defineConfig({
     web_accessible_resources: [
       {
         resources: [ "images/*" ],
-        matches: [ "*://play.autodarts.io/*" ],
+        matches: [ "*://play.autodarts.com/*" ],
       },
       {
         resources: [ "websocket-capture.js", "auth-cookie.js" ],
-        matches: [ "*://play.autodarts.io/*" ],
+        matches: [ "*://play.autodarts.com/*" ],
       },
     ],
   },

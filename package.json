@@ -1,7 +1,7 @@
 {
   "name": "autodarts-tools",
-  "description": "Autodarts Tools enhances the gaming experience on autodarts.io",
-  "version": "2.3.0",
+  "description": "Autodarts Tools enhances the gaming experience on autodarts.com",
+  "version": "2.4.0",
   "type": "module",
   "author": {
     "name": "Tobias Thiele",

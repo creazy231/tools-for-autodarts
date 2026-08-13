@@ -12,7 +12,7 @@ This document outlines the structure and patterns used for browser extension dev
 The extension has multiple entry points defined in the `entrypoints/` directory:
 
 - Background script (`background.ts`) - Persistent background service worker
-- Content scripts - Injected into specific pages on autodarts.io:
+- Content scripts - Injected into specific pages on autodarts.com:
   - `match.content/` - For match pages
   - `boards.content/` - For board management pages
   - `lobby.content/` - For lobby pages
@@ -50,5 +50,5 @@ The WXT configuration in `wxt.config.ts` defines:
 
 The extension requires these permissions:
 - `storage` - For storing user preferences
-- Host permissions for autodarts.io domains and API endpoints
+- Host permissions for autodarts.com domains and API endpoints
 - Additional permissions for specific features may be required

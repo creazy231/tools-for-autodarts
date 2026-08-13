@@ -3,7 +3,7 @@ export const QR_CODE_OPTIONS = {
   shape: "square",
   width: 300,
   height: 300,
-  data: "https://play.autodarts.io/lobbies/0196aa5d-3b34-7421-b326-8dd2e2ebd6d3",
+  data: "https://play.autodarts.com/lobbies/0196aa5d-3b34-7421-b326-8dd2e2ebd6d3",
   margin: 0,
   qrOptions: {
     typeNumber: "0",

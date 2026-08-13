@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.4.0] - 2026-08-13
+
+### Changed
+- Migrated the extension from `autodarts.io` to the new `autodarts.com` domain
+  - Host permissions, content script matches and web accessible resources now target `play.autodarts.com`
+  - All API calls now go to `api.autodarts.com` (match corrections, match/board state, lobbies) and board images to `boards.ws.autodarts.com`
+  - The auth token capture watches the `api.autodarts.com/auth/v1/*` endpoints
+  - Removed the dead legacy Keycloak token endpoint (`login.autodarts.io`), which shut down on 2026-06-28 and has no `autodarts.com` equivalent — the outgoing `Authorization: Bearer` capture covers auth regardless
 
 ### Fixed
 - Fixed `opponent_throw` Sound FX trigger firing for players who share your board

@@ -15,8 +15,8 @@ This document outlines the project structure for the Autodarts Tools browser ext
   
 - `entrypoints/` - Main entry points for the extension
   - `background.ts` - Background service worker
-  - `*.content.ts` - Content scripts injected into autodarts.io pages
-  - Various content script directories for different autodarts.io pages
+  - `*.content.ts` - Content scripts injected into autodarts.com pages
+  - Various content script directories for different autodarts.com pages
 
 - `utils/` - Utility functions and shared code
   
@@ -36,6 +36,6 @@ This document outlines the project structure for the Autodarts Tools browser ext
 
 The browser extension follows the WXT architecture:
 - Background script handles global state and background operations
-- Content scripts are injected into specific pages of autodarts.io
+- Content scripts are injected into specific pages of autodarts.com
 - Features are implemented as Vue components in the Settings directory
 - Component-based architecture with reusable UI elements

@@ -1,23 +1,32 @@
-# :dart: Tools for Autodarts v2.3.0 :dart:
+# :dart: Tools for Autodarts v2.4.0 :dart:
 
-### :rotating_light: Important — please update before June 28
-Autodarts is migrating its login system and the old auth server **shuts down on June 28, 2026**. This release updates how the extension captures your login token so features that talk to Autodarts (like Quick Correction) keep working afterwards. **Update before June 28 to avoid interruptions** — no action needed beyond updating.
+### :rotating_light: Important — Autodarts moved to autodarts.com
+Autodarts has changed its address from **autodarts.io** to **autodarts.com**. This release moves the entire extension over to the new domain.
 
-### :new: What's new
+**Without this update the extension will stop working**, because the old address now simply redirects to the new one — and the extension doesn't recognise the new site yet.
 
-:checkered_flag: **Checkout Guide**
-Displays the suggested checkout darts right inside each player's score box, so everyone can see the recommended finish at a glance. Enable it in the Matches tab.
+### :closed_lock_with_key: You'll be asked to approve permissions once
+Because the extension now needs access to `play.autodarts.com` instead of the old address, your browser will ask you to confirm this **one time** after updating:
 
-:loud_sound: **New `opponent_throw` Sound FX trigger**
-Plays a sound whenever a remote opponent throws a dart — handy throw feedback when you're playing online and not staring at the screen. Your own throws are skipped (so it won't double up with your board's throw sound), and bots keep using `bot_throw`.
-_(Requested in #170)_
+- **Chrome / Edge** — the extension stays paused until you accept the new permissions. Check the puzzle-piece icon in the toolbar, or open `chrome://extensions`
+- **Firefox** — accept the permission prompt shown after the update
+- **Safari (iOS / macOS)** — allow the extension on **autodarts.com** in Safari's extension settings (per-site access or *Allow on Every Website*)
+
+This is completely normal for a domain change and won't happen again. **Your settings, sounds, animations and WLED presets all carry over untouched** — nothing needs to be set up again.
+
+### :arrows_counterclockwise: What changed
+
+:globe_with_meridians: **Everything now runs on autodarts.com**
+Match and lobby pages, Quick Correction, board and match data, live board images, and login handling all point at the new domain.
 
 ### :wrench: Fixes
-- Updated authentication for the Autodarts OAuth 2.0 migration (see above)
-- Fixed the Gotcha Helper position after a recent Autodarts update
+
+:loud_sound: **`opponent_throw` Sound FX no longer fires for players sharing your board**
+If a friend plays on your board using their own Autodarts account, their throws are no longer treated as a remote opponent's — so the sound no longer doubles up with the throw noise coming from your physical board. The trigger now only fires for opponents actually playing on a different board.
+_(Reported in #170 by @a-jey)_
 
 ### :handshake: Community
-Thanks to **@MeisterBob** for contributing the Checkout Guide and the Gotcha Helper fix! :tada:
+Thanks to **@a-jey** for reporting the `opponent_throw` issue! :tada:
 
 ---
 

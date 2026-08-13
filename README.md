@@ -19,7 +19,7 @@ Tools for Autodarts
 
 ## 📋 Overview
 
-Tools for Autodarts is a browser extension that enhances your gaming experience on [autodarts.io](https://autodarts.io). It adds numerous quality-of-life features, customization options, and advanced functionality to make your Autodarts experience more enjoyable and personalized.
+Tools for Autodarts is a browser extension that enhances your gaming experience on [autodarts.com](https://autodarts.com). It adds numerous quality-of-life features, customization options, and advanced functionality to make your Autodarts experience more enjoyable and personalized.
 
 ## 💾 Installation
 
@@ -557,7 +557,7 @@ Give a star if this project helped you.
 
 ## 👏 Credits
 
-🎯 [Autodarts](https://autodarts.io) - The original platform this extension enhances<br>
+🎯 [Autodarts](https://autodarts.com) - The original platform this extension enhances<br>
 🎨 Benjamin Zehentner (Discord: ben_1987) - Creator of the Tools for Autodarts logo
 
 ## 📄 License

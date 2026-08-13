@@ -294,7 +294,7 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
       break; // Temp disabled because it's not working as expected since last update
       data = data as any;
       const boardImages = await AutodartsToolsBoardImages.getValue();
-      const imageUrl = `https://boards.ws.autodarts.io${(data as any).url as string}`;
+      const imageUrl = `https://boards.ws.autodarts.com${(data as any).url as string}`;
 
       // Check for duplicates before adding
       if (!boardImages.images.includes(imageUrl)) {

@@ -51,7 +51,7 @@ const tools = {
 };
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.io/*" ],
+  matches: [ "*://play.autodarts.com/*" ],
   cssInjectionMode: "ui",
   async main(ctx: any) {
     AutodartsToolsUrlStatus.watch(async (url: string) => {
@@ -67,7 +67,7 @@ export default defineContentScript({
             console.log("Autodarts Tools: Fetching match data with cookie authentication...");
 
             if (url.includes("boards")) {
-              const apiUrl = `https://api.autodarts.io/bs/v0/boards/${matchId}`;
+              const apiUrl = `https://api.autodarts.com/bs/v0/boards/${matchId}`;
               const response = await fetchWithAuth(apiUrl);
 
               if (response.ok) {
@@ -77,7 +77,7 @@ export default defineContentScript({
 
             console.log("Autodarts Tools: Match ID:", matchId);
 
-            const apiUrl = `https://api.autodarts.io/gs/v0/matches/${matchId}/state`;
+            const apiUrl = `https://api.autodarts.com/gs/v0/matches/${matchId}/state`;
             const response = await fetchWithAuth(apiUrl);
 
             console.log("Autodarts Tools: Response status:", response.status);
@@ -292,7 +292,7 @@ function startActiveMatchObserver(ctx) {
       let matchId = url.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)?.[0];
 
       if (url.includes("boards")) {
-        const apiUrl = `https://api.autodarts.io/bs/v0/boards/${matchId}`;
+        const apiUrl = `https://api.autodarts.com/bs/v0/boards/${matchId}`;
         const response = await fetchWithAuth(apiUrl);
 
         if (response.ok) {
