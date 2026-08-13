@@ -2,9 +2,10 @@
  * Content script that injects the WebSocket capture script
  */
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   runAt: "document_start",
   async main(ctx) {
     console.log("Injecting WebSocket capture script...");

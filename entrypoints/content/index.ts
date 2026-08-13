@@ -8,11 +8,12 @@ import { waitForElement } from "@/utils";
 import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsUrlStatus, defaultConfig } from "@/utils/storage";
 import { isiOS } from "@/utils/helpers";
 import Migration from "@/components/Migration.vue";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
 let migrationModalUI: any;
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main(ctx) {
     await waitForElement("#root > div:nth-of-type(1)", 15000);

@@ -15,11 +15,12 @@
  * it entirely (see the hooks in wxt.config.ts).
  */
 
-/** Injected by Vite's `define`; true only in devtools builds. */
-declare const __ADT_PICKER__: boolean;
-
 import { serializeCapture } from "./serialize";
 import { PickerUi } from "./ui";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
+
+/** Injected by Vite's `define`; true only in devtools builds. */
+declare const __ADT_PICKER__: boolean;
 
 /**
  * Write to the clipboard from a content script.
@@ -52,7 +53,7 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   runAt: "document_idle",
 
   main() {

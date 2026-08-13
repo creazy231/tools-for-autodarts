@@ -20,12 +20,13 @@ import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobbynew.conte
 import RecentLocalPlayers from "@/entrypoints/lobby.content/RecentLocalPlayers.vue";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
 let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main(ctx: any) {
     lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {

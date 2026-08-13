@@ -20,6 +20,24 @@ AUTODARTS_V2_URL=https://play-v2.autodarts.com
 
 Login is email + password. Do **not** use the Google/Apple buttons on v2.
 
+### Which site each build runs on
+
+| build | play.autodarts.com (v1) | play-v2.autodarts.com |
+|---|---|---|
+| `yarn dev` | **no** | yes |
+| `yarn build:devtools` | yes | yes |
+| `yarn build` (CI / stores) | yes | yes |
+
+`yarn dev` is deliberately **v2-only**. During the migration the devtools build
+is installed in a real browser to keep using v1 normally; if the dev build also
+claimed v1, two copies of the extension would run there at once and fight over
+the same DOM.
+
+The hosts come from `utils/content-script-matches.ts` (content-script `matches`)
+and a `build:manifestGenerated` hook in `wxt.config.ts` (host permissions and
+web accessible resources). Verified: on v1 the dev build injects nothing and the
+picker hotkey does nothing at all.
+
 ### `yarn dev` — the browser to use for migration work
 
 `yarn dev` is the primary entry point. It builds to `.output/chrome-mv3-dev`,

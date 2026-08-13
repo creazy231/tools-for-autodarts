@@ -122,8 +122,25 @@ export default defineConfig({
      * Keyed on the entrypoint name rather than an allow-list of the others, so
      * adding a new entrypoint never silently excludes it.
      */
+    /**
+     * `yarn dev` targets v2 only — see utils/content-script-matches.ts. The
+     * content-script `matches` come from that constant, but host_permissions and
+     * web_accessible_resources are declared here, so strip v1 from them too.
+     * Otherwise the dev build still holds permissions for a site it must stay
+     * off, where the installed stable build is in charge.
+     */
     "build:manifestGenerated": (wxt, manifest) => {
-      if (wxt.config.mode === "development" || DEVTOOLS) return;
+      if (wxt.config.mode === "development") {
+        const notV1 = (h: string) => !h.includes("//play.autodarts.com");
+        manifest.host_permissions = manifest.host_permissions?.filter(notV1);
+        for (const war of manifest.web_accessible_resources ?? []) {
+          if (typeof war === "object" && "matches" in war && Array.isArray(war.matches)) {
+            war.matches = war.matches.filter(notV1);
+          }
+        }
+        return;
+      }
+      if (DEVTOOLS) return;
 
       // WXT groups content scripts that share the same matches + runAt into a
       // single manifest entry, so the picker sits in the same entry as the real

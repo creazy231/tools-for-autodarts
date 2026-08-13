@@ -11,9 +11,10 @@ import {
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import { isSafari, isiOS } from "@/utils/helpers";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main() {
     AutodartsToolsUrlStatus.watch(async (url: string) => {

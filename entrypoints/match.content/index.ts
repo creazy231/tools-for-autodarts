@@ -33,6 +33,7 @@ import {
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
 let matchInitialized = false;
 let activeMatchObserver: MutationObserver;
@@ -51,7 +52,7 @@ const tools = {
 };
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main(ctx: any) {
     AutodartsToolsUrlStatus.watch(async (url: string) => {

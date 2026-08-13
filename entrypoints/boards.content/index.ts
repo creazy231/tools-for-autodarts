@@ -5,12 +5,13 @@ import type { IConfig } from "@/utils/storage";
 import { AutodartsToolsConfig, AutodartsToolsUrlStatus } from "@/utils/storage";
 import ExternalBoards from "@/entrypoints/boards.content/ExternalBoards.vue";
 import { isSafari, isiOS } from "@/utils/helpers";
+import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
 let externalBoardsUI: any;
 let boardsReadyUnwatch: any;
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
+  matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main(ctx: any) {
     boardsReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
