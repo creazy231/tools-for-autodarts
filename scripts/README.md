@@ -20,23 +20,47 @@ AUTODARTS_V2_URL=https://play-v2.autodarts.com
 
 Login is email + password. Do **not** use the Google/Apple buttons on v2.
 
-### Which site each build runs on
+### Build targets
 
-| build | play.autodarts.com (v1) | play-v2.autodarts.com |
-|---|---|---|
-| `yarn dev` | **no** | yes |
-| `yarn build:devtools` | yes | yes |
-| `yarn build` (CI / stores) | yes | yes |
+| build | output | v1 | v2 | picker |
+|---|---|---|---|---|
+| `yarn build` (CI / stores) | `.output/` | yes | yes | no |
+| `yarn build:devtools` | `.output-devtools/` | yes | yes | yes |
+| `yarn build:reference` | `.output-reference/` | **yes** | no | yes |
+| `yarn dev` | `.output/chrome-mv3-dev` | no | **yes** | yes |
 
-`yarn dev` is deliberately **v2-only**. During the migration the devtools build
-is installed in a real browser to keep using v1 normally; if the dev build also
-claimed v1, two copies of the extension would run there at once and fight over
-the same DOM.
+The host split is what makes two builds shareable in one browser. Two copies of
+the extension on the same site would both inject — duplicate overlays, doubled
+notifications, doubled sounds. So `yarn dev` owns v2, the reference build owns
+v1, and they never overlap.
 
-The hosts come from `utils/content-script-matches.ts` (content-script `matches`)
-and a `build:manifestGenerated` hook in `wxt.config.ts` (host permissions and
-web accessible resources). Verified: on v1 the dev build injects nothing and the
-picker hotkey does nothing at all.
+Hosts come from `utils/content-script-matches.ts` (content-script `matches`) and
+a `build:manifestGenerated` hook in `wxt.config.ts` (host permissions, web
+accessible resources), since those are declared in different places.
+
+### v1 and v2 side by side in one browser
+
+```bash
+yarn build:reference   # once, and again whenever v1 behaviour should be refreshed
+yarn dev               # opens one browser with BOTH extensions
+```
+
+`yarn dev` runs `scripts/load-reference-extension.mjs` alongside WXT. It waits
+for the CDP endpoint and installs the reference build, giving one browser where
+**v1 behaves exactly as the shipped extension does** and **v2 runs the code you
+are editing**, hot-reloaded. That is the setup for "look at how X works on v1 and
+port it to v2" — both are one tab away, and the picker is available on both.
+
+Log in once per site; `.chrome-profile-dev` persists it.
+
+The reference build is installed over CDP rather than `--load-extension`, which
+Chrome 137+ ignores (`DisableLoadExtensionCommandLineSwitch`). Verified on Chrome
+151: the flag reached the process and the extension still did not load.
+Overriding it needs `--disable-features`, but web-ext already passes its own
+`--disable-features` list and Chrome honours only the last one.
+
+Without a reference build `yarn dev` still works — it just opens with v2 only,
+and prints a note saying so.
 
 ### `yarn dev` — the browser to use for migration work
 

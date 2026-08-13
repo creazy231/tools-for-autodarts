@@ -1,5 +1,5 @@
-import { mkdirSync, readFileSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { URL, fileURLToPath } from "node:url";
 
 import { defineConfig } from "wxt";
@@ -28,11 +28,36 @@ mkdirSync(CHROMIUM_PROFILE, { recursive: true });
  */
 const DEVTOOLS = process.env.ADT_DEVTOOLS === "1";
 
+/**
+ * Reference build: the stable extension restricted to v1, built so it can sit
+ * next to the v2-only dev build in the same browser during the migration.
+ * `yarn dev` loads it automatically (see webExt.chromiumArgs below), giving one
+ * browser where v1 behaves normally and v2 is whatever you are working on.
+ *
+ * It carries the DOM picker too, since capturing the v1 side of a feature is
+ * half the porting workflow.
+ */
+const REFERENCE = process.env.ADT_REFERENCE === "1";
+
+/** Both extra build targets ship the picker. */
+const WITH_PICKER = DEVTOOLS || REFERENCE;
+
+const HOSTS: "v1" | "v2" | "both" = REFERENCE ? "v1" : "both";
+
+const REFERENCE_OUT = resolve(".output-reference", "chrome-mv3");
+
+if (!REFERENCE && !existsSync(REFERENCE_OUT)) {
+  console.warn(
+    "\n  No v1 reference build found — `yarn dev` will open with v2 only.\n"
+    + "  Run `yarn build:reference` once to also get v1 working in that browser.\n",
+  );
+}
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
-  // Keep devtools builds out of .output/, so a store build and a local
-  // devtools build can coexist and never overwrite each other.
-  outDir: DEVTOOLS ? ".output-devtools" : ".output",
+  // Each target gets its own output directory so a store build, a local
+  // devtools build and the v1 reference build never overwrite each other.
+  outDir: REFERENCE ? ".output-reference" : DEVTOOLS ? ".output-devtools" : ".output",
   // runner: { // Deprecated in v0.20
   //   startUrls: [ "https://play.autodarts.com/" ],
   // },
@@ -50,6 +75,11 @@ export default defineConfig({
     // Expose CDP so Playwright and the MCP servers in .mcp.json can drive this
     // exact browser - the one WXT is hot-reloading. Without this you end up
     // debugging a different browser than the one your edits land in.
+    //
+    // The v1 reference build is side-loaded over CDP instead — see
+    // scripts/load-reference-extension.mjs. Chrome 137+ ignores
+    // --load-extension, and web-ext already passes its own --disable-features
+    // list, so overriding that from here would fight with it.
     chromiumArgs: [ "--remote-debugging-port=9222" ],
   },
   modules: [ "@wxt-dev/webextension-polyfill" ],
@@ -74,7 +104,7 @@ export default defineConfig({
       "storage",
       // Only the DOM picker needs this, so store builds must not request it —
       // an unused permission is a needless prompt and a review flag.
-      ...(DEVTOOLS ? [ "clipboardWrite" ] : []),
+      ...(WITH_PICKER ? [ "clipboardWrite" ] : []),
       // "background",
     ],
     background: {
@@ -86,7 +116,7 @@ export default defineConfig({
     description: "Tools for Autodarts enhances the gaming experience on autodarts.com",
     // Chrome surfaces version_name in chrome://extensions, so it is obvious at a
     // glance whether the installed copy is the store build or the devtools one.
-    ...(DEVTOOLS ? { version_name: `${version}+devtools` } : {}),
+    ...(WITH_PICKER ? { version_name: `${version}+${REFERENCE ? "reference" : "devtools"}` } : {}),
     // content_scripts: [
     //   {
     //     matches: [ "*://play.autodarts.com/*" ],
@@ -113,34 +143,36 @@ export default defineConfig({
   },
   hooks: {
     /**
-     * The DOM picker is a development tool. Its body is behind
-     * `import.meta.env.DEV` so Vite strips the logic from production, but WXT
-     * still emits the entrypoint and registers it — leaving ~14KB of inert
-     * boilerplate injected into every page load, and an oddly-named content
-     * script for store reviewers to wonder about. Drop it entirely instead.
+     * Two jobs.
      *
-     * Keyed on the entrypoint name rather than an allow-list of the others, so
-     * adding a new entrypoint never silently excludes it.
-     */
-    /**
-     * `yarn dev` targets v2 only — see utils/content-script-matches.ts. The
-     * content-script `matches` come from that constant, but host_permissions and
-     * web_accessible_resources are declared here, so strip v1 from them too.
-     * Otherwise the dev build still holds permissions for a site it must stay
-     * off, where the installed stable build is in charge.
+     * 1. Host scoping. Content-script `matches` come from
+     *    utils/content-script-matches.ts, but host_permissions and
+     *    web_accessible_resources are declared here, so they need the same
+     *    treatment: `yarn dev` drops v1, the reference build drops v2. Without
+     *    this a build holds permissions for a site the other build owns.
+     *
+     * 2. Removing the picker from store builds. Its body is already stripped by
+     *    Vite, but WXT still emits and registers the entrypoint — ~14KB of inert
+     *    boilerplate injected on every page load, and an oddly-named content
+     *    script for store reviewers to wonder about.
      */
     "build:manifestGenerated": (wxt, manifest) => {
-      if (wxt.config.mode === "development") {
-        const notV1 = (h: string) => !h.includes("//play.autodarts.com");
-        manifest.host_permissions = manifest.host_permissions?.filter(notV1);
+      const dropHost = wxt.config.mode === "development"
+        ? "//play.autodarts.com"
+        : REFERENCE ? "//play-v2.autodarts.com" : null;
+
+      if (dropHost) {
+        const keep = (h: string) => !h.includes(dropHost);
+        manifest.host_permissions = manifest.host_permissions?.filter(keep);
         for (const war of manifest.web_accessible_resources ?? []) {
           if (typeof war === "object" && "matches" in war && Array.isArray(war.matches)) {
-            war.matches = war.matches.filter(notV1);
+            war.matches = war.matches.filter(keep);
           }
         }
-        return;
       }
-      if (DEVTOOLS) return;
+
+      // Builds that ship the picker keep it; only store builds strip it.
+      if (wxt.config.mode === "development" || WITH_PICKER) return;
 
       // WXT groups content scripts that share the same matches + runAt into a
       // single manifest entry, so the picker sits in the same entry as the real
@@ -153,7 +185,7 @@ export default defineConfig({
       if (!manifest.content_scripts?.length) delete manifest.content_scripts;
     },
     "build:done": (wxt, output) => {
-      if (wxt.config.mode === "development" || DEVTOOLS) return;
+      if (wxt.config.mode === "development" || WITH_PICKER) return;
       const isPicker = (name: string) => name.includes("picker");
 
       // Drop the emitted file, and drop it from the build output too — WXT
@@ -174,7 +206,9 @@ export default defineConfig({
       // Gates the DOM picker. In `yarn dev` the picker's own
       // `import.meta.env.DEV` check covers it; this flag is what lets a
       // PRODUCTION build (yarn build:devtools) include it as well.
-      __ADT_PICKER__: JSON.stringify(DEVTOOLS),
+      __ADT_PICKER__: JSON.stringify(WITH_PICKER),
+      // Which autodarts hosts this build claims — see utils/content-script-matches.ts
+      __ADT_HOSTS__: JSON.stringify(HOSTS),
     },
     server: {
       watch: {

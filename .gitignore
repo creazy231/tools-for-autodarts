@@ -56,3 +56,6 @@ git2md
 
 # Devtools build output (yarn build:devtools) — local install only
 .output-devtools
+
+# v1 reference build (yarn build:reference) — local only
+.output-reference

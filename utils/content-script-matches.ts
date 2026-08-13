@@ -1,18 +1,33 @@
 /**
  * Which autodarts hosts the content scripts run on.
  *
- * Production targets both the current site and the v2 rebuild, so one build
- * serves users through the transition.
+ * There are three shapes, because during the migration two builds run
+ * side by side in the same browser and must not overlap:
  *
- * `yarn dev` targets **v2 only**. During the migration the stable build is
- * installed in a real browser to keep using v1 normally; if the dev build also
- * claimed v1, two copies of the extension would run there at once and fight
- * over the same DOM. Restricting dev to v2 keeps the two out of each other's
- * way. Devtools builds (`yarn build:devtools`) are NOT dev mode, so they keep
- * both hosts — that is the build you install to use v1.
+ *   both  production and devtools builds — one extension serves users through
+ *         the transition.
+ *   v2    `yarn dev` — the build being actively worked on.
+ *   v1    `yarn build:reference` — the stable build, loaded next to the dev one
+ *         so v1 keeps working normally while v2 is under construction.
+ *
+ * The split matters: if two copies of the extension claimed the same host they
+ * would both inject, giving duplicate overlays, doubled notifications and
+ * doubled sounds.
  */
+
+/** Injected by Vite's `define` in wxt.config.ts. */
+declare const __ADT_HOSTS__: "v1" | "v2" | "both";
 
 const V1 = "*://play.autodarts.com/*";
 const V2 = "*://play-v2.autodarts.com/*";
 
-export const AUTODARTS_MATCHES: string[] = import.meta.env.DEV ? [ V2 ] : [ V1, V2 ];
+function resolve(): string[] {
+  // `yarn dev` is always v2-only, whatever else is configured.
+  if (import.meta.env.DEV) return [ V2 ];
+  if (typeof __ADT_HOSTS__ === "undefined") return [ V1, V2 ];
+  if (__ADT_HOSTS__ === "v1") return [ V1 ];
+  if (__ADT_HOSTS__ === "v2") return [ V2 ];
+  return [ V1, V2 ];
+}
+
+export const AUTODARTS_MATCHES: string[] = resolve();

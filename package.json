@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "wxt",
+    "dev": "node scripts/load-reference-extension.mjs & wxt",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",
@@ -21,7 +21,8 @@
     "zip:devtools": "ADT_DEVTOOLS=1 wxt zip",
     "compile": "vue-tsc --noEmit",
     "picker:index": "node scripts/build-selector-index.mjs",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "build:reference": "ADT_REFERENCE=1 wxt build"
   },
   "dependencies": {
     "@iconify-json/pixelarticons": "^1.2.2",
