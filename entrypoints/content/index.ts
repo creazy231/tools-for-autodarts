@@ -12,7 +12,7 @@ import Migration from "@/components/Migration.vue";
 let migrationModalUI: any;
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.io/*" ],
+  matches: [ "*://play.autodarts.io/*", "*://play.autodarts.com/*" ],
   cssInjectionMode: "ui",
   async main(ctx) {
     await waitForElement("#root > div:nth-of-type(1)", 15000);

@@ -25,11 +25,16 @@
 // Token-issuing endpoints whose JSON response contains an `access_token`.
 const TOKEN_ENDPOINTS = [
   // New OAuth 2.0 server (Authorization Code + PKCE)
+  "https://api.autodarts.com/auth/v1/exchange",
+  "https://api.autodarts.com/auth/v1/refresh",
+  "https://api.autodarts.com/auth/v1/token",
+  "https://api.autodarts.com/auth/v1/device/token",
   "https://api.autodarts.io/auth/v1/exchange",
   "https://api.autodarts.io/auth/v1/refresh",
   "https://api.autodarts.io/auth/v1/token",
   "https://api.autodarts.io/auth/v1/device/token",
-  // Legacy Keycloak — kept for the migration window (shutting down 2026-06-28)
+  // Legacy Keycloak — kept for the migration window
+  "https://login.autodarts.com/realms/autodarts/protocol/openid-connect/token",
   "https://login.autodarts.io/realms/autodarts/protocol/openid-connect/token",
 ];
 

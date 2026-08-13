@@ -266,7 +266,7 @@ const game = reactive<{
   footer: string;
 }>({
   title: "",
-  footer: "Game provided by Autodarts.io",
+  footer: "Game provided by Autodarts.com",
 });
 
 const config: Ref<IConfig | null> = ref(null);

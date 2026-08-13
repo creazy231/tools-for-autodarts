@@ -10,7 +10,7 @@ let externalBoardsUI: any;
 let boardsReadyUnwatch: any;
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.io/*" ],
+  matches: [ "*://play.autodarts.io/*", "*://play.autodarts.com/*" ],
   cssInjectionMode: "ui",
   async main(ctx: any) {
     boardsReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {

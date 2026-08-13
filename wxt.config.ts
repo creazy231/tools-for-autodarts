@@ -13,7 +13,7 @@ export default defineConfig({
   //   startUrls: [ "https://play.autodarts.io/" ],
   // },
   webExt: {
-    startUrls: [ "https://play.autodarts.io/" ],
+    startUrls: [ "https://play.autodarts.com/", "https://play.autodarts.io/" ],
   },
   modules: [ "@wxt-dev/webextension-polyfill" ],
   imports: {
@@ -24,8 +24,14 @@ export default defineConfig({
   },
   manifest: {
     host_permissions: [
+      "*://play.autodarts.com/*",
       "*://play.autodarts.io/*",
+      "*://api.autodarts.com/*",
       "*://api.autodarts.io/*",
+      "*://login.autodarts.com/*",
+      "*://login.autodarts.io/*",
+      "*://boards.ws.autodarts.com/*",
+      "*://boards.ws.autodarts.io/*",
       "*://darts-downloads.peschi.org/*",
       "*://autodarts.x10.mx/*",
       "*://adt-socket.tobias-thiele.de/*",
@@ -41,7 +47,7 @@ export default defineConfig({
       persistent: false,
     },
     name: "Tools for Autodarts",
-    description: "Tools for Autodarts enhances the gaming experience on autodarts.io",
+    description: "Tools for Autodarts enhances the gaming experience on autodarts.com",
     // content_scripts: [
     //   {
     //     matches: [ "*://play.autodarts.io/*" ],
@@ -55,11 +61,11 @@ export default defineConfig({
     web_accessible_resources: [
       {
         resources: [ "images/*" ],
-        matches: [ "*://play.autodarts.io/*" ],
+        matches: [ "*://play.autodarts.io/*", "*://play.autodarts.com/*" ],
       },
       {
         resources: [ "websocket-capture.js", "auth-cookie.js" ],
-        matches: [ "*://play.autodarts.io/*" ],
+        matches: [ "*://play.autodarts.io/*", "*://play.autodarts.com/*" ],
       },
     ],
   },
