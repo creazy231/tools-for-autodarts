@@ -76,17 +76,9 @@ defineEmits<{
 
 <style>
 .slide-dialog-bg {
-  background-color: rgba(25, 32, 71, 0.8);
-  background-image:
-    radial-gradient(600px 324px at 1650px 0px, rgba(49, 51, 112, 0.89) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(960px 756px at 1344px 238px, rgba(38, 89, 154, 0.9) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(960px 756px at 2150px 475px, rgba(44, 67, 108, 0.85) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(1728px 972px at -230px 961px, rgba(15, 47, 80, 0.88) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(960px 756px at -38px 572px, rgba(52, 32, 95, 0.89) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(960px 756px at 691px 238px, rgba(64, 52, 134, 0.83) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(960px 432px at 1267px 637px, rgba(32, 111, 185, 0.87) 7%, rgba(32, 111, 185, 0) 100%);
-
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* v2 drawer surface: flat fill with a 1px translucent edge, no gradients. */
+  background-color: var(--adt-surface-raised);
+  box-shadow: -1px 0 0 0 var(--adt-border);
   animation: slide-dialog-enter 0.3s ease-out forwards;
 }
 

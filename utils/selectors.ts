@@ -99,6 +99,15 @@ export const SELECTORS = {
   /** App shell — present on every page. */
   app: {
     root: [ "#root" ],
+    /**
+     * The scrolling content area, where the settings overlay mounts.
+     *
+     * `main` is semantic HTML and there is exactly one. The previous anchor,
+     * `#root > div > div:nth-of-type(2)`, resolves on v2 to an empty
+     * zero-height trailing div — so the overlay mounted in the wrong place and
+     * the hide-page-content logic hid nothing.
+     */
+    contentRoot: [ "main", "[role='main']" ],
     navigation: [
       "[data-slot='navigation']",
       "nav[aria-label='Main navigation']",

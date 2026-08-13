@@ -1,30 +1,29 @@
 <template>
   <Transition
-    enter-active-class="transition duration-300 ease-out"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
-    leave-active-class="transition duration-200 ease-in"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
+    enter-active-class="transition duration-100 ease-out"
+    enter-from-class="opacity-0 scale-95"
+    enter-to-class="opacity-100 scale-100"
+    leave-active-class="transition duration-100 ease-in"
+    leave-from-class="opacity-100 scale-100"
+    leave-to-class="opacity-0 scale-95"
   >
-    <div v-if="show" class="fixed inset-0 z-[1400] flex items-center justify-center">
-      <div
-        @click="$emit('close')"
-        class="absolute inset-0 bg-[var(--adt-overlay)] backdrop-blur-[4px]"
-      />
-      <div class="dialog-bg relative mx-4 w-full max-w-7xl scale-100 rounded-xl p-6 shadow-lg">
-        <AppButton
+    <div v-if="show" class="fixed inset-0 z-[1400] flex items-center justify-center p-4">
+      <div @click="$emit('close')" class="adt-modal-backdrop" />
+      <div :class="[ 'adt-modal relative', wide ? 'max-w-4xl' : '' ]">
+        <button
           @click="$emit('close')"
-          class="absolute right-3 top-3"
-          size="xs"
-          auto
+          class="adt-modal-close"
+          type="button"
+          aria-label="Close"
         >
-          <span class="icon-[pixelarticons--close]" />
-        </AppButton>
-        <h3 class="mb-4 text-xl font-[600] text-[var(--adt-text)]">
-          {{ title }}
-        </h3>
-        <div class="settings-content max-h-[70vh] overflow-y-auto py-2">
+          <span class="icon-[pixelarticons--close] text-lg" />
+        </button>
+        <div class="adt-modal-header">
+          <h2 class="adt-modal-title">
+            {{ title }}
+          </h2>
+        </div>
+        <div class="adt-modal-body settings-content">
           <slot />
         </div>
       </div>
@@ -33,8 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import AppButton from "@/components/AppButton.vue";
-
 defineProps({
   show: {
     type: Boolean,
@@ -44,52 +41,32 @@ defineProps({
     type: String,
     required: true,
   },
+  /** Settings panels are denser than v2's own dialogs; opt into a wider shell. */
+  wide: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 defineEmits([ "close" ]);
 </script>
 
-<style>
-.dialog-bg {
-  background-color: rgba(25, 32, 71, 0.95);
-  background-image:
-    radial-gradient(50% 30% at 86% 0%, rgba(49, 51, 112, 0.89) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(50% 70% at 70% 22%, rgba(38, 89, 154, 0.9) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(50% 70% at 112% 44%, rgba(44, 67, 108, 0.85) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(90% 90% at -12% 89%, rgba(15, 47, 80, 0.88) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(50% 70% at -2% 53%, rgba(52, 32, 95, 0.89) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(50% 70% at 36% 22%, rgba(64, 52, 134, 0.83) 0%, rgba(64, 52, 134, 0) 100%),
-    radial-gradient(50% 40% at 66% 59%, rgba(32, 111, 185, 0.87) 7%, rgba(32, 111, 185, 0) 100%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  animation: dialog-enter 0.3s ease-out forwards;
-}
-
+<style scoped>
+/* v2 shows a thin, low-contrast scrollbar rather than the platform default. */
 .settings-content::-webkit-scrollbar {
   width: 8px;
 }
 
 .settings-content::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: transparent;
 }
 
 .settings-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--adt-border);
   border-radius: 4px;
 }
 
 .settings-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-@keyframes dialog-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  background: var(--adt-overlay-strong);
 }
 </style>

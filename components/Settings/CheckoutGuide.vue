@@ -4,9 +4,6 @@
     <div v-if="config" class="adt-container min-h-56">
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 adt-card-title">
-            Settings - Checkout Guide
-          </h3>
           <div class="space-y-3 text-white/70">
             <p>Displays suggested checkouts for every player.</p>
           </div>

@@ -5,6 +5,7 @@ import App from "./App.vue";
 import { migrationConfig } from "./migration-config";
 
 import { waitForElement } from "@/utils";
+import { SELECTORS } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsUrlStatus, defaultConfig } from "@/utils/storage";
 import { isiOS } from "@/utils/helpers";
 import Migration from "@/components/Migration.vue";
@@ -16,7 +17,7 @@ export default defineContentScript({
   matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main(ctx) {
-    await waitForElement("#root > div:nth-of-type(1)", 15000);
+    await waitForElement(SELECTORS.app.root, 15000);
     AutodartsToolsUrlStatus.setValue(window.location.href.split("#")[0] || "undefined");
 
     // Create a custom event listener for the auth cookie
@@ -51,13 +52,13 @@ export default defineContentScript({
       if (isiOS()) {
         document.querySelector("body")!.style!.minHeight = "calc(100vh + 1px)";
       }
-      await waitForElement("#root > div:nth-of-type(1)", 15000);
+      await waitForElement(SELECTORS.app.root, 15000);
 
-      await waitForElement("#root > div > div:nth-of-type(2)", 15000);
+      await waitForElement(SELECTORS.app.contentRoot, 15000);
       const ui = await createShadowRootUi(ctx, {
         name: "autodarts-tools-wxt",
         position: "inline",
-        anchor: "#root > div > div:nth-of-type(2)",
+        anchor: SELECTORS.app.contentRoot[0],
         onMount: (container) => {
           const app = createApp(App);
           app.mount(container);
@@ -95,11 +96,11 @@ export default defineContentScript({
 });
 
 async function initMigrationModal(ctx) {
-  await waitForElement("#root > div > div:nth-of-type(2)", 15000);
+  await waitForElement(SELECTORS.app.contentRoot, 15000);
   migrationModalUI = await createShadowRootUi(ctx, {
     name: "autodarts-tools-migration-modal",
     position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
+    anchor: SELECTORS.app.contentRoot[0],
     onMount: (container) => {
       console.log("Autodarts Tools: Migration modal initialized");
       const migrationModal = createApp(Migration);

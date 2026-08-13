@@ -4,10 +4,9 @@
     <div v-if="config" class="adt-container min-h-56">
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3
-            class="mb-1 flex flex-col items-start gap-2 adt-card-title sm:flex-row sm:items-center sm:justify-between"
+          <div
+            class="mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end"
           >
-            <span>Settings - WLED</span>
             <div class="flex w-full flex-wrap gap-2 sm:w-auto">
               <AppButton
                 @click="sortEffectsByTriggers"
@@ -41,7 +40,7 @@
                 <span class="whitespace-nowrap">Import CSV</span>
               </AppButton>
             </div>
-          </h3>
+          </div>
           <div class="space-y-3 text-white/70">
             <p>
               Configure WLED effects that are played during the game. If board IDs are defined, the

@@ -1,4 +1,8 @@
 <template>
+  <!--
+    Neutral track as before; the selected option carries the colour. Same rule
+    as AppToggle — colour marks the active choice and nothing else.
+  -->
   <div
     :class="twMerge(
       'relative flex overflow-hidden rounded-md bg-[var(--adt-overlay)]',
@@ -12,13 +16,15 @@
       :key="index"
       :disabled="option.disabled"
       :class="twMerge(
-        'flex h-10 items-center justify-center whitespace-nowrap px-4 font-semibold text-[var(--adt-text)] transition-colors',
+        'flex h-10 items-center justify-center whitespace-nowrap px-4 font-semibold transition-colors',
         buttonSize === 'sm' ? 'h-8 px-3 text-sm' : buttonSize === 'lg' ? 'h-12 px-5' : 'h-10 px-4',
         modelValue === option.value
-          ? 'bg-[var(--adt-overlay-strong)]'
-          : 'enabled:hover:bg-[var(--adt-overlay)]',
+          ? 'adt-toggle-on text-white'
+          : 'text-[var(--adt-text)] enabled:hover:bg-[var(--adt-overlay)]',
         option.disabled ? 'cursor-not-allowed opacity-50' : '',
       )"
+      type="button"
+      :aria-pressed="modelValue === option.value"
     >
       {{ option.label }}
     </button>

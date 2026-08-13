@@ -7,8 +7,7 @@
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex flex-col items-start gap-2 adt-card-title sm:flex-row sm:items-center sm:justify-between">
-            <span>Settings - Sound FX</span>
+          <div class="mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end">
             <div class="flex w-full flex-wrap gap-2 sm:w-auto">
               <AppButton @click="sortSoundsByTriggers" size="sm" class="!py-1 text-xs sm:text-sm" auto title="Sort sounds by their triggers">
                 <span class="icon-[pixelarticons--sort-alphabetic] mr-1" />
@@ -27,7 +26,7 @@
                 <span class="whitespace-nowrap">Upload Files</span>
               </AppButton>
             </div>
-          </h3>
+          </div>
           <div class="space-y-3 text-white/70">
             <p>Configure sound effects that play during the game for special events.</p>
 

@@ -7,8 +7,7 @@
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex flex-col items-start gap-2 adt-card-title sm:flex-row sm:items-center sm:justify-between">
-            <span>Settings - Animations</span>
+          <div class="mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end">
             <div class="flex w-full flex-wrap gap-2 sm:w-auto">
               <AppButton @click="sortAnimationsByTriggers" size="sm" class="!py-1 text-xs sm:text-sm" auto title="Sort animations by their triggers">
                 <span class="icon-[pixelarticons--sort-alphabetic] mr-1" />
@@ -23,7 +22,7 @@
                 <span class="whitespace-nowrap">Upload GIFs</span>
               </AppButton>
             </div>
-          </h3>
+          </div>
           <div class="space-y-3 text-white/70">
             <p>Configure the animations for the game. Click the plus button to add a new animation.</p>
 
@@ -147,19 +146,21 @@
                   </button>
                 </div>
 
-                <!-- Info section -->
-                <div class="absolute inset-x-0 bottom-0 cursor-move bg-black/70 p-2 text-xs">
-                  <div class="truncate font-mono uppercase">
+                <!--
+                  Info section. Label and delete share one row: the tile is
+                  aspect-video, so in a narrow column it is only ~80px tall and
+                  a two-row footer grows up into the toggle above it.
+                -->
+                <div class="absolute inset-x-0 bottom-0 flex cursor-move items-center gap-2 bg-black/70 px-2 py-1.5 text-xs">
+                  <div class="min-w-0 flex-1 truncate font-mono uppercase">
                     {{ Array.isArray(animation.triggers) ? animation.triggers.join(', ') : '' }}
                   </div>
-                  <div class="mt-1 flex justify-end">
-                    <button
-                      @click.stop="removeAnimation(index)"
-                      class="text-red-500 hover:text-red-400"
-                    >
-                      <span class="icon-[pixelarticons--trash] text-sm" />
-                    </button>
-                  </div>
+                  <button
+                    @click.stop="removeAnimation(index)"
+                    class="shrink-0 text-red-500 hover:text-red-400"
+                  >
+                    <span class="icon-[pixelarticons--trash] text-sm" />
+                  </button>
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@
 import PageConfig from "@/components/PageConfig.vue";
 import { initV2Menu, openToolsPage } from "./v2-menu";
 import { waitForElement } from "@/utils";
+import { SELECTORS } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsUrlStatus, defaultConfig } from "@/utils/storage";
 
 let observer = new MutationObserver(() => {});
@@ -37,7 +38,7 @@ watch(currentUrl, async (newURL, oldURL) => {
 });
 
 watch(configVisible, async () => {
-  const pageContentElement = await waitForElement("#root > div > div:nth-of-type(2)", 15000);
+  const pageContentElement = await waitForElement(SELECTORS.app.contentRoot, 15000);
   const contentElements = Array.from(pageContentElement.children).filter(el => el.tagName !== "AUTODARTS-TOOLS-WXT") as HTMLElement[];
 
   if (configVisible.value) {

@@ -10,7 +10,7 @@
         $attrs.class?.toString(),
       )">
       <option v-for="option in options" :key="option.value" :value="option.value"
-        class="dialog-bg bg-white/10 text-white">
+        class="adt-popover">
         {{ option.label }}
       </option>
     </select>

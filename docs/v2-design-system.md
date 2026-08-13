@@ -151,16 +151,70 @@ overlay** rather than a colour change.
 
 ### C. Modal / drawer
 
-From the "Online" dialog in the top nav:
+Measured from the Quick Match dialog behind "Online" in the top nav:
 
 ```
-background : var(--drawer)          #0a0a23
+background : var(--drawer)          #0a0a23   (NOT --card)
 radius     : 14px                   rounded-xl
-edge       : ring-1 ring-foreground/10   (a ring, not a border)
+edge       : ring-1 ring-foreground/10   (a ring, not a border, no shadow)
 gap        : 16px                   gap-4
 size       : max-w-2xl, max-h-[85vh], overflow-hidden
 position   : fixed, centred via top/left 50% + -translate-1/2
-animation  : data-open:animate-in / data-closed:animate-out, fade + zoom
+animation  : fade + zoom-95, duration-100
+```
+
+Header, title and close button:
+
+```
+header : flex flex-col gap-0.5 px-6 pt-14 text-left
+         (pt-14 leaves room for the close button)
+title  : Bebas Neue, 18px / 700, uppercase, #ffffff
+close  : absolute top-4 right-4, plain icon, no chrome of its own
+```
+
+Dialog bodies are **flat** — v2 never places a card directly inside a dialog.
+
+### Segmented control ("toggle-group")
+
+```
+track    : #001849 (--surface-container-primary)
+           + linear-gradient(0deg, rgba(255,255,255,.05), same)
+           padding 4px, radius 12px
+selected : linear-gradient(to right bottom, #75148b 0%, #da3954 100%)
+           white text, radius 14px, height 40px, padding 0 10px, weight 700
+resting  : transparent, #b8bcc5 text, weight 700
+```
+
+Note the gradient ends on `--system-error` (`#da3954`).
+
+**The extension deliberately does not use the full segment treatment.** Its
+toggles keep a neutral track and apply only the gradient to the active choice —
+a complete v2 segment made a selected "Off" read as an alert. See
+`.adt-toggle-on` in `assets/tailwind.css`; `.adt-segment` remains as the
+reference implementation for anything that should read as v2's own.
+
+### Buttons
+
+```
+primary  : bg #0b55df (blue-60), radius 12px, height 40px,
+           padding 6px 16px, 14px / 700, hover opacity .9, active #003eb3
+disabled : bg #292c33 (black-70), text #b8bcc5 (black-30)
+```
+
+### Fields
+
+```
+field  : flex column, gap 12px, full width
+label  : 14px / 700 Manrope, line-height 100%
+```
+
+### Extra colour ramps
+
+Resolved from v2's own utilities, beyond the CSS variables:
+
+```
+blue-60 #0b55df   blue-70 #003eb3   blue-80 #002a77
+black-30 #b8bcc5  black-70 #292c33  black-05 #f7f8fa
 ```
 
 ### D. Highlighted / promo card

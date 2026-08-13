@@ -75,6 +75,21 @@
   /* Type */
   --adt-font: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
   --adt-font-display: "Bebas Neue", "Manrope Variable", sans-serif;
+
+  /* Blue ramp, resolved from v2's own utilities */
+  --adt-blue: var(--secondary, #0b55df);
+  --adt-blue-hover: #003eb3;
+  --adt-blue-deep: #002a77;
+
+  /* Segmented control (v2 "toggle-group") */
+  --adt-segment-track: var(--surface-container-primary, #001849);
+  --adt-segment-on-from: #75148b;
+  --adt-segment-on-to: #da3954;
+  --adt-segment-off-text: #b8bcc5;
+
+  /* Disabled control */
+  --adt-disabled-bg: #292c33;
+  --adt-disabled-text: #b8bcc5;
 }
 
 body {
@@ -147,4 +162,178 @@ body {
   font-weight: 700;
   line-height: 1.2;
   color: var(--adt-text);
+}
+
+/* ---------------------------------------------------------------- modals ---
+ * Pattern C, measured from v2's Quick Match dialog:
+ *   bg-drawer, rounded-xl (14px), ring-1 ring-foreground/10 (NOT a border),
+ *   gap-4, max-w-2xl, max-h-[85vh], overflow-hidden.
+ * The ring matters — v2 modals have no border and no drop shadow.
+ */
+.adt-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 42rem;
+  max-height: 85vh;
+  overflow: hidden;
+  font-size: 0.875rem;
+  color: var(--adt-text);
+  background: var(--adt-surface-raised);
+  border-radius: var(--adt-radius-xl);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 10%);
+  outline: none;
+}
+
+/* v2 puts the title block at px-6 pt-14, leaving room for the close button. */
+.adt-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 3.5rem 1.5rem 0;
+  text-align: left;
+}
+
+/* Bebas Neue, 18px/700, uppercase, pure white. */
+.adt-modal-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--adt-font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.adt-modal-body {
+  overflow-y: auto;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* Plain icon button pinned top-right — no chrome of its own in v2. */
+.adt-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--adt-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 120ms ease;
+}
+
+.adt-modal-close:hover { opacity: 1; }
+
+.adt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 60%);
+}
+
+/* ------------------------------------------------------------ form fields ---
+ * v2 field: a 12px-gap column; label is 14px/700 Manrope with leading 100%.
+ */
+.adt-field { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
+
+.adt-field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 100%;
+  color: var(--adt-text);
+}
+
+.adt-field-hint {
+  font-size: 0.875rem;
+  color: var(--adt-text-muted);
+}
+
+/* ------------------------------------------------------- segmented control ---
+ * v2's own "toggle-group": a #001849 track with a 5% white wash, 4px padding
+ * and a 12px radius; selected item is a magenta -> red gradient at 14px radius,
+ * unselected transparent with #b8bcc5 text, both 700 weight.
+ *
+ * The extension's own toggles deliberately keep their neutral track and use
+ * only the gradient (.adt-toggle-on) to mark the active choice — a full v2
+ * segment made "Off" look like an alert. Kept here as the reference for any
+ * control that should read as v2's own.
+ */
+.adt-segment {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  background-color: var(--adt-segment-track);
+  background-image: linear-gradient(0deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 5%));
+  border-radius: 12px;
+}
+
+.adt-segment-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: 40px;
+  padding: 0 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--adt-segment-off-text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--adt-radius-xl);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.adt-segment-item:hover:not(.is-active) { color: var(--adt-text); }
+
+.adt-segment-item.is-active {
+  color: #fff;
+  background-image: linear-gradient(
+    to right bottom,
+    var(--adt-segment-on-from) 0%,
+    var(--adt-segment-on-to) 100%
+  );
+}
+
+/* v2 popover surface — flatter and darker than a card, with a 1px edge. */
+.adt-popover {
+  color: var(--adt-text);
+  background: var(--adt-surface-raised);
+  border-radius: var(--adt-radius-lg);
+  box-shadow: 0 0 0 1px var(--adt-border);
+}
+
+/**
+ * v2 dialog bodies are flat on the drawer surface — a dialog never sits a card
+ * directly inside itself. Settings panels use .adt-container as their root, so
+ * flatten only that DIRECT child. Cards nested deeper (the animation rows, for
+ * instance) are real list items and keep their fill and padding — zeroing those
+ * collapses their internal spacing and the labels collide with the controls.
+ */
+.adt-modal-body > .adt-container {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/**
+ * The single spot of colour in the settings UI: a feature being ON.
+ * Uses v2's own selected-segment gradient so it reads as native.
+ */
+.adt-toggle-on {
+  background-image: linear-gradient(
+    to right bottom,
+    var(--adt-segment-on-from) 0%,
+    var(--adt-segment-on-to) 100%
+  );
 }

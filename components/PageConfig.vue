@@ -370,7 +370,9 @@ function getSettingTitle(settingId) {
   for (const group of featureGroups) {
     const feature = group.features.find(f => f.id === settingId);
     if (feature) {
-      return feature.title;
+      // Titles are stored as "<Feature> Settings"; the dialog shows the
+      // "Settings - <Feature>" form, which is the only heading now.
+      return `Settings - ${feature.title.replace(/\s*Settings$/, "")}`;
     }
   }
   return "Settings";

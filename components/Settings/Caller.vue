@@ -7,8 +7,7 @@
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex flex-col items-start gap-2 adt-card-title md:flex-row md:items-center md:justify-between">
-            <span>Settings - Caller</span>
+          <div class="mb-1 flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-end">
             <div class="flex w-full flex-wrap gap-2 md:w-auto">
               <AppButton @click="sortSoundsByTriggers" size="sm" class="!py-1 text-xs md:text-sm" auto title="Sort sounds by their triggers">
                 <span class="icon-[pixelarticons--sort-alphabetic] mr-1" />
@@ -31,7 +30,7 @@
                 <span class="whitespace-nowrap">Upload Files</span>
               </AppButton>
             </div>
-          </h3>
+          </div>
           <div class="space-y-3 text-white/70">
             <p>Configure the caller settings for the game. Click the plus button to add a new sound.<br>Click <b>Import from URL</b> to import predefined caller sets.</p>
 
