@@ -131,6 +131,7 @@
   --ad-gradient-brand: linear-gradient(118deg, var(--ad-cyan-500) 0%, var(--ad-green-400) 100%);
   --ad-gradient-hot: linear-gradient(90deg, var(--ad-magenta-700) 0%, var(--ad-crimson-600) 100%);
   --ad-gradient-plus: linear-gradient(90deg, var(--ad-orange-600) 0%, var(--ad-amber-600) 100%);
+  --ad-gradient-plus-text: linear-gradient(90deg, #e07b1f 0%, #f0b955 100%);
 
   /* --------------------------------------------------------------- motion --*/
   --ad-duration-instant: 80ms;

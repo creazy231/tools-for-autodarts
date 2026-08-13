@@ -194,7 +194,7 @@
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
             Instant Replay
-            <span class="ml-2 rounded bg-amber-500/80 px-1.5 py-0.5 text-xs font-medium text-black">BETA</span>
+            <span class="adt-badge adt-badge-plus ml-2">BETA</span>
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
