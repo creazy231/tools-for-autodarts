@@ -176,8 +176,14 @@ body {
 }
 
 /* ------------------------------------------------------------- nav tabs ---
- * Navigation/NavTabs: underline row for switching views inside a page. No pill
- * background — the active tab is bold, full-contrast, with a 2px white rule.
+ * Navigation/NavTabs, `page` variant: underline row for switching views inside
+ * a page. No pill background — the active tab is bold, full-contrast, with a
+ * 2px white rule.
+ *
+ * Sized against the site's own in-page tab row (Upcoming / Running / Finished
+ * on /tournaments), which measures 16px rather than the system's 14px. The
+ * scale here stays the system's, so this takes the neighbouring step, --ad-text-lg
+ * — 1px off the site and indistinguishable at this weight.
  */
 .adt-tabs {
   display: flex;
@@ -188,9 +194,9 @@ body {
 
 .adt-tab {
   position: relative;
-  padding: 0 2px 10px;
+  padding: 0 2px 12px;
   font-family: var(--ad-font-body);
-  font-size: var(--ad-text-base);
+  font-size: var(--ad-text-lg);
   font-weight: var(--ad-weight-semibold);
   color: var(--ad-text-muted);
   cursor: pointer;
