@@ -32,9 +32,11 @@ Snapshots live in `snapshots/` (11 v1 pages, 7 v2 pages).
 | New lobby | `/lobbies/new/<variant>` | `/play` (single game-mode picker) |
 | Lobby detail | `/lobbies/<uuid>` | **unknown** — needs a live lobby |
 | Match | `/matches/<uuid>` | **unknown** — needs a live match |
-| Boards | `/boards` | **not found** in v2 nav |
-| Camera | `/camera` | **not found** in v2 nav |
-| Settings | `/settings` | **not found** in v2 nav |
+| Boards | `/boards` | `/boards` — labelled "Devices", in the user drawer |
+| Camera | `/camera` | **not found** |
+| Settings | `/settings` | `/settings` (redirects to `/settings/general`), in the user drawer |
+| Account | — | `/account`, in the user drawer |
+| Legal | `/legal/tos`, `/legal/privacy` | `/legal`, in the user drawer |
 | History | `/history/matches` | *(likely under `/statistics`)* |
 | Tournaments | `/tournaments` | `/tournaments` |
 | Statistics | `/statistics` | `/statistics` |
@@ -83,8 +85,23 @@ v2 ships a richer token set (104 vars). Suggested mapping:
 
 Full v2 token list: `snapshots/v2/home.probe.json` → `cssVars`.
 
-**Recommended approach**: define the extension's own token aliases once, resolved
-per site version, instead of substituting 135 call sites individually.
+**Recommended approach**: define the extension's own token aliases once, instead
+of substituting 135 call sites individually.
+
+**Confirmed live on v2** (2026-08-13), with the settings overlay open:
+
+```
+--chakra-colors-white : (unset)      --background : #01040b
+--chakra-colors-glass : (unset)      --card       : #1b1f29
+--chakra-radii-md     : (unset)      --foreground : oklch(98.5% 0 0)
+
+.adt-container background-color : rgba(0, 0, 0, 0)   <- transparent
+.adt-container color            : rgb(0, 0, 0)       <- black on a dark page
+```
+
+So the overlay opens and functions, but renders effectively unstyled. This is
+the next piece of work after the nav entry, and it is the single change that
+makes the extension *look* ported rather than merely work.
 
 ## 4. Integration hooks — raise with the autodarts team
 

@@ -122,6 +122,33 @@ export const SELECTORS = {
     notificationsButton: [ "button[aria-label='Open notifications']" ],
   },
 
+  /**
+   * User drawer — the panel behind the avatar in the header.
+   *
+   * Ported to v2, so these carry no v1 candidates. Anchors are `data-slot`
+   * (shadcn/ui stamps one on every primitive) and routes, both of which survive
+   * class and layout changes. Do not add index-based selectors here: one extra
+   * drawer entry would shift every index and silently retarget us.
+   */
+  drawer: {
+    /** The `role="list"` wrapper holding every drawer entry. */
+    itemGroup: [ "[data-slot='item-group']" ],
+    /** Any entry in the drawer, link or button. */
+    item: [ "[data-slot='item']" ],
+    /** Entries that navigate — these come before the action buttons. */
+    linkItems: [ "a[data-slot='item']" ],
+    /** We insert directly after this one. */
+    legalItem: [ "a[data-slot='item'][href='/legal']" ],
+    /** Icon slot within an entry. */
+    itemMedia: [ "[data-slot='item-media']" ],
+    /** Entry label. */
+    itemTitle: [ "[data-slot='item-title']" ],
+    /** Optional subtitle (the Upgrade entry has one). */
+    itemDescription: [ "[data-slot='item-description']" ],
+    /** Opens the drawer. */
+    trigger: [ "[data-slot='drawer-trigger']", "button[aria-label='Open user menu']" ],
+  },
+
   /** Lobby list and lobby detail — entrypoints/lobby.content. */
   lobby: {
     /** Rows in the lobby's player table. */
