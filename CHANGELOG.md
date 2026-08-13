@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
 - Added `play-v2.autodarts.com` to the host permissions, so the extension loads on the rebuilt site
 
 ### Changed
+- Ported Discord Webhooks to the rebuilt site — the first feature back on v2
+  - The manual send button now sits in the lobby's *Players* header, immediately left of the site's own Shuffle button
+  - The lobby link comes from the address bar rather than a text field on the page, which the rebuilt lobby no longer has
+  - Fixed the lobby route (`/lobby/<id>`, was `/lobbies/<id>`) and the readiness check, which waited for a heading the rebuilt lobby does not render — no lobby feature ran on the new site before this
 - Restyled the settings page to the Autodarts design system, so it reads as part of the rebuilt site rather than a panel bolted onto it
   - Cards, headings, tabs, modals and inputs follow the system's surfaces, radii and type scale, using the fonts the live site actually ships (Bebas Neue / Manrope)
   - Feature on/off and the settings segmented controls use the system's SegmentedControl; colour still marks one thing only — the feature is ON

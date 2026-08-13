@@ -8,12 +8,13 @@ import { teamLobby } from "./team-lobby";
 
 import type { IConfig } from "@/utils/storage";
 
-import { waitForElement, waitForElementWithTextContent } from "@/utils";
+import { waitForElement } from "@/utils";
+import { SELECTORS } from "@/utils/selectors";
 import {
   AutodartsToolsConfig,
   AutodartsToolsUrlStatus,
 } from "@/utils/storage";
-import { discordWebhooks } from "@/entrypoints/lobby.content/discord-webhooks";
+import { discordWebhooks, onRemove as onDiscordWebhooksRemove } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
 import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
 import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobbynew.content/qr-code";
@@ -25,6 +26,27 @@ import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
 
+/** The rebuilt site's lobby route. v1's `/lobbies/<id>` is gone. */
+const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
+
+/**
+ * Lobby features whose port to the rebuilt site has landed.
+ *
+ * The route fix below makes this content script run on v2 for the first time,
+ * which would otherwise turn every remaining v1 implementation loose on markup
+ * it was never written for. Their settings cards are disabled too, so a user
+ * carrying `enabled: true` from before could not switch them off.
+ *
+ * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set
+ * the flag there as each feature is ported.
+ */
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord" ]);
+
+function isOn(config: IConfig, feature: keyof IConfig): boolean {
+  if (!PORTED_TO_V2.has(feature)) return false;
+  return Boolean((config[feature] as { enabled?: boolean })?.enabled);
+}
+
 export default defineContentScript({
   matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
@@ -33,12 +55,12 @@ export default defineContentScript({
       if (!url && (isiOS() || isSafari())) url = window.location.href;
 
       const config: IConfig = await AutodartsToolsConfig.getValue();
-      if (/\/lobbies\/(?!.*new\/)/.test(url)) {
+      const lobbyIdMatch = url.match(LOBBY_ROUTE);
+      if (lobbyIdMatch) {
         console.log("Autodarts Tools: Lobby Ready");
 
         // Extract lobby ID from URL and fetch lobby data
-        const lobbyIdMatch = url.match(/\/lobbies\/([0-9a-f-]+)/);
-        if (lobbyIdMatch && lobbyIdMatch[1]) {
+        {
           const lobbyId = lobbyIdMatch[1];
           console.log("Autodarts Tools: Lobby ID:", lobbyId);
 
@@ -61,56 +83,59 @@ export default defineContentScript({
           }
         }
 
-        if (config.discord.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        /**
+         * The lobby is rendered once the Players card header exists. The old
+         * gate here waited for an `h2` reading "Lobby" — the rebuilt lobby has
+         * no headings at all, so that promise never settled.
+         */
+        await waitForElement(SELECTORS.lobby.playersCardHeader, 15000).catch(() => {
+          console.warn("Autodarts Tools: Lobby did not render in time");
+        });
+
+        if (isOn(config, "discord")) {
           await initScript(discordWebhooks, url).catch(console.error);
         }
 
-        if (config.autoStart.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        if (isOn(config, "autoStart")) {
           await initScript(autoStart, url).catch(console.error);
         }
 
-        if (config.shufflePlayers.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        if (isOn(config, "shufflePlayers")) {
           await initScript(shufflePlayers, url).catch(console.error);
         }
 
-        if (config.qrCode.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        if (isOn(config, "qrCode")) {
           await initScript(qrCode, url).catch(console.error);
         }
 
-        if (config.recentLocalPlayers.enabled) {
+        if (isOn(config, "recentLocalPlayers")) {
           const div = document.querySelector("autodarts-tools-recent-local-players");
           if (!div) initRecentLocalPlayers(ctx).catch(console.error);
         }
 
-        if (config.teamLobby.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        if (isOn(config, "teamLobby")) {
           await initScript(teamLobby, url).catch(console.error);
         }
 
-        if (config.soundFx.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        if (isOn(config, "soundFx")) {
           await initScript(soundFx, url).catch(console.error);
         }
 
-        if (config.wledFx.enabled) {
-          await waitForElementWithTextContent("h2", "Lobby");
+        if (isOn(config, "wledFx")) {
           await initScript(wledFx, url).catch(console.error);
         }
       } else if (/\/tournaments\//.test(url)) {
         console.log("Autodarts Tools: Tournament Ready");
 
-        if (config.soundFx.enabled) {
+        if (isOn(config, "soundFx")) {
           await initScript(soundFx, url).catch(console.error);
         }
 
-        if (config.wledFx.enabled) {
+        if (isOn(config, "wledFx")) {
           await initScript(wledFx, url).catch(console.error);
         }
       } else {
+        await onDiscordWebhooksRemove();
         await onAutoStartRemove();
         await onShufflePlayersRemove();
         await onQrCodeRemove();

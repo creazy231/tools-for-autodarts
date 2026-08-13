@@ -158,21 +158,49 @@ export const SELECTORS = {
     trigger: [ "[data-slot='drawer-trigger']", "button[aria-label='Open user menu']" ],
   },
 
-  /** Lobby list and lobby detail — entrypoints/lobby.content. */
+  /** Lobby detail — entrypoints/lobby.content. */
   lobby: {
+    /**
+     * The site's own Shuffle button, in the "Players" card header.
+     *
+     * The only button that is a direct child of a card header on the lobby
+     * page, which makes this pair of data-slots unique without touching text
+     * or an index. Text is not usable: the site ships a language switcher, so
+     * "Shuffle" and "Players" are not stable anchors.
+     */
+    shuffleButton: [ "[data-slot='card-header'] > button[data-slot='button']" ],
+
+    /**
+     * The header row that button lives in — also the lobby's "am I rendered
+     * yet" signal. The v2 lobby has no h1/h2/h3 at all, so the old
+     * `waitForElementWithTextContent("h2", "Lobby")` gate never resolved.
+     */
+    playersCardHeader: [ "[data-slot='card-header']:has(> button[data-slot='button'])" ],
+
+    /**
+     * The Start Game button at the foot of the lobby.
+     *
+     * Text is the only anchor available — it carries no distinguishing
+     * data-slot, id or aria-label — so it has to be matched with
+     * `waitForElementWithTextContent`, which a language switch breaks. Worth
+     * asking autodarts for a hook; see docs/v2-migration-map.md.
+     */
+    startGameButton: [ "button[data-slot='button']" ],
+    startGameText: [ "Start Game" ],
+
     /** Rows in the lobby's player table. */
     playerRows: [
-      // TODO(v2): confirm on a live v2 lobby
+      // TODO(v2): capture when Team Lobby is ported
       "#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) table > tbody > tr",
     ],
     /** Player name within a lobby row (query relative to the row). */
     playerNameInRow: [
-      // TODO(v2)
+      // TODO(v2): capture when Team Lobby is ported
       "td:nth-of-type(2) > span > div p",
     ],
     /** Container holding the lobby action buttons (Start, Leave, ...). */
     actionButtons: [
-      // TODO(v2)
+      // TODO(v2): capture when Auto Start is ported
       "#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:last-of-type",
     ],
     /** Per-row reorder controls, relative to a row. */

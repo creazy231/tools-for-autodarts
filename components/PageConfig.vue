@@ -276,7 +276,7 @@ const featureGroups: FeatureGroup[] = [
     id: "lobbies",
     tab: 0,
     features: [
-      { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true },
+      { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
       { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false },
       { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true },
       { id: "shuffle-players", title: "Shuffle Players Settings", component: ShufflePlayers, hasSettings: false },
