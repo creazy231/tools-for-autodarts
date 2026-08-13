@@ -53,3 +53,6 @@ snapshots/**/*.png
 *.certSigningRequest
 
 git2md
+
+# Devtools build output (yarn build:devtools) — local install only
+.output-devtools

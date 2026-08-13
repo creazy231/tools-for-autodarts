@@ -77,20 +77,29 @@ A dev-only element picker for driving v1 → v2 ports. Pick the element a featur
 touches on the old site, pick its counterpart on the new one, paste both into a
 Claude Code session, and ask for the port.
 
-With `yarn dev` running, on either site:
-
 | key | action |
 |---|---|
 | `Alt+Shift+P` | arm / disarm the picker |
-| click | capture the element under the cursor |
-| `↑` / `↓` | widen / narrow the last capture to a parent or child |
+| hover | preview the element under the cursor |
+| `↑` / `↓` | widen / narrow from whatever is previewed — **no click needed** |
+| `E` or click | capture what is previewed |
 | `C` | copy all captures to the clipboard as Markdown |
 | `R` | reset the captures |
-| `Esc` | disarm |
+| `Esc` | release the lock; press again to disarm |
 
-Clicks are swallowed while armed, so the site never acts on them. `↑` matters
-more than it sounds: clicking an icon lands on a `<path>`, and one press widens
-to the button you actually meant.
+Clicks are swallowed while armed, so the site never acts on them.
+
+**Hover and walk.** Point at an element and press `↑` to move up the tree — no
+need to click first. The first `↑` *locks* the selection (the label shows 🔒), so
+moving the mouse cannot steal it back while you adjust. `↓` walks back down; on
+reaching the element you started from, the lock releases and the preview follows
+the mouse again. `E` or a click captures whatever is previewed and ends the
+walk. `E` is usually the better one — after walking up, the cursor is often no
+longer over the element you actually want, and some elements react badly to
+being clicked.
+
+This matters more than it sounds: pointing at an icon previews a `<path>`, and
+one `↑` gets you the button you actually meant.
 
 For each captured element the report carries:
 
@@ -111,9 +120,40 @@ after moving selectors around:
 yarn picker:index
 ```
 
-The picker is stripped from production entirely — its body is behind
-`import.meta.env.DEV`, and a `build:done` hook in `wxt.config.ts` drops the
-emitted file and unregisters it from the manifest, so nothing ships to users.
+#### Installing the picker in a real browser
+
+The picker is useless if it only exists in `yarn dev` — capturing the in-match
+DOM needs a real board and a real match. So there is a second build target:
+
+```bash
+yarn build:devtools           # -> .output-devtools/chrome-mv3
+yarn build:devtools:firefox
+yarn zip:devtools             # zipped, for loading as an unpacked extension
+```
+
+That is a normal production build that also ships the picker. Load
+`.output-devtools/chrome-mv3` via *chrome://extensions → Load unpacked*. It
+reports itself as `3.0.0+devtools` in `chrome://extensions`, so it is obvious
+which copy is installed.
+
+| | `yarn build` (CI / stores) | `yarn build:devtools` (local) |
+|---|---|---|
+| output | `.output/` | `.output-devtools/` |
+| picker | stripped | included |
+| `clipboardWrite` permission | not requested | requested |
+| `version_name` | — | `<version>+devtools` |
+
+Everything else is identical, so the devtools build behaves exactly like the
+store build on the existing site.
+
+**The picker never reaches store users.** It is gated on a Vite `define`
+(`__ADT_PICKER__`), and `build:manifestGenerated` / `build:done` hooks in
+`wxt.config.ts` delete the emitted file and unregister it from the manifest for
+any non-devtools production build. Verify at any time with:
+
+```bash
+grep -rl "adt-dom-picker-host" .output/chrome-mv3/   # must print nothing
+```
 
 ### Which build gets loaded
 

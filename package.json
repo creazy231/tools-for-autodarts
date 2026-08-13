@@ -1,7 +1,7 @@
 {
   "name": "autodarts-tools",
   "description": "Autodarts Tools enhances the gaming experience on autodarts.com",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "type": "module",
   "author": {
     "name": "Tobias Thiele",
@@ -16,6 +16,9 @@
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
+    "build:devtools": "ADT_DEVTOOLS=1 wxt build",
+    "build:devtools:firefox": "ADT_DEVTOOLS=1 wxt build -b firefox",
+    "zip:devtools": "ADT_DEVTOOLS=1 wxt zip",
     "compile": "vue-tsc --noEmit",
     "picker:index": "node scripts/build-selector-index.mjs",
     "postinstall": "wxt prepare"

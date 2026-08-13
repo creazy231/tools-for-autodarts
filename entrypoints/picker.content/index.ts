@@ -8,9 +8,15 @@
  * carries the selectors, ancestor anchors, and the extension code that already
  * targets them.
  *
- * The entire body is behind `import.meta.env.DEV`, so Vite dead-code-eliminates
- * it from production builds — this never ships to users.
+ * The body is gated so it never reaches store users. It is included in
+ * `yarn dev`, and in `yarn build:devtools` — a production build meant for
+ * installing locally in a real browser, since capturing the in-match DOM needs
+ * a real board and a real match. Plain `yarn build`, which CI publishes, strips
+ * it entirely (see the hooks in wxt.config.ts).
  */
+
+/** Injected by Vite's `define`; true only in devtools builds. */
+declare const __ADT_PICKER__: boolean;
 
 import { serializeCapture } from "./serialize";
 import { PickerUi } from "./ui";
@@ -50,22 +56,30 @@ export default defineContentScript({
   runAt: "document_idle",
 
   main() {
-    if (!import.meta.env.DEV) return;
+    if (!import.meta.env.DEV && !__ADT_PICKER__) return;
 
     let ui: PickerUi | null = null;
     let armed = false;
+    const captured: Element[] = [];
+
+    /** Element currently under the cursor. */
+    let hovered: Element | null = null;
 
     /**
-     * `current` is what gets serialized; `original` is where the click landed.
-     * Arrow keys walk `current` up and down that lineage, so you can click
-     * roughly and then widen to the container you actually meant.
+     * Set as soon as ↑/↓ is pressed, which freezes the preview so moving the
+     * mouse cannot steal it back. `origin` is the element the walk started
+     * from; returning to it releases the lock and hover-following resumes.
      */
-    interface Capture { current: Element; original: Element }
-    const captured: Capture[] = [];
+    let locked: { current: Element; origin: Element } | null = null;
 
-    const badgeHtml = () =>
-      `<b>DOM PICKER</b> · ${captured.length} captured`
-      + `<span class="keys">click · ↑↓ widen/narrow · C copy · R reset · Esc off</span>`;
+    /** What ↑/↓ and a click act on. */
+    const preview = () => locked?.current ?? hovered;
+
+    const badgeHtml = () => {
+      const depth = locked ? ` · locked ${locked.current.tagName.toLowerCase()}` : "";
+      return `<b>DOM PICKER</b> · ${captured.length} captured${depth}`
+        + `<span class="keys">hover · ↑↓ widen/narrow · E or click capture · C copy · R reset · Esc off</span>`;
+    };
 
     /**
      * SVG internals are almost never what you want to target — clicking an icon
@@ -91,34 +105,69 @@ export default defineContentScript({
       return null;
     }
 
-    /** Widen the most recent capture to its parent. */
+    /**
+     * Widen to the parent. The first press locks onto whatever is hovered, so
+     * you never have to click an element before adjusting the selection.
+     */
     function widen() {
-      const last = captured.at(-1);
-      if (last?.current.parentElement) last.current = last.current.parentElement;
+      const from = preview();
+      if (!from) return;
+      locked ??= { current: from, origin: from };
+      if (locked.current.parentElement) locked.current = locked.current.parentElement;
     }
 
-    /** Narrow back down one step toward where the click actually landed. */
+    /**
+     * Narrow one step back toward where the walk started. Arriving back at the
+     * origin releases the lock, so the preview follows the mouse again.
+     */
     function narrow() {
-      const last = captured.at(-1);
-      if (!last || last.current === last.original) return;
-      // The child of `current` that still contains the original pick.
-      let child: Element = last.original;
-      while (child.parentElement && child.parentElement !== last.current) child = child.parentElement;
-      if (child.parentElement === last.current) last.current = child;
+      if (!locked) return;
+      if (locked.current === locked.origin) { locked = null; return; }
+      // The child of `current` that still contains the origin.
+      let child: Element = locked.origin;
+      while (child.parentElement && child.parentElement !== locked.current) child = child.parentElement;
+      if (child.parentElement === locked.current) locked.current = child;
+      if (locked.current === locked.origin) locked = null;
+    }
+
+    /** Redraw highlight + badge for whatever is currently previewed. */
+    function reflect() {
+      if (!ui) return;
+      const el = preview();
+      if (!el) { ui.hideHighlight(); ui.setBadge(badgeHtml()); return; }
+      const cls = Array.from(el.classList).slice(0, 2).join(".");
+      const label = `${locked ? "🔒 " : ""}<${el.tagName.toLowerCase()}>${el.id ? `#${el.id}` : ""}${cls ? `.${cls}` : ""}`;
+      ui.showHighlight(el, label);
+      ui.setBadge(badgeHtml());
     }
 
     function onMove(e: MouseEvent) {
       if (!armed || !ui) return;
-      const el = targetOf(e);
-      if (!el) { ui.hideHighlight(); return; }
-      const cls = Array.from(el.classList).slice(0, 2).join(".");
-      ui.showHighlight(el, `<${el.tagName.toLowerCase()}>${el.id ? `#${el.id}` : ""}${cls ? `.${cls}` : ""}`);
+      hovered = targetOf(e);
+      // While locked the mouse is ignored, so a stray movement cannot discard a
+      // selection you walked up to.
+      if (locked) return;
+      reflect();
+    }
+
+    /** Add an element to the capture set and end the current walk. */
+    function capture(el: Element | null) {
+      if (!el || !ui) return;
+      const already = captured.includes(el);
+      if (!already) captured.push(el);
+      // A capture ends the walk; the next hover starts fresh.
+      locked = null;
+      ui.setBadge(badgeHtml());
+      ui.showHighlight(el, `${already ? "already captured" : "captured"} <${el.tagName.toLowerCase()}>`);
     }
 
     function onClick(e: MouseEvent) {
       if (!armed || !ui) return;
       if (ui.ownsEvent(e)) return;
-      const el = targetOf(e);
+
+      // Capture whatever is previewed — the walked-up ancestor when locked,
+      // otherwise the element under the cursor.
+      const el = locked?.current ?? targetOf(e);
       if (!el) return;
 
       // Stop the site from acting on this click — we are inspecting, not using.
@@ -126,17 +175,7 @@ export default defineContentScript({
       e.stopPropagation();
       e.stopImmediatePropagation();
 
-      if (!captured.some(c => c.current === el)) captured.push({ current: el, original: el });
-      ui.setBadge(badgeHtml());
-      ui.showHighlight(el, `captured <${el.tagName.toLowerCase()}>`);
-    }
-
-    /** Re-highlight the most recent capture, after ↑/↓ changed it. */
-    function reflectLatest() {
-      const last = captured.at(-1);
-      if (!last || !ui) return;
-      ui.showHighlight(last.current, `captured <${last.current.tagName.toLowerCase()}>`);
-      ui.setBadge(badgeHtml());
+      capture(el);
     }
 
     async function copyCapture() {
@@ -145,7 +184,7 @@ export default defineContentScript({
         ui.flash("<b>NOTHING CAPTURED</b><span class=\"keys\">click an element first</span>", badgeHtml());
         return;
       }
-      const md = serializeCapture(captured.map(c => c.current));
+      const md = serializeCapture(captured);
       const ok = await copyText(md);
       if (ok) {
         ui.flash(
@@ -173,6 +212,8 @@ export default defineContentScript({
 
     function disarm() {
       armed = false;
+      locked = null;
+      hovered = null;
       document.removeEventListener("mousemove", onMove, true);
       document.removeEventListener("click", onClick, true);
       ui?.hideHighlight();
@@ -189,13 +230,22 @@ export default defineContentScript({
       }
       if (!armed) return;
 
-      if (e.code === "Escape") { e.preventDefault(); disarm(); }
-      else if (e.code === "KeyC") { e.preventDefault(); void copyCapture(); }
-      else if (e.code === "ArrowUp") { e.preventDefault(); widen(); reflectLatest(); }
-      else if (e.code === "ArrowDown") { e.preventDefault(); narrow(); reflectLatest(); }
+      if (e.code === "Escape") {
+        e.preventDefault();
+        // Escape releases a lock first; only a second press disarms, so you
+        // can back out of a walk without losing the whole session.
+        if (locked) { locked = null; reflect(); } else disarm();
+      } else if (e.code === "KeyC") { e.preventDefault(); void copyCapture(); }
+      // Capture without clicking — useful once you have walked up the tree and
+      // the cursor is no longer over the element you actually want, and for
+      // elements that would react badly to a click.
+      else if (e.code === "KeyE") { e.preventDefault(); capture(preview()); }
+      else if (e.code === "ArrowUp") { e.preventDefault(); widen(); reflect(); }
+      else if (e.code === "ArrowDown") { e.preventDefault(); narrow(); reflect(); }
       else if (e.code === "KeyR") {
         e.preventDefault();
         captured.length = 0;
+        locked = null;
         ui?.hideHighlight();
         ui?.setBadge(badgeHtml());
       }

@@ -1,8 +1,10 @@
-import { mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { URL, fileURLToPath } from "node:url";
 
 import { defineConfig } from "wxt";
+
+const { version } = JSON.parse(readFileSync("./package.json", "utf8")) as { version: string };
 import vue from "@vitejs/plugin-vue";
 import AutoImport from "unplugin-auto-import/vite";
 import Component from "unplugin-vue-components/vite";
@@ -15,8 +17,22 @@ import { ViteMcp } from "vite-plugin-mcp";
 const CHROMIUM_PROFILE = ".chrome-profile-dev";
 mkdirSync(CHROMIUM_PROFILE, { recursive: true });
 
+/**
+ * Devtools build: a normal production build that ALSO ships the DOM picker,
+ * for installing locally in a real browser (`yarn build:devtools`).
+ *
+ * It is deliberately a separate target from `yarn build`, which is what CI
+ * publishes to the stores. The picker must never reach store users, but it is
+ * useless if it only exists in `yarn dev` — capturing the in-match DOM needs a
+ * real browser, a real board and a real match.
+ */
+const DEVTOOLS = process.env.ADT_DEVTOOLS === "1";
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
+  // Keep devtools builds out of .output/, so a store build and a local
+  // devtools build can coexist and never overwrite each other.
+  outDir: DEVTOOLS ? ".output-devtools" : ".output",
   // runner: { // Deprecated in v0.20
   //   startUrls: [ "https://play.autodarts.com/" ],
   // },
@@ -56,10 +72,9 @@ export default defineConfig({
     ],
     permissions: [
       "storage",
-      // Lets the dev-only DOM picker write to the clipboard without a
-      // permission prompt. Harmless in production, where the picker is
-      // dead-code-eliminated.
-      "clipboardWrite",
+      // Only the DOM picker needs this, so store builds must not request it —
+      // an unused permission is a needless prompt and a review flag.
+      ...(DEVTOOLS ? [ "clipboardWrite" ] : []),
       // "background",
     ],
     background: {
@@ -69,6 +84,9 @@ export default defineConfig({
     },
     name: "Tools for Autodarts",
     description: "Tools for Autodarts enhances the gaming experience on autodarts.com",
+    // Chrome surfaces version_name in chrome://extensions, so it is obvious at a
+    // glance whether the installed copy is the store build or the devtools one.
+    ...(DEVTOOLS ? { version_name: `${version}+devtools` } : {}),
     // content_scripts: [
     //   {
     //     matches: [ "*://play.autodarts.com/*" ],
@@ -105,7 +123,7 @@ export default defineConfig({
      * adding a new entrypoint never silently excludes it.
      */
     "build:manifestGenerated": (wxt, manifest) => {
-      if (wxt.config.mode === "development") return;
+      if (wxt.config.mode === "development" || DEVTOOLS) return;
 
       // WXT groups content scripts that share the same matches + runAt into a
       // single manifest entry, so the picker sits in the same entry as the real
@@ -118,7 +136,7 @@ export default defineConfig({
       if (!manifest.content_scripts?.length) delete manifest.content_scripts;
     },
     "build:done": (wxt, output) => {
-      if (wxt.config.mode === "development") return;
+      if (wxt.config.mode === "development" || DEVTOOLS) return;
       const isPicker = (name: string) => name.includes("picker");
 
       // Drop the emitted file, and drop it from the build output too — WXT
@@ -135,6 +153,12 @@ export default defineConfig({
     },
   },
   vite: () => ({
+    define: {
+      // Gates the DOM picker. In `yarn dev` the picker's own
+      // `import.meta.env.DEV` check covers it; this flag is what lets a
+      // PRODUCTION build (yarn build:devtools) include it as well.
+      __ADT_PICKER__: JSON.stringify(DEVTOOLS),
+    },
     server: {
       watch: {
         usePolling: true,
