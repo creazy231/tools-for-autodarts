@@ -1,0 +1,63 @@
+{
+  "site": "v2",
+  "label": "v2 (Tailwind + shadcn/ui — the target)",
+  "baseUrl": "https://play-v2.autodarts.com",
+  "reachableLinks": [
+    "/",
+    "/play",
+    "/tournaments",
+    "/statistics",
+    "/subscriptions"
+  ],
+  "routes": [
+    {
+      "slug": "home",
+      "route": "/",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/",
+      "elements": 781
+    },
+    {
+      "slug": "play",
+      "route": "/play",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/play",
+      "elements": 321
+    },
+    {
+      "slug": "tournaments",
+      "route": "/tournaments",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/tournaments?showFull=true&showRestricted=true&plusOnly=false",
+      "elements": 904
+    },
+    {
+      "slug": "statistics",
+      "route": "/statistics",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/statistics?mode=x01&legs=100&interval=daily",
+      "elements": 1581
+    },
+    {
+      "slug": "subscriptions",
+      "route": "/subscriptions",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/subscriptions",
+      "elements": 359
+    },
+    {
+      "slug": "redeem",
+      "route": "/redeem",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/redeem",
+      "elements": 227
+    },
+    {
+      "slug": "login",
+      "route": "/login",
+      "ok": true,
+      "finalUrl": "https://play-v2.autodarts.com/",
+      "elements": 782
+    }
+  ]
+}

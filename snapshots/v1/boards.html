@@ -1,0 +1,573 @@
+<!DOCTYPE html><html lang="en" translate="no" data-theme="dark" style="color-scheme: dark;"><head>
+  <meta charset="utf-8">
+  <title>My Boards | Autodarts Play</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">:root, :host {
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 7 Free";
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 7 Free";
+  --fa-font-light: normal 300 1em/1 "Font Awesome 7 Pro";
+  --fa-font-thin: normal 100 1em/1 "Font Awesome 7 Pro";
+  --fa-font-duotone: normal 900 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-duotone-regular: normal 400 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-duotone-light: normal 300 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-duotone-thin: normal 100 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-brands: normal 400 1em/1 "Font Awesome 7 Brands";
+  --fa-font-sharp-solid: normal 900 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-regular: normal 400 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-light: normal 300 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-thin: normal 100 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-sharp-duotone-light: normal 300 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-slab-regular: normal 400 1em/1 "Font Awesome 7 Slab";
+  --fa-font-slab-press-regular: normal 400 1em/1 "Font Awesome 7 Slab Press";
+  --fa-font-whiteboard-semibold: normal 600 1em/1 "Font Awesome 7 Whiteboard";
+  --fa-font-thumbprint-light: normal 300 1em/1 "Font Awesome 7 Thumbprint";
+  --fa-font-notdog-solid: normal 900 1em/1 "Font Awesome 7 Notdog";
+  --fa-font-notdog-duo-solid: normal 900 1em/1 "Font Awesome 7 Notdog Duo";
+  --fa-font-etch-solid: normal 900 1em/1 "Font Awesome 7 Etch";
+  --fa-font-jelly-regular: normal 400 1em/1 "Font Awesome 7 Jelly";
+  --fa-font-jelly-fill-regular: normal 400 1em/1 "Font Awesome 7 Jelly Fill";
+  --fa-font-jelly-duo-regular: normal 400 1em/1 "Font Awesome 7 Jelly Duo";
+  --fa-font-chisel-regular: normal 400 1em/1 "Font Awesome 7 Chisel";
+  --fa-font-utility-semibold: normal 600 1em/1 "Font Awesome 7 Utility";
+  --fa-font-utility-duo-semibold: normal 600 1em/1 "Font Awesome 7 Utility Duo";
+  --fa-font-utility-fill-semibold: normal 600 1em/1 "Font Awesome 7 Utility Fill";
+}
+
+.svg-inline--fa {
+  box-sizing: content-box;
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285714em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left,
+.svg-inline--fa .fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-pull-right,
+.svg-inline--fa .fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  inset-block-start: 0.25em; /* syncing vertical alignment with Web Font rendering */
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.fa-layers .svg-inline--fa {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: calc(10 / 16 * 1em); /* converts a 10px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 10 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 10 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xs {
+  font-size: calc(12 / 16 * 1em); /* converts a 12px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 12 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 12 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-sm {
+  font-size: calc(14 / 16 * 1em); /* converts a 14px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 14 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 14 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-lg {
+  font-size: calc(20 / 16 * 1em); /* converts a 20px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 20 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 20 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xl {
+  font-size: calc(24 / 16 * 1em); /* converts a 24px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 24 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 24 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-2xl {
+  font-size: calc(32 / 16 * 1em); /* converts a 32px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 32 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 32 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-width-auto {
+  --fa-width: auto;
+}
+
+.fa-fw,
+.fa-width-fixed {
+  --fa-width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-inline-start: var(--fa-li-margin, 2.5em);
+  padding-inline-start: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+/* Heads Up: Bordered Icons will not be supported in the future!
+  - This feature will be deprecated in the next major release of Font Awesome (v8)!
+  - You may continue to use it in this version *v7), but it will not be supported in Font Awesome v8.
+*/
+/* Notes:
+* --@{v.$css-prefix}-border-width = 1/16 by default (to render as ~1px based on a 16px default font-size)
+* --@{v.$css-prefix}-border-padding =
+  ** 3/16 for vertical padding (to give ~2px of vertical whitespace around an icon considering it's vertical alignment)
+  ** 4/16 for horizontal padding (to give ~4px of horizontal whitespace around an icon)
+*/
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.0625em);
+  box-sizing: var(--fa-border-box-sizing, content-box);
+  padding: var(--fa-border-padding, 0.1875em 0.25em);
+}
+
+.fa-pull-left,
+.fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right,
+.fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+  .fa-bounce,
+  .fa-fade,
+  .fa-beat-fade,
+  .fa-flip,
+  .fa-pulse,
+  .fa-shake,
+  .fa-spin,
+  .fa-spin-pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}
+
+.svg-inline--fa.fa-inverse {
+  fill: var(--fa-inverse, #fff);
+}
+
+.fa-stack {
+  display: inline-block;
+  height: 2em;
+  line-height: 2em;
+  position: relative;
+  vertical-align: middle;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  --fa-width: 1.25em;
+  height: 1em;
+  width: var(--fa-width);
+}
+.svg-inline--fa.fa-stack-2x {
+  --fa-width: 2.5em;
+  height: 2em;
+  width: var(--fa-width);
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  z-index: var(--fa-stack-z-index, auto);
+}</style><link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <meta name="theme-color" content="#384688">
+  <meta name="description" content="Play online darts with automatic scoring with Autodarts.">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <script type="module" crossorigin="" src="/assets/index-DOPrWBa0.js"></script>
+  <link rel="stylesheet" crossorigin="" href="/assets/index-Btw_9-DK.css">
+<style data-emotion="css-global" data-s=""></style><style data-emotion="css-global" data-s=""></style><style data-emotion="css-global" data-s=""></style><style data-emotion="css" data-s=""></style></head>
+<body class="chakra-ui-dark">
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"><div class="css-z42oq0"><div class="chakra-stack navigation css-ege71s"><div class="css-1badijy"><div class="css-79elbk"><svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 0 517.19 128.89"><g><path fill="white" d="m184.73,91.95h-14.18v-14.8h-9.09v14.8h-14.18v-45.99c0-6.54,3.44-9.02,9.71-9.02h27.75v55.01Zm-14.18-27.26v-15.14h-9.09v15.14h9.09Z"></path><path fill="white" d="m227.69,83c0,6.54-3.44,8.95-9.71,8.95h-18.04c-6.26,0-9.64-2.41-9.64-8.95v-46.06h14.18v42.41h9.02v-42.41h14.18v46.06Z"></path><path fill="white" d="m269.36,49.54h-11.77v42.41h-14.18v-42.41h-11.77v-12.6h37.73v12.6Z"></path><path fill="white" d="m310.67,83.28c0,6.13-3.17,8.67-9.43,8.67h-18.52c-5.92,0-9.43-2.41-9.43-8.67v-37.59c0-5.85,3.17-8.74,9.43-8.74h18.52c5.99,0,9.43,2.48,9.43,8.74v37.59Zm-14.18-3.92v-29.74h-9.02v29.74h9.02Z"></path><path fill="white" d="m353.71,83.28c0,5.92-3.37,8.67-9.5,8.67h-27.95v-55.01h27.95c5.85,0,9.5,2.41,9.5,8.74v37.59Zm-14.18-3.92v-29.74h-9.09v29.74h9.09Z"></path><path fill="white" d="m396.75,91.95h-14.18v-14.8h-9.09v14.8h-14.18v-45.99c0-6.54,3.44-9.02,9.71-9.02h27.75v55.01Zm-14.18-27.26v-15.14h-9.09v15.14h9.09Z"></path><path fill="white" d="m438.76,91.95h-14.18v-18.52h-8.06v18.52h-14.18v-55.01h26.71c6.27,0,9.71,2.48,9.71,9.02v14.11c0,4.13-1.93,6.13-5.09,7.09v.14c3.1.41,5.09,2.34,5.09,6.47v18.17Zm-14.18-31.05v-11.36h-8.06v11.36h8.06Z"></path><path fill="white" d="m480.42,49.54h-11.77v42.41h-14.18v-42.41h-11.77v-12.6h37.73v12.6Z"></path><path fill="white" d="m517.19,83.28c0,6.33-3.44,8.67-9.64,8.67h-23.2v-12.6h18.66v-8.81h-9.09c-7.78,0-9.57-3.79-9.57-8.61v-15.97c0-6.54,3.37-9.02,9.64-9.02h21.82v12.6h-17.28v8.4h8.95c6.61,0,9.71,2.75,9.71,9.36v15.97Z"></path><path fill="#ffffff" d="m44.61,64.45c0,15.97,12.99,28.96,28.95,28.96s28.96-12.99,28.96-28.96-12.99-28.95-28.96-28.95-28.95,12.99-28.95,28.95Zm12.62,0c0-9.01,7.33-16.33,16.33-16.33,9.01,0,16.33,7.32,16.33,16.33s-7.33,16.34-16.33,16.34c-9,0-16.33-7.33-16.33-16.34Z"></path><path fill="#ffffff" d="m0,64.45c0,3.06,2.48,5.54,5.54,5.54h17.23c2.77,25.59,24.49,45.57,50.8,45.57,7.33,0,14.29-1.58,20.59-4.37l8.62,14.92c1.53,2.65,4.92,3.56,7.57,2.03,2.65-1.53,3.56-4.92,2.03-7.57l-8.64-14.96c12.67-9.31,20.95-24.28,20.95-41.17s-8.27-31.86-20.95-41.17l8.65-14.98c1.53-2.65.62-6.04-2.03-7.57-2.65-1.53-6.04-.62-7.57,2.03l-8.63,14.94c-6.31-2.79-13.26-4.37-20.59-4.37-26.31,0-48.03,19.99-50.8,45.57H5.54c-3.06,0-5.54,2.48-5.54,5.54Zm35.08,0c0-21.22,17.27-38.48,38.49-38.48,21.22,0,38.49,17.27,38.49,38.48s-17.27,38.49-38.49,38.49-38.49-17.27-38.49-38.49Z"></path></g></svg></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1kwqbwj"><a class="chakra-button css-1m9c7fh" href="/"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0v24h24V0H0zm23 16c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8z"></path><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path></svg></span>Play</a><a class="chakra-button css-1nal3hj" href="/lobbies"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M10 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM4 18c.22-.72 3.31-2 6-2 0-.7.13-1.37.35-1.99C7.62 13.91 2 15.27 2 18v2h9.54c-.52-.58-.93-1.25-1.19-2H4zM19.43 18.02c.36-.59.57-1.28.57-2.02 0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4c.74 0 1.43-.22 2.02-.57L20.59 22 22 20.59c-1.5-1.5-.79-.8-2.57-2.57zM16 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg></span>Lobbies</a><a class="chakra-button css-1nal3hj" href="/matches"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg></span>Matches</a><a class="chakra-button css-1nal3hj" href="/tournaments"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"></path></svg></span>Tournaments</a><a class="chakra-button css-1nal3hj" href="/history/matches"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M13 3a9 9 0 00-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0013 21a9 9 0 000-18zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"></path></svg></span>Match history</a><a class="chakra-button css-1nal3hj" href="/statistics"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></span>Statistics</a><a class="chakra-button css-1nal3hj" href="/boards"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3-8c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3z"></path></svg></span>My boards</a></div><div class="css-17xejub"></div><a class="chakra-button css-1jtmech" aria-label="hidden feature" href="/camera"><div aria-hidden="true" focusable="false" class="css-0" style="transform-origin: center top;"><svg data-prefix="fas" data-icon="camera" class="svg-inline--fa fa-camera" role="img" viewBox="0 0 512 512" aria-hidden="true" font-size="0.9rem"><path fill="currentColor" d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0-10.4-31.2C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"></path></svg></div></a><div class="css-gmuwbf"><div class="css-169zhyd"><button type="button" class="chakra-button css-1jtmech" aria-label="Open notifications"><div aria-hidden="true" focusable="false" class="css-0" style="transform-origin: center top;"><svg data-prefix="fas" data-icon="bell" class="svg-inline--fa fa-bell" role="img" viewBox="0 0 448 512" aria-hidden="true" font-size="0.9rem"><path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32l0 3.2C119 50 64 114.6 64 192l0 21.7c0 48.1-16.4 94.8-46.4 132.4L7.8 358.3C2.7 364.6 0 372.4 0 380.5 0 400.1 15.9 416 35.5 416l376.9 0c19.6 0 35.5-15.9 35.5-35.5 0-8.1-2.7-15.9-7.8-22.2l-9.8-12.2C400.4 308.5 384 261.8 384 213.7l0-21.7c0-77.4-55-142-128-156.8l0-3.2c0-17.7-14.3-32-32-32zM162 464c7.1 27.6 32.2 48 62 48s54.9-20.4 62-48l-124 0z"></path></svg></div></button></div></div><div class="css-gmuwbf"><div class="css-79elbk"><button type="button" class="chakra-button chakra-menu__menu-button css-1nlwyv4" id="menu-button-:r3:" aria-expanded="false" aria-haspopup="menu" aria-controls="menu-list-:r3:"><span class="chakra-button__icon css-1wh2kri"><span aria-hidden="true" focusable="false" class="chakra-avatar css-pyu8a9" data-loaded="" style="width: 32px; height: 32px;"><img src="https://gravatar.com/avatar/882908ae96f45cc2ddc5ddf89714a2eb" alt="CREAZY" class="chakra-avatar__img css-3a5bz2"><div class="chakra-avatar__badge css-fi8vxe"></div></span></span><span class="css-xl71ch">CREAZY</span></button></div><div class="css-hacnqc" style="visibility: hidden; position: absolute; min-width: max-content; inset: 0px auto auto 0px;"><div tabindex="-1" role="menu" id="menu-list-:r3:" aria-orientation="vertical" class="chakra-menu__menu-list css-yskgbr" style="transform-origin: var(--popper-transform-origin); opacity: 0; visibility: hidden; transform: scale(0.8);"><button type="button" id="menu-list-:r3:-menuitem-:r4:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" data-index="0">Account</button><a id="menu-list-:r3:-menuitem-:r5:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/boards" data-index="1">My boards</a><a id="menu-list-:r3:-menuitem-:r6:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/settings" data-index="2">Settings</a><a id="menu-list-:r3:-menuitem-:r7:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1uorwg2" href="/statistics" data-index="3">Statistics</a><a id="menu-list-:r3:-menuitem-:r8:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/subscribed" data-index="4">Subscription</a><a id="menu-list-:r3:-menuitem-:r9:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/legal/tos" target="_blank" data-index="5">Terms &amp; Conditions</a><a id="menu-list-:r3:-menuitem-:ra:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/legal/privacy" target="_blank" data-index="6">Privacy Policy</a><button type="button" id="menu-list-:r3:-menuitem-:rb:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" data-index="7">Log out</button><div class="chakra-menu__group" role="group"><p class="chakra-menu__group__title css-hunt27" id="ad-ext-user-menu-extra" style="display: none;">Extensions</p><button type="button" id="menu-list-:r3:-menuitem-:rc:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-y7jzs3" data-index="8" style="display: none;">Dummy</button></div></div></div></div><div class="css-gmuwbf"><button type="button" class="chakra-button css-11at0h5" aria-label="Collapse side bar"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg></button></div></div><div class="css-nfhdnc"><div class="css-gmuwbf"><div class="animate__animated animate__fadeIn css-1q0rlnk" style="animation-duration: 0.2s;"><div class="chakra-stack css-abvxnf"><div class="chakra-stack css-n3uhkm"><h2 class="chakra-heading css-1dklj6k">My Boards</h2><h2 class="chakra-heading css-1dklj6k">(2/5)</h2><div class="css-17xejub"></div><button type="button" class="chakra-button css-15w88gn">Register board</button></div><div class="chakra-stack css-1uzwlbz"><div class="chakra-stack css-tgpajw"><h2 class="chakra-heading css-18j379d">Owned by me</h2><div class="css-vutusn"><div class="chakra-card css-19vjuk"><div class="chakra-card__header css-1sl53ol"><div class="chakra-stack css-1igwmid"><h2 class="chakra-heading css-18j379d"><div class="chakra-stack css-1igwmid"><p class="chakra-text css-0">Wohnzimmer</p><button type="button" class="chakra-button css-ojtbwn" aria-label="Open Board settings"><svg data-prefix="fas" data-icon="gear" class="svg-inline--fa fa-gear" role="img" viewBox="0 0 512 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M195.1 9.5C198.1-5.3 211.2-16 226.4-16l59.8 0c15.2 0 28.3 10.7 31.3 25.5L332 79.5c14.1 6 27.3 13.7 39.3 22.8l67.8-22.5c14.4-4.8 30.2 1.2 37.8 14.4l29.9 51.8c7.6 13.2 4.9 29.8-6.5 39.9L447 233.3c.9 7.4 1.3 15 1.3 22.7s-.5 15.3-1.3 22.7l53.4 47.5c11.4 10.1 14 26.8 6.5 39.9l-29.9 51.8c-7.6 13.1-23.4 19.2-37.8 14.4l-67.8-22.5c-12.1 9.1-25.3 16.7-39.3 22.8l-14.4 69.9c-3.1 14.9-16.2 25.5-31.3 25.5l-59.8 0c-15.2 0-28.3-10.7-31.3-25.5l-14.4-69.9c-14.1-6-27.2-13.7-39.3-22.8L73.5 432.3c-14.4 4.8-30.2-1.2-37.8-14.4L5.8 366.1c-7.6-13.2-4.9-29.8 6.5-39.9l53.4-47.5c-.9-7.4-1.3-15-1.3-22.7s.5-15.3 1.3-22.7L12.3 185.8c-11.4-10.1-14-26.8-6.5-39.9L35.7 94.1c7.6-13.2 23.4-19.2 37.8-14.4l67.8 22.5c12.1-9.1 25.3-16.7 39.3-22.8L195.1 9.5zM256.3 336a80 80 0 1 0 -.6-160 80 80 0 1 0 .6 160z"></path></svg></button></div></h2><div class="css-17xejub"></div><span class="css-exn4vj"><span class="css-1ny2kle">Offline</span></span><svg viewBox="0 0 24 24" focusable="false" class="chakra-icon css-uv9kxn"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 4.50982L12.9771 2.74255L12.9829 15.26L0.012 15.3338L0 4.50982ZM12.9709 16.7022L12.9811 29.2305L0.0101818 27.4473L0.00945455 16.6182L12.9709 16.7022ZM14.544 2.51127L31.7505 0V15.1007L14.544 15.2375V2.51127ZM31.7545 16.82L31.7505 31.8527L14.544 29.4244L14.52 16.792L31.7545 16.82Z" fill="rgba(255, 255, 255, 0.80)"></path></svg></svg></div></div><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-ahthbn"><div class="chakra-stack css-1igwmid"><code class="chakra-code css-lqvy6z">1.0.7</code><span class="css-m6gpa9"><svg viewBox="0 0 14 14" focusable="false" class="chakra-icon chakra-icon css-l30hbq"><g fill="currentColor"><polygon points="5.5 11.9993304 14 3.49933039 12.5 2 5.5 8.99933039 1.5 4.9968652 0 6.49933039"></polygon></g></svg><span class="css-1ny2kle">Up to date</span></span><div class="css-17xejub"></div></div><div role="group" class="chakra-stat__group css-1mpfoc5"><div class="chakra-stat css-1mbo1ls"><dl><dt class="chakra-stat__label css-14go5ty">Darts</dt><dd class="chakra-stat__number css-1axeus7">56667</dd></dl></div><div class="chakra-stat css-1mbo1ls"><dl><dt class="chakra-stat__label css-14go5ty">Corrections</dt><dd class="chakra-stat__number css-1axeus7">389</dd></dl></div><div class="chakra-stat css-1mbo1ls"><dl><dt class="chakra-stat__label css-14go5ty">Accuracy</dt><dd class="chakra-stat__number css-1axeus7">99.31%</dd></dl></div></div><div class="chakra-stack css-8g8ihq"></div></div></div><div class="chakra-card__footer css-1a7q9t8"><div class="chakra-stack css-1szdkck"><div class="css-17xejub"></div><button type="button" class="chakra-button css-19qafxr" aria-label="Copy board ID"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><a class="chakra-button css-19qafxr" aria-label="Follow board" href="/boards/59d1ba6b-198a-4990-b37d-a831ce1511a1/follow"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></a><button type="button" class="chakra-button css-19qafxr" aria-label="Sharing options"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"></path></svg></button><button type="button" class="chakra-button css-19qafxr" aria-label="Generate new API key"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12.65 10A5.99 5.99 0 007 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 005.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg></button></div></div></div></div></div><div class="chakra-stack css-tgpajw"><h2 class="chakra-heading css-18j379d">Shared with me</h2><div class="css-vutusn"><div class="chakra-card css-19vjuk"><div class="chakra-card__header css-1sl53ol"><div class="chakra-stack css-1igwmid"><h2 class="chakra-heading css-18j379d">qcKitchen </h2><div class="css-17xejub"></div><span class="css-jmdw5n"><span class="css-1ny2kle">Stopped</span></span><svg viewBox="0 0 24 24" focusable="false" class="chakra-icon css-uv9kxn"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28.6718 25.901C27.843 25.5618 27.1614 25.0242 27.2094 24.0002C27.2574 22.9762 26.4766 22.2978 26.4766 22.2978C26.4766 22.2978 27.1582 20.0546 26.5246 18.2018C25.891 16.3458 23.795 13.3762 22.1886 11.133C20.5822 8.8898 21.9454 6.3042 20.4862 2.9922C19.0206 -0.3198 15.2222 -0.1278 13.1742 1.2866C11.1262 2.6978 11.7598 6.2082 11.8558 7.8658C11.955 9.5202 11.9006 10.701 11.7118 11.1298C11.5198 11.5586 10.2014 13.1298 9.3214 14.445C8.4446 15.7602 7.811 18.4898 7.1742 19.613C6.5406 20.733 6.979 21.757 6.979 21.757C6.979 21.757 6.5406 21.901 6.1982 22.637C5.8558 23.3666 5.1742 23.7058 3.955 23.949C2.7358 24.1922 2.7358 24.9762 3.027 25.853C3.3214 26.7298 3.027 27.2194 2.6878 28.3362C2.3454 29.453 4.051 29.7986 5.7086 29.9906C7.3662 30.189 9.219 31.261 10.7806 31.453C12.339 31.6482 12.8254 30.381 12.8254 30.381C12.8254 30.381 14.579 29.9874 16.4318 29.9426C18.2846 29.8946 20.0382 30.333 20.0382 30.333C20.0382 30.333 20.3806 31.1138 21.0142 31.453C21.6478 31.7954 23.0142 31.8434 23.891 30.9186C24.771 29.9906 27.1102 28.8226 28.4254 28.0898C29.7438 27.3602 29.5006 26.2402 28.6718 25.901ZM17.267 4.4066C18.1022 4.4066 18.7774 5.2354 18.7774 6.2562C18.7774 6.9826 18.4382 7.6066 17.9454 7.9106C17.8206 7.8562 17.6862 7.7986 17.5454 7.7378C17.843 7.5906 18.0542 7.213 18.0542 6.7682C18.0542 6.1922 17.699 5.725 17.2574 5.725C16.8222 5.725 16.4638 6.1922 16.4638 6.7682C16.4638 6.9826 16.515 7.1874 16.6014 7.3538C16.3422 7.2514 16.1022 7.1554 15.9134 7.0818C15.811 6.8322 15.7534 6.5506 15.7534 6.253C15.7534 5.2354 16.4286 4.4066 17.267 4.4066ZM17.1582 8.3074C17.5774 8.4514 18.0414 8.7234 17.9934 8.9922C17.9454 9.2642 17.7246 9.2642 17.1582 9.6098C16.5918 9.9522 15.3662 10.7138 14.9726 10.7618C14.579 10.8098 14.3582 10.589 13.939 10.3202C13.5198 10.0482 12.7358 9.4082 12.9342 9.0658C12.9342 9.0658 13.5454 8.5986 13.8142 8.3522C14.0862 8.1058 14.7742 7.517 15.1902 7.5938C15.6094 7.6674 16.739 8.1602 17.1582 8.3074ZM13.3886 4.6978C14.0478 4.6978 14.5822 5.4818 14.5822 6.4514C14.5822 6.6306 14.5662 6.7938 14.531 6.9538C14.371 7.0082 14.2078 7.0978 14.0478 7.2322C13.9678 7.2994 13.8974 7.3602 13.827 7.421C13.9326 7.2258 13.9742 6.9474 13.9262 6.653C13.8366 6.125 13.4846 5.7378 13.1358 5.7922C12.787 5.853 12.5758 6.3266 12.6654 6.861C12.755 7.3922 13.107 7.7794 13.4526 7.7218C13.4718 7.7186 13.491 7.7122 13.5102 7.7058C13.3406 7.869 13.1838 8.0098 13.0238 8.1282C12.5406 7.9042 12.1886 7.2386 12.1886 6.4514C12.1982 5.4818 12.7326 4.6978 13.3886 4.6978ZM12.1022 29.3282C11.9454 30.0258 11.1294 30.5346 11.1294 30.5346C10.387 30.7682 8.3262 29.8722 7.3918 29.4818C6.4574 29.0946 4.083 28.973 3.7694 28.6274C3.459 28.2754 3.9262 27.4946 4.0446 26.7586C4.1598 26.0162 3.811 25.5522 3.9262 25.0434C4.0446 24.5378 5.5614 24.5378 6.1438 24.189C6.7294 23.837 6.8446 22.8258 7.3118 22.5538C7.779 22.2786 8.6334 23.2514 8.9854 23.8018C9.3342 24.3426 10.659 26.6818 11.203 27.2674C11.7534 27.8466 12.259 28.6274 12.1022 29.3282ZM20.723 22.5346C20.5822 23.2226 20.5822 25.7058 20.5822 25.7058C20.5822 25.7058 19.0718 27.7986 16.7294 28.141C14.3902 28.4834 13.219 28.237 13.219 28.237L11.9038 26.7298C11.9038 26.7298 12.9246 26.5826 12.7806 25.5586C12.6334 24.5346 9.6606 23.1202 9.1262 21.853C8.5918 20.589 9.0302 18.4418 9.7118 17.3666C10.3934 16.2946 10.8286 13.9586 11.5134 13.1746C12.195 12.397 12.7294 10.7394 12.4862 10.0066C12.4862 10.0066 13.9486 11.7634 14.9694 11.4722C15.9934 11.1778 18.2878 9.4722 18.6238 9.7666C18.963 10.061 21.8878 16.493 22.179 18.541C22.4734 20.5858 21.9838 22.1474 21.9838 22.1474C21.9838 22.1474 20.867 21.853 20.723 22.5346ZM28.2046 27.1266C27.7502 27.5458 25.2158 28.5666 24.4574 29.3666C23.7022 30.157 22.7166 30.8034 22.1118 30.6146C21.5038 30.4226 20.9758 29.5906 21.2414 28.3778C21.5038 27.1682 21.7342 25.8434 21.6958 25.085C21.6574 24.3266 21.5038 23.3026 21.6958 23.1522C21.8846 23.005 22.1854 23.0786 22.1854 23.0786C22.1854 23.0786 22.0382 24.5154 22.9054 24.8962C23.7758 25.2706 25.0238 24.7458 25.4046 24.3618C25.7854 23.9842 26.051 23.4178 26.051 23.4178C26.051 23.4178 26.4286 23.6098 26.3902 24.2146C26.3518 24.8194 26.6526 25.693 27.2254 25.9938C27.7886 26.2946 28.659 26.7138 28.2046 27.1266Z" fill="rgba(255, 255, 255, 0.80)"></path></svg></svg></div></div><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-ahthbn"><div class="chakra-stack css-1igwmid"><code class="chakra-code css-lqvy6z">1.0.7</code><span class="css-m6gpa9"><svg viewBox="0 0 14 14" focusable="false" class="chakra-icon chakra-icon css-l30hbq"><g fill="currentColor"><polygon points="5.5 11.9993304 14 3.49933039 12.5 2 5.5 8.99933039 1.5 4.9968652 0 6.49933039"></polygon></g></svg><span class="css-1ny2kle">Up to date</span></span><div class="css-17xejub"></div></div><div class="chakra-stack css-8g8ihq"><div class="chakra-stack css-1igwmid"><p class="chakra-text css-722v25">Owner</p><span class="css-z1uxps" style="cursor: pointer;"><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-11f2ts4"><div role="img" aria-label="qwellcode" class="chakra-avatar__initials css-1ebyn6">q</div></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">QWELLCODE</p></span></div></span></div></div></div></div><div class="chakra-card__footer css-1a7q9t8"><div class="chakra-stack css-1szdkck"><button type="button" class="chakra-button css-19qafxr" aria-label="Start board"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M8 5v14l11-7z"></path></svg></button><button type="button" class="chakra-button css-19qafxr" aria-label="Calibrate"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"></path></svg></button><a target="_blank" class="chakra-link chakra-button css-1m8xacf" aria-label="Board manager" href="http://10.13.69.187:3180"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path></svg></a><div class="css-17xejub"></div><button type="button" class="chakra-button css-19qafxr" aria-label="Copy board ID"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><a class="chakra-button css-19qafxr" aria-label="Follow board" href="/boards/6878ed8b-3ee8-46b4-b7c6-b21aff999e22/follow"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></a><button type="button" class="chakra-button css-1sey21i" aria-label="Leave board"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button></div></div></div></div></div><div class="chakra-stack css-tgpajw"><div class="css-vutusn"></div></div></div></div></div></div></div><div class="chakra-stack css-1p8piej"></div></div><span id="__chakra_env" hidden=""></span></div>
+
+
+
+<div class="chakra-portal"><div role="region" aria-live="polite" aria-label="Notifications-top" id="chakra-toast-manager-top" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; margin: 0px auto; top: env(safe-area-inset-top, 0px); right: env(safe-area-inset-right, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-top-left" id="chakra-toast-manager-top-left" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; top: env(safe-area-inset-top, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-top-right" id="chakra-toast-manager-top-right" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; top: env(safe-area-inset-top, 0px); right: env(safe-area-inset-right, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-bottom-left" id="chakra-toast-manager-bottom-left" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; bottom: env(safe-area-inset-bottom, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-bottom" id="chakra-toast-manager-bottom" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; margin: 0px auto; bottom: env(safe-area-inset-bottom, 0px); right: env(safe-area-inset-right, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-bottom-right" id="chakra-toast-manager-bottom-right" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; bottom: env(safe-area-inset-bottom, 0px); right: env(safe-area-inset-right, 0px);"></div></div></body></html>

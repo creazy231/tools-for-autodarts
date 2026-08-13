@@ -1,0 +1,346 @@
+{
+  "url": "https://play.autodarts.com/tournaments",
+  "title": "Tournaments | Autodarts Play",
+  "framework": {
+    "hasChakraClasses": true,
+    "hasEmotionClasses": true,
+    "hasDataSlot": false,
+    "looksTailwind": false
+  },
+  "cssVars": [
+    "--animate-delay",
+    "--animate-duration",
+    "--animate-repeat",
+    "--chakra-vh",
+    "--fa-font-brands",
+    "--fa-font-chisel-regular",
+    "--fa-font-duotone",
+    "--fa-font-duotone-light",
+    "--fa-font-duotone-regular",
+    "--fa-font-duotone-thin",
+    "--fa-font-etch-solid",
+    "--fa-font-jelly-duo-regular",
+    "--fa-font-jelly-fill-regular",
+    "--fa-font-jelly-regular",
+    "--fa-font-light",
+    "--fa-font-notdog-duo-solid",
+    "--fa-font-notdog-solid",
+    "--fa-font-regular",
+    "--fa-font-sharp-duotone-light",
+    "--fa-font-sharp-duotone-regular",
+    "--fa-font-sharp-duotone-solid",
+    "--fa-font-sharp-duotone-thin",
+    "--fa-font-sharp-light",
+    "--fa-font-sharp-regular",
+    "--fa-font-sharp-solid",
+    "--fa-font-sharp-thin",
+    "--fa-font-slab-press-regular",
+    "--fa-font-slab-regular",
+    "--fa-font-solid",
+    "--fa-font-thin",
+    "--fa-font-thumbprint-light",
+    "--fa-font-utility-duo-semibold",
+    "--fa-font-utility-fill-semibold",
+    "--fa-font-utility-semibold",
+    "--fa-font-whiteboard-semibold"
+  ],
+  "anchors": {
+    "dataSlot": [],
+    "dataTestid": [],
+    "ariaLabel": [
+      "Collapse side bar",
+      "Create tournament",
+      "First page",
+      "Last page",
+      "Next page",
+      "Notifications-bottom",
+      "Notifications-bottom-left",
+      "Notifications-bottom-right",
+      "Notifications-top",
+      "Notifications-top-left",
+      "Notifications-top-right",
+      "Open notifications",
+      "Previous page",
+      "Referee",
+      "Tournament statistics",
+      "hidden feature",
+      "oakie-doak-darts ",
+      "pepgarbiola",
+      "schnabel76",
+      "the diamant"
+    ],
+    "role": [
+      "group",
+      "img",
+      "menu",
+      "menuitem",
+      "radiogroup",
+      "region",
+      "tab",
+      "tablist",
+      "tabpanel"
+    ],
+    "stableIds": [
+      "__chakra_env",
+      "ad-ext-user-menu-extra",
+      "chakra-toast-manager-bottom",
+      "chakra-toast-manager-bottom-left",
+      "chakra-toast-manager-bottom-right",
+      "chakra-toast-manager-top",
+      "chakra-toast-manager-top-left",
+      "chakra-toast-manager-top-right",
+      "hide-full",
+      "hide-unmet",
+      "plus-only",
+      "root"
+    ]
+  },
+  "topClasses": [
+    [
+      "chakra-stack",
+      383
+    ],
+    [
+      "chakra-text",
+      135
+    ],
+    [
+      "css-1igwmid",
+      103
+    ],
+    [
+      "[object",
+      75
+    ],
+    [
+      "SVGAnimatedString]",
+      75
+    ],
+    [
+      "css-n3uhkm",
+      64
+    ],
+    [
+      "css-1eveppl",
+      62
+    ],
+    [
+      "css-17xejub",
+      46
+    ],
+    [
+      "chakra-heading",
+      38
+    ],
+    [
+      "chakra-card",
+      33
+    ],
+    [
+      "tournamentCard",
+      33
+    ],
+    [
+      "chakra-card__header",
+      33
+    ],
+    [
+      "css-1u27lgg",
+      33
+    ],
+    [
+      "chakra-card__body",
+      33
+    ],
+    [
+      "css-yr1695",
+      33
+    ],
+    [
+      "css-cgi92c",
+      33
+    ],
+    [
+      "css-ic6tvj",
+      33
+    ],
+    [
+      "css-itvw0n",
+      33
+    ],
+    [
+      "chakra-card__footer",
+      33
+    ],
+    [
+      "css-1tzvevm",
+      33
+    ],
+    [
+      "css-5kt1vw",
+      33
+    ],
+    [
+      "css-1byig2h",
+      33
+    ],
+    [
+      "css-1vu3uip",
+      30
+    ],
+    [
+      "css-f6odyb",
+      30
+    ],
+    [
+      "chakra-button",
+      29
+    ],
+    [
+      "css-722v25",
+      29
+    ],
+    [
+      "css-fqllj7",
+      26
+    ],
+    [
+      "css-0",
+      25
+    ],
+    [
+      "css-1qec887",
+      25
+    ],
+    [
+      "chakra-image",
+      16
+    ],
+    [
+      "chakra-avatar",
+      11
+    ],
+    [
+      "css-1hxpv5v",
+      10
+    ],
+    [
+      "css-pyw5fn",
+      10
+    ],
+    [
+      "css-1224itk",
+      10
+    ],
+    [
+      "css-10rwa7y",
+      10
+    ],
+    [
+      "css-157wn8n",
+      10
+    ],
+    [
+      "css-1ny2kle",
+      10
+    ],
+    [
+      "css-1psdi5l",
+      10
+    ],
+    [
+      "css-51k6ft",
+      10
+    ],
+    [
+      "css-1i1gewt",
+      10
+    ],
+    [
+      "css-6t0bzd",
+      10
+    ],
+    [
+      "ad-ext-player-name",
+      10
+    ],
+    [
+      "css-1oha1tj",
+      10
+    ],
+    [
+      "chakra-badge",
+      10
+    ],
+    [
+      "css-1rg4y02",
+      10
+    ],
+    [
+      "chakra-menu__menuitem",
+      9
+    ],
+    [
+      "chakra-button__icon",
+      8
+    ],
+    [
+      "css-1wh2kri",
+      8
+    ],
+    [
+      "css-1h0al4p",
+      8
+    ],
+    [
+      "css-ywo3na",
+      8
+    ],
+    [
+      "chakra-avatar__img",
+      7
+    ],
+    [
+      "css-3a5bz2",
+      7
+    ],
+    [
+      "css-1jc8v6r",
+      7
+    ],
+    [
+      "css-z1uxps",
+      7
+    ],
+    [
+      "css-11cuipc",
+      7
+    ],
+    [
+      "css-1nal3hj",
+      6
+    ],
+    [
+      "css-l5at91",
+      6
+    ],
+    [
+      "css-gmuwbf",
+      5
+    ],
+    [
+      "css-11at0h5",
+      5
+    ],
+    [
+      "css-icqrzr",
+      4
+    ]
+  ],
+  "counts": {
+    "elements": 1314,
+    "buttons": 16,
+    "tables": 0,
+    "canvas": 0
+  }
+}

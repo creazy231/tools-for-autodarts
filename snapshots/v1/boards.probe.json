@@ -1,0 +1,338 @@
+{
+  "url": "https://play.autodarts.com/boards",
+  "title": "My Boards | Autodarts Play",
+  "framework": {
+    "hasChakraClasses": true,
+    "hasEmotionClasses": true,
+    "hasDataSlot": false,
+    "looksTailwind": false
+  },
+  "cssVars": [
+    "--animate-delay",
+    "--animate-duration",
+    "--animate-repeat",
+    "--chakra-vh",
+    "--fa-font-brands",
+    "--fa-font-chisel-regular",
+    "--fa-font-duotone",
+    "--fa-font-duotone-light",
+    "--fa-font-duotone-regular",
+    "--fa-font-duotone-thin",
+    "--fa-font-etch-solid",
+    "--fa-font-jelly-duo-regular",
+    "--fa-font-jelly-fill-regular",
+    "--fa-font-jelly-regular",
+    "--fa-font-light",
+    "--fa-font-notdog-duo-solid",
+    "--fa-font-notdog-solid",
+    "--fa-font-regular",
+    "--fa-font-sharp-duotone-light",
+    "--fa-font-sharp-duotone-regular",
+    "--fa-font-sharp-duotone-solid",
+    "--fa-font-sharp-duotone-thin",
+    "--fa-font-sharp-light",
+    "--fa-font-sharp-regular",
+    "--fa-font-sharp-solid",
+    "--fa-font-sharp-thin",
+    "--fa-font-slab-press-regular",
+    "--fa-font-slab-regular",
+    "--fa-font-solid",
+    "--fa-font-thin",
+    "--fa-font-thumbprint-light",
+    "--fa-font-utility-duo-semibold",
+    "--fa-font-utility-fill-semibold",
+    "--fa-font-utility-semibold",
+    "--fa-font-whiteboard-semibold"
+  ],
+  "anchors": {
+    "dataSlot": [],
+    "dataTestid": [],
+    "ariaLabel": [
+      "Board manager",
+      "Calibrate",
+      "Collapse side bar",
+      "Copy board ID",
+      "Follow board",
+      "Generate new API key",
+      "Leave board",
+      "Notifications-bottom",
+      "Notifications-bottom-left",
+      "Notifications-bottom-right",
+      "Notifications-top",
+      "Notifications-top-left",
+      "Notifications-top-right",
+      "Open Board settings",
+      "Open notifications",
+      "Sharing options",
+      "Start board",
+      "hidden feature",
+      "qwellcode"
+    ],
+    "role": [
+      "group",
+      "img",
+      "menu",
+      "menuitem",
+      "region"
+    ],
+    "stableIds": [
+      "__chakra_env",
+      "ad-ext-user-menu-extra",
+      "chakra-toast-manager-bottom",
+      "chakra-toast-manager-bottom-left",
+      "chakra-toast-manager-bottom-right",
+      "chakra-toast-manager-top",
+      "chakra-toast-manager-top-left",
+      "chakra-toast-manager-top-right",
+      "root"
+    ]
+  },
+  "topClasses": [
+    [
+      "chakra-stack",
+      23
+    ],
+    [
+      "chakra-button",
+      23
+    ],
+    [
+      "css-17xejub",
+      9
+    ],
+    [
+      "chakra-menu__menuitem",
+      9
+    ],
+    [
+      "chakra-button__icon",
+      8
+    ],
+    [
+      "css-1wh2kri",
+      8
+    ],
+    [
+      "css-19qafxr",
+      8
+    ],
+    [
+      "[object",
+      7
+    ],
+    [
+      "SVGAnimatedString]",
+      7
+    ],
+    [
+      "css-1jc8v6r",
+      7
+    ],
+    [
+      "css-1igwmid",
+      7
+    ],
+    [
+      "css-1nal3hj",
+      6
+    ],
+    [
+      "chakra-heading",
+      6
+    ],
+    [
+      "css-gmuwbf",
+      4
+    ],
+    [
+      "css-18j379d",
+      4
+    ],
+    [
+      "chakra-text",
+      4
+    ],
+    [
+      "css-1ny2kle",
+      4
+    ],
+    [
+      "css-0",
+      3
+    ],
+    [
+      "css-tgpajw",
+      3
+    ],
+    [
+      "css-vutusn",
+      3
+    ],
+    [
+      "chakra-stat",
+      3
+    ],
+    [
+      "css-1mbo1ls",
+      3
+    ],
+    [
+      "chakra-stat__label",
+      3
+    ],
+    [
+      "css-14go5ty",
+      3
+    ],
+    [
+      "chakra-stat__number",
+      3
+    ],
+    [
+      "css-1axeus7",
+      3
+    ],
+    [
+      "css-79elbk",
+      2
+    ],
+    [
+      "css-1jtmech",
+      2
+    ],
+    [
+      "chakra-avatar",
+      2
+    ],
+    [
+      "css-1dklj6k",
+      2
+    ],
+    [
+      "chakra-card",
+      2
+    ],
+    [
+      "css-19vjuk",
+      2
+    ],
+    [
+      "chakra-card__header",
+      2
+    ],
+    [
+      "css-1sl53ol",
+      2
+    ],
+    [
+      "chakra-card__body",
+      2
+    ],
+    [
+      "css-1idwstw",
+      2
+    ],
+    [
+      "css-ahthbn",
+      2
+    ],
+    [
+      "chakra-code",
+      2
+    ],
+    [
+      "css-lqvy6z",
+      2
+    ],
+    [
+      "css-m6gpa9",
+      2
+    ],
+    [
+      "css-8g8ihq",
+      2
+    ],
+    [
+      "chakra-card__footer",
+      2
+    ],
+    [
+      "css-1a7q9t8",
+      2
+    ],
+    [
+      "css-1szdkck",
+      2
+    ],
+    [
+      "chakra-ui-dark",
+      1
+    ],
+    [
+      "css-z42oq0",
+      1
+    ],
+    [
+      "navigation",
+      1
+    ],
+    [
+      "css-ege71s",
+      1
+    ],
+    [
+      "css-1badijy",
+      1
+    ],
+    [
+      "css-1kwqbwj",
+      1
+    ],
+    [
+      "css-1m9c7fh",
+      1
+    ],
+    [
+      "css-169zhyd",
+      1
+    ],
+    [
+      "chakra-menu__menu-button",
+      1
+    ],
+    [
+      "css-1nlwyv4",
+      1
+    ],
+    [
+      "css-pyu8a9",
+      1
+    ],
+    [
+      "chakra-avatar__img",
+      1
+    ],
+    [
+      "css-3a5bz2",
+      1
+    ],
+    [
+      "chakra-avatar__badge",
+      1
+    ],
+    [
+      "css-fi8vxe",
+      1
+    ],
+    [
+      "css-xl71ch",
+      1
+    ]
+  ],
+  "counts": {
+    "elements": 257,
+    "buttons": 15,
+    "tables": 0,
+    "canvas": 0
+  }
+}

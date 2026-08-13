@@ -25,6 +25,8 @@ export default defineConfig({
   manifest: {
     host_permissions: [
       "*://play.autodarts.com/*",
+      // v2 rebuild preview — see docs/v2-migration-map.md
+      "*://play-v2.autodarts.com/*",
       "*://api.autodarts.com/*",
       "*://darts-downloads.peschi.org/*",
       "*://autodarts.x10.mx/*",
@@ -55,11 +57,11 @@ export default defineConfig({
     web_accessible_resources: [
       {
         resources: [ "images/*" ],
-        matches: [ "*://play.autodarts.com/*" ],
+        matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
       },
       {
         resources: [ "websocket-capture.js", "auth-cookie.js" ],
-        matches: [ "*://play.autodarts.com/*" ],
+        matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
       },
     ],
   },

@@ -1,0 +1,717 @@
+<!DOCTYPE html><html lang="en" translate="no" class="dark" style="--visual-viewport-height: 1000px; --keyboard-height: 0px;"><head>
+  <meta charset="utf-8">
+  <title>Select game mode | Autodarts Play</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <style type="text/css">:root, :host {
+  --fa-font-solid: normal 900 1em/1 'Font Awesome 7 Free';
+  --fa-font-regular: normal 400 1em/1 'Font Awesome 7 Free';
+  --fa-font-light: normal 300 1em/1 'Font Awesome 7 Pro';
+  --fa-font-thin: normal 100 1em/1 'Font Awesome 7 Pro';
+  --fa-font-duotone: normal 900 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-duotone-regular: normal 400 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-duotone-light: normal 300 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-duotone-thin: normal 100 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-brands: normal 400 1em/1 'Font Awesome 7 Brands';
+  --fa-font-sharp-solid: normal 900 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-regular: normal 400 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-light: normal 300 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-thin: normal 100 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-sharp-duotone-light: normal 300 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-slab-regular: normal 400 1em/1 'Font Awesome 7 Slab';
+  --fa-font-slab-press-regular: normal 400 1em/1 'Font Awesome 7 Slab Press';
+  --fa-font-whiteboard-semibold: normal 600 1em/1 'Font Awesome 7 Whiteboard';
+  --fa-font-thumbprint-light: normal 300 1em/1 'Font Awesome 7 Thumbprint';
+  --fa-font-notdog-solid: normal 900 1em/1 'Font Awesome 7 Notdog';
+  --fa-font-notdog-duo-solid: normal 900 1em/1 'Font Awesome 7 Notdog Duo';
+  --fa-font-etch-solid: normal 900 1em/1 'Font Awesome 7 Etch';
+  --fa-font-graphite-thin: normal 100 1em/1 'Font Awesome 7 Graphite';
+  --fa-font-jelly-regular: normal 400 1em/1 'Font Awesome 7 Jelly';
+  --fa-font-jelly-fill-regular: normal 400 1em/1 'Font Awesome 7 Jelly Fill';
+  --fa-font-jelly-duo-regular: normal 400 1em/1 'Font Awesome 7 Jelly Duo';
+  --fa-font-chisel-regular: normal 400 1em/1 'Font Awesome 7 Chisel';
+  --fa-font-utility-semibold: normal 600 1em/1 'Font Awesome 7 Utility';
+  --fa-font-utility-duo-semibold: normal 600 1em/1 'Font Awesome 7 Utility Duo';
+  --fa-font-utility-fill-semibold: normal 600 1em/1 'Font Awesome 7 Utility Fill';
+}
+
+.svg-inline--fa {
+  box-sizing: content-box;
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285714em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left,
+.svg-inline--fa .fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-pull-right,
+.svg-inline--fa .fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  inset-block-start: 0.25em; /* syncing vertical alignment with Web Font rendering */
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.fa-layers .svg-inline--fa {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: calc(10 / 16 * 1em); /* converts a 10px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 10 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 10 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xs {
+  font-size: calc(12 / 16 * 1em); /* converts a 12px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 12 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 12 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-sm {
+  font-size: calc(14 / 16 * 1em); /* converts a 14px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 14 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 14 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-lg {
+  font-size: calc(20 / 16 * 1em); /* converts a 20px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 20 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 20 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xl {
+  font-size: calc(24 / 16 * 1em); /* converts a 24px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 24 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 24 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-2xl {
+  font-size: calc(32 / 16 * 1em); /* converts a 32px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 32 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 32 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-width-auto {
+  --fa-width: auto;
+}
+
+.fa-fw,
+.fa-width-fixed {
+  --fa-width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-inline-start: var(--fa-li-margin, 2.5em);
+  padding-inline-start: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+/* Heads Up: Bordered Icons will not be supported in the future!
+  - This feature will be deprecated in the next major release of Font Awesome (v8)!
+  - You may continue to use it in this version *v7), but it will not be supported in Font Awesome v8.
+*/
+/* Notes:
+* --@{v.$css-prefix}-border-width = 1/16 by default (to render as ~1px based on a 16px default font-size)
+* --@{v.$css-prefix}-border-padding =
+  ** 3/16 for vertical padding (to give ~2px of vertical whitespace around an icon considering it's vertical alignment)
+  ** 4/16 for horizontal padding (to give ~4px of horizontal whitespace around an icon)
+*/
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.0625em);
+  box-sizing: var(--fa-border-box-sizing, content-box);
+  padding: var(--fa-border-padding, 0.1875em 0.25em);
+}
+
+.fa-pull-left,
+.fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right,
+.fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+  .fa-bounce,
+  .fa-fade,
+  .fa-beat-fade,
+  .fa-flip,
+  .fa-pulse,
+  .fa-shake,
+  .fa-spin,
+  .fa-spin-pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}
+
+.svg-inline--fa.fa-inverse {
+  fill: var(--fa-inverse, #fff);
+}
+
+.fa-stack {
+  display: inline-block;
+  height: 2em;
+  line-height: 2em;
+  position: relative;
+  vertical-align: middle;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  --fa-width: 1.25em;
+  height: 1em;
+  width: var(--fa-width);
+}
+.svg-inline--fa.fa-stack-2x {
+  --fa-width: 2.5em;
+  height: 2em;
+  width: var(--fa-width);
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  z-index: var(--fa-stack-z-index, auto);
+}</style><link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <meta name="theme-color" content="#384688">
+  <meta name="description" content="Play online darts with automatic scoring with Autodarts.">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <style>
+    html { background-color: #16181C; }
+  </style>
+  <script type="module" crossorigin="" src="/assets/index-G_oqDfAU.js"></script>
+  <link rel="modulepreload" crossorigin="" href="/assets/jsx-runtime-dXaYzyKa.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/preload-helper-ByStdziD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/utils-CjYXugli.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/react-CRJPF-Ki.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/pro-solid-svg-icons-DIO0LIXq.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ErrorPage-D_RvAtW8.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/logo_aqua-DYgES8F0.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/FormActions-ecTrDxg9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/PageSection-CUn6t6-9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-breakpoints-eDwaaWcc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useRenderElement-BJ4JwBCD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-BUI1wS8y.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/button-CT5NoNvQ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/react-dom-BGoezG9H.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/composite-BHb01NDK.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/composite-BgVGO5nP.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/owner-Bvqah2I2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/shadowDom-C0HEVO4T.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useValueAsRef-CDMk6Trs.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/visuallyHidden-DFjhTp8t.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/with-selector-DaU_wOLx.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useScrollLock-uzGBY_q6.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/store-C6dr_fa7.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/DialogTitle-suJkizlC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/clamp-CMinJydJ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useControlled-morpZgZZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ResponsiveDrawer-q2ZOsk9o.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/LayoutSlotsContext-pmtMYov4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-DfuDiTFM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/esm-Bl9wq-ej.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useRouter-BUXAaqxJ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useStore-KiBuIc7P.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/link-DGaixrRc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matchContext-C6D-zXiQ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useNavigate-DgGpcGiy.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/batch-CBzf4aGz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/react-BsYAwdRM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/SidebarSectionLayout-jYfmm2db.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/PageHeaderTitle-SGvlxOsC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/src-C_N8laqN.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/divider-IlB7FSgW.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/layout-CVaVBAyt.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useTranslation-CrpmfzXn.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/i18n-CQXh3s10.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/src-BvXyG2ao.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/clients-CNG25FPA.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/onlineManager-BhNi-rDE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-CNT_sHnw.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/offline-feedback-KwgwTRJB.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/connection-store-CZSVxiNE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/esm-Cs6r-DvS.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/error-C3JVnLiQ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/queryOptions-D-uREmui.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-consent-Dc4XZ_4A.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-user-stats-DBRvzsL4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useMatch-jrUBXnOJ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/lazyRouteComponent-BpN89lZZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/zod-BamFwv4f.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/statistics-Ce_Nuhum.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/NotificationToast-BPzXckLe.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-i18n-debug-BeSuvdW9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-profile-z_UglidF.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/onboarding-Vf782JS2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-permissions-eo1LPlRF.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/QueryClientProvider-CVVS7jgp.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useMutation-8XXr8Dgi.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useBaseQuery-CyYWt15u.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useQuery-nZVyDCkz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useSuspenseQuery-Lvp80Hy2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-tournaments-BM1FR-Pj.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-user-CV22ZVex.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/profile-form-qqOv3s_M.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/sfx-CTd6p1G4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/howler-DfXXEZIE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/sound-BhEnABIM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/caller-Yns3FxdH.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/EmptyState-l81kjOkq.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/RequiredAsterisk-BYXckTuY.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useRegisterFieldControl-Cw7uFh64.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/DirectionContext-iteXujkl.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/FormContext-HmdbrB5K.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useAnchoredPopupScrollLock-CX3wuEtU.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/proxy-DgtnAQd7.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/lib-B6qnc231.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ui-CT3UIezn.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/Dart-Bz4Gtw3z.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/NameTag-DvMzh8zz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ScoreBadges-rLGh59zc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/PlayerList-CkHAZr9J.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CompositeList-BrSxLVdX.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CSPContext-i8Tt8tRk.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/serializeValue-CCxxywr7.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/SelectItemText-BT53CvyC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/players-Bd850H-X.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/board-DRJTEfyv.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/usePermission-BQr-BI2P.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-lobby-D_1YygLK.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/definitions-BMMyPoaK.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/player-colors-CjYGwDbF.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/separator-CizHMuiC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/field-BRuJ2ax3.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/isElementDisabled-DpsOsrlO.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CompositeRoot-DgI0rUQC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CompositeItem-DBO5pIlA.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/shared-Dtx2b3po.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-lens-enabled-D5GPjWg1.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-user-settings-CiiZ8Toz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/info-pill-BMejpChE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/select-CO0qbdvc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-game-BspJXS1I.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/boards_._boardId.follow-DPbybc6E.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matches_._matchId-CrwpVNSZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matches_._matchId-DLqzPmM9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/join_._lobbyId-BHwFvO64.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/lobby._lobbyId-BqrxrHDb.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matches_._matchId-BNiZHFAW.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/match-history-CTnKDxD2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/history-lAPd_fB-.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/tournaments-OdGlYnK4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/_tournamentId-Cs5d64FZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/_tournamentId-Do_vdR3g.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/bracket-CPb9IEuO.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/information-DHyrQYYY.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/rankings-yBqeWvxj.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/auth._provider.callback-CAOaomv8.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/consent-CA0jslSD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dev-5taTOMzG.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/route-guards-DFi4I6tx.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/forgot-password-verify-Cb6CQazb.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/forgot-password-BUg-ZvvC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/landing-VtAVrh4Z.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/legal._type-SnaJ2BQ4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/login-old-C8ZBfpKx.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/login-Bmv1vGN0.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/redeem-Cn-6HUqk.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/register-C9y1Vn2m.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/verify-code-dZaI5FPD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/platform-Cx8sKGKW.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/sonner-BFSx_ys-.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-DE5fqU0I.js">
+  <link rel="stylesheet" crossorigin="" href="/assets/index-D3QbCI0y.css">
+<style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><link rel="modulepreload" as="script" crossorigin="" href="/assets/route-koRHss3c.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/BoltIcon-DwbHS2Mj.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/AutoscoringSelector-FmpLuBLF.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-lens-quota-D7MXEonP.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-link-enabled-C4bzbYO1.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/link-discovery-DHcKgB1e.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/pro-regular-svg-icons-Da_jSZAH.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/ConnectionBanner-CgxR4A2P.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/device-Dge51RyZ.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/input-DXQzZ_Dh.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/switch-BlJgIwpy.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/useAriaLabelledBy-BLWQ6T4K.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/free-brands-svg-icons-SBOn9_Pz.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-notifications-D4Yu52xo.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/HeadToHeadChart-DeoRmQtt.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/CollapsibleSection-CrmJlMj8.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/UserCard-CtE9Sdcq.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/StatBlock-CKS-Ghu5.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-native-subscriptions-DBpE6gYI.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-dev-mode-APnW6Eyl.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-friends-B1LlRY5h.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/useDisplayLanguage-BuReelBt.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/friends-drawer-store-CxbK1Ceo.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/item-BaMurwjv.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/useRender-CVNlntd2.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/radio-group-CvTvfrGY.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/FieldItemContext-BbgUlF_p.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/skeleton-BllSPYb9.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/tabs-D5O8ttGb.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/Trans-Db4E7Fbs.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/play-DJvseGTe.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/GamePickerList-7SvX5LSq.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/game-picker-utils-DV2NeC4V.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/UpgradeTag-KCADl6bP.js"></head>
+<body>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"><div class="relative h-screen flex flex-col"><header class="relative px-6 bg-black-80 h-16 shrink-0 flex items-center justify-between" style="border-image: linear-gradient(to right, color-mix(in srgb, var(--color-blue-60) 20%, transparent), var(--color-blue-60), color-mix(in srgb, var(--color-blue-60) 20%, transparent)) 1;"><a aria-label="Autodarts" href="/"><img aria-hidden="true" alt="Autodarts" class="h-7" src="/logo_text.svg"></a><nav aria-label="Main navigation" class="absolute inset-y-0 left-1/2 -translate-x-1/2 flex gap-6.5 items-stretch"><a class="font-bold flex items-center relative hover:text-mono-white text-black-20" href="/">Home</a><a class="font-bold flex items-center relative hover:text-mono-white text-mono-white" aria-current="page" href="/play" data-status="active">Play</a><button type="button" class="font-bold flex items-center relative hover:text-mono-white text-black-20">Online</button><a class="font-bold flex items-center relative hover:text-mono-white text-black-20" href="/tournaments">Tournaments</a><a class="font-bold flex items-center relative hover:text-mono-white text-black-20" href="/statistics">Stats</a><div aria-hidden="true" class="pointer-events-none absolute bottom-0" style="left: 77px; width: 36.4531px; transition: left 300ms, width 300ms;"><div class="absolute bottom-0 left-0 right-0 h-0.5 bg-mono-white"></div></div></nav><div class="flex gap-4 items-center"><div class="flex items-center gap-2"></div><button type="button" tabindex="0" data-base-ui-click-trigger="" id="base-ui-_r_6_" aria-haspopup="dialog" aria-expanded="false" data-slot="drawer-trigger" aria-label="Open user menu" class="rounded-full transition-all ring-1 ring-transparent data-popup-open:ring-mono-white/80 data-popup-open:shadow-[0_0_12px_4px_rgba(11,85,223,0.8)]"><span data-slot="avatar" data-size="default" data-plus="false" class="bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-8"><img alt="" data-slot="avatar-image" class="rounded-full aspect-square size-full object-cover" src="https://gravatar.com/avatar/882908ae96f45cc2ddc5ddf89714a2eb"></span></button><button type="button" tabindex="0" data-base-ui-click-trigger="" id="base-ui-_r_9_" aria-haspopup="dialog" aria-expanded="false" data-slot="drawer-trigger" class="relative size-8 flex items-center justify-center rounded-full text-mono-white hover:text-blue-30 transition-all ring-1 ring-transparent"><svg data-prefix="fas" data-icon="user-group" class="svg-inline--fa fa-user-group fa-sm" role="img" viewBox="0 0 576 512" aria-hidden="true"><path fill="currentColor" d="M64 128a112 112 0 1 1 224 0 112 112 0 1 1 -224 0zM0 464c0-97.2 78.8-176 176-176s176 78.8 176 176l0 6c0 23.2-18.8 42-42 42L42 512c-23.2 0-42-18.8-42-42l0-6zM432 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 240c79.5 0 144 64.5 144 144l0 22.4c0 23-18.6 41.6-41.6 41.6l-144.8 0c6.6-12.5 10.4-26.8 10.4-42l0-6c0-51.5-17.4-98.9-46.5-136.7 22.6-14.7 49.6-23.3 78.5-23.3z"></path></svg></button><button type="button" tabindex="0" data-base-ui-click-trigger="" id="base-ui-_r_e_" aria-haspopup="dialog" aria-expanded="false" data-slot="drawer-trigger" aria-label="Open notifications" class="relative size-8 flex items-center justify-center rounded-full text-mono-white hover:text-blue-30 transition-all ring-1 ring-transparent"><svg data-prefix="fas" data-icon="bell" class="svg-inline--fa fa-bell fa-sm" role="img" viewBox="0 0 448 512" aria-hidden="true"><path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32l0 3.2C119 50 64 114.6 64 192l0 21.7c0 48.1-16.4 94.8-46.4 132.4L7.8 358.3C2.7 364.6 0 372.4 0 380.5 0 400.1 15.9 416 35.5 416l376.9 0c19.6 0 35.5-15.9 35.5-35.5 0-8.1-2.7-15.9-7.8-22.2l-9.8-12.2C400.4 308.5 384 261.8 384 213.7l0-21.7c0-77.4-55-142-128-156.8l0-3.2c0-17.7-14.3-32-32-32zM162 464c7.1 27.6 32.2 48 62 48s54.9-20.4 62-48l-124 0z"></path></svg></button></div></header><div class="relative flex-1 min-h-0 flex flex-col"><main class="flex-1 min-h-0 overflow-y-auto overflow-x-clip"><div class="relative mx-auto max-w-6xl px-2 pt-4 pb-2"><img alt="" aria-hidden="true" class="pointer-events-none absolute -top-4 -right-20 w-110 expanded:w-124 h-auto z-0" src="/assets/bg-glow-idBMjL6p.png"><div class="relative isolate flex flex-col w-full p-4 pb-8 gap-6"><div class="flex items-start gap-3 justify-start"><div class="flex items-center gap-3 min-w-0"><svg width="401" height="347" viewBox="0 0 401 347" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-7 expanded:h-9 w-auto pb-1"><path d="M150.952 235.572C157.442 229.082 184.368 228.487 199.833 228.714C209.372 228.855 241.012 229.759 246.827 235.572H246.832V235.6L247.086 235.854L338.501 345.278C339.064 345.928 338.587 346.913 337.738 346.913H277.905C277.596 346.913 277.309 346.772 277.114 346.545L203.732 256.711C203.45 256.457 201.441 255.58 198.199 255.58C194.956 255.58 192.954 256.457 192.613 256.766L121.687 346.518C121.487 346.772 121.205 346.913 120.897 346.913H62.558C61.7135 346.913 61.232 345.928 61.7679 345.278L150.952 235.572ZM260.679 0.75989C260.961 -0.0575191 262.064 -0.144288 262.487 0.591921L292.406 52.4083C292.546 52.6626 292.574 52.9707 292.46 53.2521L251.341 161.719C251.287 162.114 251.541 164.263 253.149 167.083C254.756 169.903 256.51 171.203 256.959 171.344L370.162 187.881C370.476 187.913 370.758 188.109 370.899 188.363L400.082 238.886C400.51 239.617 399.914 240.521 399.07 240.38L259.477 217.995C250.615 215.597 236.617 192.591 229.081 179.074C224.435 170.738 209.442 143.002 211.513 134.982L211.623 134.652L260.679 0.75989ZM137.721 0.505007C138.149 -0.230797 139.22 -0.144249 139.529 0.645632L189.938 132.731C192.309 141.592 179.355 165.216 171.424 178.511C166.542 186.721 149.951 213.636 141.992 215.79V215.765L141.651 215.852L1.18103 240.32C0.331408 240.461 -0.285614 239.562 0.136108 238.826L30.056 187.01C30.1967 186.756 30.4508 186.583 30.7592 186.528L145.235 167.901C145.571 167.786 147.325 166.488 148.959 163.668C150.594 160.848 150.821 158.671 150.735 158.222L108.484 51.9044C108.37 51.623 108.397 51.2819 108.537 51.0275L137.721 0.505007ZM141.992 215.792H141.987C141.988 215.792 141.99 215.791 141.992 215.79V215.792ZM211.513 134.982L211.51 134.993V134.94L211.526 134.934C211.521 134.95 211.517 134.966 211.513 134.982Z" fill="url(#paint0_linear_645_2086)"></path><defs><linearGradient id="paint0_linear_645_2086" x1="0.000112643" y1="347" x2="400" y2="-0.00000920154" gradientUnits="userSpaceOnUse"><stop stop-color="#0075C9"></stop><stop offset="0.4" stop-color="#00B8F0"></stop><stop offset="0.8" stop-color="#28E685"></stop></linearGradient></defs></svg><h1 class="text-3xl expanded:text-5xl">Select game mode</h1></div></div><div class="flex flex-col gap-3"><div class="flex flex-col gap-3"><div class="grid grid-cols-1 gap-3 expanded:grid-cols-3"><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">X01</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-x01/20 text-game-x01">X01</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Race from a set score down to exactly zero</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Cricket / Tactics</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-cricket/20 text-game-cricket">Cricket</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Hit and close specific numbers while stopping opponents from scoring</p></button></div></div><div class="flex flex-col gap-3 pt-5"><p class="font-display text-2xl font-normal leading-[1.2]">Practice</p><div class="grid grid-cols-1 gap-3 expanded:grid-cols-3"><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Count Up</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-practice/20 text-game-practice">Practice</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Score as many points as you can in a set number of rounds</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Around The Clock</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-practice/20 text-game-practice">Practice</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Hit numbers in order from 1 to 20 to win</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Random Checkout</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-practice/20 text-game-practice">Practice</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Check out a randomly assigned score each round</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Around The World</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-practice/20 text-game-practice">Practice</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Travel around the board hitting each numbered section</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Segment Training</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-practice/20 text-game-practice">Practice</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Practice hitting specific segments on the board</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Bob's 27</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-practice/20 text-game-practice">Practice</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Hit doubles to add to your score, miss and lose points</p></button></div></div><div class="flex flex-col gap-3 pt-5"><p class="font-display text-2xl font-normal leading-[1.2]">Party</p><div class="grid grid-cols-1 gap-3 expanded:grid-cols-3"><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Shanghai</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-party/20 text-game-party">Party</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Score big by hitting a single, double, and triple of the same number in one round</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Gotcha</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-party/20 text-game-party">Party</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Match an opponent's score to reset it</p></button><button type="button" class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85 hover:bg-[image:linear-gradient(rgba(255,255,255,0.05),rgba(255,255,255,0.05))]"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-1.5"><p class="min-w-0 text-base font-bold leading-[1.2]">Bermuda</p></div><div class="py-1 rounded-full font-heading font-semibold flex h-6.25 shrink-0 items-center px-2.5 text-[13px] leading-none bg-game-party/20 text-game-party">Party</div></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground">Hit the target for each round or risk losing your score</p></button><div class="flex w-full flex-col gap-3 rounded-[12px] border border-mono-white/6 px-4 py-5 text-left transition bg-black-85"><div class="flex items-center gap-2"><div class="flex min-w-0 flex-1 items-center gap-2.5"><p class="min-w-0 text-base font-bold leading-[1.2] opacity-50">Killer</p><svg width="32" height="43" viewBox="0 0 32 43" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-auto shrink-0"><path d="M0 23.6842L2.66667 0H21.3333L17.3333 13.1579H32V17.1053L10.6667 42.1053L14.6667 23.6842H0Z" fill="url(#_r_h_)"></path><defs><linearGradient id="_r_h_" x1="0.0281734" y1="-2.05119e-06" x2="41.0154" y2="12.5353" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C5561C"></stop><stop offset="1" stop-color="#F7D458"></stop></linearGradient></defs></svg></div><a href="/subscriptions" target="_blank" class="flex h-6.5 shrink-0 items-center justify-center rounded-full border-[1.75px] border-orange-80 bg-black-80 px-3 text-xs font-bold text-mono-white">Upgrade</a></div><p class="text-[13px] font-medium leading-[1.2] text-muted-foreground opacity-50">Eliminate opponents by hitting their assigned number</p></div></div></div></div></div></div></main></div><div class="shrink-0"></div></div><script></script><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div>
+
+
+
+</body></html>

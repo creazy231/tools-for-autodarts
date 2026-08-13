@@ -1,0 +1,573 @@
+<!DOCTYPE html><html lang="en" translate="no" data-theme="dark" style="color-scheme: dark;"><head>
+  <meta charset="utf-8">
+  <title>Match history | Autodarts Play</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">:root, :host {
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 7 Free";
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 7 Free";
+  --fa-font-light: normal 300 1em/1 "Font Awesome 7 Pro";
+  --fa-font-thin: normal 100 1em/1 "Font Awesome 7 Pro";
+  --fa-font-duotone: normal 900 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-duotone-regular: normal 400 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-duotone-light: normal 300 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-duotone-thin: normal 100 1em/1 "Font Awesome 7 Duotone";
+  --fa-font-brands: normal 400 1em/1 "Font Awesome 7 Brands";
+  --fa-font-sharp-solid: normal 900 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-regular: normal 400 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-light: normal 300 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-thin: normal 100 1em/1 "Font Awesome 7 Sharp";
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-sharp-duotone-light: normal 300 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 "Font Awesome 7 Sharp Duotone";
+  --fa-font-slab-regular: normal 400 1em/1 "Font Awesome 7 Slab";
+  --fa-font-slab-press-regular: normal 400 1em/1 "Font Awesome 7 Slab Press";
+  --fa-font-whiteboard-semibold: normal 600 1em/1 "Font Awesome 7 Whiteboard";
+  --fa-font-thumbprint-light: normal 300 1em/1 "Font Awesome 7 Thumbprint";
+  --fa-font-notdog-solid: normal 900 1em/1 "Font Awesome 7 Notdog";
+  --fa-font-notdog-duo-solid: normal 900 1em/1 "Font Awesome 7 Notdog Duo";
+  --fa-font-etch-solid: normal 900 1em/1 "Font Awesome 7 Etch";
+  --fa-font-jelly-regular: normal 400 1em/1 "Font Awesome 7 Jelly";
+  --fa-font-jelly-fill-regular: normal 400 1em/1 "Font Awesome 7 Jelly Fill";
+  --fa-font-jelly-duo-regular: normal 400 1em/1 "Font Awesome 7 Jelly Duo";
+  --fa-font-chisel-regular: normal 400 1em/1 "Font Awesome 7 Chisel";
+  --fa-font-utility-semibold: normal 600 1em/1 "Font Awesome 7 Utility";
+  --fa-font-utility-duo-semibold: normal 600 1em/1 "Font Awesome 7 Utility Duo";
+  --fa-font-utility-fill-semibold: normal 600 1em/1 "Font Awesome 7 Utility Fill";
+}
+
+.svg-inline--fa {
+  box-sizing: content-box;
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285714em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left,
+.svg-inline--fa .fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-pull-right,
+.svg-inline--fa .fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  inset-block-start: 0.25em; /* syncing vertical alignment with Web Font rendering */
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.fa-layers .svg-inline--fa {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: calc(10 / 16 * 1em); /* converts a 10px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 10 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 10 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xs {
+  font-size: calc(12 / 16 * 1em); /* converts a 12px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 12 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 12 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-sm {
+  font-size: calc(14 / 16 * 1em); /* converts a 14px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 14 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 14 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-lg {
+  font-size: calc(20 / 16 * 1em); /* converts a 20px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 20 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 20 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xl {
+  font-size: calc(24 / 16 * 1em); /* converts a 24px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 24 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 24 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-2xl {
+  font-size: calc(32 / 16 * 1em); /* converts a 32px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 32 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 32 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-width-auto {
+  --fa-width: auto;
+}
+
+.fa-fw,
+.fa-width-fixed {
+  --fa-width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-inline-start: var(--fa-li-margin, 2.5em);
+  padding-inline-start: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+/* Heads Up: Bordered Icons will not be supported in the future!
+  - This feature will be deprecated in the next major release of Font Awesome (v8)!
+  - You may continue to use it in this version *v7), but it will not be supported in Font Awesome v8.
+*/
+/* Notes:
+* --@{v.$css-prefix}-border-width = 1/16 by default (to render as ~1px based on a 16px default font-size)
+* --@{v.$css-prefix}-border-padding =
+  ** 3/16 for vertical padding (to give ~2px of vertical whitespace around an icon considering it's vertical alignment)
+  ** 4/16 for horizontal padding (to give ~4px of horizontal whitespace around an icon)
+*/
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.0625em);
+  box-sizing: var(--fa-border-box-sizing, content-box);
+  padding: var(--fa-border-padding, 0.1875em 0.25em);
+}
+
+.fa-pull-left,
+.fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right,
+.fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+  .fa-bounce,
+  .fa-fade,
+  .fa-beat-fade,
+  .fa-flip,
+  .fa-pulse,
+  .fa-shake,
+  .fa-spin,
+  .fa-spin-pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}
+
+.svg-inline--fa.fa-inverse {
+  fill: var(--fa-inverse, #fff);
+}
+
+.fa-stack {
+  display: inline-block;
+  height: 2em;
+  line-height: 2em;
+  position: relative;
+  vertical-align: middle;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  --fa-width: 1.25em;
+  height: 1em;
+  width: var(--fa-width);
+}
+.svg-inline--fa.fa-stack-2x {
+  --fa-width: 2.5em;
+  height: 2em;
+  width: var(--fa-width);
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  z-index: var(--fa-stack-z-index, auto);
+}</style><link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <meta name="theme-color" content="#384688">
+  <meta name="description" content="Play online darts with automatic scoring with Autodarts.">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <script type="module" crossorigin="" src="/assets/index-DOPrWBa0.js"></script>
+  <link rel="stylesheet" crossorigin="" href="/assets/index-Btw_9-DK.css">
+<style data-emotion="css-global" data-s=""></style><style data-emotion="css-global" data-s=""></style><style data-emotion="css-global" data-s=""></style><style data-emotion="css" data-s=""></style></head>
+<body class="chakra-ui-dark">
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"><div class="css-z42oq0"><div class="chakra-stack navigation css-ege71s"><div class="css-1badijy"><div class="css-79elbk"><svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 0 517.19 128.89"><g><path fill="white" d="m184.73,91.95h-14.18v-14.8h-9.09v14.8h-14.18v-45.99c0-6.54,3.44-9.02,9.71-9.02h27.75v55.01Zm-14.18-27.26v-15.14h-9.09v15.14h9.09Z"></path><path fill="white" d="m227.69,83c0,6.54-3.44,8.95-9.71,8.95h-18.04c-6.26,0-9.64-2.41-9.64-8.95v-46.06h14.18v42.41h9.02v-42.41h14.18v46.06Z"></path><path fill="white" d="m269.36,49.54h-11.77v42.41h-14.18v-42.41h-11.77v-12.6h37.73v12.6Z"></path><path fill="white" d="m310.67,83.28c0,6.13-3.17,8.67-9.43,8.67h-18.52c-5.92,0-9.43-2.41-9.43-8.67v-37.59c0-5.85,3.17-8.74,9.43-8.74h18.52c5.99,0,9.43,2.48,9.43,8.74v37.59Zm-14.18-3.92v-29.74h-9.02v29.74h9.02Z"></path><path fill="white" d="m353.71,83.28c0,5.92-3.37,8.67-9.5,8.67h-27.95v-55.01h27.95c5.85,0,9.5,2.41,9.5,8.74v37.59Zm-14.18-3.92v-29.74h-9.09v29.74h9.09Z"></path><path fill="white" d="m396.75,91.95h-14.18v-14.8h-9.09v14.8h-14.18v-45.99c0-6.54,3.44-9.02,9.71-9.02h27.75v55.01Zm-14.18-27.26v-15.14h-9.09v15.14h9.09Z"></path><path fill="white" d="m438.76,91.95h-14.18v-18.52h-8.06v18.52h-14.18v-55.01h26.71c6.27,0,9.71,2.48,9.71,9.02v14.11c0,4.13-1.93,6.13-5.09,7.09v.14c3.1.41,5.09,2.34,5.09,6.47v18.17Zm-14.18-31.05v-11.36h-8.06v11.36h8.06Z"></path><path fill="white" d="m480.42,49.54h-11.77v42.41h-14.18v-42.41h-11.77v-12.6h37.73v12.6Z"></path><path fill="white" d="m517.19,83.28c0,6.33-3.44,8.67-9.64,8.67h-23.2v-12.6h18.66v-8.81h-9.09c-7.78,0-9.57-3.79-9.57-8.61v-15.97c0-6.54,3.37-9.02,9.64-9.02h21.82v12.6h-17.28v8.4h8.95c6.61,0,9.71,2.75,9.71,9.36v15.97Z"></path><path fill="#ffffff" d="m44.61,64.45c0,15.97,12.99,28.96,28.95,28.96s28.96-12.99,28.96-28.96-12.99-28.95-28.96-28.95-28.95,12.99-28.95,28.95Zm12.62,0c0-9.01,7.33-16.33,16.33-16.33,9.01,0,16.33,7.32,16.33,16.33s-7.33,16.34-16.33,16.34c-9,0-16.33-7.33-16.33-16.34Z"></path><path fill="#ffffff" d="m0,64.45c0,3.06,2.48,5.54,5.54,5.54h17.23c2.77,25.59,24.49,45.57,50.8,45.57,7.33,0,14.29-1.58,20.59-4.37l8.62,14.92c1.53,2.65,4.92,3.56,7.57,2.03,2.65-1.53,3.56-4.92,2.03-7.57l-8.64-14.96c12.67-9.31,20.95-24.28,20.95-41.17s-8.27-31.86-20.95-41.17l8.65-14.98c1.53-2.65.62-6.04-2.03-7.57-2.65-1.53-6.04-.62-7.57,2.03l-8.63,14.94c-6.31-2.79-13.26-4.37-20.59-4.37-26.31,0-48.03,19.99-50.8,45.57H5.54c-3.06,0-5.54,2.48-5.54,5.54Zm35.08,0c0-21.22,17.27-38.48,38.49-38.48,21.22,0,38.49,17.27,38.49,38.48s-17.27,38.49-38.49,38.49-38.49-17.27-38.49-38.49Z"></path></g></svg></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1kwqbwj"><a class="chakra-button css-1m9c7fh" href="/"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0v24h24V0H0zm23 16c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8z"></path><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path></svg></span>Play</a><a class="chakra-button css-1nal3hj" href="/lobbies"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M10 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM4 18c.22-.72 3.31-2 6-2 0-.7.13-1.37.35-1.99C7.62 13.91 2 15.27 2 18v2h9.54c-.52-.58-.93-1.25-1.19-2H4zM19.43 18.02c.36-.59.57-1.28.57-2.02 0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4c.74 0 1.43-.22 2.02-.57L20.59 22 22 20.59c-1.5-1.5-.79-.8-2.57-2.57zM16 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg></span>Lobbies</a><a class="chakra-button css-1nal3hj" href="/matches"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg></span>Matches</a><a class="chakra-button css-1nal3hj" href="/tournaments"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"></path></svg></span>Tournaments</a><a class="chakra-button css-1nal3hj" href="/history/matches"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M13 3a9 9 0 00-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0013 21a9 9 0 000-18zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"></path></svg></span>Match history</a><a class="chakra-button css-1nal3hj" href="/statistics"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></span>Statistics</a><a class="chakra-button css-1nal3hj" href="/boards"><span class="chakra-button__icon css-1wh2kri"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3-8c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3z"></path></svg></span>My boards</a></div><div class="css-17xejub"></div><a class="chakra-button css-1jtmech" aria-label="hidden feature" href="/camera"><div aria-hidden="true" focusable="false" class="css-0" style="transform-origin: center top;"><svg data-prefix="fas" data-icon="camera" class="svg-inline--fa fa-camera" role="img" viewBox="0 0 512 512" aria-hidden="true" font-size="0.9rem"><path fill="currentColor" d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0-10.4-31.2C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"></path></svg></div></a><div class="css-gmuwbf"><div class="css-169zhyd"><button type="button" class="chakra-button css-1jtmech" aria-label="Open notifications"><div aria-hidden="true" focusable="false" class="css-0" style="transform-origin: center top;"><svg data-prefix="fas" data-icon="bell" class="svg-inline--fa fa-bell" role="img" viewBox="0 0 448 512" aria-hidden="true" font-size="0.9rem"><path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32l0 3.2C119 50 64 114.6 64 192l0 21.7c0 48.1-16.4 94.8-46.4 132.4L7.8 358.3C2.7 364.6 0 372.4 0 380.5 0 400.1 15.9 416 35.5 416l376.9 0c19.6 0 35.5-15.9 35.5-35.5 0-8.1-2.7-15.9-7.8-22.2l-9.8-12.2C400.4 308.5 384 261.8 384 213.7l0-21.7c0-77.4-55-142-128-156.8l0-3.2c0-17.7-14.3-32-32-32zM162 464c7.1 27.6 32.2 48 62 48s54.9-20.4 62-48l-124 0z"></path></svg></div></button></div></div><div class="css-gmuwbf"><div class="css-79elbk"><button type="button" class="chakra-button chakra-menu__menu-button css-1nlwyv4" id="menu-button-:r3:" aria-expanded="false" aria-haspopup="menu" aria-controls="menu-list-:r3:"><span class="chakra-button__icon css-1wh2kri"><span aria-hidden="true" focusable="false" class="chakra-avatar css-pyu8a9" data-loaded="" style="width: 32px; height: 32px;"><img src="https://gravatar.com/avatar/882908ae96f45cc2ddc5ddf89714a2eb" alt="CREAZY" class="chakra-avatar__img css-3a5bz2"><div class="chakra-avatar__badge css-fi8vxe"></div></span></span><span class="css-xl71ch">CREAZY</span></button></div><div class="css-hacnqc" style="visibility: hidden; position: absolute; min-width: max-content; inset: 0px auto auto 0px;"><div tabindex="-1" role="menu" id="menu-list-:r3:" aria-orientation="vertical" class="chakra-menu__menu-list css-yskgbr" style="transform-origin: var(--popper-transform-origin); opacity: 0; visibility: hidden; transform: scale(0.8);"><button type="button" id="menu-list-:r3:-menuitem-:r4:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" data-index="0">Account</button><a id="menu-list-:r3:-menuitem-:r5:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/boards" data-index="1">My boards</a><a id="menu-list-:r3:-menuitem-:r6:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/settings" data-index="2">Settings</a><a id="menu-list-:r3:-menuitem-:r7:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1uorwg2" href="/statistics" data-index="3">Statistics</a><a id="menu-list-:r3:-menuitem-:r8:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/subscribed" data-index="4">Subscription</a><a id="menu-list-:r3:-menuitem-:r9:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/legal/tos" target="_blank" data-index="5">Terms &amp; Conditions</a><a id="menu-list-:r3:-menuitem-:ra:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" href="/legal/privacy" target="_blank" data-index="6">Privacy Policy</a><button type="button" id="menu-list-:r3:-menuitem-:rb:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-1jc8v6r" data-index="7">Log out</button><div class="chakra-menu__group" role="group"><p class="chakra-menu__group__title css-hunt27" id="ad-ext-user-menu-extra" style="display: none;">Extensions</p><button type="button" id="menu-list-:r3:-menuitem-:rc:" role="menuitem" tabindex="-1" class="chakra-menu__menuitem css-y7jzs3" data-index="8" style="display: none;">Dummy</button></div></div></div></div><div class="css-gmuwbf"><button type="button" class="chakra-button css-11at0h5" aria-label="Collapse side bar"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg></button></div></div><div class="css-nfhdnc"><div class="css-gmuwbf"><div class="animate__animated animate__fadeIn css-5bhccf" style="animation-duration: 0.2s;"><div class="chakra-stack css-1fucqvl"><div class="chakra-stack css-n3uhkm"><h2 class="chakra-heading css-1dklj6k">Match history</h2><div class="css-17xejub"></div><span class="css-1eveppl"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1jxv7ty" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg><span class="css-1ny2kle">10</span></span><span class="css-m6gpa9"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1jxv7ty" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 48C141.124 48 48 141.125 48 256s93.124 208 208 208c114.875 0 208-93.125 208-208S370.875 48 256 48zm-21.549 384.999c-39.464-4.726-75.978-22.392-104.519-50.932C96.258 348.393 77.714 303.622 77.714 256c0-42.87 15.036-83.424 42.601-115.659.71 8.517 2.463 17.648 2.014 24.175-1.64 23.795-3.988 38.687 9.94 58.762 5.426 7.819 6.759 19.028 9.4 28.078 2.583 8.854 12.902 13.498 20.019 18.953 14.359 11.009 28.096 23.805 43.322 33.494 10.049 6.395 16.326 9.576 13.383 21.839-2.367 9.862-3.028 15.937-8.13 24.723-1.557 2.681 5.877 19.918 8.351 22.392 7.498 7.497 14.938 14.375 23.111 21.125 12.671 10.469-1.231 24.072-7.274 39.117zm147.616-50.932c-25.633 25.633-57.699 42.486-92.556 49.081 4.94-12.216 13.736-23.07 21.895-29.362 7.097-5.476 15.986-16.009 19.693-24.352 3.704-8.332 8.611-15.555 13.577-23.217 7.065-10.899-17.419-27.336-25.353-30.781-17.854-7.751-31.294-18.21-47.161-29.375-11.305-7.954-34.257 4.154-47.02-1.417-17.481-7.633-31.883-20.896-47.078-32.339-15.68-11.809-14.922-25.576-14.922-42.997 12.282.453 29.754-3.399 37.908 6.478 2.573 3.117 11.42 17.042 17.342 12.094 4.838-4.043-3.585-20.249-5.212-24.059-5.005-11.715 11.404-16.284 19.803-24.228 10.96-10.364 34.47-26.618 32.612-34.047s-23.524-28.477-36.249-25.193c-1.907.492-18.697 18.097-21.941 20.859.086-5.746.172-11.491.26-17.237.055-3.628-6.768-7.352-6.451-9.692.8-5.914 17.262-16.647 21.357-21.357-2.869-1.793-12.659-10.202-15.622-8.968-7.174 2.99-15.276 5.05-22.45 8.039 0-2.488-.302-4.825-.662-7.133a176.585 176.585 0 0 1 45.31-13.152l14.084 5.66 9.944 11.801 9.924 10.233 8.675 2.795 13.779-12.995L282 87.929V79.59c27.25 3.958 52.984 14.124 75.522 29.8-4.032.361-8.463.954-13.462 1.59-2.065-1.22-4.714-1.774-6.965-2.623 6.531 14.042 13.343 27.89 20.264 41.746 7.393 14.801 23.793 30.677 26.673 46.301 3.394 18.416 1.039 35.144 2.896 56.811 1.788 20.865 23.524 44.572 23.524 44.572s10.037 3.419 18.384 2.228c-7.781 30.783-23.733 59.014-46.769 82.052z"></path></svg><span class="css-1ny2kle">0</span></span><span class="css-jmdw5n"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1jxv7ty" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M32 224h128v192H32zM192 128h128v288H192zM352 288h128v128H352z"></path></svg><span class="css-1ny2kle">0</span></span><span class="css-exn4vj"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1jxv7ty" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M392 105c.9-27 .2-56 .1-57H119.3c0 1-.8 30 .1 57H48c0 68 9.9 102.3 21 126.7S95.4 277 127.7 302c30.1 23.3 95.5 53.6 104.3 57.6v28.3c-4.6 10-23.5 28.2-83.3 28.2H128v48h256v-48h-25.7c-60.7 0-75-19.1-78.3-28.2v-28.3c9.3-4.6 80.9-40.3 104.4-57.5 25.2-18.4 50.9-51.5 58.7-70.3S464 167 464 105h-72zM109.6 211.9c-8.8-18.2-14-37.9-15.7-61.9h28.7c.7 6 1.4 11.3 2.3 16.3 6.6 39.2 14.8 70.2 25.7 96.5-17.3-13.5-31.3-30.8-41-50.9zm292.8 0c-9.9 20.3-24 37.7-41.6 51.3 11-26.2 19-56.8 25.8-96.9.8-5 1.6-10.3 2.3-16.3h29.3c-1.8 24-6.9 43.7-15.8 61.9z"></path></svg><span class="css-1ny2kle">0</span></span></div><div class="chakra-wrap css-1qfb0s7"><ul class="chakra-wrap__list css-19lo6pj"><div class="chakra-stack css-1igwmid"><div class="css-0">Type</div><div class="css-1domaf0"><div class="chakra-select__wrapper css-42b2qy"><select class="chakra-select css-1h3944a"><option value="">All</option><option value="ATC">ATC</option><option value="Bermuda">Bermuda</option><option value="CountUp">CountUp</option><option value="Cricket">Cricket</option><option value="Random Checkout">Random Checkout</option><option value="X01">X01</option></select><div class="chakra-select__icon-wrapper css-iohxn1"><svg viewBox="0 0 24 24" role="presentation" class="chakra-select__icon" focusable="false" aria-hidden="true" style="width: 1em; height: 1em; color: currentcolor;"><path fill="currentColor" d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg></div></div></div></div><div class="chakra-stack css-1igwmid"><div class="css-0">Player</div><div class="css-1domaf0"><div class="chakra-select__wrapper css-42b2qy"><select class="chakra-select css-1h3944a"><option value="">All</option><option id="20" value="Bot Level 1">Bot Level 1</option><option id="30" value="Bot Level 2">Bot Level 2</option><option id="40" value="Bot Level 3">Bot Level 3</option><option id="2f0ff59e-a831-4315-9912-4d3433324bd5" value="aaro42n">aaro42n</option><option id="7ca7a280-e9b7-4f0e-865e-41c81f772bc6" value="alexej">alexej</option><option id="0fce4dc1-d2dd-4096-863c-0dc236205815" value="alx89">alx89</option><option id="1dd15a87-fd1b-427c-ab49-cab91fae6393" value="blanko">blanko</option><option id="d644d6a2-6125-46de-b970-93e2ed870ef1" value="bullyde">bullyde</option><option id="26088c83-f655-4ef0-bfb8-bcfba2b89ca5" value="dako9976">dako9976</option><option id="42b15d9b-78d9-4dfd-893e-6e63b27df97f" value="danielb79">danielb79</option><option id="400ade48-3611-4cd1-99f6-b5100be50c8e" value="da_real_basti">da_real_basti</option><option id="19cad108-6d1d-42d1-b003-be242a4f84a6" value="dartvader!">dartvader!</option><option id="12fd5f20-05d1-4afa-b1a4-619d1f17d3ef" value="deepcold">deepcold</option><option id="741e9367-1e47-402b-a792-5a7689e8104b" value="diggi">diggi</option><option id="46d8cd82-a269-4d22-931d-93e8acc5bb9f" value="dopling">dopling</option><option id="c569d413-2ccd-40df-9df3-569058e9ed2a" value="dustin.t36">dustin.t36</option><option id="443b6029-b621-4fc7-9d4a-00cd09ea59e8" value="fabi0790">fabi0790</option><option id="994be67f-6362-40c4-a58b-2cff38daa70e" value="fabi96">fabi96</option><option id="0a9fa73a-7857-4123-ba92-4d2c23de2931" value="forello">forello</option><option id="ac840612-10f8-4fc5-a684-7fe0e429c7a2" value="g3kko_darts">g3kko_darts</option><option id="abfc438d-64d4-4d33-8fba-48250bfa35d2" value="gxs">gxs</option><option id="1f073194-c69f-496a-a679-faf6b0339c9c" value="hagi.">hagi.</option><option id="a019635c-2450-49ba-b21d-c5b0b9987f19" value="hatworscht">hatworscht</option><option id="0247f204-2e20-47a1-be4e-03772c664c79" value="hawergetzi">hawergetzi</option><option id="e5e0fe56-37e7-45e2-9f8e-4d2adbbbb9cc" value="heyitsluk">heyitsluk</option><option id="ff3e2d77-25dd-4d87-932d-9889e49ce83d" value="hulkss5">hulkss5</option><option id="0f9c4521-305d-4df2-b12f-88d2ea6fbf93" value="jancher246">jancher246</option><option id="0df5f65a-abc2-4251-8412-7a76d761f17d" value="jdc">jdc</option><option id="487c108b-9531-4c79-9335-c8f9d6ec655f" value="johannes_mdr">johannes_mdr</option><option id="19b70367-8f09-4f70-a173-093eed2d987e" value="kleintonno">kleintonno</option><option id="e30a787e-9fb0-4b00-a306-483fbe425ce8" value="koalking">koalking</option><option id="ca2535e8-c54a-4bee-b432-f5061f8236eb" value="kons">kons</option><option id="ecefb766-3d37-41cc-906f-0a0662fbb957" value="lanidel92">lanidel92</option><option id="c3b05904-53ac-41f6-95d2-412116f01392" value="lewisjamieson4">lewisjamieson4</option><option id="f0904a41-e33a-46fe-bfb3-297707113a53" value="matze">matze</option><option id="c549cf06-8d25-4037-b131-4bb94e11ed45" value="megatitus">megatitus</option><option id="821b6aa0-7d88-47f1-bed7-304a402c133f" value="micmar">micmar</option><option id="5d132637-c3cd-4017-be08-72a476a3d7b4" value="ninodarts180">ninodarts180</option><option id="729c0d2d-bb7f-4ba3-9ea8-56030534a2f0" value="oemmes96">oemmes96</option><option id="75886cb5-562b-49e8-9826-de832946226d" value="p1nkman">p1nkman</option><option id="aad9dfe5-946a-4816-a9bb-716584e4abab" value="paniccross route 26">paniccross route 26</option><option id="b97a82a7-cbbf-4086-8d92-41fc3a298992" value="patmacalister">patmacalister</option><option id="899b9d09-ba41-49b2-804e-872a91e406ca" value="paut_94">paut_94</option><option id="363528b8-ee5c-4a5e-bd4b-a990a17eef95" value="pgblade">pgblade</option><option id="ebe35788-cbfd-4c21-8bcf-e3035fec5111" value="qweddy">qweddy</option><option id="549337b6-b7bd-425c-8231-e24d88f5ec43" value="qwellcode">qwellcode</option><option id="66fa9cbc-a2d6-476d-9ab1-ea97ba0f06dd" value="reneil1337">reneil1337</option><option id="e60230f0-9e40-499d-b11e-38a7b17d681c" value="senzzoe">senzzoe</option><option id="7cc6f773-27c9-47a1-90a4-f1ecd5412bc2" value="sgnjatovic">sgnjatovic</option><option id="078a7294-df80-43c5-820c-ac9f181a2fb3" value="stikkx">stikkx</option><option id="bad45001-bfe6-442c-b7b5-d3fc4354978a" value="theboom87">theboom87</option><option id="b5bf8d59-5858-42a5-8aef-128b24e27afd" value="theo61">theo61</option><option id="66345412-1acc-4352-8895-b26aa661c6ba" value="thomasbirne">thomasbirne</option><option id="5191d681-694c-43d9-ba7d-a0f1da102095" value="toenizz">toenizz</option><option id="8c16d544-b0b9-4d3a-9173-67d056b3e39f" value="zipfeschwinga">zipfeschwinga</option></select><div class="chakra-select__icon-wrapper css-iohxn1"><svg viewBox="0 0 24 24" role="presentation" class="chakra-select__icon" focusable="false" aria-hidden="true" style="width: 1em; height: 1em; color: currentcolor;"><path fill="currentColor" d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg></div></div></div></div><div class="chakra-stack css-1igwmid"><div class="css-0">Start</div><div class="css-2cy7sg"><div class="chakra-stack css-1igwmid"><input autocomplete="off" name="date-input" aria-haspopup="dialog" aria-expanded="false" aria-controls="popover-content-:rn:" id="popover-trigger-:rn:" class="chakra-input css-1ndqqtl" value=""><div class="chakra-popover__popper css-iy22zq" style="visibility: hidden; position: absolute; min-width: max-content; inset: 0px auto auto 0px;"><section id="popover-content-:rn:" tabindex="-1" role="dialog" class="chakra-popover__content css-1uyib0q" style="transform-origin: var(--popper-transform-origin); opacity: 0; visibility: hidden; transform: scale(0.95);"></section></div><button type="button" class="chakra-button css-s01ar8" aria-label="Clear"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button></div></div><div class="css-0">End</div><div class="css-2cy7sg"><div class="chakra-stack css-1igwmid"><input autocomplete="off" name="date-input" aria-haspopup="dialog" aria-expanded="false" aria-controls="popover-content-:rs:" id="popover-trigger-:rs:" class="chakra-input css-1ndqqtl" value=""><div class="chakra-popover__popper css-iy22zq" style="visibility: hidden; position: absolute; min-width: max-content; inset: 0px auto auto 0px;"><section id="popover-content-:rs:" tabindex="-1" role="dialog" class="chakra-popover__content css-1uyib0q" style="transform-origin: var(--popper-transform-origin); opacity: 0; visibility: hidden; transform: scale(0.95);"></section></div><button type="button" class="chakra-button css-s01ar8" aria-label="Clear"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button></div></div></div><div class="css-17xejub"></div></ul></div><div class="chakra-stack css-r54r42"><div class="chakra-card animate__animated animate__fadeInDown css-14mo3fq"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">Date / Time</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">Result</p><div class="chakra-wrap css-0"><ul class="chakra-wrap__list css-k1urot">Players</ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">11.08.2026 11:35 AM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">0-2 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAQABAAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/P1VOcU8R+tPjSkuSIIHkPYgV2N21B9EZepXk+8wwDbxy5OMVXstPjEokuJZZT32jj8813Pw/wDhvqvxa8T6doekwsq3UipNcdAgzlufZea+vpf+CedjJb6fFbX8lvjH2gs5JYeo/WuKdZJ6noU8HUqJNbHwVq1jFcyNJDGYynQIOePWqlhqzWE6w3PzxHgMP4TX6pQfsVeA9LsTHDpUdxIQFZnzyfWvi79rP9l5/g/cDV9PZX0q7mAEIP8Aqieg5qI1lfQ1q4CVKHMzx8oTgg5HXPrQIwx5o0399p8LDggbSp7EHH9KnxjrwfWvRWqueVbqPjTHaq2qxmSydRk9OPxq3HnHXNNuf+Pd+M8Yx6mhq6FvqfYP7BEeh6d4Yj1DULm3t7uW7cxtPIqsTnZgZ9cYxX3cJkaBXiKujdNjZyf8K+EP2b/g1pvi34MaFcnEN6yzh52DFx+/kx0IAxXtnwg8O6r4Av8A+zbzV5r+1dydrcKBx0BJP6149SKPr8JzKKVtD6CuNd03RbRrrUby3s7dRnzJ5AgP5mvkv9tvXvDvjb4VSjS9RtdTMN3GWNrMrlOe+Dxzxz616ZrHwll8a66uoW2qS2c6NkzON4A9MZANcr+1T8M7ex+BXiCFQ017+4KXIjCyMRNGQMDg5xj8aUYpWNK7m1KLVkfnJawJGrqnAB5HcHHcdqWRfyrSvdIudIvp7a8UJcAI7KB93dGpwffnmqrpgYr2Yr3T42WkmitGcDFTDAHPCkcj+9UEZqZSO9UiPQ+9f2QfFq6r8NI4X2GezL27ovYZJH/jrCvWNJug2uNdhfPhiUjapBOfpX59/BL4uXvwn8TJcRlpNLuXVbuDPBHQtg98fyxX3/4QsNI8Q2zXtjcRwNchWJHy4yPQdPwrzKtPlk2fV4GupxUG7WO58O302nLGkoQMSNql92R9a4T9qHxteeGPhfq+uWQj+12nlNCHTcoLSomT7jdke4rrZ9PsNBKXM0iz3I4ih3mTJ9QO1eZftK6Td6r8C/FE1w3+kSQRy7QeFVZUbaM9/l6VzJrmR1Ymd4u2p+dV/cz6neXF5cvvubiRppW9WYlif1qr5ZBzmqWleIrfVmKokkTDjEgA6fStNl9eK91NWPi3fmbMiNsGp1bAB4qnG2TUOoaounQ9N0jD5RUPQDVkmSCNmlZVQDJyQPy96+4v2V9f0/xx4H0t9T8zeyGMvDK6YdT0O0jnBH51+b93fzX0uZGz3EfqR2r6N/ZJ+O2l+ADc6Drs6WVnLN9qt7uVsRxsQFZWJ6D5VOfc1z1byWh14aooT94/THQ/DGmWAMkS9B8jTSmQgd/vE4r5L/bm/aGsLPR5fA2g3cc17Ky/bGhO7yUBBwccAnA/A15/8Yv29ZtQt7jQfBQWJSSjatO33v8AcUd/fJHtXy7or22teJBPr14zW7s9zeTyyYllAySFz3ZuPxrnp0NU5HdWxlo8sR1to72ugPrck8VqPN228DcPcnd8xX2GTz04Nadnq8F/GuJB5mPmX0rm/E2vP4k1VrkfurKP5LS37RxDhQffHJ9STWdC25jgnj8MV3cyi7I8bXc//9k=" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">PATMACALISTER</p></span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019ff00b-0523-7411-8c0b-db4df1a750d7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.02s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">19.06.2026 11:56 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">1-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019ee1d1-23e2-7375-b295-56097189356d"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.04s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">19.06.2026 10:54 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">2-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019ee187-3af9-7ebc-9c6d-a3dd7dece71a"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.06s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 11:17 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">1-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBUU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAQABAAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/P1VOcU8R+tPjSkuSIIHkPYgV2N21B9EZepXk+8wwDbxy5OMVXstPjEokuJZZT32jj8813Pw/wDhvqvxa8T6doekwsq3UipNcdAgzlufZea+vpf+CedjJb6fFbX8lvjH2gs5JYeo/WuKdZJ6noU8HUqJNbHwVq1jFcyNJDGYynQIOePWqlhqzWE6w3PzxHgMP4TX6pQfsVeA9LsTHDpUdxIQFZnzyfWvi79rP9l5/g/cDV9PZX0q7mAEIP8Aqieg5qI1lfQ1q4CVKHMzx8oTgg5HXPrQIwx5o0399p8LDggbSp7EHH9KnxjrwfWvRWqueVbqPjTHaq2qxmSydRk9OPxq3HnHXNNuf+Pd+M8Yx6mhq6FvqfYP7BEeh6d4Yj1DULm3t7uW7cxtPIqsTnZgZ9cYxX3cJkaBXiKujdNjZyf8K+EP2b/g1pvi34MaFcnEN6yzh52DFx+/kx0IAxXtnwg8O6r4Av8A+zbzV5r+1dydrcKBx0BJP6149SKPr8JzKKVtD6CuNd03RbRrrUby3s7dRnzJ5AgP5mvkv9tvXvDvjb4VSjS9RtdTMN3GWNrMrlOe+Dxzxz616ZrHwll8a66uoW2qS2c6NkzON4A9MZANcr+1T8M7ex+BXiCFQ017+4KXIjCyMRNGQMDg5xj8aUYpWNK7m1KLVkfnJawJGrqnAB5HcHHcdqWRfyrSvdIudIvp7a8UJcAI7KB93dGpwffnmqrpgYr2Yr3T42WkmitGcDFTDAHPCkcj+9UEZqZSO9UiPQ+9f2QfFq6r8NI4X2GezL27ovYZJH/jrCvWNJug2uNdhfPhiUjapBOfpX59/BL4uXvwn8TJcRlpNLuXVbuDPBHQtg98fyxX3/4QsNI8Q2zXtjcRwNchWJHy4yPQdPwrzKtPlk2fV4GupxUG7WO58O302nLGkoQMSNql92R9a4T9qHxteeGPhfq+uWQj+12nlNCHTcoLSomT7jdke4rrZ9PsNBKXM0iz3I4ih3mTJ9QO1eZftK6Td6r8C/FE1w3+kSQRy7QeFVZUbaM9/l6VzJrmR1Ymd4u2p+dV/cz6neXF5cvvubiRppW9WYlif1qr5ZBzmqWleIrfVmKokkTDjEgA6fStNl9eK91NWPi3fmbMiNsGp1bAB4qnG2TUOoaounQ9N0jD5RUPQDVkmSCNmlZVQDJyQPy96+4v2V9f0/xx4H0t9T8zeyGMvDK6YdT0O0jnBH51+b93fzX0uZGz3EfqR2r6N/ZJ+O2l+ADc6Drs6WVnLN9qt7uVsRxsQFZWJ6D5VOfc1z1byWh14aooT94/THQ/DGmWAMkS9B8jTSmQgd/vE4r5L/bm/aGsLPR5fA2g3cc17Ky/bGhO7yUBBwccAnA/A15/8Yv29ZtQt7jQfBQWJSSjatO33v8AcUd/fJHtXy7or22teJBPr14zW7s9zeTyyYllAySFz3ZuPxrnp0NU5HdWxlo8sR1to72ugPrck8VqPN228DcPcnd8xX2GTz04Nadnq8F/GuJB5mPmX0rm/E2vP4k1VrkfurKP5LS37RxDhQffHJ9STWdC25jgnj8MV3cyi7I8bXc//9k=" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e56a3-6cab-7f39-875c-5cfa7bacc177"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.08s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 10:59 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">3-1 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e5688-ed07-72e8-ad4b-0a6a7632cc93"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.1s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 10:05 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">1-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e5645-5892-7872-88f5-329d1fce507d"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.12s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 09:17 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">2-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e5620-7039-72c8-8bec-97aaee0bbc80"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.14s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 08:37 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">1-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e560e-2ae3-7224-9c46-d9d710a96b28"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.16s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 08:16 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">2-3 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e55f5-5114-776c-92e1-d00e7b0eb683"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div><div class="chakra-card animate__animated animate__fadeInDown css-19vjuk" style="animation-delay: 0.18s; animation-duration: 0.5s;"><div class="chakra-card__body css-1idwstw"><div class="chakra-stack css-cs6kq4"><div class="chakra-stack css-1igwmid"><div class="chakra-stack css-18lbu3y"><span class="css-1xbroe7"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-13otjrl" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M208 448V320h96v128h97.6V256H464L256 64 48 256h62.4v192z"></path></svg></span><span class="css-1xbroe7">X01</span></div><div class="css-17xejub"></div><div class="chakra-stack css-18zd4fb"><p class="chakra-text css-0">23.05.2026 07:49 PM</p></div></div><div class="chakra-stack css-1rafi8n"><p class="chakra-text css-1ijltce">3-1 (Legs)</p><div class="chakra-wrap css-70qvj9"><ul class="chakra-wrap__list css-ppc6cx"><div class="css-1obaf7i"><span class="css-hewh2h" style="cursor: initial;"><span class="chakra-text css-11l8nwy"><svg data-prefix="fas" data-icon="trophy" class="svg-inline--fa fa-trophy fa-2xs" role="img" viewBox="0 0 512 512" aria-hidden="true" color="#feda44"><path fill="currentColor" d="M144.3 0l224 0c26.5 0 48.1 21.8 47.1 48.2-.2 5.3-.4 10.6-.7 15.8l49.6 0c26.1 0 49.1 21.6 47.1 49.8-7.5 103.7-60.5 160.7-118 190.5-15.8 8.2-31.9 14.3-47.2 18.8-20.2 28.6-41.2 43.7-57.9 51.8l0 73.1 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0 0-73.1c-16-7.7-35.9-22-55.3-48.3-18.4-4.8-38.4-12.1-57.9-23.1-54.1-30.3-102.9-87.4-109.9-189.9-1.9-28.1 21-49.7 47.1-49.7l49.6 0c-.3-5.2-.5-10.4-.7-15.8-1-26.5 20.6-48.2 47.1-48.2zM101.5 112l-52.4 0c6.2 84.7 45.1 127.1 85.2 149.6-14.4-37.3-26.3-86-32.8-149.6zM380 256.8c40.5-23.8 77.1-66.1 83.3-144.8L411 112c-6.2 60.9-17.4 108.2-31 144.8z"></path></svg></span><div class="chakra-stack css-1psdi5l"><span class="chakra-text css-51k6ft"></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">ANNAECKEN</p></span></div></span></div><div class="css-1obaf7i"><span class="css-z1uxps" style="cursor: pointer;"><div class="chakra-stack css-1psdi5l"><span class="chakra-avatar css-xa3y8w" data-loaded=""><img src="data:image/jpeg;base64,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" alt="creazy" class="chakra-avatar__img css-3a5bz2"></span><span class="chakra-text css-51k6ft"><div class="css-1i1gewt"><img alt="de" src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20id='flag-icons-de'%20viewBox='0%200%20640%20480'%3e%3cpath%20fill='%23fc0'%20d='M0%20320h640v160H0z'%20/%3e%3cpath%20fill='%23000001'%20d='M0%200h640v160H0z'%20/%3e%3cpath%20fill='red'%20d='M0%20160h640v160H0z'%20/%3e%3c/svg%3e" class="chakra-image css-6t0bzd"></div></span></div><div class="chakra-stack css-1igwmid"><span class="ad-ext-player-name css-1oha1tj"><p class="chakra-text css-11cuipc">CREAZY</p></span><span class="chakra-badge css-n2903v">30+</span></div></span></div></ul></div></div><div class="css-17xejub"></div><div class="chakra-stack css-1igwmid"><div class="css-17xejub"></div><a class="chakra-button css-1rg4y02" aria-label="Stats" href="/history/matches/019e55e2-3bf9-7a3b-9c1f-db56f214cf70"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M4 9h4v11H4zM16 13h4v7h-4zM10 4h4v16h-4z"></path></svg></a></div></div></div></div></div><div class="css-gmuwbf"><div class="css-1tpm6op"><div class="chakra-stack css-fqllj7"><div class="chakra-stack css-1igwmid"><button disabled="" type="button" class="chakra-button css-11at0h5" aria-label="First page"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"></path><path fill="none" d="M24 24H0V0h24v24z"></path></svg></button><button disabled="" type="button" class="chakra-button css-11at0h5" aria-label="Previous page"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg></button></div><p class="chakra-text css-0">Page 1 of 56</p><button type="button" class="chakra-button css-11at0h5" aria-label="Next page"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button><button type="button" class="chakra-button css-11at0h5" aria-label="Last page"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z"></path><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"></path></svg></button></div></div></div></div></div></div></div><div class="chakra-stack css-1p8piej"></div></div><span id="__chakra_env" hidden=""></span></div>
+
+
+
+<div class="chakra-portal"><div role="region" aria-live="polite" aria-label="Notifications-top" id="chakra-toast-manager-top" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; margin: 0px auto; top: env(safe-area-inset-top, 0px); right: env(safe-area-inset-right, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-top-left" id="chakra-toast-manager-top-left" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; top: env(safe-area-inset-top, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-top-right" id="chakra-toast-manager-top-right" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; top: env(safe-area-inset-top, 0px); right: env(safe-area-inset-right, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-bottom-left" id="chakra-toast-manager-bottom-left" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; bottom: env(safe-area-inset-bottom, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-bottom" id="chakra-toast-manager-bottom" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; margin: 0px auto; bottom: env(safe-area-inset-bottom, 0px); right: env(safe-area-inset-right, 0px); left: env(safe-area-inset-left, 0px);"></div><div role="region" aria-live="polite" aria-label="Notifications-bottom-right" id="chakra-toast-manager-bottom-right" style="position: fixed; z-index: var(--toast-z-index, 5500); pointer-events: none; display: flex; flex-direction: column; bottom: env(safe-area-inset-bottom, 0px); right: env(safe-area-inset-right, 0px);"></div></div></body></html>

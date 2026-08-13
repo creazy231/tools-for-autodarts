@@ -4,7 +4,7 @@
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*" ],
+  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
   runAt: "document_start",
   async main(ctx) {
     console.log("Injecting WebSocket capture script...");

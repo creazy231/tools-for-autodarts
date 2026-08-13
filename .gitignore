@@ -28,6 +28,19 @@ web-ext.config.ts
 .env.*
 !.env.example
 
+# Local credentials for the v2 migration tooling (never commit).
+# Deliberately NOT a .env file so WXT/Vite never loads it into a build.
+.secrets/
+
+# Chrome profile used by scripts/dev-chrome.sh (contains a logged-in session)
+.chrome-profile/
+
+# DOM snapshots: the .html and .probe.json files ARE committed (they are the
+# migration baseline and v1 is not recapturable once retired). The screenshots
+# are not - 15MB of PNGs would grow every clone by ~50%. Regenerate locally with
+#   node scripts/capture-dom.mjs
+snapshots/**/*.png
+
 # Signing certificates and provisioning profiles
 *.p8
 *.p12

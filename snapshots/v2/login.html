@@ -1,0 +1,717 @@
+<!DOCTYPE html><html lang="en" translate="no" class="dark" style="--visual-viewport-height: 1000px; --keyboard-height: 0px;"><head>
+  <meta charset="utf-8">
+  <title>Autodarts Play</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <style type="text/css">:root, :host {
+  --fa-font-solid: normal 900 1em/1 'Font Awesome 7 Free';
+  --fa-font-regular: normal 400 1em/1 'Font Awesome 7 Free';
+  --fa-font-light: normal 300 1em/1 'Font Awesome 7 Pro';
+  --fa-font-thin: normal 100 1em/1 'Font Awesome 7 Pro';
+  --fa-font-duotone: normal 900 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-duotone-regular: normal 400 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-duotone-light: normal 300 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-duotone-thin: normal 100 1em/1 'Font Awesome 7 Duotone';
+  --fa-font-brands: normal 400 1em/1 'Font Awesome 7 Brands';
+  --fa-font-sharp-solid: normal 900 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-regular: normal 400 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-light: normal 300 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-thin: normal 100 1em/1 'Font Awesome 7 Sharp';
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-sharp-duotone-light: normal 300 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 'Font Awesome 7 Sharp Duotone';
+  --fa-font-slab-regular: normal 400 1em/1 'Font Awesome 7 Slab';
+  --fa-font-slab-press-regular: normal 400 1em/1 'Font Awesome 7 Slab Press';
+  --fa-font-whiteboard-semibold: normal 600 1em/1 'Font Awesome 7 Whiteboard';
+  --fa-font-thumbprint-light: normal 300 1em/1 'Font Awesome 7 Thumbprint';
+  --fa-font-notdog-solid: normal 900 1em/1 'Font Awesome 7 Notdog';
+  --fa-font-notdog-duo-solid: normal 900 1em/1 'Font Awesome 7 Notdog Duo';
+  --fa-font-etch-solid: normal 900 1em/1 'Font Awesome 7 Etch';
+  --fa-font-graphite-thin: normal 100 1em/1 'Font Awesome 7 Graphite';
+  --fa-font-jelly-regular: normal 400 1em/1 'Font Awesome 7 Jelly';
+  --fa-font-jelly-fill-regular: normal 400 1em/1 'Font Awesome 7 Jelly Fill';
+  --fa-font-jelly-duo-regular: normal 400 1em/1 'Font Awesome 7 Jelly Duo';
+  --fa-font-chisel-regular: normal 400 1em/1 'Font Awesome 7 Chisel';
+  --fa-font-utility-semibold: normal 600 1em/1 'Font Awesome 7 Utility';
+  --fa-font-utility-duo-semibold: normal 600 1em/1 'Font Awesome 7 Utility Duo';
+  --fa-font-utility-fill-semibold: normal 600 1em/1 'Font Awesome 7 Utility Fill';
+}
+
+.svg-inline--fa {
+  box-sizing: content-box;
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285714em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left,
+.svg-inline--fa .fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-pull-right,
+.svg-inline--fa .fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  inset-block-start: 0.25em; /* syncing vertical alignment with Web Font rendering */
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: var(--fa-width, 1.25em);
+}
+.fa-layers .svg-inline--fa {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: calc(10 / 16 * 1em); /* converts a 10px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 10 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 10 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xs {
+  font-size: calc(12 / 16 * 1em); /* converts a 12px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 12 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 12 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-sm {
+  font-size: calc(14 / 16 * 1em); /* converts a 14px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 14 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 14 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-lg {
+  font-size: calc(20 / 16 * 1em); /* converts a 20px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 20 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 20 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-xl {
+  font-size: calc(24 / 16 * 1em); /* converts a 24px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 24 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 24 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-2xl {
+  font-size: calc(32 / 16 * 1em); /* converts a 32px size into an em-based value that's relative to the scale's 16px base */
+  line-height: calc(1 / 32 * 1em); /* sets the line-height of the icon back to that of it's parent */
+  vertical-align: calc((6 / 32 - 0.375) * 1em); /* vertically centers the icon taking into account the surrounding text's descender */
+}
+
+.fa-width-auto {
+  --fa-width: auto;
+}
+
+.fa-fw,
+.fa-width-fixed {
+  --fa-width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-inline-start: var(--fa-li-margin, 2.5em);
+  padding-inline-start: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  inset-inline-start: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+/* Heads Up: Bordered Icons will not be supported in the future!
+  - This feature will be deprecated in the next major release of Font Awesome (v8)!
+  - You may continue to use it in this version *v7), but it will not be supported in Font Awesome v8.
+*/
+/* Notes:
+* --@{v.$css-prefix}-border-width = 1/16 by default (to render as ~1px based on a 16px default font-size)
+* --@{v.$css-prefix}-border-padding =
+  ** 3/16 for vertical padding (to give ~2px of vertical whitespace around an icon considering it's vertical alignment)
+  ** 4/16 for horizontal padding (to give ~4px of horizontal whitespace around an icon)
+*/
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.0625em);
+  box-sizing: var(--fa-border-box-sizing, content-box);
+  padding: var(--fa-border-padding, 0.1875em 0.25em);
+}
+
+.fa-pull-left,
+.fa-pull-start {
+  float: inline-start;
+  margin-inline-end: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right,
+.fa-pull-end {
+  float: inline-end;
+  margin-inline-start: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+  .fa-bounce,
+  .fa-fade,
+  .fa-beat-fade,
+  .fa-flip,
+  .fa-pulse,
+  .fa-shake,
+  .fa-spin,
+  .fa-spin-pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}
+
+.svg-inline--fa.fa-inverse {
+  fill: var(--fa-inverse, #fff);
+}
+
+.fa-stack {
+  display: inline-block;
+  height: 2em;
+  line-height: 2em;
+  position: relative;
+  vertical-align: middle;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  --fa-width: 1.25em;
+  height: 1em;
+  width: var(--fa-width);
+}
+.svg-inline--fa.fa-stack-2x {
+  --fa-width: 2.5em;
+  height: 2em;
+  width: var(--fa-width);
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  z-index: var(--fa-stack-z-index, auto);
+}</style><link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <meta name="theme-color" content="#384688">
+  <meta name="description" content="Play online darts with automatic scoring with Autodarts.">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <style>
+    html { background-color: #16181C; }
+  </style>
+  <script type="module" crossorigin="" src="/assets/index-G_oqDfAU.js"></script>
+  <link rel="modulepreload" crossorigin="" href="/assets/jsx-runtime-dXaYzyKa.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/preload-helper-ByStdziD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/utils-CjYXugli.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/react-CRJPF-Ki.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/pro-solid-svg-icons-DIO0LIXq.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ErrorPage-D_RvAtW8.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/logo_aqua-DYgES8F0.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/FormActions-ecTrDxg9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/PageSection-CUn6t6-9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-breakpoints-eDwaaWcc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useRenderElement-BJ4JwBCD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-BUI1wS8y.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/button-CT5NoNvQ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/react-dom-BGoezG9H.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/composite-BHb01NDK.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/composite-BgVGO5nP.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/owner-Bvqah2I2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/shadowDom-C0HEVO4T.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useValueAsRef-CDMk6Trs.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/visuallyHidden-DFjhTp8t.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/with-selector-DaU_wOLx.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useScrollLock-uzGBY_q6.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/store-C6dr_fa7.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/DialogTitle-suJkizlC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/clamp-CMinJydJ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useControlled-morpZgZZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ResponsiveDrawer-q2ZOsk9o.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/LayoutSlotsContext-pmtMYov4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-DfuDiTFM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/esm-Bl9wq-ej.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useRouter-BUXAaqxJ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useStore-KiBuIc7P.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/link-DGaixrRc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matchContext-C6D-zXiQ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useNavigate-DgGpcGiy.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/batch-CBzf4aGz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/react-BsYAwdRM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/SidebarSectionLayout-jYfmm2db.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/PageHeaderTitle-SGvlxOsC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/src-C_N8laqN.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/divider-IlB7FSgW.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/layout-CVaVBAyt.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useTranslation-CrpmfzXn.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/i18n-CQXh3s10.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/src-BvXyG2ao.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/clients-CNG25FPA.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/onlineManager-BhNi-rDE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-CNT_sHnw.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/offline-feedback-KwgwTRJB.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/connection-store-CZSVxiNE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/esm-Cs6r-DvS.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/error-C3JVnLiQ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/queryOptions-D-uREmui.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-consent-Dc4XZ_4A.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-user-stats-DBRvzsL4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useMatch-jrUBXnOJ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/lazyRouteComponent-BpN89lZZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/zod-BamFwv4f.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/statistics-Ce_Nuhum.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/NotificationToast-BPzXckLe.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-i18n-debug-BeSuvdW9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-profile-z_UglidF.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/onboarding-Vf782JS2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-permissions-eo1LPlRF.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/QueryClientProvider-CVVS7jgp.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useMutation-8XXr8Dgi.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useBaseQuery-CyYWt15u.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useQuery-nZVyDCkz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useSuspenseQuery-Lvp80Hy2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-tournaments-BM1FR-Pj.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-user-CV22ZVex.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/profile-form-qqOv3s_M.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/sfx-CTd6p1G4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/howler-DfXXEZIE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/sound-BhEnABIM.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/caller-Yns3FxdH.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/EmptyState-l81kjOkq.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/RequiredAsterisk-BYXckTuY.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useRegisterFieldControl-Cw7uFh64.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/DirectionContext-iteXujkl.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/FormContext-HmdbrB5K.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/useAnchoredPopupScrollLock-CX3wuEtU.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/proxy-DgtnAQd7.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/lib-B6qnc231.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ui-CT3UIezn.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/Dart-Bz4Gtw3z.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/NameTag-DvMzh8zz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/ScoreBadges-rLGh59zc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/PlayerList-CkHAZr9J.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CompositeList-BrSxLVdX.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CSPContext-i8Tt8tRk.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/serializeValue-CCxxywr7.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/SelectItemText-BT53CvyC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/players-Bd850H-X.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/board-DRJTEfyv.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/usePermission-BQr-BI2P.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-lobby-D_1YygLK.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/definitions-BMMyPoaK.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/player-colors-CjYGwDbF.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/separator-CizHMuiC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/field-BRuJ2ax3.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/isElementDisabled-DpsOsrlO.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CompositeRoot-DgI0rUQC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/CompositeItem-DBO5pIlA.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/shared-Dtx2b3po.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-lens-enabled-D5GPjWg1.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-user-settings-CiiZ8Toz.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/info-pill-BMejpChE.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/select-CO0qbdvc.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/use-game-BspJXS1I.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/boards_._boardId.follow-DPbybc6E.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matches_._matchId-CrwpVNSZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matches_._matchId-DLqzPmM9.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/join_._lobbyId-BHwFvO64.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/lobby._lobbyId-BqrxrHDb.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/matches_._matchId-BNiZHFAW.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/match-history-CTnKDxD2.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/history-lAPd_fB-.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/tournaments-OdGlYnK4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/_tournamentId-Cs5d64FZ.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/_tournamentId-Do_vdR3g.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/bracket-CPb9IEuO.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/information-DHyrQYYY.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/rankings-yBqeWvxj.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/auth._provider.callback-CAOaomv8.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/consent-CA0jslSD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dev-5taTOMzG.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/route-guards-DFi4I6tx.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/forgot-password-verify-Cb6CQazb.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/forgot-password-BUg-ZvvC.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/landing-VtAVrh4Z.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/legal._type-SnaJ2BQ4.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/login-old-C8ZBfpKx.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/login-Bmv1vGN0.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/redeem-Cn-6HUqk.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/register-C9y1Vn2m.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/verify-code-dZaI5FPD.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/platform-Cx8sKGKW.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/sonner-BFSx_ys-.js">
+  <link rel="modulepreload" crossorigin="" href="/assets/dist-DE5fqU0I.js">
+  <link rel="stylesheet" crossorigin="" href="/assets/index-D3QbCI0y.css">
+<style type="text/css">[data-sonner-toaster][dir=ltr],html[dir=ltr]{--toast-icon-margin-start:-3px;--toast-icon-margin-end:4px;--toast-svg-margin-start:-1px;--toast-svg-margin-end:0px;--toast-button-margin-start:auto;--toast-button-margin-end:0;--toast-close-button-start:0;--toast-close-button-end:unset;--toast-close-button-transform:translate(-35%, -35%)}[data-sonner-toaster][dir=rtl],html[dir=rtl]{--toast-icon-margin-start:4px;--toast-icon-margin-end:-3px;--toast-svg-margin-start:0px;--toast-svg-margin-end:-1px;--toast-button-margin-start:0;--toast-button-margin-end:auto;--toast-close-button-start:unset;--toast-close-button-end:0;--toast-close-button-transform:translate(35%, -35%)}[data-sonner-toaster]{position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1:hsl(0, 0%, 99%);--gray2:hsl(0, 0%, 97.3%);--gray3:hsl(0, 0%, 95.1%);--gray4:hsl(0, 0%, 93%);--gray5:hsl(0, 0%, 90.9%);--gray6:hsl(0, 0%, 88.7%);--gray7:hsl(0, 0%, 85.8%);--gray8:hsl(0, 0%, 78%);--gray9:hsl(0, 0%, 56.1%);--gray10:hsl(0, 0%, 52.3%);--gray11:hsl(0, 0%, 43.5%);--gray12:hsl(0, 0%, 9%);--border-radius:8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:0;z-index:999999999;transition:transform .4s ease}@media (hover:none) and (pointer:coarse){[data-sonner-toaster][data-lifted=true]{transform:none}}[data-sonner-toaster][data-x-position=right]{right:var(--offset-right)}[data-sonner-toaster][data-x-position=left]{left:var(--offset-left)}[data-sonner-toaster][data-x-position=center]{left:50%;transform:translateX(-50%)}[data-sonner-toaster][data-y-position=top]{top:var(--offset-top)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--offset-bottom)}[data-sonner-toast]{--y:translateY(100%);--lift-amount:calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:0;overflow-wrap:anywhere}[data-sonner-toast][data-styled=true]{padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px rgba(0,0,0,.1);width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}[data-sonner-toast]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-y-position=top]{top:0;--y:translateY(-100%);--lift:1;--lift-amount:calc(1 * var(--gap))}[data-sonner-toast][data-y-position=bottom]{bottom:0;--y:translateY(100%);--lift:-1;--lift-amount:calc(var(--lift) * var(--gap))}[data-sonner-toast][data-styled=true] [data-description]{font-weight:400;line-height:1.4;color:#3f3f3f}[data-rich-colors=true][data-sonner-toast][data-styled=true] [data-description]{color:inherit}[data-sonner-toaster][data-sonner-theme=dark] [data-description]{color:#e8e8e8}[data-sonner-toast][data-styled=true] [data-title]{font-weight:500;line-height:1.5;color:inherit}[data-sonner-toast][data-styled=true] [data-icon]{display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}[data-sonner-toast][data-promise=true] [data-icon]>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}[data-sonner-toast][data-styled=true] [data-icon]>*{flex-shrink:0}[data-sonner-toast][data-styled=true] [data-icon] svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}[data-sonner-toast][data-styled=true] [data-content]{display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;font-weight:500;cursor:pointer;outline:0;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}[data-sonner-toast][data-styled=true] [data-button]:focus-visible{box-shadow:0 0 0 2px rgba(0,0,0,.4)}[data-sonner-toast][data-styled=true] [data-button]:first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}[data-sonner-toast][data-styled=true] [data-cancel]{color:var(--normal-text);background:rgba(0,0,0,.08)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-styled=true] [data-cancel]{background:rgba(255,255,255,.3)}[data-sonner-toast][data-styled=true] [data-close-button]{position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;color:var(--gray12);background:var(--normal-bg);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}[data-sonner-toast][data-styled=true] [data-close-button]:focus-visible{box-shadow:0 4px 12px rgba(0,0,0,.1),0 0 0 2px rgba(0,0,0,.2)}[data-sonner-toast][data-styled=true] [data-disabled=true]{cursor:not-allowed}[data-sonner-toast][data-styled=true]:hover [data-close-button]:hover{background:var(--gray2);border-color:var(--gray5)}[data-sonner-toast][data-swiping=true]::before{content:'';position:absolute;left:-100%;right:-100%;height:100%;z-index:-1}[data-sonner-toast][data-y-position=top][data-swiping=true]::before{bottom:50%;transform:scaleY(3) translateY(50%)}[data-sonner-toast][data-y-position=bottom][data-swiping=true]::before{top:50%;transform:scaleY(3) translateY(-50%)}[data-sonner-toast][data-swiping=false][data-removed=true]::before{content:'';position:absolute;inset:0;transform:scaleY(2)}[data-sonner-toast][data-expanded=true]::after{content:'';position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}[data-sonner-toast][data-mounted=true]{--y:translateY(0);opacity:1}[data-sonner-toast][data-expanded=false][data-front=false]{--scale:var(--toasts-before) * 0.05 + 1;--y:translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}[data-sonner-toast]>*{transition:opacity .4s}[data-sonner-toast][data-x-position=right]{right:0}[data-sonner-toast][data-x-position=left]{left:0}[data-sonner-toast][data-expanded=false][data-front=false][data-styled=true]>*{opacity:0}[data-sonner-toast][data-visible=false]{opacity:0;pointer-events:none}[data-sonner-toast][data-mounted=true][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}[data-sonner-toast][data-removed=true][data-front=true][data-swipe-out=false]{--y:translateY(calc(var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=true]{--y:translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}[data-sonner-toast][data-removed=true][data-front=false][data-swipe-out=false][data-expanded=false]{--y:translateY(40%);opacity:0;transition:transform .5s,opacity .2s}[data-sonner-toast][data-removed=true][data-front=false]::before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount-y,0)) translateX(var(--swipe-amount-x,0));transition:none}[data-sonner-toast][data-swiped=true]{user-select:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation-duration:.2s;animation-timing-function:ease-out;animation-fill-mode:forwards}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=left]{animation-name:swipe-out-left}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=right]{animation-name:swipe-out-right}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=up]{animation-name:swipe-out-up}[data-sonner-toast][data-swipe-out=true][data-swipe-direction=down]{animation-name:swipe-out-down}@keyframes swipe-out-left{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) - 100%));opacity:0}}@keyframes swipe-out-right{from{transform:var(--y) translateX(var(--swipe-amount-x));opacity:1}to{transform:var(--y) translateX(calc(var(--swipe-amount-x) + 100%));opacity:0}}@keyframes swipe-out-up{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) - 100%));opacity:0}}@keyframes swipe-out-down{from{transform:var(--y) translateY(var(--swipe-amount-y));opacity:1}to{transform:var(--y) translateY(calc(var(--swipe-amount-y) + 100%));opacity:0}}@media (max-width:600px){[data-sonner-toaster]{position:fixed;right:var(--mobile-offset-right);left:var(--mobile-offset-left);width:100%}[data-sonner-toaster][dir=rtl]{left:calc(var(--mobile-offset-left) * -1)}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset-left) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset-left)}[data-sonner-toaster][data-y-position=bottom]{bottom:var(--mobile-offset-bottom)}[data-sonner-toaster][data-y-position=top]{top:var(--mobile-offset-top)}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset-left);right:var(--mobile-offset-right);transform:none}}[data-sonner-toaster][data-sonner-theme=light]{--normal-bg:#fff;--normal-border:var(--gray4);--normal-text:var(--gray12);--success-bg:hsl(143, 85%, 96%);--success-border:hsl(145, 92%, 87%);--success-text:hsl(140, 100%, 27%);--info-bg:hsl(208, 100%, 97%);--info-border:hsl(221, 91%, 93%);--info-text:hsl(210, 92%, 45%);--warning-bg:hsl(49, 100%, 97%);--warning-border:hsl(49, 91%, 84%);--warning-text:hsl(31, 92%, 45%);--error-bg:hsl(359, 100%, 97%);--error-border:hsl(359, 100%, 94%);--error-text:hsl(360, 100%, 45%)}[data-sonner-toaster][data-sonner-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg:#000;--normal-border:hsl(0, 0%, 20%);--normal-text:var(--gray1)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg:#fff;--normal-border:var(--gray3);--normal-text:var(--gray12)}[data-sonner-toaster][data-sonner-theme=dark]{--normal-bg:#000;--normal-bg-hover:hsl(0, 0%, 12%);--normal-border:hsl(0, 0%, 20%);--normal-border-hover:hsl(0, 0%, 25%);--normal-text:var(--gray1);--success-bg:hsl(150, 100%, 6%);--success-border:hsl(147, 100%, 12%);--success-text:hsl(150, 86%, 65%);--info-bg:hsl(215, 100%, 6%);--info-border:hsl(223, 43%, 17%);--info-text:hsl(216, 87%, 65%);--warning-bg:hsl(64, 100%, 6%);--warning-border:hsl(60, 100%, 9%);--warning-text:hsl(46, 87%, 65%);--error-bg:hsl(358, 76%, 10%);--error-border:hsl(357, 89%, 16%);--error-text:hsl(358, 100%, 81%)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]{background:var(--normal-bg);border-color:var(--normal-border);color:var(--normal-text)}[data-sonner-toaster][data-sonner-theme=dark] [data-sonner-toast] [data-close-button]:hover{background:var(--normal-bg-hover);border-color:var(--normal-border-hover)}[data-rich-colors=true][data-sonner-toast][data-type=success]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size:16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:first-child{animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}100%{opacity:.15}}@media (prefers-reduced-motion){.sonner-loading-bar,[data-sonner-toast],[data-sonner-toast]>*{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}</style><link rel="modulepreload" as="script" crossorigin="" href="/assets/route-koRHss3c.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/BoltIcon-DwbHS2Mj.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/AutoscoringSelector-FmpLuBLF.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-lens-quota-D7MXEonP.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-link-enabled-C4bzbYO1.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/link-discovery-DHcKgB1e.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/pro-regular-svg-icons-Da_jSZAH.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/ConnectionBanner-CgxR4A2P.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/device-Dge51RyZ.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/input-DXQzZ_Dh.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/switch-BlJgIwpy.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/useAriaLabelledBy-BLWQ6T4K.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/free-brands-svg-icons-SBOn9_Pz.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-notifications-D4Yu52xo.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/HeadToHeadChart-DeoRmQtt.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/CollapsibleSection-CrmJlMj8.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/UserCard-CtE9Sdcq.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/StatBlock-CKS-Ghu5.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-native-subscriptions-DBpE6gYI.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-dev-mode-APnW6Eyl.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/use-friends-B1LlRY5h.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/useDisplayLanguage-BuReelBt.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/friends-drawer-store-CxbK1Ceo.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/item-BaMurwjv.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/useRender-CVNlntd2.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/radio-group-CvTvfrGY.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/FieldItemContext-BbgUlF_p.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/skeleton-BllSPYb9.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/tabs-D5O8ttGb.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/Trans-Db4E7Fbs.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/_authorized-TySKwoUl.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/game-card2-rJD8VRCL.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/HomePlusUpsellBanner-CU6AcFmU.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/LensOnboardingContent-2FCe0cVu.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/LensPromoVideo-BfQxIKgY.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/VideoThumbnail-BGkEZ17B.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/lens-wordmark-Djq9-j3y.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/GamePickerList-7SvX5LSq.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/game-picker-utils-DV2NeC4V.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/UpgradeTag-KCADl6bP.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/get-friend-status-DWoBxn9a.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/TournamentStatus-3WPX1n_d.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/utils-Pw3Ce9WS.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/format-Dt3DCXh5.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/dialog-a75yXUzZ.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/section-C700MNAS.js"></head>
+<body>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"><div class="relative h-screen flex flex-col"><header class="relative px-6 bg-black-80 h-16 shrink-0 flex items-center justify-between" style="border-image: linear-gradient(to right, color-mix(in srgb, var(--color-blue-60) 20%, transparent), var(--color-blue-60), color-mix(in srgb, var(--color-blue-60) 20%, transparent)) 1;"><a aria-label="Autodarts" class="active" href="/" data-status="active" aria-current="page"><img aria-hidden="true" alt="Autodarts" class="h-7" src="/logo_text.svg"></a><nav aria-label="Main navigation" class="absolute inset-y-0 left-1/2 -translate-x-1/2 flex gap-6.5 items-stretch"><a class="font-bold flex items-center relative hover:text-mono-white text-mono-white" aria-current="page" href="/" data-status="active">Home</a><a class="font-bold flex items-center relative hover:text-mono-white text-black-20" href="/play">Play</a><button type="button" class="font-bold flex items-center relative hover:text-mono-white text-black-20">Online</button><a class="font-bold flex items-center relative hover:text-mono-white text-black-20" href="/tournaments">Tournaments</a><a class="font-bold flex items-center relative hover:text-mono-white text-black-20" href="/statistics">Stats</a><div aria-hidden="true" class="pointer-events-none absolute bottom-0" style="left: 0px; width: 51px; transition: left 300ms, width 300ms;"><div class="absolute bottom-0 left-0 right-0 h-0.5 bg-mono-white"></div></div></nav><div class="flex gap-4 items-center"><div class="flex items-center gap-2"></div><button type="button" tabindex="0" data-base-ui-click-trigger="" id="base-ui-_r_6_" aria-haspopup="dialog" aria-expanded="false" data-slot="drawer-trigger" aria-label="Open user menu" class="rounded-full transition-all ring-1 ring-transparent data-popup-open:ring-mono-white/80 data-popup-open:shadow-[0_0_12px_4px_rgba(11,85,223,0.8)]"><span data-slot="avatar" data-size="default" data-plus="false" class="bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-8"><img alt="" data-slot="avatar-image" class="rounded-full aspect-square size-full object-cover" src="https://gravatar.com/avatar/882908ae96f45cc2ddc5ddf89714a2eb"></span></button><button type="button" tabindex="0" data-base-ui-click-trigger="" id="base-ui-_r_9_" aria-haspopup="dialog" aria-expanded="false" data-slot="drawer-trigger" class="relative size-8 flex items-center justify-center rounded-full text-mono-white hover:text-blue-30 transition-all ring-1 ring-transparent"><svg data-prefix="fas" data-icon="user-group" class="svg-inline--fa fa-user-group fa-sm" role="img" viewBox="0 0 576 512" aria-hidden="true"><path fill="currentColor" d="M64 128a112 112 0 1 1 224 0 112 112 0 1 1 -224 0zM0 464c0-97.2 78.8-176 176-176s176 78.8 176 176l0 6c0 23.2-18.8 42-42 42L42 512c-23.2 0-42-18.8-42-42l0-6zM432 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 240c79.5 0 144 64.5 144 144l0 22.4c0 23-18.6 41.6-41.6 41.6l-144.8 0c6.6-12.5 10.4-26.8 10.4-42l0-6c0-51.5-17.4-98.9-46.5-136.7 22.6-14.7 49.6-23.3 78.5-23.3z"></path></svg></button><button type="button" tabindex="0" data-base-ui-click-trigger="" id="base-ui-_r_e_" aria-haspopup="dialog" aria-expanded="false" data-slot="drawer-trigger" aria-label="Open notifications" class="relative size-8 flex items-center justify-center rounded-full text-mono-white hover:text-blue-30 transition-all ring-1 ring-transparent"><svg data-prefix="fas" data-icon="bell" class="svg-inline--fa fa-bell fa-sm" role="img" viewBox="0 0 448 512" aria-hidden="true"><path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32l0 3.2C119 50 64 114.6 64 192l0 21.7c0 48.1-16.4 94.8-46.4 132.4L7.8 358.3C2.7 364.6 0 372.4 0 380.5 0 400.1 15.9 416 35.5 416l376.9 0c19.6 0 35.5-15.9 35.5-35.5 0-8.1-2.7-15.9-7.8-22.2l-9.8-12.2C400.4 308.5 384 261.8 384 213.7l0-21.7c0-77.4-55-142-128-156.8l0-3.2c0-17.7-14.3-32-32-32zM162 464c7.1 27.6 32.2 48 62 48s54.9-20.4 62-48l-124 0z"></path></svg></button></div></header><div class="relative flex-1 min-h-0 flex flex-col"><main class="flex-1 min-h-0 overflow-y-auto"><div class="relative mx-auto max-w-6xl px-2 pt-4 pb-2"><div class="relative isolate flex flex-col w-full p-4 pb-8 gap-6"><div class="flex flex-col gap-4"><div class="@container/card"><div class="relative pb-4 @[54rem]/card:pb-0"><a href="/subscriptions" class="absolute bottom-0 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-orange-60/30 px-3 py-1.5 whitespace-nowrap @[54rem]/card:bottom-auto @[54rem]/card:top-1/2 @[54rem]/card:right-4 @[54rem]/card:left-auto @[54rem]/card:translate-x-0 @[54rem]/card:-translate-y-1/2" style="background: var(--color-black-90);"><span class="text-sm font-bold" style="background-image: ; background-position-x: ; background-position-y: ; background-size: ; background-repeat: ; background-attachment: ; background-origin: ; background-clip: text; background-color: ; -webkit-text-fill-color: transparent;">Get</span><svg width="95" height="10" viewBox="0 0 95 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="AUTODARTS+" class="h-3 w-auto"><path d="M12.6819 0.271484C12.748 0.271597 12.8019 0.325257 12.802 0.391602V5.68848C12.802 6.08352 12.875 6.42931 13.0227 6.72559C13.1785 7.01355 13.396 7.23533 13.675 7.3916C13.962 7.54788 14.3108 7.62595 14.7209 7.62598C15.1392 7.62598 15.4881 7.54782 15.7668 7.3916C16.0542 7.23529 16.2724 7.0137 16.4202 6.72559C16.5679 6.43785 16.6409 6.09168 16.6409 5.68848V0.391602C16.6409 0.325218 16.6948 0.271534 16.761 0.271484H18.5393C18.6055 0.271554 18.6594 0.325231 18.6594 0.391602V5.61426C18.6594 6.41213 18.507 7.10348 18.2034 7.6875C17.9002 8.27129 17.4575 8.7242 16.8752 9.04492C16.2928 9.35754 15.5741 9.51367 14.7209 9.51367C13.8761 9.51364 13.1581 9.35748 12.5676 9.04492C11.9852 8.72415 11.5421 8.27148 11.2385 7.6875C10.9349 7.10348 10.7834 6.41213 10.7834 5.61426V0.391602C10.7835 0.325188 10.8373 0.271484 10.9036 0.271484H12.6819ZM33.8713 0C34.6588 2.63073e-05 35.3523 0.135849 35.9514 0.407227C36.55 0.670435 37.0503 1.02444 37.4524 1.46875C37.8541 1.9128 38.1574 2.41094 38.3625 2.96191C38.5676 3.50467 38.6701 4.05578 38.6702 4.61523V4.88672C38.6702 5.38869 38.5719 5.91092 38.3752 6.4541C38.1783 6.99678 37.883 7.50285 37.4895 7.97168C37.0959 8.43244 36.5948 8.80699 35.9875 9.09473C35.3889 9.37422 34.6832 9.51365 33.8713 9.51367C33.0595 9.51367 32.3492 9.37415 31.7424 9.09473C31.1437 8.80662 30.6468 8.43205 30.2532 7.97168C29.8596 7.50284 29.5644 6.9968 29.3674 6.4541C29.1786 5.91129 29.0832 5.38869 29.0832 4.88672V4.61523C29.0833 4.05584 29.1822 3.50498 29.3791 2.96191C29.5842 2.41102 29.8876 1.91275 30.2893 1.46875C30.6914 1.0247 31.1921 0.670463 31.7913 0.407227C32.39 0.135838 33.0838 0 33.8713 0ZM82.4709 0C83.1764 2.56151e-05 83.7794 0.123399 84.2795 0.370117C84.7878 0.608768 85.1778 0.950332 85.4485 1.39453C85.7006 1.80059 85.8353 2.27491 85.8528 2.81641C85.855 2.88287 85.8009 2.9375 85.7346 2.9375H84.0051C83.939 2.93727 83.886 2.88272 83.8801 2.81641C83.8641 2.64136 83.8131 2.47966 83.7258 2.33203C83.6192 2.14276 83.4586 1.99141 83.2454 1.87598C83.0402 1.76094 82.7817 1.70312 82.47 1.70312C82.1751 1.70317 81.925 1.75194 81.72 1.85059C81.523 1.94933 81.3751 2.08521 81.2766 2.25781C81.1781 2.42225 81.1292 2.60332 81.1291 2.80078C81.1291 3.05585 81.2199 3.27842 81.4006 3.46777C81.5814 3.65687 81.8764 3.76776 82.2864 3.80078L82.9758 3.8623C83.6319 3.91985 84.2106 4.06376 84.7112 4.29395C85.2117 4.51597 85.6013 4.82509 85.8801 5.21973C86.1673 5.60617 86.3108 6.07967 86.3108 6.63867C86.3107 7.19769 86.1592 7.72008 85.8557 8.15625C85.5606 8.58389 85.1375 8.91692 84.5881 9.15527C84.0383 9.39401 83.3816 9.51367 82.6184 9.51367C81.8066 9.51363 81.1213 9.38588 80.5637 9.13086C80.0058 8.86763 79.5834 8.51371 79.2961 8.06934C79.0289 7.64835 78.8859 7.17007 78.8674 6.63477C78.8654 6.56847 78.9194 6.51466 78.9856 6.51465H80.7024C80.7685 6.51472 80.8219 6.5685 80.8284 6.63477C80.8461 6.81966 80.9056 6.99461 81.0071 7.15723C81.1385 7.35458 81.3355 7.51451 81.5979 7.6377C81.8603 7.7527 82.2003 7.81051 82.6184 7.81055C82.9957 7.81055 83.3123 7.76185 83.5666 7.66309C83.8208 7.56441 84.0133 7.42829 84.1448 7.25586C84.2758 7.0751 84.342 6.86915 84.342 6.63867C84.342 6.35095 84.2191 6.12443 83.9729 5.95996C83.7267 5.78736 83.3288 5.67635 82.7795 5.62695L82.1028 5.56543C81.2085 5.49155 80.4947 5.21085 79.9612 4.72559C79.428 4.24033 79.1614 3.59862 79.1614 2.80078C79.1614 2.22499 79.297 1.72713 79.5676 1.30762C79.8464 0.888332 80.232 0.567652 80.7239 0.345703C81.2162 0.11557 81.7987 5.96521e-05 82.4709 0ZM44.6965 0.203125C45.3847 0.229204 45.9946 0.346778 46.5256 0.555664C47.1328 0.794389 47.6418 1.11894 48.052 1.53027C48.4622 1.94163 48.7661 2.41461 48.9631 2.94922C49.1683 3.47569 49.2707 4.03121 49.2707 4.61523V4.88672C49.2707 5.42937 49.1682 5.96844 48.9631 6.50293C48.7661 7.02936 48.4622 7.50651 48.052 7.93457C47.6417 8.35409 47.1328 8.6916 46.5256 8.94629C45.9187 9.20136 45.2087 9.3291 44.3967 9.3291H41.1819C41.1156 9.3291 41.0618 9.27447 41.0618 9.20801V0.317383C41.0618 0.250952 41.1156 0.197266 41.1819 0.197266H44.3967L44.6965 0.203125ZM6.09594 0.272461C6.14697 0.272461 6.19348 0.304976 6.2102 0.353516L9.20434 9.12109V9.12012C9.23095 9.19796 9.17342 9.27904 9.09105 9.2793H7.25316C7.20146 9.27923 7.15524 9.24649 7.13891 9.19727L6.4641 7.12891C6.4477 7.07974 6.40155 7.04688 6.34984 7.04688H2.77172C2.71954 7.0469 2.67338 7.08076 2.65746 7.13086L1.99926 9.19629C1.98334 9.24603 1.93719 9.28026 1.885 9.28027H0.120352C0.0385193 9.28027 -0.0194555 9.20004 0.00609398 9.12207L2.89281 0.354492C2.90916 0.305335 2.95542 0.272553 3.00707 0.272461H6.09594ZM56.4446 0.272461C56.4958 0.272585 56.5411 0.305143 56.5579 0.353516L59.552 9.12109L59.5539 9.12012C59.5806 9.19809 59.5223 9.2793 59.4397 9.2793H57.6028C57.551 9.2793 57.5049 9.24647 57.4885 9.19727L56.8127 7.12891C56.7964 7.0799 56.751 7.04705 56.6995 7.04688H53.1204C53.0683 7.04699 53.022 7.08082 53.0061 7.13086L52.3479 9.19629C52.332 9.24604 52.2858 9.28027 52.2336 9.28027H50.469C50.3872 9.28025 50.3292 9.20003 50.3547 9.12207L53.2414 0.354492C53.2578 0.30531 53.304 0.272481 53.3557 0.272461H56.4446ZM27.5657 0.271484C27.6317 0.271745 27.6848 0.325349 27.6848 0.391602V1.91602C27.6847 1.98221 27.6316 2.03587 27.5657 2.03613H25.2698C25.2037 2.03635 25.1507 2.08999 25.1506 2.15625V9.15918C25.1506 9.22549 25.0966 9.27914 25.0305 9.2793H23.2522C23.1859 9.2793 23.1321 9.22558 23.1321 9.15918V2.15625C23.132 2.0899 23.0781 2.03621 23.012 2.03613H20.7288C20.6627 2.03599 20.6088 1.98228 20.6086 1.91602V0.391602C20.6087 0.325278 20.6626 0.271631 20.7288 0.271484H27.5657ZM65.4485 0.203125C66.08 0.228318 66.6364 0.341324 67.1174 0.542969C67.6669 0.764993 68.0895 1.09855 68.385 1.54297C68.6804 1.98697 68.8283 2.54622 68.8284 3.2207V3.41797C68.8284 4.08423 68.6767 4.63962 68.3733 5.08398C68.1093 5.47343 67.7435 5.77741 67.2766 5.99609C67.2066 6.02877 67.181 6.11755 67.2258 6.18066L69.2961 9.08984C69.3525 9.16924 69.2961 9.27917 69.1985 9.2793H67.1565C67.1169 9.2793 67.0795 9.25961 67.0569 9.22656L65.1663 6.44434C65.144 6.41133 65.1066 6.3916 65.0666 6.3916H63.7795C63.7133 6.3916 63.6594 6.44624 63.6594 6.5127V9.15918C63.6593 9.22557 63.6055 9.27928 63.5393 9.2793H61.761C61.6948 9.27919 61.6409 9.22552 61.6409 9.15918V0.317383C61.6409 0.251016 61.6948 0.19737 61.761 0.197266H65.1731L65.4485 0.203125ZM77.4582 0.271484C77.5245 0.27151 77.5783 0.325203 77.5784 0.391602V1.91602C77.5782 1.98236 77.5244 2.03611 77.4582 2.03613H75.1633C75.0971 2.03613 75.0433 2.08985 75.0432 2.15625V9.15918C75.0431 9.22558 74.9893 9.2793 74.9231 9.2793H73.1448C73.0785 9.27929 73.0247 9.22558 73.0246 9.15918V2.15625C73.0246 2.08985 72.9708 2.03613 72.9045 2.03613H70.6213C70.5553 2.03595 70.5013 1.98226 70.5012 1.91602V0.391602C70.5013 0.325301 70.5552 0.271668 70.6213 0.271484H77.4582ZM92.5452 4.39551H95.0012V5.62402H92.5452V8.08008H91.3166V5.62402H88.8606V4.39551H91.3166V1.93945H92.5452V4.39551ZM33.8704 1.88867C33.4442 1.88875 33.0631 1.95787 32.7268 2.09766C32.3907 2.23758 32.099 2.43903 31.8528 2.70215C31.6151 2.95713 31.4347 3.26194 31.3118 3.61523C31.1885 3.96078 31.1263 4.34332 31.1262 4.7627C31.1262 5.15774 31.1885 5.52873 31.3118 5.87402C31.4347 6.21948 31.6148 6.524 31.8528 6.78711C32.099 7.05029 32.3906 7.25618 32.7268 7.4043C33.0633 7.55235 33.4449 7.62598 33.8713 7.62598C34.2978 7.62595 34.6793 7.55241 35.0159 7.4043C35.3606 7.25616 35.6518 7.05032 35.8899 6.78711C36.1356 6.52398 36.3203 6.21951 36.4436 5.87402C36.5665 5.52836 36.6282 5.15736 36.6282 4.7627C36.6281 4.34332 36.5623 3.9604 36.4309 3.61523C36.308 3.2615 36.1234 2.95716 35.8772 2.70215C35.6395 2.43895 35.3514 2.23724 35.0149 2.09766C34.6788 1.95782 34.2967 1.88867 33.8704 1.88867ZM43.1995 2.08594C43.1333 2.08603 43.0794 2.13969 43.0793 2.20605V7.32031C43.0793 7.38671 43.1333 7.44033 43.1995 7.44043H44.5071C44.9254 7.44043 45.3028 7.37943 45.6389 7.25586C45.9753 7.12412 46.2622 6.94293 46.5002 6.71289C46.7383 6.47416 46.9193 6.19028 47.0422 5.86133C47.1655 5.52426 47.2268 5.15374 47.2268 4.75098C47.2268 4.34814 47.1655 3.95688 47.0422 3.62793C46.9193 3.29903 46.7383 3.01923 46.5002 2.78906C46.2626 2.55898 45.9754 2.38557 45.6389 2.27051C45.3027 2.14729 44.9254 2.08594 44.5071 2.08594H43.1995ZM4.40258 1.92578C4.35045 1.92578 4.30432 1.9588 4.28832 2.00879L3.26879 5.21094C3.24399 5.28851 3.30163 5.36811 3.38305 5.36816H5.72387C5.80506 5.36804 5.86325 5.28869 5.83813 5.21094L4.79223 2.00781C4.7762 1.95862 4.72969 1.92578 4.67797 1.92578H4.40258ZM54.7522 1.9248C54.7 1.9248 54.6529 1.95871 54.637 2.00879L53.6174 5.21094H53.6184C53.5936 5.28853 53.6512 5.36816 53.7327 5.36816H56.0725C56.154 5.36816 56.2123 5.28793 56.1868 5.20996L55.1409 2.00781C55.1249 1.95864 55.0792 1.92496 55.0276 1.9248H54.7522ZM63.7795 1.91211C63.7133 1.91211 63.6594 1.96674 63.6594 2.0332V4.67969L63.6682 4.72656C63.6863 4.76993 63.7297 4.7998 63.7795 4.7998H65.3332C65.6286 4.79976 65.8827 4.74238 66.0959 4.62695C66.3174 4.50369 66.4857 4.33494 66.6008 4.12109C66.7236 3.89918 66.7854 3.64436 66.7854 3.35645C66.7854 3.06833 66.7238 2.81737 66.6008 2.60352C66.486 2.38158 66.3173 2.21272 66.0959 2.09766C65.8824 1.97449 65.6285 1.91215 65.3332 1.91211H63.7795Z" fill="url(#paint0_linear_1183_23740)"></path><defs><linearGradient id="paint0_linear_1183_23740" x1="0.0836407" y1="-4.63465e-7" x2="7.84353" y2="31.1824" gradientUnits="userSpaceOnUse"><stop stop-color="#C5561C"></stop><stop offset="1" stop-color="#F7D458"></stop></linearGradient></defs></svg><svg width="32" height="43" viewBox="0 0 32 43" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-3.5"><path d="M0 23.6842L2.66667 0H21.3333L17.3333 13.1579H32V17.1053L10.6667 42.1053L14.6667 23.6842H0Z" fill="url(#_r_l_)"></path><defs><linearGradient id="_r_l_" x1="0.0281734" y1="-2.05119e-06" x2="41.0154" y2="12.5353" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C5561C"></stop><stop offset="1" stop-color="#F7D458"></stop></linearGradient></defs></svg></a><div class="@container relative overflow-hidden rounded-xl border border-border shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)] pt-4 pb-8 px-2.5 @[54rem]/card:flex @[54rem]/card:items-center @[54rem]/card:gap-8 @[54rem]/card:p-4 @[54rem]/card:pr-56"><div aria-hidden="true" class="pointer-events-none absolute inset-0 rounded-[inherit]" style="background-image: linear-gradient(134.62deg, rgb(22, 24, 28) 0%, rgb(22, 24, 28) 30%, rgba(22, 24, 28, 0) 75%), linear-gradient(134.62deg, var(--color-black-90) 0%, var(--color-blue-90) 100%);"></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div><div class="relative @[54rem]/card:min-w-0"><div class="flex flex-col min-w-0 cursor-pointer" role="button" tabindex="0"><div class="flex min-w-0 items-center"><div class="relative shrink-0 z-4 rounded-full border-2 border-black-05 dark:border-black-90" style="margin-right: -9.9px;"><span data-slot="avatar" data-size="default" data-plus="false" class="bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten after:border-none size-10.5"><img alt="" data-slot="avatar-image" class="rounded-full aspect-square size-full object-cover" src="https://gravatar.com/avatar/882908ae96f45cc2ddc5ddf89714a2eb"></span></div><div class="bg-black-05 dark:bg-black-90 flex items-center gap-1.5 py-1 pr-px min-w-0 z-3 h-8 -ml-0.5 pl-4"><span class="font-display text-[18px] h-3.75 truncate block leading-none uppercase text-black-90 dark:text-black-05">creazy</span><div class="w-4 h-3 shrink-0 rounded-xs overflow-hidden"><img alt="DE" class="block size-full object-cover" src="/flags/4x3/de.svg"></div></div><svg viewBox="0 0 15 26" fill="none" class="h-8 w-auto shrink-0 overflow-visible text-black-05 dark:text-black-90 z-2"><path d="M-2 0H10C11.7 0 13.6 2.4 13 4L6 22C5.4 23.6 4.7 26 3 26H-2Z" fill="currentColor"></path></svg><div class="text-xl h-8 font-display leading-none justify-center items-center flex shrink-0 pl-4.5 -ml-4 z-1 bg-[#292C33] text-black-40"><span class="overflow-hidden block leading-none h-4.5">30+</span></div><svg viewBox="0 0 15 26" fill="none" class="h-8 -ml-1.5 w-auto shrink-0 overflow-visible text-[#292C33]"><path d="M-2 0H10C11.7 0 13.6 2.4 13 4L6 22C5.4 23.6 4.7 26 3 26H-2Z" fill="currentColor"></path></svg></div></div></div><div class="relative flex items-start justify-between px-0.5 mt-4 @[54rem]/card:mt-0 @[460px]:justify-start @[460px]:gap-4 @[460px]:pl-1"><div class="flex flex-col gap-1.5 border-l-[3px] border-solid pl-3 @[460px]:w-30" style="border-color: var(--color-black-40);"><span class="text-[13px] font-semibold leading-[1.2] text-foreground/70 @max-[270px]:text-[11px]">3-Dart Avg</span><span class="font-number font-semibold uppercase text-foreground text-[18px] leading-none">31.3</span></div><div class="flex flex-col gap-1.5 border-l-[3px] border-solid pl-3 @[460px]:w-30" style="border-color: var(--color-black-40);"><span class="text-[13px] font-semibold leading-[1.2] text-foreground/70 @max-[270px]:text-[11px]">Win Rate</span><span class="font-number font-semibold uppercase text-foreground text-[18px] leading-none">54.0%</span></div><div class="flex flex-col gap-1.5 border-l-[3px] border-solid pl-3 @[460px]:w-30" style="border-color: var(--color-black-40);"><span class="text-[13px] font-semibold leading-[1.2] text-foreground/70 @max-[270px]:text-[11px]">Checkout %</span><span class="font-number font-semibold uppercase text-foreground text-[18px] leading-none">7%</span></div></div></div></div></div></div><section class="flex flex-col gap-2 pt-2"><div class="flex items-center justify-between pb-2"><h2 class="text-heading-2 text-foreground font-display text-2xl">Quickplay</h2><div class="flex items-center gap-3"><button type="button" tabindex="0" data-slot="button" class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 bg-clip-padding focus-visible:ring-[3px] aria-invalid:ring-[3px] [&amp;_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none shrink-0 [&amp;_svg]:shrink-0 outline-none group/button select-none border-2 border-outline-high text-white font-bold hover:bg-blue-60 hover:border-blue-60 data-open:bg-blue-60 data-open:border-blue-60 active:bg-blue-70 active:border-blue-70 ellipse-overlay h-8 gap-1 text-xs rounded-[8px] px-2.5 in-data-[slot=button-group]:rounded-[8px] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5">All Game Modes<svg data-prefix="fas" data-icon="chevron-right" class="svg-inline--fa fa-chevron-right text-[9px]" role="img" viewBox="0 0 320 512" aria-hidden="true"><path fill="currentColor" d="M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path></svg></button></div></div><div class="flex flex-col gap-2 sm:flex-row"><button type="button" class="group relative h-32.5 w-full cursor-pointer overflow-hidden rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.45)] sm:h-52 sm:flex-1 lg:h-64"><picture class="absolute inset-0 h-full w-full"><source media="(min-width: 640px)" srcset="/assets/game-card1-BqP17yOl.webp"><img alt="" class="h-full w-full object-cover object-[50%_0%]" src="/assets/game-card1-mobile-BDxYFKr5.webp"></picture><span aria-hidden="true" class="bg-brand-gradient pointer-events-none absolute inset-0 z-10 rounded-xl p-[3px] opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="mask: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px) content-box exclude, linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px);"></span><div class="pointer-events-none absolute inset-0 sm:hidden" style="background: linear-gradient(to right top, rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 0.35) 50%, transparent 65%);"></div><div class="pointer-events-none absolute bottom-0 left-0 right-0 h-24 sm:h-31 bg-linear-to-b from-transparent via-50% via-[rgba(0,0,0,0.4)] to-[rgba(0,0,0,0.75)]"></div><div class="pointer-events-none absolute bottom-0 left-0 right-0 h-24 sm:h-31 bg-linear-to-b from-transparent via-50% via-[rgba(0,0,0,0.2)] to-[rgba(0,0,0,0.55)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div><div class="absolute bottom-5 left-4 flex flex-col gap-0.5 text-left sm:bottom-6"><p class="font-display text-2xl font-normal leading-tight text-foreground sm:text-3xl">Play Now</p><p class="text-xs font-semibold leading-tight text-muted-foreground sm:text-sm">Solo, vs a friend or vs a bot</p></div></button><button type="button" class="group relative h-32.5 w-full cursor-pointer overflow-hidden rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.45)] sm:h-52 sm:flex-1 lg:h-64"><picture class="absolute inset-0 h-full w-full"><source media="(min-width: 640px)" srcset="/assets/game-card2-DQKSuyeB.webp"><img alt="" class="h-full w-full object-cover object-[50%_0%]" src="/assets/game-card2-mobile-CvSQIgwz.webp"></picture><span aria-hidden="true" class="pointer-events-none absolute inset-0 z-10 rounded-xl p-[3px] opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="background-image: linear-gradient(to right, rgb(110, 30, 155) 0%, rgb(182, 31, 99) 40%, rgb(245, 54, 85) 80%); mask: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px) content-box exclude, linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px);"></span><div class="pointer-events-none absolute inset-0 sm:hidden" style="background: linear-gradient(to right top, rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 0.35) 50%, transparent 65%);"></div><div class="pointer-events-none absolute bottom-0 left-0 right-0 h-24 sm:h-31 bg-linear-to-b from-transparent via-50% via-[rgba(0,0,0,0.4)] to-[rgba(0,0,0,0.75)]"></div><div class="pointer-events-none absolute bottom-0 left-0 right-0 h-24 sm:h-31 bg-linear-to-b from-transparent via-50% via-[rgba(0,0,0,0.2)] to-[rgba(0,0,0,0.35)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div><div class="absolute left-4 top-3 flex h-6.5 items-center gap-1.5 rounded-full border border-green-40 bg-surface-surface px-3"><span class="size-1.5 rounded-full bg-green-40 animate-pulse"></span><span class="text-[12px] font-bold leading-none text-foreground">1574 Players Online</span></div><div class="absolute bottom-5 left-4 flex flex-col gap-0.5 text-left sm:bottom-6"><p class="font-display text-2xl font-normal leading-tight text-foreground sm:text-3xl">Find an opponent</p><p class="text-xs font-semibold leading-tight text-muted-foreground sm:text-sm">Matched by skill level</p></div></button></div></section><section class="flex flex-col gap-0 bg-black-80/70 mt-4 py-2 px-4 max-md:-mx-4"><div class="flex items-center justify-between pb-2"><h2 class="text-heading-2 text-foreground font-display text-2xl">Tournaments</h2><div class="flex items-center gap-3"><button type="button" tabindex="0" data-slot="button" href="/tournaments" class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border-transparent bg-clip-padding focus-visible:ring-[3px] aria-invalid:ring-[3px] [&amp;_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none shrink-0 [&amp;_svg]:shrink-0 outline-none group/button select-none hover:bg-mono-white hover:text-blue-90 hover:brand-glow data-open:bg-mono-white data-open:text-blue-90 data-open:brand-glow aria-expanded:bg-muted aria-expanded:text-foreground font-bold border-0 h-8 gap-1 text-xs rounded-[8px] px-2.5 in-data-[slot=button-group]:rounded-[8px] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5">See all</button></div></div><div class="max-md:-mx-4 overflow-x-auto snap-x snap-mandatory [&amp;::-webkit-scrollbar]:hidden" style="scrollbar-width: none;"><div class="flex gap-2 max-md:px-4 pb-2"><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><div class="inline-flex items-center shrink-0 bg-black-70 rounded-full pr-4.25"><div class="flex items-center justify-center h-[26px] px-3 rounded-full bg-surface-surface border-[1.75px] border-solid text-xs font-bold text-mono-white whitespace-nowrap shrink-0 -mr-[5px] border-red-40">Full</div><div class="flex items-center h-6.5 pl-3.25 shrink-0"><span class="text-xs text-mono-white"><span class="font-medium">Starting in </span><span class="font-bold tracking-tight" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">1m 59s</span></span></div></div><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">32/32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><div class="inline-flex items-center shrink-0 bg-black-70 rounded-full pr-4.25"><div class="flex items-center justify-center h-[26px] px-3 rounded-full bg-surface-surface border-[1.75px] border-solid text-xs font-bold text-mono-white whitespace-nowrap shrink-0 -mr-[5px] border-green-40">Open</div><div class="flex items-center h-6.5 pl-3.25 shrink-0"><span class="text-xs text-mono-white"><span class="font-medium">Starting in </span><span class="font-bold tracking-tight" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">2m 59s</span></span></div></div><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">23/32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Lunchtime Launch</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 2 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><div class="inline-flex items-center shrink-0 bg-black-70 rounded-full pr-4.25"><div class="flex items-center justify-center h-[26px] px-3 rounded-full bg-surface-surface border-[1.75px] border-solid text-xs font-bold text-mono-white whitespace-nowrap shrink-0 -mr-[5px] border-red-40">Avg 0-30</div><div class="flex items-center h-6.5 pl-3.25 shrink-0"><span class="text-xs text-mono-white"><span class="font-medium">Starting in </span><span class="font-bold tracking-tight" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">5m 59s</span></span></div></div><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">1/32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Lunchtime Launch</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 2 Legs</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 30</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><div class="inline-flex items-center shrink-0 bg-black-70 rounded-full pr-4.25"><div class="flex items-center justify-center h-[26px] px-3 rounded-full bg-surface-surface border-[1.75px] border-solid text-xs font-bold text-mono-white whitespace-nowrap shrink-0 -mr-[5px] border-green-40">Open</div><div class="flex items-center h-6.5 pl-3.25 shrink-0"><span class="text-xs text-mono-white"><span class="font-medium">Starting in </span><span class="font-bold tracking-tight" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">13m 59s</span></span></div></div><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">1/32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 40</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">12m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">12m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 40</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">12m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">7m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Grand Double Trouble</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">17m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">22m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 40</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">22m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">22m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Lunchtime Launch</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 2 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">20m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Grand Double Trouble</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">25m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Lunchtime Launch</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 2 Legs</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 30</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">32m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">24m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">24m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Grand Double Trouble</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">28m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 40</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">52m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Rapid Ricky</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 1 Leg</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">46m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">58m 59s</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span><span class="size-1 rounded-full bg-muted-foreground/40"></span><span class="text-xs font-semibold text-mono-white">Avg. Below 40</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">1h 7m</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Grand Double Trouble</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">1h 20m</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Grand Double Trouble</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">1h 24m</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Daytime Frenzy</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button><button type="button" class="relative flex shrink-0 snap-start flex-col gap-1.5 rounded-lg bg-black-80 px-3 pb-4 pt-3 text-left shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]" style="min-width: 190px;"><div class="flex w-full items-center justify-between gap-3"><span class="inline-flex items-center bg-black-70 px-3 py-1 rounded-full text-xs text-muted-foreground leading-[120%] "><span class="font-medium"><span class="sm:hidden">Opens in</span><span class="hidden sm:inline">Registration opens in</span></span> <span class="ml-1 font-bold tracking-tight text-mono-white" style="font-feature-settings: &quot;lnum&quot;, &quot;tnum&quot;;">1h 24m</span></span><div class="flex h-[22px] items-center gap-1 rounded-full bg-black-70 px-2.5"><svg data-prefix="fas" data-icon="users" class="svg-inline--fa fa-users text-[10px] text-muted-foreground opacity-60" role="img" viewBox="0 0 640 512" aria-hidden="true"><path fill="currentColor" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path></svg><span class="text-[10px] font-semibold text-muted-foreground">Max 32</span></div></div><p class="pt-1 text-sm font-bold leading-snug text-mono-white">Grand Double Trouble</p><div class="flex items-center gap-1.5"><span class="text-xs text-muted-foreground">First to 3 Legs</span></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></button></div></div></section><section class="flex flex-col gap-2 pt-2"><div class="flex items-center justify-between pb-2"><h2 class="text-heading-2 text-foreground font-display text-2xl">Friends</h2><div class="flex items-center gap-3"><button type="button" tabindex="0" data-slot="button" class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 border-transparent bg-clip-padding focus-visible:ring-[3px] aria-invalid:ring-[3px] [&amp;_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none shrink-0 [&amp;_svg]:shrink-0 outline-none group/button select-none hover:bg-mono-white hover:text-blue-90 hover:brand-glow data-open:bg-mono-white data-open:text-blue-90 data-open:brand-glow aria-expanded:bg-muted aria-expanded:text-foreground font-bold border-0 h-8 gap-1 text-xs rounded-[8px] px-2.5 in-data-[slot=button-group]:rounded-[8px] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5">See all</button></div></div><div class="overflow-x-auto [&amp;::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4" style="scrollbar-width: none;"><div class="flex px-4"><div class="snap-start shrink-0" style="width: 80px;"><div class="flex flex-col items-center gap-2 py-3 px-2 cursor-pointer"><div class="relative"><span data-slot="avatar" data-size="2xl" data-plus="false" class="bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-14"><img alt="" data-slot="avatar-image" class="rounded-full aspect-square size-full object-cover" src="https://storage.autodarts.io/avatars/11d816/a6/11d816a6-ea70-4677-80b2-865fc5be470c.png"></span><span class="absolute bottom-0.5 right-0.5 size-3 rounded-full border-2 border-drawer bg-black-30"></span></div><div class="flex flex-col items-center gap-0.5 w-full"><span class="text-foreground text-xs font-semibold truncate w-full text-center leading-none">at-prinzessin</span><span class="text-[11px] leading-none text-black-30">Offline</span></div></div></div><div class="snap-start shrink-0" style="width: 80px;"><div class="flex flex-col items-center gap-2 py-3 px-2 cursor-pointer"><div class="relative"><span data-slot="avatar" data-size="2xl" data-plus="false" class="bg-black-90 rounded-full after:rounded-full after:border-border group/avatar relative flex shrink-0 select-none after:absolute after:inset-0 after:border after:mix-blend-darken dark:after:mix-blend-lighten size-14"><img alt="" data-slot="avatar-image" class="rounded-full aspect-square size-full object-cover" src="https://gravatar.com/avatar/d7a756104d6d39529915ff0e8d1954e3"></span><span class="absolute bottom-0.5 right-0.5 size-3 rounded-full border-2 border-drawer bg-black-30"></span></div><div class="flex flex-col items-center gap-0.5 w-full"><span class="text-foreground text-xs font-semibold truncate w-full text-center leading-none">toenizz</span><span class="text-[11px] leading-none text-black-30">Offline</span></div></div></div></div></div></section><div class="relative flex flex-col gap-4 overflow-hidden rounded-xl border border-[#8b5e00] bg-black-80 p-6 shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)] sm:flex-row sm:items-center sm:justify-between"><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div><div class="relative flex flex-col gap-2"><div class="flex items-center justify-between sm:gap-16 sm:justify-start"><div class="flex flex-col gap-2"><svg width="95" height="10" viewBox="0 0 95 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="AUTODARTS+" class="h-4.5 w-auto self-start"><path d="M12.6819 0.271484C12.748 0.271597 12.8019 0.325257 12.802 0.391602V5.68848C12.802 6.08352 12.875 6.42931 13.0227 6.72559C13.1785 7.01355 13.396 7.23533 13.675 7.3916C13.962 7.54788 14.3108 7.62595 14.7209 7.62598C15.1392 7.62598 15.4881 7.54782 15.7668 7.3916C16.0542 7.23529 16.2724 7.0137 16.4202 6.72559C16.5679 6.43785 16.6409 6.09168 16.6409 5.68848V0.391602C16.6409 0.325218 16.6948 0.271534 16.761 0.271484H18.5393C18.6055 0.271554 18.6594 0.325231 18.6594 0.391602V5.61426C18.6594 6.41213 18.507 7.10348 18.2034 7.6875C17.9002 8.27129 17.4575 8.7242 16.8752 9.04492C16.2928 9.35754 15.5741 9.51367 14.7209 9.51367C13.8761 9.51364 13.1581 9.35748 12.5676 9.04492C11.9852 8.72415 11.5421 8.27148 11.2385 7.6875C10.9349 7.10348 10.7834 6.41213 10.7834 5.61426V0.391602C10.7835 0.325188 10.8373 0.271484 10.9036 0.271484H12.6819ZM33.8713 0C34.6588 2.63073e-05 35.3523 0.135849 35.9514 0.407227C36.55 0.670435 37.0503 1.02444 37.4524 1.46875C37.8541 1.9128 38.1574 2.41094 38.3625 2.96191C38.5676 3.50467 38.6701 4.05578 38.6702 4.61523V4.88672C38.6702 5.38869 38.5719 5.91092 38.3752 6.4541C38.1783 6.99678 37.883 7.50285 37.4895 7.97168C37.0959 8.43244 36.5948 8.80699 35.9875 9.09473C35.3889 9.37422 34.6832 9.51365 33.8713 9.51367C33.0595 9.51367 32.3492 9.37415 31.7424 9.09473C31.1437 8.80662 30.6468 8.43205 30.2532 7.97168C29.8596 7.50284 29.5644 6.9968 29.3674 6.4541C29.1786 5.91129 29.0832 5.38869 29.0832 4.88672V4.61523C29.0833 4.05584 29.1822 3.50498 29.3791 2.96191C29.5842 2.41102 29.8876 1.91275 30.2893 1.46875C30.6914 1.0247 31.1921 0.670463 31.7913 0.407227C32.39 0.135838 33.0838 0 33.8713 0ZM82.4709 0C83.1764 2.56151e-05 83.7794 0.123399 84.2795 0.370117C84.7878 0.608768 85.1778 0.950332 85.4485 1.39453C85.7006 1.80059 85.8353 2.27491 85.8528 2.81641C85.855 2.88287 85.8009 2.9375 85.7346 2.9375H84.0051C83.939 2.93727 83.886 2.88272 83.8801 2.81641C83.8641 2.64136 83.8131 2.47966 83.7258 2.33203C83.6192 2.14276 83.4586 1.99141 83.2454 1.87598C83.0402 1.76094 82.7817 1.70312 82.47 1.70312C82.1751 1.70317 81.925 1.75194 81.72 1.85059C81.523 1.94933 81.3751 2.08521 81.2766 2.25781C81.1781 2.42225 81.1292 2.60332 81.1291 2.80078C81.1291 3.05585 81.2199 3.27842 81.4006 3.46777C81.5814 3.65687 81.8764 3.76776 82.2864 3.80078L82.9758 3.8623C83.6319 3.91985 84.2106 4.06376 84.7112 4.29395C85.2117 4.51597 85.6013 4.82509 85.8801 5.21973C86.1673 5.60617 86.3108 6.07967 86.3108 6.63867C86.3107 7.19769 86.1592 7.72008 85.8557 8.15625C85.5606 8.58389 85.1375 8.91692 84.5881 9.15527C84.0383 9.39401 83.3816 9.51367 82.6184 9.51367C81.8066 9.51363 81.1213 9.38588 80.5637 9.13086C80.0058 8.86763 79.5834 8.51371 79.2961 8.06934C79.0289 7.64835 78.8859 7.17007 78.8674 6.63477C78.8654 6.56847 78.9194 6.51466 78.9856 6.51465H80.7024C80.7685 6.51472 80.8219 6.5685 80.8284 6.63477C80.8461 6.81966 80.9056 6.99461 81.0071 7.15723C81.1385 7.35458 81.3355 7.51451 81.5979 7.6377C81.8603 7.7527 82.2003 7.81051 82.6184 7.81055C82.9957 7.81055 83.3123 7.76185 83.5666 7.66309C83.8208 7.56441 84.0133 7.42829 84.1448 7.25586C84.2758 7.0751 84.342 6.86915 84.342 6.63867C84.342 6.35095 84.2191 6.12443 83.9729 5.95996C83.7267 5.78736 83.3288 5.67635 82.7795 5.62695L82.1028 5.56543C81.2085 5.49155 80.4947 5.21085 79.9612 4.72559C79.428 4.24033 79.1614 3.59862 79.1614 2.80078C79.1614 2.22499 79.297 1.72713 79.5676 1.30762C79.8464 0.888332 80.232 0.567652 80.7239 0.345703C81.2162 0.11557 81.7987 5.96521e-05 82.4709 0ZM44.6965 0.203125C45.3847 0.229204 45.9946 0.346778 46.5256 0.555664C47.1328 0.794389 47.6418 1.11894 48.052 1.53027C48.4622 1.94163 48.7661 2.41461 48.9631 2.94922C49.1683 3.47569 49.2707 4.03121 49.2707 4.61523V4.88672C49.2707 5.42937 49.1682 5.96844 48.9631 6.50293C48.7661 7.02936 48.4622 7.50651 48.052 7.93457C47.6417 8.35409 47.1328 8.6916 46.5256 8.94629C45.9187 9.20136 45.2087 9.3291 44.3967 9.3291H41.1819C41.1156 9.3291 41.0618 9.27447 41.0618 9.20801V0.317383C41.0618 0.250952 41.1156 0.197266 41.1819 0.197266H44.3967L44.6965 0.203125ZM6.09594 0.272461C6.14697 0.272461 6.19348 0.304976 6.2102 0.353516L9.20434 9.12109V9.12012C9.23095 9.19796 9.17342 9.27904 9.09105 9.2793H7.25316C7.20146 9.27923 7.15524 9.24649 7.13891 9.19727L6.4641 7.12891C6.4477 7.07974 6.40155 7.04688 6.34984 7.04688H2.77172C2.71954 7.0469 2.67338 7.08076 2.65746 7.13086L1.99926 9.19629C1.98334 9.24603 1.93719 9.28026 1.885 9.28027H0.120352C0.0385193 9.28027 -0.0194555 9.20004 0.00609398 9.12207L2.89281 0.354492C2.90916 0.305335 2.95542 0.272553 3.00707 0.272461H6.09594ZM56.4446 0.272461C56.4958 0.272585 56.5411 0.305143 56.5579 0.353516L59.552 9.12109L59.5539 9.12012C59.5806 9.19809 59.5223 9.2793 59.4397 9.2793H57.6028C57.551 9.2793 57.5049 9.24647 57.4885 9.19727L56.8127 7.12891C56.7964 7.0799 56.751 7.04705 56.6995 7.04688H53.1204C53.0683 7.04699 53.022 7.08082 53.0061 7.13086L52.3479 9.19629C52.332 9.24604 52.2858 9.28027 52.2336 9.28027H50.469C50.3872 9.28025 50.3292 9.20003 50.3547 9.12207L53.2414 0.354492C53.2578 0.30531 53.304 0.272481 53.3557 0.272461H56.4446ZM27.5657 0.271484C27.6317 0.271745 27.6848 0.325349 27.6848 0.391602V1.91602C27.6847 1.98221 27.6316 2.03587 27.5657 2.03613H25.2698C25.2037 2.03635 25.1507 2.08999 25.1506 2.15625V9.15918C25.1506 9.22549 25.0966 9.27914 25.0305 9.2793H23.2522C23.1859 9.2793 23.1321 9.22558 23.1321 9.15918V2.15625C23.132 2.0899 23.0781 2.03621 23.012 2.03613H20.7288C20.6627 2.03599 20.6088 1.98228 20.6086 1.91602V0.391602C20.6087 0.325278 20.6626 0.271631 20.7288 0.271484H27.5657ZM65.4485 0.203125C66.08 0.228318 66.6364 0.341324 67.1174 0.542969C67.6669 0.764993 68.0895 1.09855 68.385 1.54297C68.6804 1.98697 68.8283 2.54622 68.8284 3.2207V3.41797C68.8284 4.08423 68.6767 4.63962 68.3733 5.08398C68.1093 5.47343 67.7435 5.77741 67.2766 5.99609C67.2066 6.02877 67.181 6.11755 67.2258 6.18066L69.2961 9.08984C69.3525 9.16924 69.2961 9.27917 69.1985 9.2793H67.1565C67.1169 9.2793 67.0795 9.25961 67.0569 9.22656L65.1663 6.44434C65.144 6.41133 65.1066 6.3916 65.0666 6.3916H63.7795C63.7133 6.3916 63.6594 6.44624 63.6594 6.5127V9.15918C63.6593 9.22557 63.6055 9.27928 63.5393 9.2793H61.761C61.6948 9.27919 61.6409 9.22552 61.6409 9.15918V0.317383C61.6409 0.251016 61.6948 0.19737 61.761 0.197266H65.1731L65.4485 0.203125ZM77.4582 0.271484C77.5245 0.27151 77.5783 0.325203 77.5784 0.391602V1.91602C77.5782 1.98236 77.5244 2.03611 77.4582 2.03613H75.1633C75.0971 2.03613 75.0433 2.08985 75.0432 2.15625V9.15918C75.0431 9.22558 74.9893 9.2793 74.9231 9.2793H73.1448C73.0785 9.27929 73.0247 9.22558 73.0246 9.15918V2.15625C73.0246 2.08985 72.9708 2.03613 72.9045 2.03613H70.6213C70.5553 2.03595 70.5013 1.98226 70.5012 1.91602V0.391602C70.5013 0.325301 70.5552 0.271668 70.6213 0.271484H77.4582ZM92.5452 4.39551H95.0012V5.62402H92.5452V8.08008H91.3166V5.62402H88.8606V4.39551H91.3166V1.93945H92.5452V4.39551ZM33.8704 1.88867C33.4442 1.88875 33.0631 1.95787 32.7268 2.09766C32.3907 2.23758 32.099 2.43903 31.8528 2.70215C31.6151 2.95713 31.4347 3.26194 31.3118 3.61523C31.1885 3.96078 31.1263 4.34332 31.1262 4.7627C31.1262 5.15774 31.1885 5.52873 31.3118 5.87402C31.4347 6.21948 31.6148 6.524 31.8528 6.78711C32.099 7.05029 32.3906 7.25618 32.7268 7.4043C33.0633 7.55235 33.4449 7.62598 33.8713 7.62598C34.2978 7.62595 34.6793 7.55241 35.0159 7.4043C35.3606 7.25616 35.6518 7.05032 35.8899 6.78711C36.1356 6.52398 36.3203 6.21951 36.4436 5.87402C36.5665 5.52836 36.6282 5.15736 36.6282 4.7627C36.6281 4.34332 36.5623 3.9604 36.4309 3.61523C36.308 3.2615 36.1234 2.95716 35.8772 2.70215C35.6395 2.43895 35.3514 2.23724 35.0149 2.09766C34.6788 1.95782 34.2967 1.88867 33.8704 1.88867ZM43.1995 2.08594C43.1333 2.08603 43.0794 2.13969 43.0793 2.20605V7.32031C43.0793 7.38671 43.1333 7.44033 43.1995 7.44043H44.5071C44.9254 7.44043 45.3028 7.37943 45.6389 7.25586C45.9753 7.12412 46.2622 6.94293 46.5002 6.71289C46.7383 6.47416 46.9193 6.19028 47.0422 5.86133C47.1655 5.52426 47.2268 5.15374 47.2268 4.75098C47.2268 4.34814 47.1655 3.95688 47.0422 3.62793C46.9193 3.29903 46.7383 3.01923 46.5002 2.78906C46.2626 2.55898 45.9754 2.38557 45.6389 2.27051C45.3027 2.14729 44.9254 2.08594 44.5071 2.08594H43.1995ZM4.40258 1.92578C4.35045 1.92578 4.30432 1.9588 4.28832 2.00879L3.26879 5.21094C3.24399 5.28851 3.30163 5.36811 3.38305 5.36816H5.72387C5.80506 5.36804 5.86325 5.28869 5.83813 5.21094L4.79223 2.00781C4.7762 1.95862 4.72969 1.92578 4.67797 1.92578H4.40258ZM54.7522 1.9248C54.7 1.9248 54.6529 1.95871 54.637 2.00879L53.6174 5.21094H53.6184C53.5936 5.28853 53.6512 5.36816 53.7327 5.36816H56.0725C56.154 5.36816 56.2123 5.28793 56.1868 5.20996L55.1409 2.00781C55.1249 1.95864 55.0792 1.92496 55.0276 1.9248H54.7522ZM63.7795 1.91211C63.7133 1.91211 63.6594 1.96674 63.6594 2.0332V4.67969L63.6682 4.72656C63.6863 4.76993 63.7297 4.7998 63.7795 4.7998H65.3332C65.6286 4.79976 65.8827 4.74238 66.0959 4.62695C66.3174 4.50369 66.4857 4.33494 66.6008 4.12109C66.7236 3.89918 66.7854 3.64436 66.7854 3.35645C66.7854 3.06833 66.7238 2.81737 66.6008 2.60352C66.486 2.38158 66.3173 2.21272 66.0959 2.09766C65.8824 1.97449 65.6285 1.91215 65.3332 1.91211H63.7795Z" fill="url(#paint0_linear_1183_23740)"></path><defs><linearGradient id="paint0_linear_1183_23740" x1="0.0836407" y1="-4.63465e-7" x2="7.84353" y2="31.1824" gradientUnits="userSpaceOnUse"><stop stop-color="#C5561C"></stop><stop offset="1" stop-color="#F7D458"></stop></linearGradient></defs></svg><p class="text-xl font-bold leading-[1.2] text-foreground">Upgrade your game</p></div><svg width="32" height="43" viewBox="0 0 32 43" fill="none" xmlns="http://www.w3.org/2000/svg" class="size-10 shrink-0"><path d="M0 23.6842L2.66667 0H21.3333L17.3333 13.1579H32V17.1053L10.6667 42.1053L14.6667 23.6842H0Z" fill="url(#_r_k_)"></path><defs><linearGradient id="_r_k_" x1="0.0281734" y1="-2.05119e-06" x2="41.0154" y2="12.5353" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C5561C"></stop><stop offset="1" stop-color="#F7D458"></stop></linearGradient></defs></svg></div><p class="mt-1 max-w-75 text-[13px] font-bold leading-[1.2] text-muted-foreground">AI referee, advanced stats, custom darts, additional game modes and more</p></div><button type="button" tabindex="0" data-slot="button" href="/subscriptions" class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-[12px] border-transparent bg-clip-padding text-sm focus-visible:ring-[3px] aria-invalid:ring-[3px] [&amp;_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none [&amp;_svg]:pointer-events-none shrink-0 [&amp;_svg]:shrink-0 outline-none group/button select-none bg-orange-slice-diagonal text-blue-90 font-bold p-3.5 leading-[100%] border-0 hover:opacity-90 data-open:opacity-90 active:opacity-80 disabled:bg-none disabled:bg-black-70 disabled:text-black-30 disabled:opacity-100 h-10 gap-1.5 py-1.5 px-4 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 relative self-start sm:self-auto">Join for €6.99/month</button></div><section class="flex flex-col gap-0 bg-black-80/70 mt-4 py-2 px-4 max-md:-mx-4"><div class="flex items-center justify-between pb-2"><h2 class="text-heading-2 text-foreground font-display text-2xl">What's New</h2></div><div class="max-md:-mx-4 overflow-x-auto snap-x snap-mandatory [&amp;::-webkit-scrollbar]:hidden" style="scrollbar-width: none;"><div class="flex gap-2 max-md:px-4 pb-2"><div class="relative flex min-w-55 flex-1 snap-start flex-col overflow-hidden rounded-xl bg-black-80 shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]"><img alt="" class="h-31 w-full object-cover" src="/assets/matchmaking-KegmvAT7.png"><div class="flex flex-col gap-2 px-3 pb-4 pt-3"><p class="text-base font-bold leading-snug text-mono-white">Matchmaking is live</p><p class="text-[13px] font-medium leading-snug text-muted-foreground">Jump into online games against players matched to your skill level</p></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></div><div class="relative flex min-w-55 flex-1 snap-start flex-col overflow-hidden rounded-xl bg-black-80 shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]"><img alt="" class="h-31 w-full object-cover" src="/assets/vantage-Cf376Ymj.png"><div class="flex flex-col gap-2 px-3 pb-4 pt-3"><p class="text-base font-bold leading-snug text-mono-white">Upgrade to Vantage</p><p class="text-[13px] font-medium leading-snug text-muted-foreground">Elite all-in-one hardware designed for pro-level accuracy and performance.</p></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></div><div class="relative flex min-w-55 flex-1 snap-start flex-col overflow-hidden rounded-xl bg-black-80 shadow-[0px_2px_2px_0px_rgba(13,13,13,0.5)]"><img alt="" class="h-31 w-full object-cover" src="/assets/blade-x-news-qE54NKdv.png"><div class="flex flex-col gap-2 px-3 pb-4 pt-3"><p class="text-base font-bold leading-snug text-mono-white">Blade X</p><p class="text-[13px] font-medium leading-snug text-muted-foreground">The most advanced dartboard in the world and the new official dartboard of the PDC</p></div><div class="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0px_-0.5px_0px_0px_rgba(255,255,255,0.08)]"></div></div></div></div></section></div></div></main></div><div class="shrink-0"></div></div><script></script><section aria-label="Notifications alt+T" tabindex="-1" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></section></div>
+
+
+
+</body></html>

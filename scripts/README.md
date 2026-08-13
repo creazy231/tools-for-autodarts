@@ -1,5 +1,82 @@
 # Scripts Documentation
 
+## v2 Migration Tooling
+
+Tooling for adapting the extension to the rebuilt autodarts site
+(v1 `play.autodarts.com` → v2 `play-v2.autodarts.com`).
+Background and findings: [`docs/v2-migration-map.md`](../docs/v2-migration-map.md).
+
+### Credentials
+
+Both scripts read `.secrets/autodarts.env`, which is **gitignored** and
+deliberately *not* a `.env` file so WXT/Vite never loads it into a build:
+
+```bash
+AUTODARTS_EMAIL=...
+AUTODARTS_PASSWORD=...
+AUTODARTS_V1_URL=https://play.autodarts.com
+AUTODARTS_V2_URL=https://play-v2.autodarts.com
+```
+
+Login is email + password. Do **not** use the Google/Apple buttons on v2.
+
+### `dev-chrome.sh` — interactive debugging browser
+
+Launches a **visible** Chrome with the extension loaded and a CDP endpoint on
+port 9222, which both MCP servers in `.mcp.json` attach to. You can watch every
+action and take over the browser at any time.
+
+```bash
+yarn dev                    # terminal 1 — builds + hot-reloads the extension
+./scripts/dev-chrome.sh     # terminal 2 — opens v2
+./scripts/dev-chrome.sh --v1
+./scripts/dev-chrome.sh --clean   # wipe the saved profile
+```
+
+The profile lives in `.chrome-profile/` (gitignored), so you log in once and the
+session persists. A dedicated profile directory is required — Chrome 136+
+refuses `--remote-debugging-port` on the default profile.
+
+### `capture-dom.mjs` — DOM baseline capture
+
+Snapshots the raw site (no extension loaded) so we have a durable record of the
+DOM the content scripts target. **v1 is not recapturable once retired.**
+
+```bash
+node scripts/capture-dom.mjs                 # both sites, all routes
+node scripts/capture-dom.mjs --site=v2
+node scripts/capture-dom.mjs --discover      # list reachable routes, capture nothing
+node scripts/capture-dom.mjs --route=/play   # one ad-hoc route
+node scripts/capture-dom.mjs --headless      # no visible window
+node scripts/capture-dom.mjs --fresh-login   # ignore the cached session
+```
+
+The browser is **visible by default**; pass `--headless` to suppress it.
+
+Per route it writes into `snapshots/<site>/`:
+
+| file | contents | committed |
+|---|---|---|
+| `<slug>.html` | full outerHTML | yes |
+| `<slug>.probe.json` | design tokens + stable-anchor inventory | yes |
+| `<slug>.png` | full-page screenshot | no — regenerate locally |
+
+`.probe.json` is the migration input: which token system is live, and every
+`data-slot` / `aria-label` / `role` / stable `id` available to anchor on.
+
+### Selector registry
+
+`utils/selectors.ts` centralises every selector that targets the autodarts DOM.
+Entries are ordered candidate lists — v2 first, v1 last — so one build serves
+both sites during the transition:
+
+```ts
+waitForElement(SELECTORS.match.menuBar)   // accepts string[] natively
+qs(SELECTORS.lobby.playerRows)            // querySelector with fallback
+qsa(SELECTORS.lobby.playerRows)           // querySelectorAll with fallback
+detectSiteVersion()                       // "v1" | "v2"
+```
+
 ## AltStore Source Update Automation
 
 ### Overview

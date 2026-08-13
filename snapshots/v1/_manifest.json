@@ -1,0 +1,98 @@
+{
+  "site": "v1",
+  "label": "v1 (Chakra UI — being retired)",
+  "baseUrl": "https://play.autodarts.com",
+  "reachableLinks": [
+    "/",
+    "/lobbies",
+    "/matches",
+    "/tournaments",
+    "/history/matches",
+    "/statistics",
+    "/boards",
+    "/camera",
+    "/settings",
+    "/subscribed",
+    "/legal/tos",
+    "/legal/privacy"
+  ],
+  "routes": [
+    {
+      "slug": "home",
+      "route": "/",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/",
+      "elements": 249
+    },
+    {
+      "slug": "lobbies",
+      "route": "/lobbies",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/lobbies",
+      "elements": 1042
+    },
+    {
+      "slug": "lobbies-new-x01",
+      "route": "/lobbies/new/x01",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/lobbies/new/x01",
+      "elements": 189
+    },
+    {
+      "slug": "lobbies-new-cricket",
+      "route": "/lobbies/new/cricket",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/lobbies/new/cricket",
+      "elements": 174
+    },
+    {
+      "slug": "matches",
+      "route": "/matches",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/matches",
+      "elements": 138
+    },
+    {
+      "slug": "history-matches",
+      "route": "/history/matches",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/history/matches",
+      "elements": 734
+    },
+    {
+      "slug": "boards",
+      "route": "/boards",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/boards",
+      "elements": 257
+    },
+    {
+      "slug": "camera",
+      "route": "/camera",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/camera",
+      "elements": 132
+    },
+    {
+      "slug": "tournaments",
+      "route": "/tournaments",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/tournaments",
+      "elements": 1314
+    },
+    {
+      "slug": "statistics",
+      "route": "/statistics",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/statistics",
+      "elements": 288
+    },
+    {
+      "slug": "settings",
+      "route": "/settings",
+      "ok": true,
+      "finalUrl": "https://play.autodarts.com/settings",
+      "elements": 531
+    }
+  ]
+}

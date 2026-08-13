@@ -13,7 +13,7 @@ import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import { isSafari, isiOS } from "@/utils/helpers";
 
 export default defineContentScript({
-  matches: [ "*://play.autodarts.com/*" ],
+  matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
   cssInjectionMode: "ui",
   async main() {
     AutodartsToolsUrlStatus.watch(async (url: string) => {
