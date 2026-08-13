@@ -3,37 +3,29 @@
     @click="handleClick"
     v-bind="_.omit($attrs, 'class')"
     :class="twMerge(
-      'user-select-none position-relative white-space-nowrap vertical-align-middle line-height-1.2 transition-property-common transition-duration-normal group relative inline-flex appearance-none items-center justify-center border-none outline-offset-2 outline-transparent',
-      'rounded-[var(--adt-radius-md)] font-[600]',
+      // Design system › Core › Button
+      'group relative inline-flex select-none appearance-none items-center justify-center whitespace-nowrap border-none leading-none outline-none',
+      'font-[var(--ad-weight-semibold)] transition-[background-color,color,border-color,opacity,transform] duration-[var(--ad-duration-fast)]',
+      'active:enabled:translate-y-px',
 
-      // Default style
-      type === 'default' && 'bg-[var(--adt-overlay)] text-[var(--adt-text)] enabled:hover:bg-[var(--adt-overlay-strong)] enabled:active:bg-[var(--adt-overlay-strong)]',
+      // Variants — primary blue is the only accent; secondary is the chip fill.
+      type === 'default' && 'bg-[var(--ad-action-secondary)] text-[var(--ad-text-primary)] enabled:hover:bg-[var(--ad-action-secondary-hover)]',
+      type === 'primary' && 'bg-[var(--ad-action-primary)] font-[var(--ad-weight-bold)] text-[var(--ad-white)] enabled:hover:bg-[var(--ad-action-primary-hover)] enabled:active:bg-[var(--ad-action-primary-active)]',
+      type === 'ghost' && 'bg-transparent text-[var(--ad-text-primary)] enabled:hover:bg-white/[.07]',
+      type === 'success' && 'bg-[var(--ad-success)] font-[var(--ad-weight-bold)] text-[var(--ad-text-on-light)] enabled:hover:brightness-110',
+      type === 'danger' && 'bg-[var(--ad-danger)] font-[var(--ad-weight-bold)] text-[var(--ad-white)] enabled:hover:brightness-110',
+      type === 'warning' && 'bg-[var(--ad-warning)] font-[var(--ad-weight-bold)] text-[var(--ad-text-on-light)] enabled:hover:brightness-110',
 
-      // Success style
-      type === 'success' && 'border border-solid border-[var(--adt-success-border)] bg-[var(--adt-success-surface)] text-[var(--adt-text)] enabled:hover:bg-[rgba(58,255,0,0.3)] enabled:active:bg-[rgba(58,255,0,0.3)]',
+      // Sizes — heights and radii straight from the Button spec.
+      size === 'xs' && 'h-6 min-w-6 gap-1.5 rounded-[var(--ad-radius-sm)] px-2 text-[var(--ad-text-sm)]',
+      size === 'sm' && 'h-8 min-w-8 gap-[7px] rounded-[var(--ad-radius-md)] px-[14px] text-[var(--ad-text-sm)]',
+      size === 'md' && 'h-[42px] min-w-[42px] gap-[9px] rounded-[var(--ad-radius-lg)] px-[18px] text-[var(--ad-text-md)]',
+      size === 'lg' && 'h-12 min-w-12 gap-2.5 rounded-[var(--ad-radius-lg)] px-[22px] text-[var(--ad-text-md)]',
+      size === 'xl' && 'h-14 min-w-14 gap-2.5 rounded-[var(--ad-radius-lg)] px-8 text-[var(--ad-text-lg)]',
 
-      // Danger style
-      type === 'danger' && 'border border-solid border-[var(--adt-error-border)] bg-[var(--adt-error-surface)] text-[var(--adt-text)] enabled:hover:bg-[rgba(255,0,0,0.3)] enabled:active:bg-[rgba(255,0,0,0.3)]',
-
-      // Warning style
-      type === 'warning' && 'border border-solid border-amber-500/50 bg-amber-500/20 text-[var(--adt-text)] enabled:hover:bg-amber-500/30 enabled:active:bg-amber-500/30',
-
-      // Default size (md)
-      size === 'md' && 'h-[2.5rem] min-w-[2.5rem] pe-[1rem] ps-[1rem]',
-
-      // Small size
-      size === 'sm' && 'h-8 max-h-8 min-w-8 pe-[0.75rem] ps-[0.75rem] text-[14px]',
-
-      // Extra small size
-      size === 'xs' && 'h-6 max-h-6 min-w-6 pe-[0.5rem] ps-[0.5rem] text-[14px]',
-
-      // Large sizes
-      size === 'lg' && 'h-[3rem] min-w-[3rem] pe-[1.5rem] ps-[1.5rem]',
-      size === 'xl' && 'h-[4rem] min-w-[4rem] pe-[2rem] ps-[2rem]',
-
-      'transition-colors',
       !auto && 'w-full',
-      (disabled && !loading) && 'cursor-not-allowed opacity-50',
+      // The system uses a single disabled treatment for every variant.
+      (disabled && !loading) && 'cursor-not-allowed !bg-[var(--ad-action-disabled)] !text-[var(--ad-text-disabled)]',
       $attrs.class?.toString(),
     )"
     :disabled="disabled || loading"
@@ -71,7 +63,7 @@ const props = withDefaults(defineProps<{
   disabled?: boolean;
   auto?: boolean;
   centered?: boolean;
-  type?: "default" | "danger" | "success" | "warning";
+  type?: "default" | "primary" | "ghost" | "danger" | "success" | "warning";
 }>(), {
   size: "md",
   centered: true,

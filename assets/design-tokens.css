@@ -1,0 +1,243 @@
+/**
+ * Autodarts design system tokens.
+ *
+ * Mirrored from the "Autodarts Design System" project (tokens/palette.css,
+ * semantic.css, radius.css, motion.css, elevation.css, gradients.css). The
+ * extension renders inside a shadow root, which does not inherit custom
+ * properties declared on the host page's :root — so these have to be declared
+ * here rather than borrowed from the site.
+ *
+ * Keep the names identical to the design system. That way a change there maps
+ * to a one-line change here instead of a translation exercise.
+ *
+ * TYPOGRAPHY IS THE ONE DELIBERATE DIVERGENCE — see the note further down.
+ */
+:root,
+:host {
+  /* ---------------------------------------------------------- raw palette --
+   * Measured pixel-for-pixel from Autodarts Play v2. Never restyle with a
+   * value that is not in here. */
+  --ad-ink-1000: #0d0f12;
+  --ad-ink-950: #101215;
+  --ad-ink-900: #16181c;
+  --ad-ink-850: #1b1f29;
+  --ad-ink-800: #22262f;
+  --ad-ink-750: #292c33;
+  --ad-ink-700: #2d313a;
+  --ad-ink-600: #3a4354;
+  --ad-ink-500: #6b7480;
+  --ad-ink-400: #a1a1a1;
+  --ad-ink-300: #c7cbd7;
+  --ad-ink-200: #dbe1eb;
+  --ad-ink-100: #f7f8fa;
+  --ad-white: #fff;
+
+  --ad-navy-1000: #000814;
+  --ad-navy-900: #000a1e;
+  --ad-navy-800: #001030;
+  --ad-navy-700: #001339;
+  --ad-navy-600: #001540;
+  --ad-navy-500: #001849;
+  --ad-navy-400: #0e2250;
+  --ad-indigo-950: #0b0b23;
+
+  --ad-blue-800: #0c3f9e;
+  --ad-blue-700: #0c50cf;
+  --ad-blue-600: #0b55df;
+  --ad-blue-500: #3271e5;
+  --ad-blue-400: #0a70ff;
+  --ad-blue-300: #7498dd;
+
+  --ad-cyan-500: #03bbeb;
+  --ad-green-400: #28e685;
+  --ad-green-500: #49da9e;
+  --ad-green-600: #0ea76f;
+
+  --ad-magenta-700: #901f7d;
+  --ad-crimson-600: #c12f63;
+  --ad-crimson-700: #a12439;
+  --ad-rose-500: #e24e67;
+
+  --ad-amber-500: #f29727;
+  --ad-amber-600: #e8b348;
+  --ad-orange-500: #fc712b;
+  --ad-orange-600: #d3792c;
+  --ad-gold-900: #8b5f01;
+
+  --ad-lime-400: #e9f81f;
+  --ad-yellow-400: #f7d458;
+
+  /* ------------------------------------------------------ semantic aliases --
+   * Components reference these, not the raw palette. */
+  --ad-surface-canvas: var(--ad-navy-800);
+  --ad-surface-chrome: var(--ad-ink-900);
+  --ad-surface-card: var(--ad-ink-850);
+  --ad-surface-card-hover: var(--ad-ink-800);
+  --ad-surface-sunken: var(--ad-ink-950);
+  --ad-surface-chip: var(--ad-ink-750);
+  --ad-surface-chip-strong: var(--ad-ink-700);
+  --ad-surface-overlay: var(--ad-indigo-950);
+  --ad-surface-input: var(--ad-ink-750);
+  --ad-surface-input-light: var(--ad-ink-100);
+  --ad-surface-pill: rgb(255 255 255 / 10%);
+  --ad-scrim: rgb(1 5 14 / 82%);
+
+  --ad-text-primary: var(--ad-ink-100);
+  --ad-text-secondary: var(--ad-ink-300);
+  --ad-text-muted: var(--ad-ink-400);
+  --ad-text-disabled: #72747b;
+  --ad-text-on-light: #16181c;
+  --ad-text-accent: var(--ad-blue-400);
+  --ad-text-destructive: var(--ad-rose-500);
+
+  --ad-border-subtle: rgb(255 255 255 / 8%);
+  --ad-border-strong: rgb(255 255 255 / 16%);
+  --ad-border-focus: var(--ad-blue-600);
+  --ad-divider: var(--ad-ink-700);
+
+  --ad-action-primary: var(--ad-blue-600);
+  --ad-action-primary-hover: var(--ad-blue-500);
+  --ad-action-primary-active: var(--ad-blue-700);
+  --ad-action-secondary: var(--ad-ink-750);
+  --ad-action-secondary-hover: var(--ad-ink-700);
+  --ad-action-disabled: #2e333d;
+  --ad-focus-ring: 0 0 0 2px rgb(11 85 223 / 55%);
+
+  --ad-success: var(--ad-green-400);
+  --ad-success-text: var(--ad-green-500);
+  --ad-warning: var(--ad-amber-500);
+  --ad-danger: var(--ad-crimson-700);
+  --ad-info: var(--ad-blue-400);
+  --ad-plus: var(--ad-orange-500);
+
+  /* --------------------------------------------------------------- radius --*/
+  --ad-radius-xs: 4px;
+  --ad-radius-sm: 8px;
+  --ad-radius-md: 10px;
+  --ad-radius-lg: 12px;
+  --ad-radius-xl: 16px;
+  --ad-radius-full: 999px;
+
+  /* ------------------------------------------------------------ elevation --
+   * The app is almost flat: surfaces separate by fill, not by shadow. */
+  --ad-shadow-card: none;
+  --ad-shadow-raised: inset 0 1px 0 rgb(255 255 255 / 4%);
+  --ad-shadow-overlay: 0 24px 64px rgb(0 0 0 / 55%);
+  --ad-shadow-popover: 0 12px 32px rgb(0 0 0 / 45%);
+  --ad-blur-overlay: blur(2px);
+
+  /* ------------------------------------------------------------ gradients --
+   * Exactly three live in the product — do not invent a fourth. */
+  --ad-gradient-brand: linear-gradient(118deg, var(--ad-cyan-500) 0%, var(--ad-green-400) 100%);
+  --ad-gradient-hot: linear-gradient(90deg, var(--ad-magenta-700) 0%, var(--ad-crimson-600) 100%);
+  --ad-gradient-plus: linear-gradient(90deg, var(--ad-orange-600) 0%, var(--ad-amber-600) 100%);
+
+  /* --------------------------------------------------------------- motion --*/
+  --ad-duration-instant: 80ms;
+  --ad-duration-fast: 120ms;
+  --ad-duration-base: 180ms;
+  --ad-duration-slow: 260ms;
+  --ad-ease-standard: cubic-bezier(.2, .6, .2, 1);
+  --ad-transition-interactive:
+    background-color var(--ad-duration-fast) var(--ad-ease-standard),
+    color var(--ad-duration-fast) var(--ad-ease-standard),
+    border-color var(--ad-duration-fast) var(--ad-ease-standard),
+    opacity var(--ad-duration-fast) var(--ad-ease-standard),
+    transform var(--ad-duration-fast) var(--ad-ease-standard);
+
+  /* ----------------------------------------------------------- typography --
+   * DELIBERATE DIVERGENCE FROM THE DESIGN SYSTEM.
+   *
+   * It specifies Big Shoulders Display / Plus Jakarta Sans. The live site does
+   * not use either — it ships Bebas Neue for display and Manrope Variable for
+   * body (measured; see docs/v2-design-system.md). The extension renders inside
+   * autodarts' own page, so it has to match what is actually on screen there,
+   * not the reference kit. The scale and weights below ARE the design system's.
+   */
+  --ad-font-display: "Bebas Neue", "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --ad-font-body: "Manrope Variable", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+
+  --ad-text-2xs: 11px;
+  --ad-text-xs: 12px;
+  --ad-text-sm: 13px;
+  --ad-text-base: 14px;
+  --ad-text-md: 15px;
+  --ad-text-lg: 17px;
+  --ad-text-xl: 18px;
+  --ad-text-2xl: 22px;
+  --ad-text-3xl: 26px;
+  --ad-text-4xl: 30px;
+
+  --ad-weight-regular: 400;
+  --ad-weight-medium: 500;
+  --ad-weight-semibold: 600;
+  --ad-weight-bold: 700;
+  --ad-weight-extrabold: 800;
+
+  --ad-leading-tight: 1.15;
+  --ad-leading-snug: 1.3;
+  --ad-leading-normal: 1.45;
+  --ad-tracking-caps: .06em;
+}
+
+/**
+ * Extension-local aliases.
+ *
+ * Components across the codebase reference `--adt-*`; these map that vocabulary
+ * onto the design system so there is exactly one place to re-point if the
+ * system changes. Prefer `--ad-*` directly in new code.
+ */
+:root,
+:host {
+  --adt-bg: var(--ad-surface-canvas);
+  --adt-surface: var(--ad-surface-card);
+  --adt-surface-sunken: var(--ad-surface-sunken);
+  --adt-surface-raised: var(--ad-surface-overlay);
+  --adt-surface-disabled: var(--ad-action-disabled);
+
+  --adt-text: var(--ad-text-primary);
+  --adt-text-muted: var(--ad-text-muted);
+  --adt-text-on-accent: var(--ad-white);
+
+  --adt-accent: var(--ad-action-primary);
+  --adt-accent-hover: var(--ad-action-primary-hover);
+  --adt-outline: var(--ad-border-strong);
+
+  --adt-success: var(--ad-success);
+  --adt-warning: var(--ad-warning);
+  --adt-error: var(--ad-rose-500);
+
+  --adt-border: var(--ad-border-strong);
+  --adt-border-subtle: var(--ad-border-subtle);
+  --adt-overlay: var(--ad-surface-pill);
+  --adt-overlay-strong: var(--ad-border-strong);
+
+  --adt-success-border: rgb(40 230 133 / 40%);
+  --adt-success-surface: rgb(40 230 133 / 15%);
+  --adt-error-border: rgb(226 78 103 / 40%);
+  --adt-error-surface: rgb(226 78 103 / 15%);
+
+  --adt-card-edge: var(--ad-shadow-raised);
+  --adt-hover-wash: rgb(255 255 255 / 5%);
+
+  --adt-radius-sm: var(--ad-radius-sm);
+  --adt-radius-md: var(--ad-radius-md);
+  --adt-radius-lg: var(--ad-radius-lg);
+  --adt-radius-xl: var(--ad-radius-xl);
+  --adt-radius-2xl: var(--ad-radius-xl);
+
+  --adt-font: var(--ad-font-body);
+  --adt-font-display: var(--ad-font-display);
+
+  --adt-blue: var(--ad-blue-600);
+  --adt-blue-hover: var(--ad-blue-500);
+  --adt-blue-deep: var(--ad-blue-800);
+
+  --adt-segment-track: var(--ad-navy-400);
+  --adt-segment-on-from: var(--ad-magenta-700);
+  --adt-segment-on-to: var(--ad-crimson-600);
+  --adt-segment-off-text: var(--ad-text-secondary);
+
+  --adt-disabled-bg: var(--ad-action-disabled);
+  --adt-disabled-text: var(--ad-text-disabled);
+}

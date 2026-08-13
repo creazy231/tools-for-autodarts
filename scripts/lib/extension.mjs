@@ -21,8 +21,12 @@ export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..")
 const DEV_DIR = join(ROOT, ".output", "chrome-mv3-dev");
 const PROD_DIR = join(ROOT, ".output", "chrome-mv3");
 
-/** Port WXT serves HMR on (see the dev build's CSP, which allowlists it). */
-export const WXT_DEV_PORT = 3000;
+/**
+ * Port WXT serves HMR on. Set via `wxt --port` in the dev script; override here
+ * with WXT_DEV_PORT if that changes. The dev build's CSP allowlists this port,
+ * so the two must agree.
+ */
+export const WXT_DEV_PORT = Number(process.env.WXT_DEV_PORT ?? 4000);
 
 /** Host the migration targets. A build without it cannot run on v2. */
 const REQUIRED_HOST = "play-v2";

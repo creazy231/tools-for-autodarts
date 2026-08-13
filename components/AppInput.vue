@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label v-if="label" :for="id" class="mb-1 block text-sm font-medium text-white">{{ label }}</label>
+    <label v-if="label" :for="id" class="adt-field-label">{{ label }}</label>
     <input
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       :id="id"
@@ -9,12 +9,13 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :class="twMerge(
-        'w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none',
-        disabled && 'cursor-not-allowed opacity-60',
+        // Design system › Forms › TextField
+        'adt-input placeholder:text-[var(--ad-text-muted)]',
+        disabled && 'cursor-not-allowed',
         $attrs.class?.toString(),
       )"
     >
-    <p v-if="helperText" class="mt-1 text-xs text-white/60">
+    <p v-if="helperText" class="adt-field-hint">
       {{ helperText }}
     </p>
   </div>

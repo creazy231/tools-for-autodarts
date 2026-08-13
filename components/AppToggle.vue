@@ -1,72 +1,45 @@
 <template>
   <!--
-    Neutral track, as before. Colour is reserved for a single meaning: the
-    feature is ON. "Off" being selected is the resting state, so it stays
-    neutral — a gradient there would read as an alert.
+    Design system › Forms › Switch.
+
+    A real switch rather than a pair of On/Off buttons: 48x24 track, 18px thumb
+    inset 3px, blue when on, chip-strong when off. Styling lives in
+    assets/tailwind.css so the track, thumb and transitions stay in one place.
   -->
-  <div
-    class="relative flex overflow-hidden rounded-md bg-[var(--adt-overlay)]"
-    :class="{
-      'h-6': props.size === 'xs',
-      'h-8': props.size === 'sm',
-      'h-10': props.size === 'md',
-    }"
-  >
-    <button
-      @click="setToOn"
-      :class="twMerge(
-        'flex h-full items-center justify-center transition-colors',
-        props.size === 'xs' ? 'px-3 text-xs font-medium'
-        : props.size === 'sm' ? 'px-4 text-sm font-semibold' : 'px-4 font-semibold',
-        props.modelValue
-          ? 'adt-toggle-on text-white'
-          : 'text-[var(--adt-text)] enabled:hover:bg-[var(--adt-overlay)]',
-      )"
-      type="button"
-      :aria-pressed="props.modelValue"
-    >
-      On
-    </button>
-    <button
-      @click="setToOff"
-      :class="twMerge(
-        'flex h-full items-center justify-center text-[var(--adt-text)] transition-colors',
-        props.size === 'xs' ? 'px-3 text-xs font-medium'
-        : props.size === 'sm' ? 'px-4 text-sm font-semibold' : 'px-4 font-semibold',
-        !props.modelValue
-          ? 'bg-[var(--adt-overlay-strong)]'
-          : 'enabled:hover:bg-[var(--adt-overlay)]',
-      )"
-      type="button"
-      :aria-pressed="!props.modelValue"
-    >
-      Off
-    </button>
-  </div>
+  <button
+    @click="toggle"
+    :class="[ 'adt-switch', className ]"
+    :style="scale"
+    :aria-checked="props.modelValue"
+    :disabled="props.disabled"
+    type="button"
+    role="switch"
+  />
 </template>
 
 <script setup lang="ts">
-import { twMerge } from "tailwind-merge";
-// Define props with defaults
 const props = withDefaults(defineProps<{
   modelValue: boolean;
+  /** Kept for call-site compatibility; scales the 48x24 spec proportionally. */
   size?: "xs" | "sm" | "md";
+  disabled?: boolean;
+  className?: string;
 }>(), {
   size: "md",
+  disabled: false,
 });
 
 const emit = defineEmits([ "update:modelValue" ]);
 
+/** The spec is a fixed 48x24; smaller call sites scale it rather than restyle. */
+const scale = computed(() => {
+  if (props.size === "md") return undefined;
+  const factor = props.size === "xs" ? 0.75 : 0.875;
+  return { transform: `scale(${factor})`, transformOrigin: "left center" };
+});
 
-function setToOn() {
-  if (!props.modelValue) {
-    emit("update:modelValue", true);
-  }
-}
-
-function setToOff() {
-  if (props.modelValue) {
-    emit("update:modelValue", false);
-  }
+function toggle() {
+  if (props.disabled) return;
+  emit("update:modelValue", !props.modelValue);
 }
 </script>

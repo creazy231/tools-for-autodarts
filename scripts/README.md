@@ -65,7 +65,7 @@ and prints a note saying so.
 ### `yarn dev` — the browser to use for migration work
 
 `yarn dev` is the primary entry point. It builds to `.output/chrome-mv3-dev`,
-serves hot reload on `:3000`, and opens a **visible** Chrome with that dev build
+serves hot reload on `:4000`, and opens a **visible** Chrome with that dev build
 already loaded. Via `webExt` in `wxt.config.ts` it also:
 
 - keeps its profile in `.chrome-profile-dev/`, so the autodarts login survives
@@ -78,6 +78,25 @@ of the extension than the one you're editing wastes a lot of time.
 
 It opens v2 and v1 side by side. Note `yarn dev` needs a real terminal: it waits
 on stdin for its "press o + enter" prompt and exits immediately without a TTY.
+
+#### If the extension stops injecting
+
+Symptom: the content script never runs on a page it should — no extension
+console output at all, and `chrome.scripting.getRegisteredContentScripts()`
+returns an empty list from the dev service worker.
+
+The usual cause is a corrupted dev Chrome profile, not the code. Installing a
+second unpacked extension over CDP while WXT's own install is still in flight
+loses one of them, and the browser can persist that broken state. Wipe it:
+
+```bash
+rm -rf .chrome-profile-dev     # you will need to log in again
+```
+
+Rule this out before debugging the extension itself — stash your changes and
+retest if unsure. `scripts/load-reference-extension.mjs` now waits for WXT's
+extension to appear before adding the reference, and warns if fewer than two
+end up registered.
 
 ### `inspect.mjs` — drive the site with the extension loaded
 

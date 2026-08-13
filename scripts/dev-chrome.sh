@@ -70,10 +70,10 @@ fi
 
 # Hot reload needs the WXT dev server; the dev build alone is not enough.
 if [[ "$BUILD" == "dev" ]]; then
-  if lsof -nP -iTCP:3000 -sTCP:LISTEN >/dev/null 2>&1; then
+  if lsof -nP -iTCP:"${WXT_DEV_PORT:-4000}" -sTCP:LISTEN >/dev/null 2>&1; then
     BUILD="dev (hot reload active)"
   else
-    BUILD="dev (dev server DOWN — no hot reload; run 'yarn dev')"
+    BUILD="dev (dev server DOWN on :${WXT_DEV_PORT:-4000} — no hot reload; run 'yarn dev')"
   fi
 fi
 

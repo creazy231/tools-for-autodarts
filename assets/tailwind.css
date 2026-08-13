@@ -1,324 +1,262 @@
+@import "./design-tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /**
- * Extension design tokens.
- *
- * Each maps to an autodarts v2 token with a hard fallback, so the UI still
- * renders if the site renames one. Components reference `--adt-*` only — never
- * autodarts' own variables directly — so a rename upstream is a one-line fix
- * here instead of a sweep across ~28 files.
- *
- * Values measured from the live site; see docs/v2-design-system.md.
- *
- * These are declared on :host as well as :root because the extension mounts
- * inside a shadow root, which does not inherit page-level custom properties
- * defined on :root alone.
+ * Component styles, built to the Autodarts Design System specs.
+ * Sources: components/core/Button, components/forms/{Switch,SegmentedControl,
+ * TextField}, components/navigation/NavTabs, components/overlay/Modal.
  */
-:root,
-:host {
-  /* Surfaces */
-  --adt-bg: var(--background, #01040b);
-  --adt-surface: var(--card, #1b1f29);
-  --adt-surface-sunken: var(--surface-surface, #16181c);
-  --adt-surface-raised: var(--drawer, #0a0a23);
-  --adt-surface-disabled: var(--state-disabled, #292c33);
-
-  /* Text */
-  --adt-text: var(--foreground, #fafafa);
-  --adt-text-muted: var(--muted-foreground, #b4b4b4);
-  --adt-text-on-accent: var(--secondary-foreground, #f0f5fd);
-
-  /* Accent — v2 has exactly one */
-  --adt-accent: var(--secondary, #0b55df);
-  --adt-accent-hover: var(--state-secondary-hovered, #003eb3);
-  --adt-outline: var(--outline-mid, #374c9899);
-
-  /* Status */
-  --adt-success: var(--system-success, #49da9e);
-  --adt-warning: var(--system-warning, #f7d458);
-  --adt-error: var(--system-error, #da3954);
-
-  /* Borders — v2 borders are translucent white, never solid grey */
-  --adt-border: rgb(255 255 255 / 10%);
-  --adt-border-subtle: rgb(255 255 255 / 6%);
-
-  /**
-   * Translucent overlays for controls sitting on a card (toggles, tabs,
-   * sliders). Previously written as `--chakra-colors-whiteAlpha-*`, which was
-   * never actually defined — those resolved to nothing and the controls
-   * rendered transparent even on v1.
-   */
-  --adt-overlay: rgb(255 255 255 / 8%);
-  --adt-overlay-strong: rgb(255 255 255 / 16%);
-
-  /* Success / danger button treatments — also previously undefined. */
-  --adt-success-border: rgb(73 218 158 / 40%);
-  --adt-success-surface: rgb(73 218 158 / 15%);
-  --adt-error-border: rgb(218 57 84 / 40%);
-  --adt-error-surface: rgb(218 57 84 / 15%);
-
-  /* The inset bottom highlight that stands in for a card border in v2 */
-  --adt-card-edge: inset 0 -0.5px 0 0 rgb(255 255 255 / 8%);
-
-  /* Hover wash used on selectable tiles */
-  --adt-hover-wash: rgb(255 255 255 / 5%);
-
-  /* Radii — v2's scale, not Tailwind's defaults */
-  --adt-radius-sm: 6px;
-  --adt-radius-md: 8px;
-  --adt-radius-lg: 10px;
-  --adt-radius-xl: 14px;
-  --adt-radius-2xl: 18px;
-
-  /* Type */
-  --adt-font: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
-  --adt-font-display: "Bebas Neue", "Manrope Variable", sans-serif;
-
-  /* Blue ramp, resolved from v2's own utilities */
-  --adt-blue: var(--secondary, #0b55df);
-  --adt-blue-hover: #003eb3;
-  --adt-blue-deep: #002a77;
-
-  /* Segmented control (v2 "toggle-group") */
-  --adt-segment-track: var(--surface-container-primary, #001849);
-  --adt-segment-on-from: #75148b;
-  --adt-segment-on-to: #da3954;
-  --adt-segment-off-text: #b8bcc5;
-
-  /* Disabled control */
-  --adt-disabled-bg: #292c33;
-  --adt-disabled-text: #b8bcc5;
-}
 
 body {
-  font-family: var(--adt-font);
-  color: var(--adt-text);
+  font-family: var(--ad-font-body);
+  color: var(--ad-text-primary);
   font-feature-settings: "kern";
 }
 
-/**
- * Content card — pattern A from docs/v2-design-system.md.
- * No border and no drop shadow: v2 cards are defined by a fill plus a
- * half-pixel inset highlight along the bottom edge.
+/* ----------------------------------------------------------------- cards ---
+ * "The app is almost flat: surfaces separate by fill, not by shadow."
  */
 .adt-container {
   position: relative;
   overflow: hidden;
   padding: 1.5rem;
-  color: var(--adt-text);
-  background: var(--adt-surface);
-  border-radius: var(--adt-radius-2xl);
-  box-shadow: var(--adt-card-edge);
+  color: var(--ad-text-primary);
+  background: var(--ad-surface-card);
+  border-radius: var(--ad-radius-lg);
+  box-shadow: var(--ad-shadow-raised);
 }
 
-/**
- * Feature cards are interactive, so they take v2's tile hover: a 5% white wash.
- * v2 never translates or scales a card on hover.
- */
 .adt-container.adt-interactive {
-  transition: background-color 150ms ease;
+  transition: var(--ad-transition-interactive);
 }
 
 .adt-container.adt-interactive:hover {
-  background-image: linear-gradient(var(--adt-hover-wash), var(--adt-hover-wash));
+  background: var(--ad-surface-card-hover);
 }
 
-/**
- * Card title. v2 sets section headings in Bebas Neue, which is already a
- * condensed all-caps face — so no `uppercase` or bold is needed on top.
- */
+/** Display face: uppercase, tight leading. */
 .adt-card-title {
-  font-family: var(--adt-font-display);
-  font-size: 1.25rem;
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: 0.02em;
-  color: var(--adt-text);
-}
-
-/**
- * Selectable tile — pattern B. Unlike cards these DO carry a border, and hover
- * is a 5% white wash rather than a colour change.
- */
-.adt-tile {
-  padding: 1.25rem 1rem;
-  text-align: left;
-  background: var(--adt-surface);
-  border: 1px solid var(--adt-border-subtle);
-  border-radius: 12px;
-  transition: background-color 150ms ease, border-color 150ms ease;
-}
-
-.adt-tile:hover {
-  background-image: linear-gradient(var(--adt-hover-wash), var(--adt-hover-wash));
-}
-
-/** Section heading — the one place v2 uses Bebas Neue. */
-.adt-heading {
-  font-family: var(--adt-font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--adt-text);
-}
-
-/* ---------------------------------------------------------------- modals ---
- * Pattern C, measured from v2's Quick Match dialog:
- *   bg-drawer, rounded-xl (14px), ring-1 ring-foreground/10 (NOT a border),
- *   gap-4, max-w-2xl, max-h-[85vh], overflow-hidden.
- * The ring matters — v2 modals have no border and no drop shadow.
- */
-.adt-modal {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 42rem;
-  max-height: 85vh;
-  overflow: hidden;
-  font-size: 0.875rem;
-  color: var(--adt-text);
-  background: var(--adt-surface-raised);
-  border-radius: var(--adt-radius-xl);
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 10%);
-  outline: none;
-}
-
-/* v2 puts the title block at px-6 pt-14, leaving room for the close button. */
-.adt-modal-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding: 3.5rem 1.5rem 0;
-  text-align: left;
-}
-
-/* Bebas Neue, 18px/700, uppercase, pure white. */
-.adt-modal-title {
-  display: flex;
-  align-items: center;
-  font-family: var(--adt-font-display);
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--ad-font-display);
+  font-size: var(--ad-text-2xl);
+  font-weight: var(--ad-weight-bold);
+  line-height: var(--ad-leading-tight);
+  color: var(--ad-text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-.adt-modal-body {
-  overflow-y: auto;
-  padding: 0 1.5rem 1.5rem;
+.adt-heading {
+  font-family: var(--ad-font-display);
+  font-size: var(--ad-text-3xl);
+  font-weight: var(--ad-weight-bold);
+  line-height: var(--ad-leading-tight);
+  color: var(--ad-text-primary);
+  text-transform: uppercase;
 }
 
-/* Plain icon button pinned top-right — no chrome of its own in v2. */
-.adt-modal-close {
+/* ---------------------------------------------------------------- switch ---
+ * Forms/Switch: 48x24 track, 18px thumb inset 3px, blue when on,
+ * --ad-surface-chip-strong when off, full radius, sliding thumb.
+ */
+.adt-switch {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 48px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--ad-surface-chip-strong);
+  border: 0;
+  border-radius: var(--ad-radius-full);
+  transition: background-color var(--ad-duration-base) var(--ad-ease-standard);
+}
+
+.adt-switch::after {
+  content: "";
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 10;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--ad-white);
+  border-radius: var(--ad-radius-full);
+  transition: left var(--ad-duration-base) var(--ad-ease-standard);
+}
+
+.adt-switch[aria-checked="true"] {
+  background: var(--ad-action-primary);
+}
+
+.adt-switch[aria-checked="true"]::after {
+  left: 27px;
+}
+
+.adt-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.adt-switch:focus-visible {
+  outline: none;
+  box-shadow: var(--ad-focus-ring);
+}
+
+/* ---------------------------------------------------- segmented control ---
+ * Forms/SegmentedControl: navy-400 track, radius-lg, 44px items, the selected
+ * one filled with the hot gradient. One of only three gradients in the product.
+ */
+.adt-segment {
   display: flex;
+  overflow: hidden;
+  background: var(--ad-navy-400);
+  border-radius: var(--ad-radius-lg);
+}
+
+.adt-segment-item {
+  display: inline-flex;
+  flex: 1;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  color: var(--adt-text);
-  background: none;
-  border: 0;
+  height: 44px;
+  font-size: var(--ad-text-md);
+  font-weight: var(--ad-weight-semibold);
+  color: var(--ad-text-primary);
   cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 120ms ease;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-lg);
+  transition: var(--ad-transition-interactive);
 }
 
-.adt-modal-close:hover { opacity: 1; }
+.adt-segment-item.is-active {
+  font-weight: var(--ad-weight-bold);
+  background: var(--ad-gradient-hot);
+}
+
+/* ------------------------------------------------------------- nav tabs ---
+ * Navigation/NavTabs: underline row for switching views inside a page. No pill
+ * background — the active tab is bold, full-contrast, with a 2px white rule.
+ */
+.adt-tabs {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  border-bottom: 1px solid var(--ad-border-subtle);
+}
+
+.adt-tab {
+  position: relative;
+  padding: 0 2px 10px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-base);
+  font-weight: var(--ad-weight-semibold);
+  color: var(--ad-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-tab:hover:not(.is-active) {
+  color: var(--ad-text-secondary);
+}
+
+.adt-tab.is-active {
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-text-primary);
+}
+
+.adt-tab.is-active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--ad-white);
+  border-radius: 2px;
+}
+
+/* ----------------------------------------------------------------- modal ---
+ * Overlay/Modal: surface-overlay panel, radius-xl, 24px padding, overlay
+ * shadow, scrim + 2px blur, close button inset 14px.
+ */
+.adt-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 674px;
+  max-height: 85vh;
+  padding: 24px;
+  overflow: hidden;
+  font-family: var(--ad-font-body);
+  color: var(--ad-text-primary);
+  background: var(--ad-surface-overlay);
+  border-radius: var(--ad-radius-xl);
+  box-shadow: var(--ad-shadow-overlay);
+  outline: none;
+}
 
 .adt-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / 60%);
+  background: var(--ad-scrim);
+  backdrop-filter: var(--ad-blur-overlay);
 }
 
-/* ------------------------------------------------------------ form fields ---
- * v2 field: a 12px-gap column; label is 14px/700 Manrope with leading 100%.
- */
-.adt-field { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
+.adt-modal-header {
+  margin-top: 14px;
+  margin-bottom: 18px;
+  padding-right: 28px;
+}
 
-.adt-field-label {
+.adt-modal-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  line-height: 100%;
-  color: var(--adt-text);
+  font-family: var(--ad-font-display);
+  font-size: var(--ad-text-2xl);
+  font-weight: var(--ad-weight-bold);
+  line-height: var(--ad-leading-tight);
+  color: var(--ad-text-primary);
+  text-transform: uppercase;
 }
 
-.adt-field-hint {
-  font-size: 0.875rem;
-  color: var(--adt-text-muted);
+.adt-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
-/* ------------------------------------------------------- segmented control ---
- * v2's own "toggle-group": a #001849 track with a 5% white wash, 4px padding
- * and a 12px radius; selected item is a magenta -> red gradient at 14px radius,
- * unselected transparent with #b8bcc5 text, both 700 weight.
- *
- * The extension's own toggles deliberately keep their neutral track and use
- * only the gradient (.adt-toggle-on) to mark the active choice — a full v2
- * segment made "Off" look like an alert. Kept here as the reference for any
- * control that should read as v2's own.
- */
-.adt-segment {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px;
-  background-color: var(--adt-segment-track);
-  background-image: linear-gradient(0deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 5%));
-  border-radius: 12px;
-}
-
-.adt-segment-item {
+/* Ghost icon button, per Core/IconButton. */
+.adt-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  height: 40px;
-  padding: 0 10px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--adt-segment-off-text);
+  width: 32px;
+  height: 32px;
+  color: var(--ad-text-primary);
+  cursor: pointer;
   background: transparent;
   border: 0;
-  border-radius: var(--adt-radius-xl);
-  cursor: pointer;
-  transition: color 120ms ease;
+  border-radius: var(--ad-radius-md);
+  transition: var(--ad-transition-interactive);
 }
 
-.adt-segment-item:hover:not(.is-active) { color: var(--adt-text); }
-
-.adt-segment-item.is-active {
-  color: #fff;
-  background-image: linear-gradient(
-    to right bottom,
-    var(--adt-segment-on-from) 0%,
-    var(--adt-segment-on-to) 100%
-  );
+.adt-modal-close:hover {
+  background: rgb(255 255 255 / 7%);
 }
 
-/* v2 popover surface — flatter and darker than a card, with a 1px edge. */
-.adt-popover {
-  color: var(--adt-text);
-  background: var(--adt-surface-raised);
-  border-radius: var(--adt-radius-lg);
-  box-shadow: 0 0 0 1px var(--adt-border);
-}
-
-/**
- * v2 dialog bodies are flat on the drawer surface — a dialog never sits a card
- * directly inside itself. Settings panels use .adt-container as their root, so
- * flatten only that DIRECT child. Cards nested deeper (the animation rows, for
- * instance) are real list items and keep their fill and padding — zeroing those
- * collapses their internal spacing and the labels collide with the controls.
- */
+/* A dialog never sits a card directly inside itself. */
 .adt-modal-body > .adt-container {
   padding: 0;
   background: none;
@@ -326,27 +264,70 @@ body {
   box-shadow: none;
 }
 
-/**
- * The single spot of colour in the settings UI: a feature being ON.
- * Uses v2's own selected-segment gradient so it reads as native.
+/* ---------------------------------------------------------------- fields ---
+ * Forms/TextField: 52px tall, radius-xl, chip fill on dark, focus ring.
  */
-.adt-toggle-on {
-  background-image: linear-gradient(
-    to right bottom,
-    var(--adt-segment-on-from) 0%,
-    var(--adt-segment-on-to) 100%
-  );
+.adt-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-/**
- * A feature that has not been ported to the rebuilt autodarts site yet.
- *
- * Cosmetic + inert: the card stays legible so its description is still useful,
- * but nothing inside it can be clicked. The card itself keeps pointer events so
- * the not-allowed cursor shows across the whole tile; only its children go
- * inert.
- *
- * Flip a feature back on by adding `v2Ready: true` to its entry in
+.adt-field-label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: var(--ad-text-base);
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-text-primary);
+}
+
+.adt-field-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: var(--ad-text-xs);
+  color: var(--ad-text-muted);
+}
+
+.adt-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-md);
+  font-weight: var(--ad-weight-medium);
+  color: var(--ad-text-primary);
+  background: var(--ad-surface-input);
+  border: 0;
+  border-radius: var(--ad-radius-xl);
+  outline: none;
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-input:focus,
+.adt-input:focus-within {
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-input:disabled {
+  color: var(--ad-text-disabled);
+  background: var(--ad-action-disabled);
+}
+
+/* -------------------------------------------------------------- popover ---*/
+.adt-popover {
+  color: var(--ad-text-primary);
+  background: var(--ad-surface-overlay);
+  border-radius: var(--ad-radius-lg);
+  box-shadow: var(--ad-shadow-popover);
+}
+
+/* --------------------------------------------------------- disabled tile ---
+ * A feature not yet ported to v2. Re-enable with `v2Ready: true` in
  * components/PageConfig.vue.
  */
 .adt-feature-disabled {
@@ -358,9 +339,8 @@ body {
   pointer-events: none;
 }
 
-/* No hover wash on something that cannot be interacted with. */
 .adt-feature-disabled.adt-interactive:hover {
-  background-image: none;
+  background: var(--ad-surface-card);
 }
 
 .adt-feature-disabled::after {
@@ -370,12 +350,12 @@ body {
   right: 0;
   z-index: 30;
   padding: 0.25rem 0.625rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: var(--ad-text-2xs);
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-text-primary);
   text-transform: uppercase;
-  color: var(--adt-text);
-  background: var(--adt-overlay-strong);
-  border-bottom-left-radius: var(--adt-radius-md);
+  letter-spacing: var(--ad-tracking-caps);
   pointer-events: none;
+  background: var(--ad-surface-chip-strong);
+  border-bottom-left-radius: var(--ad-radius-md);
 }
