@@ -341,8 +341,15 @@ const mounted = useMounted();
 const { confirmDialog, showConfirmDialog, confirmDialogConfirm, confirmDialogCancel } = useConfirmDialog();
 const { notification, showNotification, hideNotification } = useNotification();
 
+/**
+ * Return to whatever the user was looking at before opening the tools page.
+ *
+ * Exactly one history entry is added when the overlay opens (the pushState in
+ * v2-menu.ts), so exactly one step back undoes it. This used to step back twice
+ * because the old flow navigated to /settings first and then rewrote the URL,
+ * adding two entries — stepping twice now overshoots onto an unrelated page.
+ */
 function goBack() {
-  window.history.back();
   window.history.back();
 }
 

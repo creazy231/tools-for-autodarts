@@ -37,19 +37,30 @@ watch(currentUrl, async (newURL, oldURL) => {
   }
 });
 
+/**
+ * Hide the site's own content while the settings overlay is up.
+ *
+ * Restoring means putting back whatever `display` the element had, which is
+ * usually no inline style at all — v2's content container is a plain `block`
+ * and forcing `flex` on it silently changes the page layout after the overlay
+ * closes. The previous value is stashed on the element so an element that
+ * genuinely carried an inline display keeps it.
+ */
 watch(configVisible, async () => {
   const pageContentElement = await waitForElement(SELECTORS.app.contentRoot, 15000);
   const contentElements = Array.from(pageContentElement.children).filter(el => el.tagName !== "AUTODARTS-TOOLS-WXT") as HTMLElement[];
 
-  if (configVisible.value) {
-    contentElements.forEach((el) => {
+  contentElements.forEach((el) => {
+    if (configVisible.value) {
+      if (el.dataset.adtPrevDisplay === undefined) el.dataset.adtPrevDisplay = el.style.display;
       el.style.display = "none";
-    });
-  } else {
-    contentElements.forEach((el) => {
-      el.style.display = "flex";
-    });
-  }
+    } else {
+      const previous = el.dataset.adtPrevDisplay;
+      if (previous) el.style.display = previous;
+      else el.style.removeProperty("display");
+      delete el.dataset.adtPrevDisplay;
+    }
+  });
 });
 
 onMounted(async () => {
@@ -92,6 +103,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   observer.disconnect();
+  window.removeEventListener("popstate", syncUrl);
   teardownMenu?.();
 });
 
@@ -99,6 +111,19 @@ onBeforeUnmount(() => {
 function openTools() {
   configVisible.value = true;
   openToolsPage();
+  /**
+   * pushState fires no popstate and mutates no DOM, so nothing else would tell
+   * `currentUrl` that we are now on /tools. Leaving it stale breaks going back:
+   * the URL returns to the value the ref still holds, the watcher sees no
+   * change, and the overlay stays open over a hidden page.
+   */
+  syncUrl();
+}
+
+function syncUrl() {
+  if (window.location.href !== currentUrl.value) {
+    currentUrl.value = window.location.href;
+  }
 }
 
 function startObserver() {
@@ -109,14 +134,20 @@ function startObserver() {
   }
   observer = new MutationObserver((mutationsList) => {
     for (const mutation of mutationsList) {
-      if (mutation.type === "childList") {
-        if (window.location.href !== currentUrl.value) {
-          currentUrl.value = window.location.href;
-        }
-      }
+      if (mutation.type === "childList") syncUrl();
     }
   });
   observer.observe(targetNode, { childList: true, subtree: true });
+
+  /**
+   * Back/forward must be observed directly.
+   *
+   * The overlay opens by pushState without routing, so the page underneath
+   * never re-renders — and going back may not re-render it either. A DOM
+   * mutation is therefore not guaranteed, and without this the URL leaves
+   * /tools while the overlay stays open and the site's content stays hidden.
+   */
+  window.addEventListener("popstate", syncUrl);
 }
 
 </script>
