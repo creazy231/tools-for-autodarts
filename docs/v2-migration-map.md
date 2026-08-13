@@ -162,7 +162,11 @@ The table slots matter most: `[data-slot='table-row']` and
 3. `node scripts/inspect.mjs --url=<route>` to confirm the extension actually
    injected there, and see what it logged.
 4. Navigate to the screen the feature touches.
-5. Find the v2 anchor, preferring `data-slot` → semantic id → `aria-label` → text.
+5. Find the v2 anchor with the **DOM picker**: `Alt+Shift+P`, click the element
+   (`↑` to widen to the container you meant), `C` to copy. The report ranks
+   selector candidates by durability, lists the ancestors you can scope to, and
+   names the `file:line` of extension code already targeting it. Do the same on
+   v1 and hand both to Claude Code. See `scripts/README.md`.
 6. **Prepend** the v2 candidate to the entry in `utils/selectors.ts`; keep the v1
    candidate last so one build serves both sites.
 7. Replace the inline literal at the call site with the registry entry.

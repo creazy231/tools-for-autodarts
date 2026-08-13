@@ -1,4 +1,5 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
 import { URL, fileURLToPath } from "node:url";
 
 import { defineConfig } from "wxt";
@@ -55,6 +56,10 @@ export default defineConfig({
     ],
     permissions: [
       "storage",
+      // Lets the dev-only DOM picker write to the clipboard without a
+      // permission prompt. Harmless in production, where the picker is
+      // dead-code-eliminated.
+      "clipboardWrite",
       // "background",
     ],
     background: {
@@ -87,6 +92,47 @@ export default defineConfig({
   },
   dev: {
     reloadCommand: "Alt+T",
+  },
+  hooks: {
+    /**
+     * The DOM picker is a development tool. Its body is behind
+     * `import.meta.env.DEV` so Vite strips the logic from production, but WXT
+     * still emits the entrypoint and registers it — leaving ~14KB of inert
+     * boilerplate injected into every page load, and an oddly-named content
+     * script for store reviewers to wonder about. Drop it entirely instead.
+     *
+     * Keyed on the entrypoint name rather than an allow-list of the others, so
+     * adding a new entrypoint never silently excludes it.
+     */
+    "build:manifestGenerated": (wxt, manifest) => {
+      if (wxt.config.mode === "development") return;
+
+      // WXT groups content scripts that share the same matches + runAt into a
+      // single manifest entry, so the picker sits in the same entry as the real
+      // content scripts. Strip only its path — dropping the whole entry would
+      // silently unregister boards/content/lobby/lobbynew/match.
+      for (const cs of manifest.content_scripts ?? []) {
+        cs.js = cs.js?.filter(path => !path.includes("picker"));
+      }
+      manifest.content_scripts = manifest.content_scripts?.filter(cs => cs.js?.length);
+      if (!manifest.content_scripts?.length) delete manifest.content_scripts;
+    },
+    "build:done": (wxt, output) => {
+      if (wxt.config.mode === "development") return;
+      const isPicker = (name: string) => name.includes("picker");
+
+      // Drop the emitted file, and drop it from the build output too — WXT
+      // stats every listed chunk when printing the build summary, so deleting
+      // the file without this crashes the build with ENOENT.
+      for (const step of output.steps) {
+        for (const chunk of step.chunks.filter(c => isPicker(c.fileName))) {
+          rmSync(join(wxt.config.outDir, chunk.fileName), { force: true });
+        }
+        // `output` is only shallowly readonly, so a step's chunk list can still
+        // be replaced. Empty steps are harmless — the summary just skips them.
+        step.chunks = step.chunks.filter(c => !isPicker(c.fileName));
+      }
+    },
   },
   vite: () => ({
     server: {

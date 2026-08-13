@@ -71,6 +71,50 @@ Fallback for when you want the extension in a browser but aren't running
 A dedicated profile directory is required either way — Chrome 136+ refuses
 `--remote-debugging-port` on the default profile.
 
+### DOM picker — capture elements for a Claude Code session
+
+A dev-only element picker for driving v1 → v2 ports. Pick the element a feature
+touches on the old site, pick its counterpart on the new one, paste both into a
+Claude Code session, and ask for the port.
+
+With `yarn dev` running, on either site:
+
+| key | action |
+|---|---|
+| `Alt+Shift+P` | arm / disarm the picker |
+| click | capture the element under the cursor |
+| `↑` / `↓` | widen / narrow the last capture to a parent or child |
+| `C` | copy all captures to the clipboard as Markdown |
+| `R` | reset the captures |
+| `Esc` | disarm |
+
+Clicks are swallowed while armed, so the site never acts on them. `↑` matters
+more than it sounds: clicking an icon lands on a `<path>`, and one press widens
+to the button you actually meant.
+
+For each captured element the report carries:
+
+- **ranked selector candidates with live match counts**, ordered by *durability*
+  rather than uniqueness — a two-match `a[href="/statistics"]` beats a unique
+  `.chakra-stack > a:nth-of-type(6)`, because the chain breaks the moment a
+  sibling moves
+- attributes, text, box, and classes split into semantic / utility / **generated**
+  (Emotion `css-*`, React `:r0:`, Base UI `_r_*_` — never anchor on these)
+- the ancestor chain with each ancestor's stable anchors, for scoping
+- **which extension code already targets it**, as `file:line`, filtered so
+  generic selectors like `querySelector("button")` don't drown the useful ones
+
+That last section comes from `utils/selector-index.generated.ts`. Regenerate it
+after moving selectors around:
+
+```bash
+yarn picker:index
+```
+
+The picker is stripped from production entirely — its body is behind
+`import.meta.env.DEV`, and a `build:done` hook in `wxt.config.ts` drops the
+emitted file and unregisters it from the manifest, so nothing ships to users.
+
 ### Which build gets loaded
 
 `scripts/lib/extension.mjs` resolves this for every script: the **dev** build is

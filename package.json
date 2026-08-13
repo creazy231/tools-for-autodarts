@@ -17,6 +17,7 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "vue-tsc --noEmit",
+    "picker:index": "node scripts/build-selector-index.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {
