@@ -94,19 +94,24 @@
           <!-- Ko-fi Support Section -->
           <div class="adt-container space-y-4">
             <div class="flex items-center justify-between">
-              <h2 class="text-xl font-bold text-white">
+              <h2 class="adt-card-title">
                 Support the Project
               </h2>
-              <AppButton @click="toggleDangerZone" auto class="text-white/70 hover:text-white">
+              <AppButton @click="toggleDangerZone" type="ghost" auto>
                 <span class="icon-[pixelarticons--close]" />
               </AppButton>
             </div>
             <p class="text-white/70">
               Autodarts Tools is free and open source. If you enjoy using it, consider supporting the development to keep it going!
             </p>
+            <!--
+              The single action in this panel, so it takes the primary variant.
+              Green here was a status token doing an action's job — the system
+              keeps blue as the only accent.
+            -->
             <AppButton
               @click="openKofi"
-              type="success"
+              type="primary"
               auto
             >
               <span class="icon-[pixelarticons--heart] mr-2" />
@@ -115,36 +120,28 @@
           </div>
 
           <!-- Danger Zone -->
-          <div class="adt-container space-y-6">
-            <div class="flex items-center">
-              <h2 class="text-xl font-bold text-red-400">
-                Danger Zone
-              </h2>
-            </div>
-            <div class="space-y-4">
-              <p class="text-white/70">
-                These actions are destructive and cannot be undone. Please proceed with caution and may export your settings before proceeding.
-              </p>
-              <div class="rounded border border-red-500/30 bg-red-500/5 p-4">
-                <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                  <div>
-                    <h3 class="font-semibold text-red-300">
-                      Reset All Settings
-                    </h3>
-                    <p class="text-sm text-white/60">
-                      This will reset all settings to their default values. All your customizations will be lost.
-                    </p>
-                  </div>
-                  <AppButton
-                    @click="resetAllSettings"
-                    auto
-                    type="danger"
-                  >
-                    Reset All Settings
-                  </AppButton>
-                </div>
-              </div>
-            </div>
+          <div class="adt-container space-y-4">
+            <!-- `!` because .adt-card-title sets its own colour and, being
+                 plain CSS after @tailwind utilities, otherwise wins. -->
+            <h2 class="adt-card-title !text-[var(--ad-text-destructive)]">
+              Danger Zone
+            </h2>
+            <p class="text-white/70">
+              These actions are destructive and cannot be undone. Please proceed with caution and may export your settings before proceeding.
+            </p>
+            <AppAlert variant="error" title="Reset All Settings">
+              This will reset all settings to their default values. All your customizations will be lost.
+              <template #action>
+                <AppButton
+                  @click="resetAllSettings"
+                  size="sm"
+                  auto
+                  type="danger"
+                >
+                  Reset
+                </AppButton>
+              </template>
+            </AppAlert>
           </div>
         </div>
 
@@ -157,22 +154,15 @@
           >
 
             <!-- Warning message for sound and animation features -->
-            <div
+            <AppAlert
               v-if="featureGroups[activeTab].id==='sounds-animations'"
-              class="col-span-full rounded-md border border-yellow-500/50 bg-yellow-500/10 p-4 text-xs"
+              variant="warning"
+              title="Performance Warning"
+              class="col-span-full"
             >
-              <div class="flex items-start">
-                <div>
-                  <p class="font-medium text-yellow-400">
-                    Performance Warning
-                  </p>
-                  <p class="mt-1 text-white/70">
-                    Enabling the <b>Animations</b>, <b>Caller</b>, or <b>Sound FX</b> features may cause performance issues and may require decent hardware.
-                    If you experience any lags or errors, try disabling these features.
-                  </p>
-                </div>
-              </div>
-            </div>
+              Enabling the <b>Animations</b>, <b>Caller</b>, or <b>Sound FX</b> features may cause performance issues and may require decent hardware.
+              If you experience any lags or errors, try disabling these features.
+            </AppAlert>
 
             <!--
               Feature Cards.
@@ -244,6 +234,7 @@ import type { IConfig, ISound } from "@/utils/storage";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
+import AppAlert from "@/components/AppAlert.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import AppNotification from "@/components/AppNotification.vue";
 import SettingsModal from "@/components/SettingsModal.vue";

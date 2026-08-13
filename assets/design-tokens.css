@@ -110,6 +110,10 @@
   --ad-info: var(--ad-blue-400);
   --ad-plus: var(--ad-orange-500);
 
+  /* Alerts: the tone over the card fill, ringed with the same tone. */
+  --ad-alert-fill-alpha: 14%;
+  --ad-alert-border-alpha: 30%;
+
   /* --------------------------------------------------------------- radius --*/
   --ad-radius-xs: 4px;
   --ad-radius-sm: 8px;

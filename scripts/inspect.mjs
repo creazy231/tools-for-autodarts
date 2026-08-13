@@ -96,14 +96,26 @@ if (await isCdpOpen(CDP_PORT)) {
   ctx = await chromium.launchPersistentContext(PROFILE, {
     headless: false, // MV3 extensions require a headed browser
     viewport: null,
+    // Playwright's default args include --disable-extensions, which installs
+    // an extension quite happily and then never runs it: no content script, no
+    // error, nothing to see. Drop it.
+    ignoreDefaultArgs: [ "--disable-extensions" ],
     args: [
-      `--disable-extensions-except=${ext.dir}`,
-      `--load-extension=${ext.dir}`,
       `--remote-debugging-port=${CDP_PORT}`,
       "--no-first-run",
       "--no-default-browser-check",
     ],
   });
+
+  // Chrome 137+ ignores --load-extension (see the note in
+  // load-reference-extension.mjs), so install over CDP instead. It is a
+  // browser-level command — a page session rejects it.
+  const cdp = await chromium.connectOverCDP(`http://127.0.0.1:${CDP_PORT}`);
+  try {
+    await (await cdp.newBrowserCDPSession()).send("Extensions.loadUnpacked", { path: ext.dir });
+  } finally {
+    await cdp.close(); // closes this connection, not the browser
+  }
 }
 
 const page = ctx.pages()[0] ?? await ctx.newPage();

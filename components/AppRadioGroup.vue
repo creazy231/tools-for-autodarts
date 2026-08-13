@@ -1,30 +1,21 @@
 <template>
   <!--
-    Neutral track as before; the selected option carries the colour. Same rule
-    as AppToggle — colour marks the active choice and nothing else.
+    Design system › Forms › SegmentedControl — the same control as AppToggle,
+    for an exclusive 2–3 way choice. The selected option carries the hot
+    gradient; the track is navy-400.
   -->
   <div
-    :class="twMerge(
-      'relative flex overflow-hidden rounded-md bg-[var(--adt-overlay)]',
-      vertical ? 'flex-col' : 'flex-row',
-      className,
-    )"
+    :class="[ 'adt-segment', sizeClass, { 'is-vertical': vertical }, className ]"
+    role="group"
   >
     <button
       @click="!option.disabled && selectOption(option.value)"
       v-for="(option, index) in options"
       :key="index"
+      :class="[ 'adt-segment-item', { 'is-active': modelValue === option.value } ]"
       :disabled="option.disabled"
-      :class="twMerge(
-        'flex h-10 items-center justify-center whitespace-nowrap px-4 font-semibold transition-colors',
-        buttonSize === 'sm' ? 'h-8 px-3 text-sm' : buttonSize === 'lg' ? 'h-12 px-5' : 'h-10 px-4',
-        modelValue === option.value
-          ? 'adt-toggle-on text-white'
-          : 'text-[var(--adt-text)] enabled:hover:bg-[var(--adt-overlay)]',
-        option.disabled ? 'cursor-not-allowed opacity-50' : '',
-      )"
-      type="button"
       :aria-pressed="modelValue === option.value"
+      type="button"
     >
       {{ option.label }}
     </button>
@@ -32,8 +23,6 @@
 </template>
 
 <script setup lang="ts">
-import { twMerge } from "tailwind-merge";
-
 interface RadioOption {
   label?: string;
   value: string | number | boolean;
@@ -54,6 +43,9 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits([ "update:modelValue" ]);
+
+/** md is the spec's 44px. */
+const sizeClass = computed(() => (props.buttonSize === "md" ? "" : `is-${props.buttonSize}`));
 
 function selectOption(value: string | number | boolean) {
   emit("update:modelValue", value);

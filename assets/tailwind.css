@@ -74,75 +74,52 @@ body {
   text-transform: uppercase;
 }
 
-/* ---------------------------------------------------------------- switch ---
- * Forms/Switch: 48x24 track, 18px thumb inset 3px, blue when on,
- * --ad-surface-chip-strong when off, full radius, sliding thumb.
- */
-.adt-switch {
-  position: relative;
-  display: inline-block;
-  flex: none;
-  width: 48px;
-  height: 24px;
-  padding: 0;
-  cursor: pointer;
-  background: var(--ad-surface-chip-strong);
-  border: 0;
-  border-radius: var(--ad-radius-full);
-  transition: background-color var(--ad-duration-base) var(--ad-ease-standard);
-}
-
-.adt-switch::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  background: var(--ad-white);
-  border-radius: var(--ad-radius-full);
-  transition: left var(--ad-duration-base) var(--ad-ease-standard);
-}
-
-.adt-switch[aria-checked="true"] {
-  background: var(--ad-action-primary);
-}
-
-.adt-switch[aria-checked="true"]::after {
-  left: 27px;
-}
-
-.adt-switch:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.adt-switch:focus-visible {
-  outline: none;
-  box-shadow: var(--ad-focus-ring);
-}
-
 /* ---------------------------------------------------- segmented control ---
- * Forms/SegmentedControl: navy-400 track, radius-lg, 44px items, the selected
- * one filled with the hot gradient. One of only three gradients in the product.
+ * Forms/SegmentedControl, as shown in the Overlay card: navy-400 track,
+ * radius-lg, 44px items, the selected one filled with the hot gradient. One of
+ * only three gradients in the product.
+ *
+ * This is the product's on/off control — a switch was tried and rejected.
+ *
+ * `position: relative` is load-bearing: feature cards lay an absolutely
+ * positioned click-catcher over the card to open the settings modal, and an
+ * unpositioned control of any real width would end up underneath it.
  */
 .adt-segment {
-  display: flex;
+  position: relative;
+  display: inline-flex;
   overflow: hidden;
   background: var(--ad-navy-400);
   border-radius: var(--ad-radius-lg);
 }
 
+/* Spans its column — the system's default inside a modal or a form. */
+.adt-segment.is-fill {
+  display: flex;
+  width: 100%;
+}
+
+.adt-segment.is-fill > .adt-segment-item {
+  flex: 1;
+}
+
+.adt-segment.is-vertical {
+  flex-direction: column;
+}
+
 .adt-segment-item {
   display: inline-flex;
-  flex: 1;
+  flex: none;
   gap: 8px;
   align-items: center;
   justify-content: center;
   height: 44px;
+  padding: 0 18px;
+  font-family: var(--ad-font-body);
   font-size: var(--ad-text-md);
   font-weight: var(--ad-weight-semibold);
   color: var(--ad-text-primary);
+  white-space: nowrap;
   cursor: pointer;
   background: transparent;
   border: 0;
@@ -150,9 +127,52 @@ body {
   transition: var(--ad-transition-interactive);
 }
 
+.adt-segment-item:enabled:hover:not(.is-active, .is-resting) {
+  background: rgb(255 255 255 / 6%);
+}
+
 .adt-segment-item.is-active {
   font-weight: var(--ad-weight-bold);
   background: var(--ad-gradient-hot);
+}
+
+/**
+ * A selected segment that must not read as an alert.
+ *
+ * "Off" on a feature toggle is the resting state, not a warning, so it takes a
+ * neutral fill. Colour in this UI means one thing: the feature is ON.
+ */
+.adt-segment-item.is-resting {
+  font-weight: var(--ad-weight-bold);
+  background: var(--ad-surface-chip-strong);
+}
+
+.adt-segment-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.adt-segment-item:focus-visible {
+  outline: none;
+  box-shadow: inset var(--ad-focus-ring);
+}
+
+/* Denser rows; 44px is the spec height. */
+.adt-segment.is-sm > .adt-segment-item {
+  height: 36px;
+  padding: 0 14px;
+  font-size: var(--ad-text-base);
+}
+
+.adt-segment.is-xs > .adt-segment-item {
+  height: 30px;
+  padding: 0 12px;
+  font-size: var(--ad-text-sm);
+}
+
+.adt-segment.is-lg > .adt-segment-item {
+  height: 48px;
+  padding: 0 22px;
 }
 
 /* ------------------------------------------------------------- nav tabs ---
@@ -395,6 +415,100 @@ body {
 .adt-badge-neutral {
   color: var(--ad-text-secondary);
   background: var(--ad-surface-chip-strong);
+}
+
+/* ---------------------------------------------------------------- alerts ---
+ * Feedback/Alert: the four semantic tones, each filled with its own colour at
+ * 14% over the card surface plus a 1px ring of the same colour at 30%.
+ *
+ * "Body copy stays neutral — the colour is carried by the icon, fill and ring,
+ * never by the text." Nothing in this product floats or auto-dismisses, so an
+ * alert sits in the flow, above the thing it concerns.
+ */
+.adt-alert {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  font-family: var(--ad-font-body);
+  background: color-mix(in srgb, var(--adt-alert-tone) var(--ad-alert-fill-alpha), var(--ad-surface-card));
+  border-radius: var(--ad-radius-lg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--adt-alert-tone) var(--ad-alert-border-alpha), transparent);
+}
+
+.adt-alert-success {
+  --adt-alert-tone: var(--ad-success-text);
+}
+
+.adt-alert-error {
+  --adt-alert-tone: var(--ad-rose-500);
+}
+
+.adt-alert-warning {
+  --adt-alert-tone: var(--ad-warning);
+}
+
+.adt-alert-info {
+  --adt-alert-tone: var(--ad-info);
+}
+
+/* Single line, no title — status inside a card, a form or a settings row. */
+.adt-alert.is-compact,
+.adt-alert.is-untitled {
+  align-items: center;
+}
+
+.adt-alert.is-compact {
+  padding: 10px 12px;
+}
+
+.adt-alert-icon {
+  flex: none;
+  margin-top: 1px;
+  font-size: 15px;
+  color: var(--adt-alert-tone);
+}
+
+.adt-alert.is-compact > .adt-alert-icon,
+.adt-alert.is-untitled > .adt-alert-icon {
+  margin-top: 0;
+}
+
+.adt-alert.is-compact > .adt-alert-icon {
+  font-size: 13px;
+}
+
+.adt-alert-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.adt-alert-title {
+  font-size: var(--ad-text-md);
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-text-primary);
+}
+
+.adt-alert-text {
+  font-size: var(--ad-text-base);
+  font-weight: var(--ad-weight-medium);
+  line-height: var(--ad-leading-normal);
+  color: var(--ad-text-muted);
+}
+
+/* Without a title the body carries the message, so it takes full contrast. */
+.adt-alert.is-untitled .adt-alert-text {
+  color: var(--ad-text-primary);
+}
+
+.adt-alert-action {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
 }
 
 /* --------------------------------------------------------- disabled tile ---
