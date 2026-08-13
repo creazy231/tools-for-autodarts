@@ -364,13 +364,15 @@ body {
 }
 
 /* ---------------------------------------------------------------- badges ---
- * Geometry from Core/Badge: a full-radius pill, bold, tight.
+ * Core/Badge, `soft` variant — the game-mode look: "hue text on the same hue
+ * at 22%", in a full-radius pill.
+ *
+ * Geometry is the spec's `sm` (20px / 0 8px / 11px), not `md`: these sit inline
+ * in a 22px display heading, where the 26px pill overshoots the cap height.
  */
 .adt-badge {
-  position: relative;
-  /* Own stacking context, so the ::before fill layer sits behind the badge's
-     own text rather than behind the whole card. */
-  isolation: isolate;
+  --adt-badge-tone: var(--ad-ink-400);
+
   display: inline-flex;
   flex: none;
   gap: 5px;
@@ -381,40 +383,14 @@ body {
   font-size: var(--ad-text-2xs);
   font-weight: var(--ad-weight-bold);
   line-height: 1;
+  color: var(--adt-badge-tone);
   white-space: nowrap;
+  background: color-mix(in srgb, var(--adt-badge-tone) var(--ad-badge-fill-alpha), transparent);
   border-radius: var(--ad-radius-full);
 }
 
-/**
- * "Plus Only" treatment, from Core/Button's plusOutline variant: a dark fill,
- * a gold hairline, and gradient-clipped text.
- *
- * The fill and ring live on ::before because the element itself is spending its
- * background on `background-clip: text` for the gradient lettering — one box
- * cannot carry both. The design system solves the same problem by nesting a
- * span; a pseudo-element keeps the markup a single tag.
- */
-.adt-badge-plus {
-  color: transparent;
-  background: var(--ad-gradient-plus-text);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.adt-badge-plus::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: rgb(0 4 10 / 72%);
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgb(226 146 44 / 55%);
-}
-
-/** Same pill, neutral tone — for status that is not an Autodarts+ marker. */
-.adt-badge-neutral {
-  color: var(--ad-text-secondary);
-  background: var(--ad-surface-chip-strong);
+.adt-badge-practice {
+  --adt-badge-tone: var(--ad-cat-practice);
 }
 
 /* ---------------------------------------------------------------- alerts ---

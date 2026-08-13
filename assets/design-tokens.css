@@ -114,6 +114,21 @@
   --ad-alert-fill-alpha: 14%;
   --ad-alert-border-alpha: 30%;
 
+  /**
+   * Game-mode category accents — badge text colour, with the fill the same
+   * hue at 22%. "X01 green, Cricket blue, Practice orange, Party lime,
+   * Autodarts+ amber."
+   *
+   * The system declares the alpha unitless (`.22`); color-mix() needs a
+   * percentage, so it is written as one here.
+   */
+  --ad-cat-x01: var(--ad-green-600);
+  --ad-cat-cricket: var(--ad-blue-400);
+  --ad-cat-practice: var(--ad-orange-500);
+  --ad-cat-party: var(--ad-lime-400);
+  --ad-cat-plus: var(--ad-amber-500);
+  --ad-badge-fill-alpha: 22%;
+
   /* --------------------------------------------------------------- radius --*/
   --ad-radius-xs: 4px;
   --ad-radius-sm: 8px;
