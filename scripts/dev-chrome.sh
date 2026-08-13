@@ -44,12 +44,37 @@ if [[ ! -x "$CHROME" ]]; then
 fi
 
 # Prefer the dev build (hot reload); fall back to a production build.
-if   [[ -d "$ROOT/.output/chrome-mv3-dev" ]]; then EXT="$ROOT/.output/chrome-mv3-dev"; BUILD="dev (hot reload)"
+if   [[ -d "$ROOT/.output/chrome-mv3-dev" ]]; then EXT="$ROOT/.output/chrome-mv3-dev"; BUILD="dev"
 elif [[ -d "$ROOT/.output/chrome-mv3"     ]]; then EXT="$ROOT/.output/chrome-mv3";     BUILD="production"
 else
   echo "No extension build found in .output/"
   echo "Run 'yarn dev' (or 'yarn build') first, then re-run this script."
   exit 1
+fi
+
+# A build is an artifact and can lag the source. One made before play-v2 was
+# added to the manifest will silently not load on v2 at all — no error, the
+# extension simply isn't there. Catch that here rather than during debugging.
+if ! grep -q 'play-v2' "$EXT/manifest.json" 2>/dev/null; then
+  echo "!  The $BUILD build is STALE — its manifest has no play-v2 host."
+  echo "   The extension will silently NOT load on play-v2.autodarts.com."
+  if [[ "$BUILD" == "dev" ]]; then
+    echo "   Restart 'yarn dev' to rebuild it, then re-run this script."
+  else
+    echo "   Run 'yarn build' to rebuild it, then re-run this script."
+  fi
+  [[ "$URL" == "$URL_V2" ]] && exit 1
+  echo "   Continuing anyway because you asked for v1."
+  echo
+fi
+
+# Hot reload needs the WXT dev server; the dev build alone is not enough.
+if [[ "$BUILD" == "dev" ]]; then
+  if lsof -nP -iTCP:3000 -sTCP:LISTEN >/dev/null 2>&1; then
+    BUILD="dev (hot reload active)"
+  else
+    BUILD="dev (dev server DOWN — no hot reload; run 'yarn dev')"
+  fi
 fi
 
 if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then

@@ -20,22 +20,66 @@ AUTODARTS_V2_URL=https://play-v2.autodarts.com
 
 Login is email + password. Do **not** use the Google/Apple buttons on v2.
 
-### `dev-chrome.sh` — interactive debugging browser
+### `yarn dev` — the browser to use for migration work
 
-Launches a **visible** Chrome with the extension loaded and a CDP endpoint on
-port 9222, which both MCP servers in `.mcp.json` attach to. You can watch every
-action and take over the browser at any time.
+`yarn dev` is the primary entry point. It builds to `.output/chrome-mv3-dev`,
+serves hot reload on `:3000`, and opens a **visible** Chrome with that dev build
+already loaded. Via `webExt` in `wxt.config.ts` it also:
+
+- keeps its profile in `.chrome-profile-dev/`, so the autodarts login survives
+  dev-server restarts, and
+- exposes **CDP on `:9222`**, so Playwright and both MCP servers in `.mcp.json`
+  drive *this* browser — the one your edits hot-reload into.
+
+That last point is the whole trick. Debugging a browser running a different copy
+of the extension than the one you're editing wastes a lot of time.
+
+It opens v2 and v1 side by side. Note `yarn dev` needs a real terminal: it waits
+on stdin for its "press o + enter" prompt and exits immediately without a TTY.
+
+### `inspect.mjs` — drive the site with the extension loaded
+
+Reports whether the extension actually injected, and what it logged.
 
 ```bash
-yarn dev                    # terminal 1 — builds + hot-reloads the extension
-./scripts/dev-chrome.sh     # terminal 2 — opens v2
+node scripts/inspect.mjs                      # v2 home
+node scripts/inspect.mjs --url=/tournaments
+node scripts/inspect.mjs --v1
+node scripts/inspect.mjs --keep-open          # leave the browser up on :9222
+node scripts/inspect.mjs --prod               # packaged build instead of dev
+```
+
+If a browser is already serving CDP on `:9222` (i.e. `yarn dev`'s), it **attaches
+to that one** instead of starting a second browser. Otherwise it launches its own
+with the dev build, using the `.chrome-profile-pw/` profile.
+
+It refuses to start against v2 with a build whose manifest lacks the `play-v2`
+host, because the extension would silently not load and everything you observed
+would be the bare site.
+
+### `dev-chrome.sh` — browser without the dev server
+
+Fallback for when you want the extension in a browser but aren't running
+`yarn dev` (no hot reload). Same CDP endpoint, profile in `.chrome-profile/`.
+
+```bash
+./scripts/dev-chrome.sh           # v2
 ./scripts/dev-chrome.sh --v1
 ./scripts/dev-chrome.sh --clean   # wipe the saved profile
 ```
 
-The profile lives in `.chrome-profile/` (gitignored), so you log in once and the
-session persists. A dedicated profile directory is required — Chrome 136+
-refuses `--remote-debugging-port` on the default profile.
+A dedicated profile directory is required either way — Chrome 136+ refuses
+`--remote-debugging-port` on the default profile.
+
+### Which build gets loaded
+
+`scripts/lib/extension.mjs` resolves this for every script: the **dev** build is
+preferred, production is the fallback. It also checks two things that otherwise
+cost real debugging time:
+
+- **Is the dev server up?** The dev build loads without it but won't hot-reload.
+- **Is the build stale?** A build made before `play-v2` was added to the manifest
+  silently does not load on v2 at all. `dev-chrome.sh` performs the same check.
 
 ### `capture-dom.mjs` — DOM baseline capture
 

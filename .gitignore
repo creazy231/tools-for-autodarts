@@ -32,8 +32,11 @@ web-ext.config.ts
 # Deliberately NOT a .env file so WXT/Vite never loads it into a build.
 .secrets/
 
-# Chrome profile used by scripts/dev-chrome.sh (contains a logged-in session)
-.chrome-profile/
+# Chrome profiles holding a logged-in autodarts session:
+#   .chrome-profile      scripts/dev-chrome.sh
+#   .chrome-profile-dev  `yarn dev` (see webExt.chromiumProfile in wxt.config.ts)
+#   .chrome-profile-pw   scripts/inspect.mjs
+.chrome-profile*/
 
 # DOM snapshots: the .html and .probe.json files ARE committed (they are the
 # migration baseline and v1 is not recapturable once retired). The screenshots

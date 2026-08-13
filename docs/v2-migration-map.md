@@ -49,7 +49,15 @@ Route detection is currently hardcoded across entrypoints and all of it assumes 
 - `entrypoints/boards.content/index.ts` — `url.endsWith("/boards")`
 - `entrypoints/content/index.ts` — `/tools`, `/settings`
 - `utils/websocket-helpers.ts` — `/lobbies\/(id)/`, `/matches\/(id)/`, `/boards\/(id)/`
-- `wxt.config.ts` — `matches: ["*://play.autodarts.com/*"]` does **not** cover `play-v2`
+- `wxt.config.ts` — `matches: ["*://play.autodarts.com/*"]` did **not** cover
+  `play-v2` (fixed; the extension now loads there)
+
+Confirmed empirically with `node scripts/inspect.mjs`: on v2 the content scripts
+**do** run — the extension's own console logging fires — but nothing mounts. The
+logs are all teardown (`Clearing match`, `Restoring menu in match`,
+`Cleaning up automatic fullscreen`), i.e. the route-gated mount logic never
+matches, so every feature immediately tears itself down. Route detection is
+therefore the first thing to fix, before any selector work.
 
 ## 3. Design tokens — the silent breakage
 
@@ -146,9 +154,13 @@ The table slots matter most: `[data-slot='table-row']` and
 
 ## 7. How to migrate a feature
 
-1. `yarn dev` in one terminal.
-2. `./scripts/dev-chrome.sh` — visible Chrome, extension loaded, CDP on 9222.
-3. Log in once; the profile persists in `.chrome-profile/`.
+1. `yarn dev` — builds the dev extension, serves hot reload on `:3000`, and
+   opens Chrome with that build loaded and CDP on `:9222`. Playwright and the
+   MCP servers attach to this same browser, so what you debug is what your
+   edits hot-reload into.
+2. Log in once; the profile persists in `.chrome-profile-dev/`.
+3. `node scripts/inspect.mjs --url=<route>` to confirm the extension actually
+   injected there, and see what it logged.
 4. Navigate to the screen the feature touches.
 5. Find the v2 anchor, preferring `data-slot` → semantic id → `aria-label` → text.
 6. **Prepend** the v2 candidate to the entry in `utils/selectors.ts`; keep the v1
