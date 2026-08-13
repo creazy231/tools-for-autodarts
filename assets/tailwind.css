@@ -337,3 +337,45 @@ body {
     var(--adt-segment-on-to) 100%
   );
 }
+
+/**
+ * A feature that has not been ported to the rebuilt autodarts site yet.
+ *
+ * Cosmetic + inert: the card stays legible so its description is still useful,
+ * but nothing inside it can be clicked. The card itself keeps pointer events so
+ * the not-allowed cursor shows across the whole tile; only its children go
+ * inert.
+ *
+ * Flip a feature back on by adding `v2Ready: true` to its entry in
+ * components/PageConfig.vue.
+ */
+.adt-feature-disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.adt-feature-disabled > * {
+  pointer-events: none;
+}
+
+/* No hover wash on something that cannot be interacted with. */
+.adt-feature-disabled.adt-interactive:hover {
+  background-image: none;
+}
+
+.adt-feature-disabled::after {
+  content: "Not yet available on v2";
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 30;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--adt-text);
+  background: var(--adt-overlay-strong);
+  border-bottom-left-radius: var(--adt-radius-md);
+  pointer-events: none;
+}

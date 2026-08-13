@@ -174,16 +174,28 @@
               </div>
             </div>
 
-            <!-- Feature Cards -->
-            <component
+            <!--
+              Feature Cards.
+
+              The disabled state lives on this wrapper rather than on the
+              component: several settings components have two root templates
+              (panel / card), which makes them multi-root, and Vue does not
+              apply fallthrough attributes to those — the class silently landed
+              on only the single-root ones.
+            -->
+            <div
               v-for="(feature, idx) in featureGroups[activeTab].features"
-              :is="feature.component"
               :key="feature.id"
-              :data-feature-index="idx + 1"
-              @setting-change="updateConfig"
-              @toggle="handleToggle(feature)"
-              class="feature-card"
-            />
+              :class="[ 'relative', { 'adt-feature-disabled': !feature.v2Ready } ]"
+            >
+              <component
+                :is="feature.component"
+                :data-feature-index="idx + 1"
+                @setting-change="updateConfig"
+                @toggle="handleToggle(feature)"
+                class="feature-card"
+              />
+            </div>
           </div>
         </template>
       </div>
@@ -192,6 +204,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Component } from "vue";
 import { useDebounceFn, useStorage } from "@vueuse/core";
 
 import DiscordWebhooks from "./Settings/DiscordWebhooks.vue";
@@ -239,7 +252,34 @@ import { useNotification } from "@/composables/useNotification";
 import AppTabs from "@/components/AppTabs.vue";
 
 // Define feature groups with titles for modals
-const featureGroups = [
+interface Feature {
+  id: string;
+  title: string;
+  component: Component;
+  hasSettings: boolean;
+  /** Ported to the rebuilt site. Absent means "not yet" — the card renders inert. */
+  v2Ready?: boolean;
+}
+
+interface FeatureGroup {
+  id: string;
+  tab: number;
+  features: Feature[];
+  settingIds: string[];
+}
+
+/**
+ * Feature registry.
+ *
+ * `v2Ready` opts a feature back in after it has been ported to the rebuilt
+ * autodarts site. Anything without it renders dimmed, with a not-allowed
+ * cursor and no interaction — its selectors still target the old DOM, so
+ * switching it on would only fail silently.
+ *
+ * Porting checklist: move its selectors into utils/selectors.ts, verify against
+ * live v2, then add `v2Ready: true` here.
+ */
+const featureGroups: FeatureGroup[] = [
   // Lobbies (Tab 0)
   {
     id: "lobbies",
@@ -367,6 +407,10 @@ watch(config, async () => {
 }, { deep: true });
 
 function handleToggle(feature) {
+  // Features not yet ported to v2 are inert — their selectors still target the
+  // old site, so letting them be switched on would just fail silently.
+  if (!feature.v2Ready) return;
+
   if (feature.hasSettings) {
     openSettingsModal(feature.id);
   }
