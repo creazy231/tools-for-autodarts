@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added a "Tools for Autodarts" entry to the user drawer on the rebuilt site, below "Legal", opening the settings page at `/tools`
 - Added a DOM element picker for development, used to drive the port to the rebuilt autodarts site
   - `Alt+Shift+P` arms it; hover an element, `↑`/`↓` walk up and down the tree without needing to click, `E` or a click captures, `C` copies every capture to the clipboard as Markdown
   - The report ranks selector candidates by durability rather than uniqueness, splits classes into semantic/utility/generated, lists each ancestor's stable anchors, and names the `file:line` of extension code already targeting the element
   - Ships only in `yarn build:devtools`, a production build for local installation. `yarn build` — what CI publishes — strips the picker and does not request the `clipboardWrite` permission
 - Added `play-v2.autodarts.com` to the host permissions, so the extension loads on the rebuilt site
+
+### Changed
+- Restyled the settings page to the Autodarts design system, so it reads as part of the rebuilt site rather than a panel bolted onto it
+  - Cards, headings, tabs, modals and inputs follow the system's surfaces, radii and type scale, using the fonts the live site actually ships (Bebas Neue / Manrope)
+  - Feature on/off and the settings segmented controls use the system's SegmentedControl; colour still marks one thing only — the feature is ON
+  - Inline warnings use the system's Alert; the BETA markers use its Badge
+- Every feature is temporarily disabled while the port to the rebuilt site proceeds — they are re-enabled one at a time as each is ported
 
 ### Fixed
 - Fixed the Streaming Mode footer still reading "Game provided by Autodarts.io" after the domain migration
