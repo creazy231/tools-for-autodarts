@@ -1,5 +1,4 @@
 import "~/assets/tailwind.css";
-import { createApp } from "vue";
 
 import { soundFx, soundFxOnRemove } from "../match.content/sound-fx";
 import { wledFx, wledFxOnRemove } from "../match.content/wled";
@@ -16,14 +15,12 @@ import {
 } from "@/utils/storage";
 import { discordWebhooks, onRemove as onDiscordWebhooksRemove } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
-import { onRemove as onShufflePlayersRemove, shufflePlayers } from "@/entrypoints/lobby.content/shuffle-players";
 import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobbynew.content/qr-code";
-import RecentLocalPlayers from "@/entrypoints/lobby.content/RecentLocalPlayers.vue";
+import { onRemove as onRecentLocalPlayersRemove, recentLocalPlayers } from "@/entrypoints/lobby.content/recent-local-players";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
-let recentLocalPlayersUI: any;
 let lobbyReadyUnwatch: any;
 
 /** The rebuilt site's lobby route. v1's `/lobbies/<id>` is gone. */
@@ -40,7 +37,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set
  * the flag there as each feature is ported.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -102,17 +99,12 @@ export default defineContentScript({
           await initScript(() => autoStart(ctx), url).catch(console.error);
         }
 
-        if (isOn(config, "shufflePlayers")) {
-          await initScript(shufflePlayers, url).catch(console.error);
-        }
-
         if (isOn(config, "qrCode")) {
           await initScript(qrCode, url).catch(console.error);
         }
 
         if (isOn(config, "recentLocalPlayers")) {
-          const div = document.querySelector("autodarts-tools-recent-local-players");
-          if (!div) initRecentLocalPlayers(ctx).catch(console.error);
+          await initScript(() => recentLocalPlayers(ctx), url).catch(console.error);
         }
 
         if (isOn(config, "teamLobby")) {
@@ -139,8 +131,8 @@ export default defineContentScript({
       } else {
         await onDiscordWebhooksRemove();
         await onAutoStartRemove();
-        await onShufflePlayersRemove();
         await onQrCodeRemove();
+        await onRecentLocalPlayersRemove();
         await soundFxOnRemove();
         await wledFxOnRemove();
       }
@@ -151,27 +143,4 @@ export default defineContentScript({
 async function initScript(fn: any, url: string) {
   if (window.location.href !== url) return;
   await fn();
-}
-
-async function initRecentLocalPlayers(ctx: any) {
-  const lobbyUserInputParent = (await waitForElement("input[placeholder=\"Enter name for local player\"]"))?.parentElement;
-  if (!lobbyUserInputParent) return;
-
-  recentLocalPlayersUI = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-recent-local-players",
-    position: "inline",
-    anchor: lobbyUserInputParent.parentElement,
-    onMount: (container: any) => {
-      const app = createApp(RecentLocalPlayers);
-      app.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
-      return app;
-    },
-    onRemove: (app: any) => {
-      app?.unmount();
-    },
-  });
-  recentLocalPlayersUI.mount();
 }

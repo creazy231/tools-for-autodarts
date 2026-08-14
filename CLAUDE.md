@@ -31,7 +31,7 @@ WXT uses file-based routing for extension entry points:
 - **`background.ts`** — Service worker handling CORS-bypassing fetch relay and chunked downloads for content scripts
 - **`content/`** — Settings popup UI (main extension settings page)
 - **`match.content/`** — Match page enhancements (20+ features: Zoom, Takeout, QuickCorrection, Animations, etc.)
-- **`lobby.content/`** — Lobby features (AutoStart, Discord webhooks, ShufflePlayers, RecentLocalPlayers)
+- **`lobby.content/`** — Lobby features (AutoStart, Discord webhooks, RecentLocalPlayers)
 - **`lobbynew.content/`** — New lobby UI features (QR codes)
 - **`boards.content/`** — External boards support
 - **`websocket-monitor.content.ts`** — WebSocket connection monitoring

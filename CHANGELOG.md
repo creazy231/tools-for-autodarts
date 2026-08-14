@@ -12,7 +12,15 @@ All notable changes to this project will be documented in this file.
   - Ships only in `yarn build:devtools`, a production build for local installation. `yarn build` — what CI publishes — strips the picker and does not request the `clipboardWrite` permission
 - Added `play-v2.autodarts.com` to the host permissions, so the extension loads on the rebuilt site
 
+### Removed
+- Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
+
 ### Changed
+- Ported Recent Local Players to the rebuilt site, and it now does considerably more
+  - The rebuilt site keeps its guest players in `localStorage`, capped at six, and rewrites the whole list on every add — enter a seventh name and the oldest is gone with no other copy of it anywhere
+  - Saved names now appear as a **Saved players** strip under the lobby's player list; one click adds a player, using the same request the site's own dialog makes
+  - The full list is written back into the site's own store, so its *Add Player* dialog offers everything instead of the last six
+  - Replaces the old approach of hiding the site's recent-players row and rendering a copy of it beside a text field the rebuilt lobby no longer has
 - Ported Auto Start to the rebuilt site
   - Arming it is now a proper **Autostart On / Autostart Off** toggle beside the lobby's *Start Game* button, in the same style as the settings page, replacing the cloned button that flipped between green and red
   - A player leaving inside the 3-second grace period now cancels the start instead of letting it fire on an empty lobby

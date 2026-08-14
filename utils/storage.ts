@@ -59,9 +59,6 @@ export interface IConfig {
   smallerScores: {
     enabled: boolean;
   };
-  shufflePlayers: {
-    enabled: boolean;
-  };
   sounds: {
     enabled: boolean;
   };
@@ -399,9 +396,6 @@ export const defaultConfig: IConfig = {
     enabled: false,
   },
   smallerScores: {
-    enabled: false,
-  },
-  shufflePlayers: {
     enabled: false,
   },
   caller: {

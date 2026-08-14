@@ -200,7 +200,6 @@ import { useDebounceFn, useStorage } from "@vueuse/core";
 import DiscordWebhooks from "./Settings/DiscordWebhooks.vue";
 import AutoStart from "./Settings/AutoStart.vue";
 import RecentLocalPlayers from "./Settings/RecentLocalPlayers.vue";
-import ShufflePlayers from "./Settings/ShufflePlayers.vue";
 import TeamLobby from "./Settings/TeamLobby.vue";
 import QrCode from "./Settings/QrCode.vue";
 import Colors from "./Settings/Colors.vue";
@@ -278,8 +277,7 @@ const featureGroups: FeatureGroup[] = [
     features: [
       { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
       { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false, v2Ready: true },
-      { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true },
-      { id: "shuffle-players", title: "Shuffle Players Settings", component: ShufflePlayers, hasSettings: false },
+      { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true },
       { id: "team-lobby", title: "Team Lobby Settings", component: TeamLobby, hasSettings: false },
       { id: "qr-code", title: "QR Code Settings", component: QrCode, hasSettings: false },
     ],

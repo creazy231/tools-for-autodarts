@@ -8,7 +8,7 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div class="space-y-3 text-white/70">
-            <p>Configure recent local players settings here.</p>
+            <p>Saved players appear as a strip under the lobby's player list, and are written back into the site's own Add Player dialog.</p>
 
             <div class="mt-4 space-y-4">
               <!-- Maximum Players Cap -->
@@ -21,7 +21,7 @@
                   size="sm"
                   input-class="w-full"
                 />
-                <p>Maximum recent players you want to store</p>
+                <p>Maximum saved players to keep</p>
               </div>
 
               <!-- Current Players List -->
@@ -78,7 +78,7 @@
           </h3>
 
           <p class="w-2/3 text-white/70">
-            Default recent local players capped at 5, this will extend it to infinite.
+            Autodarts remembers your last 6 local players and drops the rest for good. This keeps them all and puts them one click away in the lobby.
           </p>
         </div>
         <div class="flex">

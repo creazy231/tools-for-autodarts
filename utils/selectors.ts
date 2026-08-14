@@ -203,6 +203,11 @@ export const SELECTORS = {
      */
     playersCardHeader: [ "[data-slot='card-header']:has(> button[data-slot='button'])" ],
 
+    /** Body of that same card — the player rows, then Add Player / Add Bot. */
+    playersCardContent: [
+      "[data-slot='card']:has(> [data-slot='card-header'] > button[data-slot='button']) > [data-slot='card-content']",
+    ],
+
     /**
      * The Start Game button at the foot of the lobby.
      *

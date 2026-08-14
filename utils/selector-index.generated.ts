@@ -15,220 +15,52 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1786630728697;
+export const GENERATED_AT = 1786722980064;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1786628949891;
+export const NEWEST_SOURCE_AT = 1786722333447;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "html",
     "file": "components/PageConfig.vue",
-    "line": 316,
+    "line": 345,
     "fn": "querySelector"
   },
   {
     "selector": "[data-id]",
     "file": "components/Settings/Animations.vue",
-    "line": 576,
+    "line": 577,
     "fn": "querySelectorAll"
   },
   {
     "selector": "autodarts-tools-external-boards",
     "file": "entrypoints/boards.content/index.ts",
-    "line": 23,
+    "line": 24,
     "fn": "querySelector"
   },
   {
     "selector": "My Boards",
     "file": "entrypoints/boards.content/index.ts",
-    "line": 39,
+    "line": 40,
     "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "#root > div > div > .chakra-stack",
-    "file": "entrypoints/content/App.vue",
-    "line": 91,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button[aria-label='Collapse side bar']",
-    "file": "entrypoints/content/App.vue",
-    "line": 93,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button[aria-label='Collapse side bar']",
-    "file": "entrypoints/content/App.vue",
-    "line": 106,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#root > div > div > .chakra-stack",
-    "file": "entrypoints/content/App.vue",
-    "line": 117,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "svg",
-    "file": "entrypoints/content/App.vue",
-    "line": 133,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "a[href='/settings']",
-    "file": "entrypoints/content/App.vue",
-    "line": 139,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#root > div > div",
-    "file": "entrypoints/content/App.vue",
-    "line": 169,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "svg",
-    "file": "entrypoints/content/App.vue",
-    "line": 191,
-    "fn": "querySelector"
   },
   {
     "selector": "#root",
     "file": "entrypoints/content/index.ts",
-    "line": 47,
+    "line": 49,
     "fn": "querySelector"
   },
   {
     "selector": "body",
     "file": "entrypoints/content/index.ts",
-    "line": 51,
+    "line": 53,
     "fn": "querySelector"
   },
   {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/auto-start.ts",
-    "line": 12,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/auto-start.ts",
-    "line": 62,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "#root select",
-    "file": "entrypoints/lobby.content/discord-webhooks.ts",
-    "line": 29,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/discord-webhooks.ts",
-    "line": 32,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/discord-webhooks.ts",
-    "line": 123,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/discord-webhooks.ts",
-    "line": 145,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "#root input",
-    "file": "entrypoints/lobby.content/discord-webhooks.ts",
-    "line": 257,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/discord-webhooks.ts",
-    "line": 423,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 64,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 69,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 74,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 79,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "autodarts-tools-recent-local-players",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 84,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 89,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 94,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Lobby",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 99,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "input[placeholder=\\\"Enter name for local player\\\"]",
-    "file": "entrypoints/lobby.content/index.ts",
-    "line": 129,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "input[placeholder=\\\"Enter name for local player\\\"]",
-    "file": "entrypoints/lobby.content/RecentLocalPlayers.vue",
-    "line": 56,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/RecentLocalPlayers.vue",
-    "line": 64,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/shuffle-players.ts",
-    "line": 10,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#autodarts-tools-shuffle-button",
-    "file": "entrypoints/lobby.content/shuffle-players.ts",
-    "line": 46,
+    "selector": "svg",
+    "file": "entrypoints/content/v2-menu.ts",
+    "line": 55,
     "fn": "querySelector"
   },
   {
@@ -264,25 +96,25 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "button",
     "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 28,
+    "line": 29,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Public",
     "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 28,
+    "line": 29,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "button",
     "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 29,
+    "line": 30,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Private",
     "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 29,
+    "line": 30,
     "fn": "waitForElementWithTextContent"
   },
   {
@@ -606,43 +438,43 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 97,
+    "line": 98,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 97,
+    "line": 98,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 97,
+    "line": 98,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 282,
+    "line": 283,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 282,
+    "line": 283,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 282,
+    "line": 283,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "#ad-ext-player-display",
     "file": "entrypoints/match.content/index.ts",
-    "line": 345,
+    "line": 346,
     "fn": "waitForElement"
   },
   {
@@ -970,9 +802,15 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelector"
   },
   {
+    "selector": "Lobby",
+    "file": "utils/selectors.ts",
+    "line": 202,
+    "fn": "waitForElementWithTextContent"
+  },
+  {
     "selector": "img[src^=\\\"blob:\\\"]",
     "file": "utils/websocket-helpers.ts",
-    "line": 260,
+    "line": 263,
     "fn": "querySelectorAll"
   }
 ];

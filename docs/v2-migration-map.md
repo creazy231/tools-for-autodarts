@@ -144,7 +144,7 @@ td:nth-of-type(2) > span > div p
 **Files carrying the most risk**, in order:
 `winner-animation.ts` · `Zoom.vue` · `hide-menu-in-match.ts` ·
 `automatic-fullscreen.ts` · `color-change.ts` · `StreamingMode.vue` ·
-`sound-fx.ts` · `caller.ts` · `shuffle-players.ts`
+`sound-fx.ts` · `caller.ts`
 
 **Files that need no work** (zero site selectors, WebSocket-driven):
 `wled.ts` · `smaller-scores.ts` · `discord-stream.ts` · `Takeout.vue` ·

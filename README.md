@@ -66,8 +66,10 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - **Send manually**: Adds a **Discord** button to the lobby's *Players* header, next to Shuffle, so you choose when to announce. With this off, the webhook fires as soon as the lobby opens
   - **Auto-Start Timer**: Automatically starts the game after a configurable time delay once the webhook is sent
   - The announcement is edited in place once the game starts, so the channel does not fill up with lobbies nobody can join
-- **Shuffle Players**: Randomly reorder players in the lobby
-- **Extended Recent Players List**: Increase the number of recent local players beyond the default limit of 5
+- **Extended Recent Players List**: Autodarts remembers your last **6** local players and drops the rest for good. This keeps every name you have entered
+  - A **Saved players** strip appears under the lobby's player list — one click adds a player, however long ago you last used them
+  - The full list is also written back into the site's own *Add Player* dialog, so it offers everything rather than the last six
+  - The number of names kept is configurable, and individual names can be removed from the settings page
 - **Team Lobby Mode**: Removes initial player and auto-selects board for team games
 - **QR Code**: Automatically displays the lobby QR code for easily sharing with other players
 

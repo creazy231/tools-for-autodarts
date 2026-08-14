@@ -1,141 +1,54 @@
 <template>
-  <div v-if="config?.recentLocalPlayers?.players?.length">
-    <div class="mt-4 flex flex-wrap gap-2">
-      <div
-        @click="addUserToLobby(player)"
-        v-for="player in config.recentLocalPlayers.players"
-        :key="player"
-        :class="twMerge(
-          'flex cursor-pointer items-center justify-center rounded-md bg-white/10 px-3 py-1 text-sm font-bold uppercase transition-colors hover:bg-white/15',
-        )"
+  <div v-if="players.length" class="mt-4 border-t border-white/10 pt-4">
+    <p class="mb-2 text-xs font-bold uppercase tracking-wide text-white/50">
+      Saved players
+    </p>
+    <div class="flex flex-wrap gap-2">
+      <AppButton
+        @click="onAdd(name)"
+        v-for="name in players"
+        :key="name"
+        :loading="pending === name"
+        :disabled="pending !== null"
+        size="sm"
+        auto
       >
-        {{ player }}
-      </div>
-      <div
-        @click="handleClearAll"
-        :class="twMerge(
-          'flex cursor-pointer items-center justify-center rounded-md px-3 py-1 text-sm font-bold transition-colors hover:bg-white/15',
-        )"
-        v-html="clearAllSVG"
-      />
+        {{ name }}
+      </AppButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { twMerge } from "tailwind-merge";
+import { computed, ref } from "vue";
 
-import { waitForElement } from "@/utils";
-import { AutodartsToolsConfig } from "@/utils/storage";
+import type { Ref } from "vue";
 
-const clearAllSVG = "<svg stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\" height=\"1.3em\" width=\"1.3em\" xmlns=\"http://www.w3.org/2000/svg\"><path fill=\"none\" d=\"M0 0h24v24H0z\"></path><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"></path></svg>";
+import AppButton from "@/components/AppButton.vue";
 
-const config = ref();
-const addUserInput = ref() as Ref<HTMLInputElement>;
-const addUserButton = ref() as Ref<HTMLButtonElement>;
-const recentUsersDiv = ref() as Ref<HTMLDivElement>;
+/**
+ * The list lives in recent-local-players.ts, which keeps it in sync with the
+ * site's own store. Passing the ref rather than a copy means the strip follows
+ * along when a name is added through the site's own dialog.
+ */
+const props = defineProps<{
+  names: Ref<string[]>;
+  add: (name: string) => Promise<boolean>;
+}>();
 
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
+const state = props.names;
+const players = computed(() => state.value);
 
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  console.log("Recent Local Players setting changed");
-}, { deep: true });
+/** Which chip is mid-request; also blocks the rest, since adds are ordered. */
+const pending = ref<string | null>(null);
 
-onBeforeMount(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-
-  if (config.value.recentLocalPlayers.players.length > config.value.recentLocalPlayers.cap) {
-    config.value.recentLocalPlayers.players = config.value.recentLocalPlayers.players.slice(0, config.value.recentLocalPlayers.cap);
-  }
-});
-
-onMounted(async () => {
+async function onAdd(name: string) {
+  if (pending.value !== null) return;
+  pending.value = name;
   try {
-    // querySelector for `placeholder="Enter name for local player"`
-    addUserInput.value = await waitForElement("input[placeholder=\"Enter name for local player\"]") as HTMLInputElement;
-    if (!addUserInput.value) return;
-
-    // get div that comes right after lobbyUserInput
-    const lobbyUserInputParent = addUserInput.value.parentElement;
-    if (!lobbyUserInputParent) return;
-
-    // get first button in lobbyUserInputParent
-    addUserButton.value = lobbyUserInputParent.querySelector("button") as HTMLButtonElement;
-    if (!addUserButton.value) return;
-
-    addUserButton.value.addEventListener("click", addUserToRecentPlayers);
-
-    recentUsersDiv.value = lobbyUserInputParent.nextElementSibling as HTMLDivElement;
-
-    // if recentUsersDiv and recentUsersDiv has more than one child -> for each button in recentUsersDiv log its textContent
-    if (recentUsersDiv.value && recentUsersDiv.value.children.length > 1) {
-      for (let i = 0; i < recentUsersDiv.value.children.length; i++) {
-        const username = recentUsersDiv.value.children[i].textContent?.trim()?.toUpperCase();
-        if (username) {
-          // check if username is already in config.recentLocalPlayers, otherwise prepend it
-          if (!config.value.recentLocalPlayers.players.includes(username)) {
-            config.value.recentLocalPlayers.players.unshift(username);
-          }
-        }
-      }
-    }
-
-    // hide recentUsersDiv
-    recentUsersDiv.value.style.display = "none";
-  } catch (e) {
-    console.log("Autodarts Tools: RecentLocalPlayers - Error", e);
-  }
-});
-
-onBeforeUnmount(() => {
-  if (addUserButton.value) {
-    addUserButton.value.removeEventListener("click", addUserToRecentPlayers);
-  }
-});
-
-function addUserToRecentPlayers(event: Event) {
-  if (addUserInput.value && addUserInput.value.value) {
-    const username = addUserInput.value.value.toUpperCase();
-    if (!config.value.recentLocalPlayers.players.includes(username)) {
-      config.value.recentLocalPlayers.players.unshift(username);
-    }
-  }
-}
-
-async function addUserToLobby(player: string) {
-  if (addUserInput.value) {
-    // simulate type into addUserInput
-    addUserInput.value.value = player;
-
-    try {
-      // Use InputEvent which is designed for input elements
-      const inputEvent = new InputEvent("input", { bubbles: true });
-      addUserInput.value.dispatchEvent(inputEvent);
-    } catch (e) {
-      // Fallback for browsers that might have issues with InputEvent
-      try {
-        // Create event the old way as fallback
-        const event = document.createEvent("HTMLEvents");
-        event.initEvent("input", true, true);
-        addUserInput.value.dispatchEvent(event);
-      } catch (err) {
-        console.error("Autodarts Tools: Error dispatching input event", err);
-      }
-    }
-
-    if (addUserButton.value) {
-      addUserButton.value.removeAttribute("disabled");
-      addUserButton.value.click();
-    }
-  }
-}
-
-function handleClearAll() {
-  config.value.recentLocalPlayers.players = [];
-  if (recentUsersDiv.value) {
-    const clearAllButton = recentUsersDiv.value.lastElementChild as HTMLDivElement;
-    clearAllButton.click();
+    await props.add(name);
+  } finally {
+    pending.value = null;
   }
 }
 </script>

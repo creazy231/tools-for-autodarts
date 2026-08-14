@@ -104,9 +104,6 @@ interface OldConfig {
   inactiveSmall: {
     enabled: boolean;
   };
-  shufflePlayers: {
-    enabled: boolean;
-  };
   caller: {
     enabled: boolean;
   };
@@ -256,7 +253,6 @@ async function migrateSettings() {
     config.recentLocalPlayers = oldConfig.recentLocalPlayers;
     config.takeout = oldConfig.takeout;
     config.smallerScores = oldConfig.inactiveSmall;
-    config.shufflePlayers = oldConfig.shufflePlayers;
     config.externalBoards = oldConfig.externalBoards;
     config.hideMenuInMatch = { enabled: oldConfig.menuDisabled };
     config.largerLegsSets = oldConfig.legsSetsLarger;
