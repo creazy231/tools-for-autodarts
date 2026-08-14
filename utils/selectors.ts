@@ -241,12 +241,21 @@ export const SELECTORS = {
     ],
     /** Player name within a lobby row (query relative to the row). */
     playerNameInRow: [
-      // TODO(v2): capture when Team Lobby is ported
+      "span.font-display",
       "td:nth-of-type(2) > span > div p",
     ],
-    /** Per-row reorder controls, relative to a row. */
-    movePlayerUp: [ "button:nth-of-type(1)" ],
-    movePlayerDown: [ "button:nth-of-type(2)" ],
+
+    /**
+     * Per-row controls, queried relative to a player row.
+     *
+     * The buttons carry no data-slot of their own beyond the generic `button`,
+     * but FontAwesome stamps `data-icon` on the glyph it renders, which names
+     * the action without depending on a class or a position. The board button
+     * is v1's "Use my board"; the site disables it while that player is already
+     * playing here.
+     */
+    playerBoardButton: [ "button[data-slot='button']:has([data-icon='house'])" ],
+    playerRemoveButton: [ "button[data-slot='button']:has([data-icon='xmark'])" ],
   },
 
   /**

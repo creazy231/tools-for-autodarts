@@ -9,9 +9,10 @@
           </h3>
           <div class="space-y-3 text-white/70">
             <p>This feature doesn't have any additional settings.</p>
-            <p>When enabled, the first player is removed from the lobby and every following player is added to the board.</p>
+            <p>When enabled, your own entry is removed from the lobby, and anyone who joins on their own board is moved onto yours — so a whole team can play on one dartboard.</p>
+            <p>Add the teams as local players once your own row is gone.</p>
             <p class="italic text-white/50">
-              This feature only works in private lobbies.
+              Only runs in private lobbies that you host.
             </p>
           </div>
         </div>
@@ -31,7 +32,7 @@
             Team Lobby
           </h3>
           <p class="w-2/3 text-white/70">
-            Removes first player from the lobby and adds every following player to the board. Works only in <b>private lobbies</b>.
+            Removes your own entry and moves everyone who joins onto your board, so a team can play on one dartboard. Only in <b>private lobbies</b> you host.
           </p>
         </div>
         <div class="flex">

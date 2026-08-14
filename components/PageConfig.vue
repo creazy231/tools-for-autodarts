@@ -278,7 +278,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
       { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false, v2Ready: true },
       { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true },
-      { id: "team-lobby", title: "Team Lobby Settings", component: TeamLobby, hasSettings: false },
+      { id: "team-lobby", title: "Team Lobby Settings", component: TeamLobby, hasSettings: false, v2Ready: true },
       { id: "qr-code", title: "QR Code Settings", component: QrCode, hasSettings: false },
     ],
     settingIds: [ "discord-webhooks", "recent-local-players" ],

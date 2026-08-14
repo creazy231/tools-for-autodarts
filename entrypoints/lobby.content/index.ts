@@ -3,7 +3,7 @@ import "~/assets/tailwind.css";
 import { soundFx, soundFxOnRemove } from "../match.content/sound-fx";
 import { wledFx, wledFxOnRemove } from "../match.content/wled";
 
-import { teamLobby } from "./team-lobby";
+import { onRemove as onTeamLobbyRemove, teamLobby } from "./team-lobby";
 
 import type { IConfig } from "@/utils/storage";
 
@@ -37,7 +37,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set
  * the flag there as each feature is ported.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -133,6 +133,7 @@ export default defineContentScript({
         await onAutoStartRemove();
         await onQrCodeRemove();
         await onRecentLocalPlayersRemove();
+        await onTeamLobbyRemove();
         await soundFxOnRemove();
         await wledFxOnRemove();
       }

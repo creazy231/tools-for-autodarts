@@ -16,6 +16,12 @@ All notable changes to this project will be documented in this file.
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
 
 ### Changed
+- Ported Team Lobby to the rebuilt site
+  - Now only runs in private lobbies **you host**; previously it would act in anyone's private lobby
+  - Your own entry is removed by player index taken from the lobby data, rather than by matching a name against a table the rebuilt lobby does not render
+  - "Use my board" is now the board button on each player row, which the site disables while that player is already playing on your board — so an enabled one is exactly a player who needs moving
+  - Dropped the separate new-lobby hook that watched the Private/Public buttons to guess whether the lobby was private; the lobby data says so directly
+  - The feature's teardown is now actually called when leaving a lobby, which it never was
 - Ported Recent Local Players to the rebuilt site, and it now does considerably more
   - The rebuilt site keeps its guest players in `localStorage`, capped at six, and rewrites the whole list on every add — enter a seventh name and the oldest is gone with no other copy of it anywhere
   - Saved names now appear as a **Saved players** strip under the lobby's player list; one click adds a player, using the same request the site's own dialog makes

@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1786722980064;
+export const GENERATED_AT = 1786725887385;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1786722333447;
+export const NEWEST_SOURCE_AT = 1786725266616;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -62,36 +62,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "file": "entrypoints/content/v2-menu.ts",
     "line": 55,
     "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext-player-name",
-    "file": "entrypoints/lobby.content/team-lobby.ts",
-    "line": 33,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "tr",
-    "file": "entrypoints/lobby.content/team-lobby.ts",
-    "line": 39,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": ".ad-ext-player-name > p",
-    "file": "entrypoints/lobby.content/team-lobby.ts",
-    "line": 49,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button:last-of-type",
-    "file": "entrypoints/lobby.content/team-lobby.ts",
-    "line": 52,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobby.content/team-lobby.ts",
-    "line": 66,
-    "fn": "querySelectorAll"
   },
   {
     "selector": "button",
