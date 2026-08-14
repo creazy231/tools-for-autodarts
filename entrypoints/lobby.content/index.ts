@@ -15,7 +15,7 @@ import {
 } from "@/utils/storage";
 import { discordWebhooks, onRemove as onDiscordWebhooksRemove } from "@/entrypoints/lobby.content/discord-webhooks";
 import { autoStart, onRemove as onAutoStartRemove } from "@/entrypoints/lobby.content/auto-start";
-import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobbynew.content/qr-code";
+import { onRemove as onQrCodeRemove, qrCode } from "@/entrypoints/lobby.content/qr-code";
 import { onRemove as onRecentLocalPlayersRemove, recentLocalPlayers } from "@/entrypoints/lobby.content/recent-local-players";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
@@ -37,7 +37,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set
  * the flag there as each feature is ported.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby", "qrCode" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -100,7 +100,7 @@ export default defineContentScript({
         }
 
         if (isOn(config, "qrCode")) {
-          await initScript(qrCode, url).catch(console.error);
+          await initScript(() => qrCode(ctx), url).catch(console.error);
         }
 
         if (isOn(config, "recentLocalPlayers")) {

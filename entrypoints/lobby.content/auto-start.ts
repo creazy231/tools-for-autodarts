@@ -63,11 +63,14 @@ export async function autoStart(ctx: any) {
     // create. On wide screens the chat button in between is absolutely
     // positioned, which leaves the toggle sitting right of Start Game anyway.
     append: "last",
-    onMount: (container: HTMLElement, _shadow: ShadowRoot, host: HTMLElement) => {
-      host.style.display = "flex";
-      host.style.alignItems = "center";
-      host.style.flexShrink = "0";
-
+    /**
+     * Nothing is styled on the host: WXT resets it with
+     * `:host { all: initial !important }`, and an important declaration from a
+     * shadow tree beats even an important inline style on the host from out
+     * here. The toggle is a flex item either way, which blockifies it, so the
+     * layout comes out right without any of it.
+     */
+    onMount: (container: HTMLElement) => {
       const app = createApp(AutoStartToggle, { armed });
       app.mount(container);
       return app;

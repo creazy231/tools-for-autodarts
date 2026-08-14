@@ -1,7 +1,6 @@
 import QRCodeStyling from "qr-code-styling";
 
-import { QR_CODE_OPTIONS } from "./qr-code-options";
-
+import { QR_CODE_OPTIONS } from "@/utils/qr-code-options";
 import { waitForElementWithTextContent } from "@/utils";
 
 export async function qrCodeTournament() {

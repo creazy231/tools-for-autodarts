@@ -10,7 +10,7 @@
           QR Code
         </h3>
         <p class="w-2/3 text-white/70">
-          Automatically displays the lobby QR code for easily sharing with other players.
+          Pins the lobby's join code to the top right corner. The ✕ below it hides it for that lobby.
         </p>
       </div>
       <div class="flex">

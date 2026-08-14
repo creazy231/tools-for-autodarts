@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1786725887385;
+export const GENERATED_AT = 1786730848330;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1786725266616;
+export const NEWEST_SOURCE_AT = 1786730848247;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -64,30 +64,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelector"
   },
   {
-    "selector": "button",
-    "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 29,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Public",
-    "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 29,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 30,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Private",
-    "file": "entrypoints/lobbynew.content/index.ts",
-    "line": 30,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
     "selector": "Invite friends",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
     "line": 11,
@@ -115,48 +91,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "selector": "canvas",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
     "line": 64,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "p",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 8,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "or share link:",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 8,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Link teilen:",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 8,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Deel link:",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 8,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "input[placeholder=\\\"Lobby invite url\\\"]",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 11,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "canvas",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 29,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "canvas",
-    "file": "entrypoints/lobbynew.content/qr-code.ts",
-    "line": 41,
     "fn": "querySelector"
   },
   {

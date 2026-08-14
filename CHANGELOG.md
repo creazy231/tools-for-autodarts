@@ -16,6 +16,10 @@ All notable changes to this project will be documented in this file.
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
 
 ### Changed
+- Ported QR Code to the rebuilt site, and changed what it does
+  - The code is now pinned to the top right corner and stays there while you scroll, instead of being drawn into the lobby's share-link row — which the rebuilt lobby does not have
+  - A ✕ beneath the code hides it for the rest of that lobby. Nothing brings it back, by design: the site's own QR button is in the same corner just above it
+  - Opening a different lobby shows it again
 - Ported Team Lobby to the rebuilt site
   - Now only runs in private lobbies **you host**; previously it would act in anyone's private lobby
   - Your own entry is removed by player index taken from the lobby data, rather than by matching a name against a table the rebuilt lobby does not render

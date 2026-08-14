@@ -56,8 +56,10 @@ export async function recentLocalPlayers(ctx: any) {
     position: "inline",
     anchor: () => qs(SELECTORS.lobby.playersCardContent),
     append: "last",
-    onMount: (container: HTMLElement, _shadow: ShadowRoot, host: HTMLElement) => {
-      host.style.display = "block";
+    // The host takes no styling — WXT's `:host { all: initial !important }`
+    // reset beats anything set from out here. The strip is a flex item in the
+    // card, which blockifies it, so it lays out correctly regardless.
+    onMount: (container: HTMLElement) => {
       const app = createApp(RecentLocalPlayersStrip, { names, add: addPlayer });
       app.mount(container);
       return app;
