@@ -10,7 +10,7 @@
           Autostart
         </h3>
         <p class="w-2/3 text-white/70">
-          Displays a button to enable autostart on the lobby page. If autostart is enabled, it will automatically start the game after <b>3 seconds</b> once a player joins the lobby.
+          Adds an <b>Autostart</b> toggle beside the lobby's Start Game button. While it is on, the game starts <b>3 seconds</b> after another player joins. Each lobby opens with it off.
         </p>
       </div>
       <div class="flex">

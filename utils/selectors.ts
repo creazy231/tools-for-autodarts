@@ -93,6 +93,32 @@ export function exists(set: SelectorSet, root: ParentNode = document): boolean {
   return qs(set, root) !== null;
 }
 
+/**
+ * querySelectorAll narrowed to elements whose trimmed text is one of `texts`.
+ *
+ * For the handful of v2 controls that carry no data-slot, id or aria-label of
+ * their own — Start Game is the notable one. Comparison is case-insensitive,
+ * but this is still the one kind of selector a language switch breaks, so reach
+ * for it only when the markup offers nothing better.
+ */
+export function qsaText<T extends Element = HTMLElement>(
+  set: SelectorSet,
+  texts: SelectorSet,
+  root: ParentNode = document,
+): T[] {
+  const wanted = texts.map(t => t.toLowerCase());
+  return qsa<T>(set, root).filter(el => wanted.includes((el.textContent ?? "").trim().toLowerCase()));
+}
+
+/** First match of {@link qsaText}. */
+export function qsText<T extends Element = HTMLElement>(
+  set: SelectorSet,
+  texts: SelectorSet,
+  root: ParentNode = document,
+): T | null {
+  return qsaText<T>(set, texts, root)[0] ?? null;
+}
+
 // -------------------------------------------------------------------- registry
 
 export const SELECTORS = {
@@ -188,20 +214,30 @@ export const SELECTORS = {
     startGameButton: [ "button[data-slot='button']" ],
     startGameText: [ "Start Game" ],
 
-    /** Rows in the lobby's player table. */
+    /**
+     * The player counter chip beside the "Players" title, e.g. "2/6".
+     *
+     * Digits and a slash, so reading a count out of it survives the language
+     * switcher. Scoped to the players card header so the other cards' headers
+     * cannot answer instead.
+     */
+    playerCountChip: [ "[data-slot='card-header']:has(> button[data-slot='button']) > span" ],
+
+    /**
+     * Rows in the lobby's player list.
+     *
+     * v2 renders each row as a drag-and-drop item; dnd-kit stamps
+     * `aria-roledescription="sortable"` on the grab handle, which is the only
+     * attribute in the row that is not a Tailwind class.
+     */
     playerRows: [
-      // TODO(v2): capture when Team Lobby is ported
+      "[data-slot='card-content'] div:has(> [aria-roledescription='sortable'])",
       "#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) table > tbody > tr",
     ],
     /** Player name within a lobby row (query relative to the row). */
     playerNameInRow: [
       // TODO(v2): capture when Team Lobby is ported
       "td:nth-of-type(2) > span > div p",
-    ],
-    /** Container holding the lobby action buttons (Start, Leave, ...). */
-    actionButtons: [
-      // TODO(v2): capture when Auto Start is ported
-      "#root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:last-of-type",
     ],
     /** Per-row reorder controls, relative to a row. */
     movePlayerUp: [ "button:nth-of-type(1)" ],

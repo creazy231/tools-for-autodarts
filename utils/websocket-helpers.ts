@@ -206,7 +206,10 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
   switch (channel) {
     case "autodarts.lobbies": {
       data = data as ILobbies;
-      const id = window.location.href.match(/lobbies\/([0-9a-f-]+)/)?.[1];
+      // The rebuilt site moved this route to /lobby/<id>. Matching only the old
+      // spelling meant `id` was undefined on v2 and every lobby message was
+      // dropped here, leaving Discord announcements with an empty settings list.
+      const id = window.location.href.match(/\/lobb(?:y|ies)\/([0-9a-f-]+)/)?.[1];
       if (id !== data.id) return;
 
       AutodartsToolsLobbyData.setValue(data as ILobbies);

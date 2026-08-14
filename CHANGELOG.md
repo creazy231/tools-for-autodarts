@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
 - Added `play-v2.autodarts.com` to the host permissions, so the extension loads on the rebuilt site
 
 ### Changed
+- Ported Auto Start to the rebuilt site
+  - Arming it is now a proper **Autostart On / Autostart Off** toggle beside the lobby's *Start Game* button, in the same style as the settings page, replacing the cloned button that flipped between green and red
+  - A player leaving inside the 3-second grace period now cancels the start instead of letting it fire on an empty lobby
+  - The player count is read from the lobby's own counter chip, falling back to counting rows, rather than from a table the rebuilt lobby does not render
 - Ported Discord Webhooks to the rebuilt site — the first feature back on v2
   - The manual send button now sits in the lobby's *Players* header, immediately left of the site's own Shuffle button
   - The lobby link comes from the address bar rather than a text field on the page, which the rebuilt lobby no longer has
@@ -24,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - Every feature is temporarily disabled while the port to the rebuilt site proceeds — they are re-enabled one at a time as each is ported
 
 ### Fixed
+- Fixed lobby data being discarded on the rebuilt site — the handler only recognised the old `/lobbies/<id>` route, so every lobby message was dropped and Discord announcements went out with an empty settings list
 - Fixed the Streaming Mode footer still reading "Game provided by Autodarts.io" after the domain migration
   - Caught in #234 by @cameronbol
 

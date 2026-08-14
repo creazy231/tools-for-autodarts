@@ -11,7 +11,7 @@
  */
 
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
-import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { SELECTORS, qs, qsaText } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
@@ -188,9 +188,7 @@ function watchForStartButton() {
 }
 
 function findStartButtons(): HTMLButtonElement[] {
-  const wanted = SELECTORS.lobby.startGameText.map(t => t.toLowerCase());
-  return qsa<HTMLButtonElement>(SELECTORS.lobby.startGameButton)
-    .filter(b => wanted.includes((b.textContent ?? "").trim().toLowerCase()));
+  return qsaText<HTMLButtonElement>(SELECTORS.lobby.startGameButton, SELECTORS.lobby.startGameText);
 }
 
 async function onGameStarted() {

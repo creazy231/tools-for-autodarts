@@ -40,7 +40,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set
  * the flag there as each feature is ported.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -97,7 +97,9 @@ export default defineContentScript({
         }
 
         if (isOn(config, "autoStart")) {
-          await initScript(autoStart, url).catch(console.error);
+          // Needs ctx: its toggle is a Vue app in a shadow root, not a cloned
+          // page button.
+          await initScript(() => autoStart(ctx), url).catch(console.error);
         }
 
         if (isOn(config, "shufflePlayers")) {
