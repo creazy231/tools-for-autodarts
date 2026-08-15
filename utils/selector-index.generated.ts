@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1786791941341;
+export const GENERATED_AT = 1786818649968;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1786791941246;
+export const NEWEST_SOURCE_AT = 1786818428918;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -34,27 +34,15 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelectorAll"
   },
   {
-    "selector": "autodarts-tools-external-boards",
-    "file": "entrypoints/boards.content/index.ts",
-    "line": 24,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "My Boards",
-    "file": "entrypoints/boards.content/index.ts",
-    "line": 40,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
     "selector": "#root",
     "file": "entrypoints/content/index.ts",
-    "line": 49,
+    "line": 50,
     "fn": "querySelector"
   },
   {
     "selector": "body",
     "file": "entrypoints/content/index.ts",
-    "line": 53,
+    "line": 54,
     "fn": "querySelector"
   },
   {

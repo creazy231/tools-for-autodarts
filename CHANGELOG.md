@@ -16,6 +16,11 @@ All notable changes to this project will be documented in this file.
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
 
 ### Changed
+- Ported External Boards to the rebuilt site
+  - The section now attaches to the rebuilt *My Devices* page, anchored on its heading rather than on a "My Boards" heading that no longer exists
+  - The **Stats** button is gone: `/boards/<id>/stats` answers 404 on the rebuilt site, as does `/boards/<id>` — Follow is the only board view left
+  - A board can now be added by pasting a link as well as a bare ID, which is what actually gets shared, and duplicates are rejected
+  - Fixed the section mounting under the host element name of an unrelated feature (`autodarts-tools-recent-local-players`), and gave it a teardown so it is removed when you leave the page
 - Ported QR Code to the rebuilt site, and changed what it does
   - The code is now pinned to the top right corner and stays there while you scroll, instead of being drawn into the lobby's share-link row — which the rebuilt lobby does not have
   - Autodarts' own QR button shares that corner and overlapped the pinned code, so it is hidden while the code is up and restored as soon as it is closed

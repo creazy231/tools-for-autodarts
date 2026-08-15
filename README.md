@@ -96,7 +96,10 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Automatic Next Player**: Switches to the next player after a configurable delay when takeout is stuck
 - **Automatic Next Leg/Set**: Automatically advances to the next leg or set after takeout
 - **Smaller Font for Inactive Players**: Reduces the font size of scores for players not currently throwing
-- **External Boards Support**: Easily follow games on external boards
+- **External Boards Support**: Follow a board that is not your own — save any board by name and open its live view in one click
+  - Adds an **External Boards** section to the *My Devices* page
+  - Paste either the board's ID or a link containing it; the ID is picked out for you
+  - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
 - **Enhanced Scoring Display**: Improves dart throw visuals with larger numbers and scoring notation
   - Shows dart notation (S/D/T, BULL) beneath point values

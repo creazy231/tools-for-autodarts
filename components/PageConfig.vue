@@ -314,7 +314,7 @@ const featureGroups: FeatureGroup[] = [
     id: "boards",
     tab: 2,
     features: [
-      { id: "external-boards", title: "External Boards Settings", component: ExternalBoards, hasSettings: false },
+      { id: "external-boards", title: "External Boards Settings", component: ExternalBoards, hasSettings: false, v2Ready: true },
     ],
     settingIds: [],
   },

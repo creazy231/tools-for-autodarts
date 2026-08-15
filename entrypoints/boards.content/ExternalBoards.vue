@@ -1,87 +1,81 @@
 <template>
-  <div class="mt-16 space-y-5">
-    <h2 class="text-4xl font-bold">
+  <section v-if="config" class="mt-6 flex flex-col gap-6">
+    <!-- The bracket needs the hint: a bare `font-[…]` reads as a weight. -->
+    <h2 class="font-[family-name:var(--ad-font-display)] text-2xl font-normal">
       External Boards
     </h2>
-    <div v-if="config" class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
       <div
         v-for="board in config.externalBoards.boards"
         :key="board.id"
-        class="adt-container flex flex-col justify-between"
+        class="adt-container flex flex-col justify-between gap-4"
       >
-        <h3 class="mb-4 truncate text-xl font-bold">
-          {{ board.name }}
-        </h3>
-        <div class="flex items-center justify-between gap-1">
-          <div>
-            <AppButton
-              @click="handleRemoveBoard(board.id)"
-              auto
-              class="aspect-square p-3"
-              type="danger"
-            >
-              <span class="icon-[pixelarticons--trash]" />
-            </AppButton>
-          </div>
-          <div class="flex items-center gap-1">
-            <AppButton
-              @click="handleBoardStats(board.id)"
-              auto
-              class="aspect-square p-3"
-            >
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z" /></svg>
-            </AppButton>
-            <AppButton
-              @click="handleBoardFollow(board.id)"
-              auto
-              class="aspect-square p-3"
-            >
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" focusable="false" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z" /><path fill-rule="evenodd" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" /></svg>
-            </AppButton>
-          </div>
+        <div class="min-w-0">
+          <h3 class="adt-card-title truncate">
+            {{ board.name || "Unnamed board" }}
+          </h3>
+          <p class="truncate text-xs text-white/40">
+            {{ board.id }}
+          </p>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <AppButton
+            @click="removeBoard(board.id)"
+            title="Forget this board"
+            type="danger"
+            size="sm"
+            auto
+          >
+            <span class="icon-[pixelarticons--trash]" />
+          </AppButton>
+          <AppButton
+            @click="followBoard(board.id)"
+            type="primary"
+            size="sm"
+            auto
+          >
+            Follow
+          </AppButton>
         </div>
       </div>
 
-      <div class="adt-container space-y-4">
+      <div class="adt-container flex flex-col justify-between gap-4">
         <div class="space-y-2">
-          <AppInput
-            v-model="newBoard.name"
-            placeholder="External Board Name"
-          />
-          <AppInput
-            v-model="newBoard.id"
-            placeholder="External Board ID"
-          />
+          <AppInput v-model="draft.name" placeholder="Board name" />
+          <AppInput v-model="draft.id" placeholder="Board ID or link" />
         </div>
-        <div class="flex items-center justify-between gap-1">
-          <div />
-          <div class="flex items-center gap-1">
-            <AppButton
-              @click="handleAddBoard"
-              auto
-              class="aspect-square p-2"
-              type="success"
-            >
-              <span class="icon-[pixelarticons--check]" />
-            </AppButton>
-          </div>
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs text-[var(--ad-text-destructive)]">
+            {{ error }}
+          </p>
+          <AppButton
+            @click="addBoard"
+            type="success"
+            size="sm"
+            auto
+          >
+            Add
+          </AppButton>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
+import { nextTick, onBeforeMount, reactive, ref, watch } from "vue";
+
 import AppButton from "@/components/AppButton.vue";
 import AppInput from "@/components/AppInput.vue";
 import { AutodartsToolsConfig, updateConfigIfChanged } from "@/utils/storage";
 
-const config = ref();
+/** Boards are identified by a UUID anywhere in what was pasted. */
+const BOARD_ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
-const newBoard = reactive({
-  id: "",
-  name: "",
-});
+const config = ref();
+const error = ref("");
+const draft = reactive({ id: "", name: "" });
 
 watch(config, async () => {
   const currentConfig = await AutodartsToolsConfig.getValue();
@@ -93,22 +87,41 @@ onBeforeMount(async () => {
   config.value = await AutodartsToolsConfig.getValue();
 });
 
-async function handleAddBoard() {
-  config.value.externalBoards.boards.push({
-    id: newBoard.id,
-    name: newBoard.name,
-  });
+/**
+ * Take the id out of whatever was pasted.
+ *
+ * What gets shared is the follow link, not the bare UUID, so asking for the id
+ * and rejecting a URL would fail on the one thing people actually have.
+ */
+function addBoard() {
+  const id = draft.id.trim().match(BOARD_ID)?.[0];
+  if (!id) {
+    error.value = "Paste a board link or its ID";
+    return;
+  }
+
+  if (config.value.externalBoards.boards.some((board: { id: string }) => board.id === id)) {
+    error.value = "That board is already in the list";
+    return;
+  }
+
+  config.value.externalBoards.boards.push({ id, name: draft.name.trim() });
+  draft.id = "";
+  draft.name = "";
+  error.value = "";
 }
 
-function handleRemoveBoard(id: string) {
-  config.value.externalBoards.boards = config.value.externalBoards.boards.filter(board => board.id !== id);
+function removeBoard(id: string) {
+  config.value.externalBoards.boards = config.value.externalBoards.boards
+    .filter((board: { id: string }) => board.id !== id);
 }
 
-function handleBoardStats(id: string) {
-  window.location.href = `/boards/${id}/stats`;
-}
-
-function handleBoardFollow(id: string) {
+/**
+ * Follow is the only board view the rebuilt site still has: `/boards/<id>` and
+ * `/boards/<id>/stats` both answer 404 now, so v1's stats button has nowhere
+ * left to go.
+ */
+function followBoard(id: string) {
   window.location.href = `/boards/${id}/follow`;
 }
 </script>

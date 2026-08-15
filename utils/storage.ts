@@ -751,7 +751,16 @@ export const AutodartsToolsBoardStatus: WxtStorageItem<TBoardStatus, any> = stor
 export const AutodartsToolsUrlStatus: WxtStorageItem<string, any> = storage.defineItem(
   "local:urlstatus",
   {
-    defaultValue: typeof window !== "undefined" ? window.location.href.split("#")[0] || "undefined" : "undefined",
+    /**
+     * `window` alone is not enough of a guard. WXT pre-renders every entrypoint
+     * in Node to read its config, and in that environment `window` exists while
+     * `window.location` does not — so reading `.href` there takes the whole dev
+     * server down with "Cannot read properties of undefined", pointing at
+     * whichever module happened to pull this one in first.
+     */
+    defaultValue: typeof window !== "undefined" && window.location
+      ? window.location.href.split("#")[0] || "undefined"
+      : "undefined",
   },
 );
 

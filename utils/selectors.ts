@@ -318,13 +318,17 @@ export const SELECTORS = {
     ],
   },
 
-  /** Boards page — entrypoints/boards.content. */
+  /** Boards page — entrypoints/boards.content. Still at /boards on v2. */
   boards: {
-    boardRows: [
-      "[data-slot='card']",
-      // TODO(v2): verify; v1 used a structural chain
-      "#root > div > div:nth-of-type(2)",
-    ],
+    /**
+     * The column holding the page heading and each device section, which is
+     * where the extension appends its own.
+     *
+     * Anchored on the single `h1` in `main` ("My Devices"), so it resolves the
+     * same whether or not the account owns a board — a user with none is
+     * exactly who wants External Boards.
+     */
+    pageColumn: [ "main div:has(> h1)" ],
   },
 
   /** Login form — used by the capture tooling, and stable on both sites. */
