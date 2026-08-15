@@ -47,6 +47,9 @@ All notable changes to this project will be documented in this file.
 - Every feature is temporarily disabled while the port to the rebuilt site proceeds — they are re-enabled one at a time as each is ported
 
 ### Fixed
+- Fixed the settings page not scrolling, which cut off every tab taller than the window — most obviously Matches, at nearly three screens
+  - The rebuilt site's `<main>` is a fixed-height clip box that never scrolls; its own routes each bring a scrolling container inside it, and the settings overlay now does the same
+  - Only while the overlay is open, so it takes part in no layout on any other page
 - Fixed lobby data being discarded on the rebuilt site — the handler only recognised the old `/lobbies/<id>` route, so every lobby message was dropped and Discord announcements went out with an empty settings list
 - Fixed the Streaming Mode footer still reading "Game provided by Autodarts.io" after the domain migration
   - Caught in #234 by @cameronbol

@@ -5,8 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import PageConfig from "@/components/PageConfig.vue";
 import { initV2Menu, openToolsPage } from "./v2-menu";
+import { setToolsOverlayOpen } from "./tools-overlay";
+
+import PageConfig from "@/components/PageConfig.vue";
 import { waitForElement } from "@/utils";
 import { SELECTORS } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsUrlStatus, defaultConfig } from "@/utils/storage";
@@ -47,6 +49,10 @@ watch(currentUrl, async (newURL, oldURL) => {
  * genuinely carried an inline display keeps it.
  */
 watch(configVisible, async () => {
+  // `main` clips instead of scrolling, so the overlay carries its own scroller
+  // while it is open. See tools-overlay.ts.
+  setToolsOverlayOpen(configVisible.value);
+
   const pageContentElement = await waitForElement(SELECTORS.app.contentRoot, 15000);
   const contentElements = Array.from(pageContentElement.children).filter(el => el.tagName !== "AUTODARTS-TOOLS-WXT") as HTMLElement[];
 
@@ -149,5 +155,4 @@ function startObserver() {
    */
   window.addEventListener("popstate", syncUrl);
 }
-
 </script>

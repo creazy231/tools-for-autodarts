@@ -3,6 +3,7 @@ import { createApp } from "vue";
 
 import App from "./App.vue";
 import { migrationConfig } from "./migration-config";
+import { TOOLS_OVERLAY_CSS } from "./tools-overlay";
 
 import { waitForElement } from "@/utils";
 import { SELECTORS } from "@/utils/selectors";
@@ -59,6 +60,8 @@ export default defineContentScript({
         name: "autodarts-tools-wxt",
         position: "inline",
         anchor: SELECTORS.app.contentRoot[0],
+        // Gives the overlay a scroller of its own — see tools-overlay.ts.
+        css: TOOLS_OVERLAY_CSS,
         onMount: (container) => {
           const app = createApp(App);
           app.mount(container);
