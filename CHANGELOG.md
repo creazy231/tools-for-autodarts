@@ -18,7 +18,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Ported QR Code to the rebuilt site, and changed what it does
   - The code is now pinned to the top right corner and stays there while you scroll, instead of being drawn into the lobby's share-link row — which the rebuilt lobby does not have
-  - A ✕ beneath the code hides it for the rest of that lobby. Nothing brings it back, by design: the site's own QR button is in the same corner just above it
+  - Autodarts' own QR button shares that corner and overlapped the pinned code, so it is hidden while the code is up and restored as soon as it is closed
+  - A ✕ beneath the code hides it for the rest of that lobby. Nothing in the extension brings it back, by design — closing it hands the corner back to the site's own button
   - Opening a different lobby shows it again
 - Ported Team Lobby to the rebuilt site
   - Now only runs in private lobbies **you host**; previously it would act in anyone's private lobby

@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1786730848330;
+export const GENERATED_AT = 1786791941341;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1786730848247;
+export const NEWEST_SOURCE_AT = 1786791941246;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -66,31 +66,31 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Invite friends",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 11,
+    "line": 10,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Nodig vrienden uit",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 11,
+    "line": 10,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Freunde einladen",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 11,
+    "line": 10,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": ".ad-ext_qr-code-wrapper",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 37,
+    "line": 36,
     "fn": "querySelector"
   },
   {
     "selector": "canvas",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 64,
+    "line": 63,
     "fn": "querySelector"
   },
   {

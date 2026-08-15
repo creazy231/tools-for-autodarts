@@ -203,6 +203,17 @@ export const SELECTORS = {
      */
     playersCardHeader: [ "[data-slot='card-header']:has(> button[data-slot='button'])" ],
 
+    /**
+     * The site's own "Share lobby QR code" button, in the top right corner.
+     *
+     * Anchored on the data-slot plus the FontAwesome glyph name rather than the
+     * aria-label, which the language switcher rewrites.
+     */
+    siteQrButton: [
+      "button[data-slot='popover-trigger']:has([data-icon='qrcode'])",
+      "button[aria-label='Share lobby QR code']",
+    ],
+
     /** Body of that same card — the player rows, then Add Player / Add Bot. */
     playersCardContent: [
       "[data-slot='card']:has(> [data-slot='card-header'] > button[data-slot='button']) > [data-slot='card-content']",

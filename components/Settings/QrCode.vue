@@ -10,7 +10,7 @@
           QR Code
         </h3>
         <p class="w-2/3 text-white/70">
-          Pins the lobby's join code to the top right corner. The ✕ below it hides it for that lobby.
+          Pins the lobby's join code to the top right corner, in place of Autodarts' own QR button. The ✕ below it hides the code for that lobby and gives the original button back.
         </p>
       </div>
       <div class="flex">

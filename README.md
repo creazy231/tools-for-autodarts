@@ -75,7 +75,8 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Anyone who joins on their own board is moved onto yours
   - Only runs in **private lobbies that you host**
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything
-  - The ✕ underneath hides it for the rest of that lobby; the site's own QR button sits right above it if you want it back
+  - Autodarts' own QR button occupies the same corner, so it is hidden while the pinned code is up and comes back the moment you close it
+  - The ✕ underneath hides the code for the rest of that lobby; from then on the site's own button is there if you want it
 
 ### 🎨 Match Customization
 - **Color Customization**: Change the colors of dart throws, scores, and match background for a personalized gaming environment
