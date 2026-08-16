@@ -64,6 +64,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "largerPlayerNames",
   "largerPlayerMatchData",
   "automaticFullscreen",
+  "winnerAnimation",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {

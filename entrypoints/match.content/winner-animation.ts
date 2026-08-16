@@ -1,242 +1,150 @@
 import type { IConfig } from "@/utils/storage";
+import type { IGameData } from "@/utils/game-data-storage";
 
-import { addStyles, waitForElement } from "@/utils";
+import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData, GameMode } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
+import { SELECTORS, qsa } from "@/utils/selectors";
 
-// CSS styles for winner animation
-const WINNER_ANIMATION_STYLES = `
-  .ad-ext-player-winner .ad-ext-player-score {
-    text-align: center;
-    line-height: 1;
-    margin-bottom: 0;
-  }
-  
-  #ad-ext_winner-animation--message {
-    text-align: center;
-    line-height: 1;
-  }
+/**
+ * Winner Animation — mark the winning card and say what it took.
+ *
+ * v1 restructured the card: it wrapped the score element in a div of its own,
+ * shrank it and appended a message element. None of that survives on the
+ * rebuilt site, which re-renders the card from React state.
+ *
+ * So the whole effect is CSS keyed on one attribute. The attribute is the only
+ * thing JS writes, and a MutationObserver puts it back if a re-render drops it;
+ * the border, the "Game Shot!" line and the darts-thrown note are all generated
+ * content, which React cannot clear because it never sees it.
+ */
+const WINNER_FLAG = "data-adt-winner";
+const MESSAGE_ATTR = "data-adt-winner-message";
+const STYLE_ID = "winner-animation";
 
-  .ad-ext_winner-score-wrapper + div{
-    margin-bottom: 1rem;
-  }
+let gameDataWatcherUnwatch: (() => void) | undefined;
+let reapplyObserver: MutationObserver | null = null;
 
-  .ad-ext_winner-animation {
-    overflow: visible;
+const STYLES = `
+  [${WINNER_FLAG}] {
     position: relative;
-    z-index: 1;
+    isolation: isolate;
+    border-radius: 1rem;
   }
 
-  .ad-ext_winner-animation > div:first-child {
-    border-radius: 5px;
-    background: linear-gradient(0deg, #000000, #212121);
-  }
-
-  .ad-ext_winner-animation:before,
-  .ad-ext_winner-animation:after {
+  /* the animated ring */
+  [${WINNER_FLAG}]::before {
     content: "";
     position: absolute;
-    left: -2px;
-    top: -2px;
-    background: linear-gradient(
-      45deg,
-      #fb0094,
-      #0000ff,
-      #00ff00,
-      #ffff00,
-      #ff0000,
-      #fb0094,
-      #0000ff,
-      #00ff00,
-      #ffff00,
-      #ff0000
-    );
-    background-size: 400%;
-    width: calc(100% + 4px);
-    height: calc(100% + 4px);
+    inset: -3px;
     z-index: -1;
-    animation: steam 20s linear infinite;
-    border-radius: 5px;
+    border-radius: inherit;
+    background: linear-gradient(45deg, #fb0094, #00f, #0f0, #ff0, #f00, #fb0094, #00f, #0f0, #ff0, #f00);
+    background-size: 400%;
+    animation: adt-winner-steam 20s linear infinite;
   }
 
-  .ad-ext_winner-animation .ad-ext-player-winner + div {
-    border-radius: 5px;
-    background: black;
-    margin-top: 2px;
-  }
-  
-  @keyframes steam {
-    0% {
-      background-position: 0 0;
-    }
-    50% {
-      background-position: 400% 0;
-    }
-    100% {
-      background-position: 0 0;
-    }
+  /* "Game Shot!", plus whatever the leg deserved */
+  [${WINNER_FLAG}]::after {
+    content: attr(${MESSAGE_ATTR});
+    position: absolute;
+    inset-inline: 0;
+    bottom: 100%;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    white-space: pre-line;
+    font-family: var(--ad-font-display, inherit);
+    font-size: clamp(1.25rem, 2.5cqmin, 2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 8px rgb(0 0 0 / 80%);
+    pointer-events: none;
   }
 
-  .ad-ext_winner-animation:after {
-    filter: blur(50px);
+  @keyframes adt-winner-steam {
+    0%   { background-position: 0 0; }
+    50%  { background-position: 400% 0; }
+    100% { background-position: 0 0; }
   }
 `;
 
-// Motivation text mapping based on game type and darts thrown
-const MOTIVATION_TEXT = [ "UNBELIEVABLE!", "Splendid Game!", "Great Game!", "Nice Game!" ];
-const MOTIVATION_MAPPING: Record<string, number[]> = {
-  v121: [ 3, 4, 5, 6 ],
-  v170: [ 3, 5, 7, 9 ],
-  v301: [ 6, 9, 12, 15 ],
-  v501: [ 9, 15, 20, 25 ],
-  v701: [ 12, 18, 23, 28 ],
-  v901: [ 16, 22, 27, 32 ],
-};
+export async function winnerAnimation() {
+  console.log("Autodarts Tools: Winner Animation");
 
-let gameDataWatcher: (() => void) | null = null;
+  addStyles(STYLES, STYLE_ID);
 
-/**
- * Removes winner animation styling and elements
- */
-export async function removeWinnerAnimation(): Promise<void> {
-  await waitForElement("#ad-ext-turn");
+  const gameData = await AutodartsToolsGameData.getValue();
+  await apply(gameData);
 
-  try {
-    document.querySelectorAll(".ad-ext-player-score")?.forEach((el) => {
-      (el as HTMLElement).style.fontSize = "";
-      (el as HTMLElement).style.lineHeight = "";
-    });
-
-    document.getElementById("ad-ext_winner-animation--message")?.remove();
-
-    const winnerAnimationContainer = document.querySelector(".ad-ext_winner-animation");
-    if (!winnerAnimationContainer) return;
-
-    const winnerScoreWrapperEl = winnerAnimationContainer?.querySelector(".ad-ext_winner-score-wrapper");
-    if (winnerScoreWrapperEl) (winnerScoreWrapperEl as HTMLElement).style.height = "";
-
-    document.querySelector(".ad-ext_winner-animation")?.classList.remove("ad-ext_winner-animation");
-  } catch (e) {
-    console.error("Autodarts Tools: Remove Winner Animation - Error: ", e);
-  }
+  gameDataWatcherUnwatch?.();
+  gameDataWatcherUnwatch = AutodartsToolsGameData.watch(apply);
 }
 
-/**
- * Removes winner animation when game is edited
- */
-export async function removeWinnerAnimationOnEdit(): Promise<void> {
-  try {
-    await removeWinnerAnimation();
-  } catch (e) {
-    console.error("Autodarts Tools: Remove Winner Animation on Edit - Error: ", e);
-  }
+export async function winnerAnimationOnRemove() {
+  gameDataWatcherUnwatch?.();
+  gameDataWatcherUnwatch = undefined;
+  clear();
+  removeStyles(STYLE_ID);
 }
 
-/**
- * Applies winner animation based on game data
- */
-async function applyWinnerAnimation(gameData: any): Promise<void> {
-  if (!gameData?.match) return;
+async function apply(gameData: IGameData): Promise<void> {
+  const match = gameData?.match;
+  if (!match) return;
 
-  // If match is activated (>= 0), call removeWinnerAnimationOnEdit
-  if ((gameData.match.activated !== undefined && gameData.match.activated >= 0) || (gameData.match.winner === -1 && gameData.match.gameWinner === -1)) {
-    return await removeWinnerAnimationOnEdit();
-  }
+  // A throw being corrected replays a finished leg; the ring should come off
+  // rather than celebrate it twice.
+  const editing = match.activated !== undefined && match.activated >= 0;
+  const winner = match.gameWinner ?? -1;
+  if (editing || winner < 0) return clear();
 
-  try {
-    const winnerPlayerCard = document.querySelector(".ad-ext-player-winner");
-    const winnerScoreEl = winnerPlayerCard?.querySelector(".ad-ext-player-score");
-    if (!winnerScoreEl) return;
+  const config: IConfig = await AutodartsToolsConfig.getValue();
+  if (!config.winnerAnimation.enabled) return clear();
 
-    const dartsThrown = gameData.match.stats[0].matchStats.dartsThrown;
-    const winnerPlayerCardContainer = winnerPlayerCard?.parentElement;
-    let winnerScoreWrapperEl = winnerPlayerCard?.querySelector(".ad-ext_winner-score-wrapper");
+  const card = qsa<HTMLElement>(SELECTORS.match.playerCards)[winner];
+  if (!card) return;
 
-    const winnerScoreElHeight = winnerScoreWrapperEl?.clientHeight || winnerScoreEl.clientHeight;
+  clear();
+  card.setAttribute(WINNER_FLAG, "");
+  card.setAttribute(MESSAGE_ATTR, message(gameData));
 
-    if (!winnerScoreWrapperEl) {
-      winnerScoreWrapperEl = document.createElement("div");
-      winnerScoreWrapperEl.classList.add("ad-ext_winner-score-wrapper");
-      winnerScoreEl.parentNode?.insertBefore(winnerScoreWrapperEl, winnerScoreEl);
-      winnerScoreWrapperEl.appendChild(winnerScoreEl);
-
-      (winnerScoreWrapperEl as HTMLElement).style.height = `${winnerScoreElHeight}px`;
+  // React re-renders the cards as the leg wraps up; put the flag back if the
+  // element we marked is replaced.
+  reapplyObserver?.disconnect();
+  reapplyObserver = new MutationObserver(() => {
+    const current = qsa<HTMLElement>(SELECTORS.match.playerCards)[winner];
+    if (current && !current.hasAttribute(WINNER_FLAG)) {
+      clear();
+      current.setAttribute(WINNER_FLAG, "");
+      current.setAttribute(MESSAGE_ATTR, message(gameData));
     }
-
-    const config: IConfig = await AutodartsToolsConfig.getValue();
-
-    if (!config.winnerAnimation.enabled) return;
-
-    // Add animation class to container
-    winnerPlayerCardContainer?.classList.add("ad-ext_winner-animation");
-
-    // Create and add winner message
-    document.getElementById("ad-ext_winner-animation--message")?.remove();
-    const winnerAnimationMessageElement = document.createElement("p");
-    winnerAnimationMessageElement.id = "ad-ext_winner-animation--message";
-    winnerAnimationMessageElement.textContent = "Game Shot!";
-    winnerAnimationMessageElement.style.fontSize = "4.85cqmin";
-    winnerAnimationMessageElement.style.lineHeight = `${winnerScoreElHeight / 5 * 3.6}px`;
-
-    (winnerScoreEl as HTMLElement).style.fontSize = `${winnerScoreElHeight / 5 * 1.4}px`;
-    (winnerScoreEl as HTMLElement).style.lineHeight = `${winnerScoreElHeight / 5 * 1.4}px`;
-    winnerScoreWrapperEl.appendChild(winnerAnimationMessageElement);
-
-    if (gameData.gameMode !== GameMode.X01) return;
-
-    // Set motivation text based on game type and darts thrown
-    let baseScore = "";
-    if (gameData.match.settings && "baseScore" in gameData.match.settings) {
-      baseScore = gameData.match.settings.baseScore.toString();
-    } else {
-      baseScore = document.querySelector("#ad-ext-game-variant")?.nextSibling?.textContent || "";
-    }
-
-    if (!baseScore || !dartsThrown) return;
-
-    const baseScoreKeys = MOTIVATION_MAPPING[`v${baseScore}`];
-    if (baseScoreKeys) {
-      baseScoreKeys.some((key, index) => {
-        if (key >= dartsThrown) {
-          winnerAnimationMessageElement.textContent = MOTIVATION_TEXT[index];
-          return true;
-        }
-        return false;
-      });
-    }
-  } catch (e) {
-    console.warn("Autodarts Tools: Winner Animation - Error: ", e);
-  }
-}
-
-/**
- * Sets up and displays the winner animation
- */
-export async function winnerAnimation(): Promise<void> {
-  console.log("Autodarts Tools: Winner Animation - Initializing");
-
-  addStyles(WINNER_ANIMATION_STYLES, "winner-animation");
-  await waitForElement("#ad-ext-turn");
-
-  if (gameDataWatcher) {
-    gameDataWatcher();
-  }
-
-  // Initial check when function is called
-  const initialGameData = await AutodartsToolsGameData.getValue();
-  await applyWinnerAnimation(initialGameData);
-
-  gameDataWatcher = AutodartsToolsGameData.watch(async (gameData) => {
-    await applyWinnerAnimation(gameData);
   });
+  const host = card.parentElement;
+  if (host) reapplyObserver.observe(host, { childList: true, subtree: true });
 }
 
-/**
- * Cleanup function to remove watcher when component is unmounted
- */
-export function winnerAnimationOnRemove(): void {
-  if (gameDataWatcher) {
-    gameDataWatcher();
-    gameDataWatcher = null;
+/** "Game Shot!" on its own, or with what the leg was worth. */
+function message(gameData: IGameData): string {
+  const match = gameData.match!;
+  const darts = match.stats?.[match.gameWinner]?.matchStats?.dartsThrown;
+
+  if (gameData.gameMode !== GameMode.X01 || !darts) return "Game Shot!";
+
+  const settings = match.settings as { baseScore?: number };
+  const base = settings?.baseScore;
+  // A 501 leg in nine darts is the perfect leg; 301 in six is its equivalent.
+  const perfect = (base === 501 && darts === 9) || (base === 301 && darts === 6);
+
+  if (perfect) return `Game Shot!\n${darts} Darter — Perfect Leg!`;
+  return `Game Shot!\n${darts} Darts`;
+}
+
+function clear() {
+  reapplyObserver?.disconnect();
+  reapplyObserver = null;
+  for (const el of document.querySelectorAll(`[${WINNER_FLAG}]`)) {
+    el.removeAttribute(WINNER_FLAG);
+    el.removeAttribute(MESSAGE_ATTR);
   }
 }

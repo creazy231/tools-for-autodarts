@@ -305,7 +305,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "larger-legs-sets", title: "Larger Legs Sets Settings", component: LargerLegsSets, hasSettings: true, v2Ready: true },
       { id: "larger-player-names", title: "Larger Player Names Settings", component: LargerPlayerNames, hasSettings: true, v2Ready: true },
       { id: "larger-player-match-data", title: "Larger Player Match Data Settings", component: LargerPlayerMatchData, hasSettings: true, v2Ready: true },
-      { id: "winner-animation", title: "Winner Animation Settings", component: WinnerAnimation, hasSettings: false },
+      { id: "winner-animation", title: "Winner Animation Settings", component: WinnerAnimation, hasSettings: false, v2Ready: true },
       { id: "automatic-fullscreen", title: "Automatic Fullscreen Settings", component: AutomaticFullscreen, hasSettings: false, v2Ready: true },
       { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true },
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true },

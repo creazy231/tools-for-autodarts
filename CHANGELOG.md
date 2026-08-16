@@ -22,6 +22,14 @@ All notable changes to this project will be documented in this file.
 - Sound FX's lobby join and leave sounds never fired on the rebuilt site: the check was for the old `/lobbies/` route, and the new one is `/lobby/`
 
 ### Changed
+- Ported seven of the Matches features to the rebuilt site, and checked the other eleven one by one
+  - **Colors**, **Smaller Scores**, **Larger Player Names**, **Larger Legs/Sets**, **Larger Player Match Data** are stylesheets now instead of styles written onto elements. The rebuilt score cards are React and re-render on every dart, so anything set on the element itself was gone by the next throw; Colors also drops the twice-a-second poll that only existed to paper over that
+  - The rebuilt cards needed more than a remap: the active player is marked by a gradient background image rather than a class, and the score, name and legs counter each sit in a fixed-height box sized for the site's own type, so every rule grows or shrinks its box with the text
+  - **Automatic Fullscreen** builds its own button for the match header instead of cloning Chakra's settings button into a `ul` that no longer exists. Entering automatically is attempted but not relied on — browsers grant fullscreen only from a user gesture
+  - **Winner Animation** is CSS keyed on a single attribute, so the ring and the "Game Shot! / N Darts" line are generated content React cannot clear. v1 restructured the card, which the rebuilt site undoes
+  - **Hide Menu In Match** and **Checkout Guide** are not ported and no longer needed: the rebuilt match screen ships no navigation to hide, and it shows a checkout route beside every player's score already
+  - **Takeout Notification**, **Next Player On Takeout Stuck**, **Automatic Next Leg**, **Instant Replay** and **Streaming Mode** are unchanged and still disabled — each is driven by board events or the board camera, so none can be built or checked without a real board
+  - **Zoom**, **Quick Correction**, **Enhanced Scoring Display** and **Gotcha** are feasible without a board but not done yet
 - Brought Caller and Sound FX back on the rebuilt site. Both read game data and never touched the old markup, so the port was the gate plus the lobby-route fix above
   - Their settings dialogs are now the widest of the set — 1152px, up from 674px — because both pair a grid of sounds with a column of options; every other settings dialog goes to 896px, the width it always asked for
 - Ported Animations to the rebuilt site — the first in-match feature to make the move
