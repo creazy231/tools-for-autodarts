@@ -17,19 +17,17 @@
                 { label: 'Manual', value: true },
               ]"
             />
-            <div class="relative">
-              <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+            <AppInput
+              v-model="config.discord.url"
+              placeholder="Enter Discord webhook URL"
+              label="Webhook URL"
+              helper-text="The Discord webhook URL to send lobby invitations to"
+              size="sm"
+            >
+              <template #icon>
                 <span class="icon-[pixelarticons--link]" />
-              </span>
-              <AppInput
-                v-model="config.discord.url"
-                placeholder="Enter Discord webhook URL"
-                label="Webhook URL"
-                class="pl-9"
-                helper-text="The Discord webhook URL to send lobby invitations to"
-                size="sm"
-              />
-            </div>
+              </template>
+            </AppInput>
 
             <div v-if="config?.discord?.autoStartAfterTimer" class="mt-6 border-t border-white/20 pt-4">
               <h4 class="mb-3 font-semibold">

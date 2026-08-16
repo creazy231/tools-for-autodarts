@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
 
 ### Fixed
+- Text ran straight over the icon in every settings field that has one — the webhook URL, sound and effect names, animation URLs, the TTS text. Same cause as the modal widths below: `.adt-input` sets its padding after `@tailwind utilities`, so the `pl-9` those fields relied on lost the cascade. A leading icon now goes in `AppInput`'s `icon` slot, which owns the spacing, and sits against the input rather than being laid over the whole field — where a field had a label it was drawn over that too
 - Modal size props never did anything. `.adt-modal` fixes the width to 674px and is declared after `@tailwind utilities`, so it beat every `max-w-*` a modal asked for — including the wide shell the settings dialogs have always requested. Sizes are now `adt-modal-*` classes that cascade properly
 - Settings dialogs taller than 85% of the window were cut off with no way to scroll to the rest, footer buttons included
 - Sound FX's lobby join and leave sounds never fired on the rebuilt site: the check was for the old `/lobbies/` route, and the new one is `/lobby/`

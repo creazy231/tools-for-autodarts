@@ -217,18 +217,16 @@
           <label for="effect-name" class="mb-1 block text-sm font-medium text-white">
             Effect Name (optional)
           </label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput
+            id="effect-name"
+            v-model="newEffect.name"
+            type="text"
+            placeholder="Enter a name for this effect"
+          >
+            <template #icon>
               <span class="icon-[pixelarticons--contact-multiple]" />
-            </span>
-            <AppInput
-              id="effect-name"
-              v-model="newEffect.name"
-              type="text"
-              placeholder="Enter a name for this effect"
-              class="pl-9"
-            />
-          </div>
+            </template>
+          </AppInput>
         </div>
 
         <div>
@@ -247,13 +245,12 @@
         <div v-if="newEffect.type === WledType.PRESET">
           <label for="effect-url" class="mb-1 block text-sm font-medium text-white">WLED
             domain/IP</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput id="effect-url" v-model="newEffect.url" type="text"
+            placeholder="wled-device.local | 192.168.0.69">
+            <template #icon>
               <span class="icon-[pixelarticons--link]" />
-            </span>
-            <AppInput id="effect-url" v-model="newEffect.url" type="text" class="pl-9"
-              placeholder="wled-device.local | 192.168.0.69" />
-          </div>
+            </template>
+          </AppInput>
           <div v-if="urlError" class="mt-1 text-sm text-red-500">
             {{ urlError }}
           </div>
@@ -269,13 +266,12 @@
         <div v-if="newEffect.type === WledType.URL">
           <label for="effect-url" class="mb-1 block text-sm font-medium text-white">Effect
             URL</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput id="effect-url" v-model="newEffect.url" type="text"
+            placeholder="http://wled-device.local/win/PL=1">
+            <template #icon>
               <span class="icon-[pixelarticons--link]" />
-            </span>
-            <AppInput id="effect-url" v-model="newEffect.url" type="text"
-              placeholder="http://wled-device.local/win/PL=1" class="pl-9" />
-          </div>
+            </template>
+          </AppInput>
           <div v-if="urlError" class="mt-1 text-sm text-red-500">
             {{ urlError }}
           </div>
@@ -286,13 +282,12 @@
         <div v-if="newEffect.type === WledType.API">
           <label for="effect-url" class="mb-1 block text-sm font-medium text-white">WLED API
             Endpoint</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput id="effect-url" v-model="newEffect.url" type="text"
+            placeholder="http://wled-device.local/json">
+            <template #icon>
               <span class="icon-[pixelarticons--link]" />
-            </span>
-            <AppInput id="effect-url" v-model="newEffect.url" type="text"
-              placeholder="http://wled-device.local/json" class="pl-9" />
-          </div>
+            </template>
+          </AppInput>
           <div v-if="urlError" class="mt-1 text-sm text-red-500">
             {{ urlError }}
           </div>

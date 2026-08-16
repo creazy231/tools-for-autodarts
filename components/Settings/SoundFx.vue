@@ -133,34 +133,30 @@
       <div class="space-y-4">
         <div>
           <label for="sound-name" class="mb-1 block text-sm font-medium text-white">Sound Name (optional)</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput
+            id="sound-name"
+            v-model="newSound.name"
+            type="text"
+            placeholder="Enter a name for this sound"
+          >
+            <template #icon>
               <span class="icon-[pixelarticons--contact-multiple]" />
-            </span>
-            <AppInput
-              id="sound-name"
-              v-model="newSound.name"
-              type="text"
-              placeholder="Enter a name for this sound"
-              class="pl-9"
-            />
-          </div>
+            </template>
+          </AppInput>
         </div>
 
         <div v-if="!newSound.base64">
           <label for="sound-url" class="mb-1 block text-sm font-medium text-white">Sound URL (MP3, WAV, etc.)</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput
+            id="sound-url"
+            v-model="newSound.url"
+            type="url"
+            placeholder="https://example.com/sound.mp3"
+          >
+            <template #icon>
               <span class="icon-[pixelarticons--link]" />
-            </span>
-            <AppInput
-              id="sound-url"
-              v-model="newSound.url"
-              type="url"
-              placeholder="https://example.com/sound.mp3"
-              class="pl-9"
-            />
-          </div>
+            </template>
+          </AppInput>
           <div v-if="urlError" class="mt-1 text-sm text-red-500">
             {{ urlError }}
           </div>
@@ -276,18 +272,16 @@
             <label for="bulk-trigger" class="mb-1 block text-sm font-medium text-white">
               Assign same trigger to all files (optional)
             </label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+            <AppInput
+              id="bulk-trigger"
+              v-model="bulkTrigger"
+              type="text"
+              placeholder="e.g., t20, 180, gameshot"
+            >
+              <template #icon>
                 <span class="icon-[pixelarticons--edit]" />
-              </span>
-              <AppInput
-                id="bulk-trigger"
-                v-model="bulkTrigger"
-                type="text"
-                placeholder="e.g., t20, 180, gameshot"
-                class="pl-9"
-              />
-            </div>
+              </template>
+            </AppInput>
             <p class="mt-1 text-xs text-white/60">
               If provided, all uploaded files will be assigned this trigger.
             </p>
@@ -345,18 +339,16 @@
       <div class="space-y-4">
         <div>
           <label for="tts-text" class="mb-1 block text-sm font-medium text-white">Text to speak</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput
+            id="tts-text"
+            v-model="ttsForm.text"
+            type="text"
+            placeholder="e.g., One hundred and eighty!"
+          >
+            <template #icon>
               <span class="icon-[pixelarticons--chat]" />
-            </span>
-            <AppInput
-              id="tts-text"
-              v-model="ttsForm.text"
-              type="text"
-              placeholder="e.g., One hundred and eighty!"
-              class="pl-9"
-            />
-          </div>
+            </template>
+          </AppInput>
         </div>
 
         <div>

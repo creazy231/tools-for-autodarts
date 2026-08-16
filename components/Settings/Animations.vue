@@ -180,19 +180,17 @@
           <label for="animation-url" class="mb-1 block text-sm font-medium text-white">
             {{ isUploadedGif ? "Uploaded GIF" : "Animation URL (GIF)" }}
           </label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+          <AppInput
+            id="animation-url"
+            v-model="newAnimation.url"
+            type="url"
+            :placeholder="isUploadedGif ? `Uploaded GIF: ${uploadedGifFilename}` : 'https://example.com/animation.gif'"
+            :disabled="isUploadedGif"
+          >
+            <template #icon>
               <span :class="isUploadedGif ? 'icon-[pixelarticons--image]' : 'icon-[pixelarticons--link]'" />
-            </span>
-            <AppInput
-              id="animation-url"
-              v-model="newAnimation.url"
-              type="url"
-              :placeholder="isUploadedGif ? `Uploaded GIF: ${uploadedGifFilename}` : 'https://example.com/animation.gif'"
-              class="pl-9"
-              :disabled="isUploadedGif"
-            />
-          </div>
+            </template>
+          </AppInput>
           <p v-if="isUploadedGif" class="mt-1 text-xs text-white/60">
             This GIF was uploaded to your browser's storage and cannot be edited directly.
           </p>
@@ -312,18 +310,16 @@
             <label for="bulk-trigger-gif" class="mb-1 block text-sm font-medium text-white">
               Assign same trigger to all files (optional)
             </label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-3 flex items-center text-white/60">
+            <AppInput
+              id="bulk-trigger-gif"
+              v-model="bulkTriggerGif"
+              type="text"
+              placeholder="e.g., t20, 180, gameshot"
+            >
+              <template #icon>
                 <span class="icon-[pixelarticons--edit]" />
-              </span>
-              <AppInput
-                id="bulk-trigger-gif"
-                v-model="bulkTriggerGif"
-                type="text"
-                placeholder="e.g., t20, 180, gameshot"
-                class="pl-9"
-              />
-            </div>
+              </template>
+            </AppInput>
             <p class="mt-1 text-xs text-white/60">
               If provided, all uploaded files will be assigned this trigger.
             </p>

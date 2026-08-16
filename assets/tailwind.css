@@ -364,6 +364,40 @@ body {
   transition: var(--ad-transition-interactive);
 }
 
+/*
+ * Leading icon.
+ *
+ * The icon has to be laid out against the input alone, which is why the group
+ * wraps only the input and not the field's label — an `inset-y-0` overlay on
+ * the whole field centres the icon over label-plus-input and sits high.
+ *
+ * `.adt-input-has-icon` is a class rather than Tailwind's `pl-9` because
+ * everything in this file is declared after `@tailwind utilities`: same
+ * specificity, later in source order, so `.adt-input`'s padding shorthand won
+ * and the placeholder ran straight over the icon.
+ */
+.adt-input-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.adt-input-icon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  color: var(--ad-text-muted);
+  pointer-events: none;
+}
+
+/* 16px inset + a 16px glyph + a 14px gap. */
+.adt-input-has-icon {
+  padding-left: 46px;
+}
+
 .adt-input:focus,
 .adt-input:focus-within {
   box-shadow: var(--ad-focus-ring);
