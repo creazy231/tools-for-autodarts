@@ -25,11 +25,14 @@ import CheckoutGuide from "./CheckoutGuide.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
 
+import type { IConfig } from "@/utils/storage";
+
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import {
   AutodartsToolsConfig,
   AutodartsToolsUrlStatus,
 } from "@/utils/storage";
+import { SELECTORS } from "@/utils/selectors";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
@@ -38,6 +41,25 @@ import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 let matchInitialized = false;
 let activeMatchObserver: MutationObserver;
 let gameDataWatcher: any;
+
+/**
+ * Match features whose port to the rebuilt site has landed.
+ *
+ * Everything below still targets the old Chakra markup — `#ad-ext-turn`,
+ * `.ad-ext-player`, `#root > div > div:nth-of-type(2)` — none of which the
+ * rebuilt match screen emits. Turning them loose on it does nothing useful and
+ * plenty that is confusing, and their settings cards are disabled, so a user
+ * carrying `enabled: true` from before could not switch them off.
+ *
+ * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set the
+ * flag there as each feature is ported.
+ */
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "animations" ]);
+
+function isOn(config: IConfig, feature: keyof IConfig): boolean {
+  if (!PORTED_TO_V2.has(feature)) return false;
+  return Boolean((config[feature] as { enabled?: boolean })?.enabled);
+}
 
 const tools = {
   streamingMode: null as any,
@@ -59,7 +81,12 @@ export default defineContentScript({
       if (!url && (isiOS() || isSafari())) url = window.location.href;
 
       if (/\/(matches|boards)\/([0-9a-f-]+)/.test(url) && !url.includes("history")) {
-        await waitForElement("#root > div > div:nth-of-type(2)");
+        // The app shell. The old gate here, `#root > div > div:nth-of-type(2)`,
+        // resolves on v2 to an empty zero-height trailing div — it settles, so
+        // nothing looked broken, but it was not waiting for anything.
+        await waitForElement(SELECTORS.app.contentRoot, 15000).catch(() => {
+          console.warn("Autodarts Tools: Match page did not render in time");
+        });
 
         // Extract lobby ID from URL and fetch lobby data
         let matchId = url.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)?.[0];
@@ -135,99 +162,102 @@ async function initMatch(ctx, url: string, matchId?: string) {
 
   const config = await AutodartsToolsConfig.getValue();
 
-  if (config.hideMenuInMatch.enabled) {
+  if (isOn(config, "hideMenuInMatch")) {
     await initScript(hideMenuInMatch, url).catch(console.error);
   }
 
-  if (config.automaticFullscreen.enabled) {
+  if (isOn(config, "automaticFullscreen")) {
     await initScript(automaticFullscreen, url).catch(console.error);
   }
 
-  if (config.streamingMode.enabled) {
+  if (isOn(config, "streamingMode")) {
     await initStreamingMode(ctx).catch(console.error);
   }
 
-  if (config.colors.enabled) {
+  if (isOn(config, "colors")) {
     await initScript(colorChange, url).catch(console.error);
   }
 
-  if (config.takeout.enabled) {
+  if (isOn(config, "takeout")) {
     await initTakeout(ctx).catch(console.error);
   }
 
-  if (config.nextPlayerOnTakeOutStuck.enabled) {
+  if (isOn(config, "nextPlayerOnTakeOutStuck")) {
     await initScript(nextPlayerOnTakeOutStuck, url).catch(console.error);
   }
 
-  if (config.automaticNextLeg.enabled) {
+  if (isOn(config, "automaticNextLeg")) {
     await initScript(automaticNextLeg, url).catch(console.error);
   }
 
-  if (config.smallerScores.enabled) {
+  if (isOn(config, "smallerScores")) {
     await initScript(smallerScores, url).catch(console.error);
   }
 
-  if (config.largerLegsSets.enabled) {
+  if (isOn(config, "largerLegsSets")) {
     await initScript(largerLegsSets, url).catch(console.error);
   }
 
-  if (config.largerPlayerMatchData.enabled) {
+  if (isOn(config, "largerPlayerMatchData")) {
     await initScript(largerPlayerMatchData, url).catch(console.error);
   }
 
-  if (config.largerPlayerNames.enabled) {
+  if (isOn(config, "largerPlayerNames")) {
     await initScript(largerPlayerNames, url).catch(console.error);
   }
 
-  if (config.winnerAnimation.enabled) {
+  if (isOn(config, "winnerAnimation")) {
     await initScript(winnerAnimation, url).catch(console.error);
   }
 
-  if (config.zoom.enabled) {
+  if (isOn(config, "zoom")) {
     await initZoom(ctx).catch(console.error);
   }
 
-  if (config.quickCorrection.enabled) {
+  if (isOn(config, "quickCorrection")) {
     await initQuickCorrection(ctx).catch(console.error);
   }
 
-  if (config.instantReplay.enabled) {
+  if (isOn(config, "instantReplay")) {
     await initInstantReplay(ctx).catch(console.error);
   }
 
-  if (config.gotcha?.enabled) {
+  if (isOn(config, "gotcha")) {
     await initGotcha(ctx).catch(console.error);
   }
 
-  if (config.checkoutGuide?.enabled) {
+  if (isOn(config, "checkoutGuide")) {
     await initCheckoutGuide(ctx).catch(console.error);
   }
 
-  if (matchId && config.discord.autoStartAfterTimer?.stream) {
+  // Discord's lobby half — the webhook announcements — is ported and enabled in
+  // entrypoints/lobby.content. This is the other half, which starts a stream
+  // once the match begins, and it is not.
+  if (matchId && isOn(config, "discord") && config.discord.autoStartAfterTimer?.stream) {
     if (config.discord.autoStartAfterTimer?.matchId === matchId || config.discord.autoStartAfterTimer?.matchId?.includes(matchId)) await initScript(discordStream, url).catch(console.error);
   }
 
   // *********************** YOU CAN ADD HERE ***********************
 
-  if (config.enhancedScoringDisplay.enabled) {
+  if (isOn(config, "enhancedScoringDisplay")) {
     await initScript(enhancedScoringDisplay, url).catch(console.error);
   }
 
   // ****************************************************************
 
-  if (config.animations.enabled) {
+  if (isOn(config, "animations")) {
     await initAnimations(ctx).catch(console.error);
   }
 
-  if (config.caller.enabled) {
+  if (isOn(config, "caller")) {
     await initScript(caller, url).catch(console.error);
   }
 
-  if (config.soundFx.enabled) {
+  if (isOn(config, "soundFx")) {
     await initScript(soundFx, url).catch(console.error);
   }
 
-  if (config.wledFx.enabled) {
+  if (isOn(config, "wledFx")) {
     await initScript(wledFx, url).catch(console.error);
   }
 }
@@ -367,18 +397,25 @@ async function initStreamingMode(ctx) {
 }
 
 async function initAnimations(ctx) {
-  await waitForElement("#root > div > div:nth-of-type(2)");
+  // The app shell, not the match screen: the overlay covers the viewport and
+  // measures the board when it plays, so it has nothing to wait for beyond a
+  // rendered page. Anchoring it in `body` also keeps it clear of the grid cell
+  // the site re-renders around the board on every throw.
+  await waitForElement(SELECTORS.app.contentRoot, 15000).catch(() => {
+    console.warn("Autodarts Tools: Animations - page did not render in time");
+  });
+
   tools.animations = await createShadowRootUi(ctx, {
     name: "autodarts-tools-animations",
     position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
+    anchor: "body",
+    append: "last",
+    // The overlay pins itself — see Animations.vue for why the host cannot.
     onMount: (container: any) => {
       console.log("Autodarts Tools: Animations initialized");
       const app = createApp(Animations);
       app.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
+      container.classList.add("dark");
       return app;
     },
     onRemove: (app: any) => {

@@ -16,6 +16,13 @@ All notable changes to this project will be documented in this file.
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
 
 ### Changed
+- Ported Animations to the rebuilt site — the first in-match feature to make the move
+  - The animation is placed over the rebuilt match screen's dartboard in *Board Only* mode; v1 found that area through `#ad-ext-turn`, a hook the rebuilt site does not emit
+  - The overlay is now anchored in `body` rather than inside the match layout, which the site re-renders around the board on every throw
+  - Fixed animations playing twice over: the game-data watcher was never unregistered, so every remount — a new leg, or the hand-off out of a bull-off — left another one running
+  - Every trigger kind was re-checked against a live X01 leg: per-dart segments, turn totals, ranges, three-dart combinations, `outside`, `busted` and `gameshot`
+  - Documented **View Mode** and range triggers, neither of which the README mentioned
+- Match features that have not been ported yet no longer run on the rebuilt site. All of them target the old Chakra markup, and their settings cards are disabled, so a user carrying `enabled: true` from before could not switch them off
 - Ported External Boards to the rebuilt site
   - The section now attaches to the rebuilt *My Devices* page, anchored on its heading rather than on a "My Boards" heading that no longer exists
   - The **Stats** button is gone: `/boards/<id>/stats` answers 404 on the rebuilt site, as does `/boards/<id>` — Follow is the only board view left

@@ -286,11 +286,26 @@ export const SELECTORS = {
   /**
    * In-match screen — entrypoints/match.content, the largest feature surface.
    *
-   * Every v2 entry here is unverified: capturing the match DOM needs a live
-   * match, which the snapshot tooling cannot start on its own. Run
-   * `./scripts/dev-chrome.sh`, start a match, and fill these in.
+   * Entries still marked TODO(v2) are unverified: they belong to features that
+   * have not been ported yet. The ones below them were filled in from a live
+   * X01 match on the rebuilt site.
    */
   match: {
+    /**
+     * The square block holding the dartboard, or the board camera view when a
+     * board is attached. This is what Animations covers in "board only" mode.
+     *
+     * v1's equivalent was `#ad-ext-turn`'s next sibling, narrowed to the
+     * `.showAnimations` element the old site rendered around the board image.
+     * The rebuilt match screen emits neither, so both anchors below are ours:
+     * the site's own aria-label first, then the single square block in `main`,
+     * which is the same element one level out.
+     */
+    boardArea: [
+      "main [role='img'][aria-label='Dartboard']",
+      "main div.aspect-square",
+    ],
+
     /** autodarts-emitted hooks on the match screen (v1). */
     playerDisplay: [ "#ad-ext-player-display" ],
     turn: [ "#ad-ext-turn" ],

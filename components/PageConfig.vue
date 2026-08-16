@@ -323,7 +323,7 @@ const featureGroups: FeatureGroup[] = [
     id: "sounds-animations",
     tab: 3,
     features: [
-      { id: "animations", title: "Animations Settings", component: Animations, hasSettings: true },
+      { id: "animations", title: "Animations Settings", component: Animations, hasSettings: true, v2Ready: true },
       { id: "caller", title: "Caller Settings", component: Caller, hasSettings: true },
       { id: "sound-fx", title: "Sound FX Settings", component: SoundFx, hasSettings: true },
       { id: "wled-fx", title: "WLED Settings", component: Wled, hasSettings: true },

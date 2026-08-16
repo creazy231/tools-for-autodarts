@@ -472,12 +472,16 @@ The Animations feature allows you to display custom GIF animations for special e
 - **Delay**: Set how long to wait before showing the animation (in seconds)
 - **Duration**: Set how long the animation should display (in seconds)
 - **Object Fit**: Choose between 'cover' (fill screen) or 'contain' (maintain aspect ratio)
+- **View Mode**: Choose between 'Board Only' (the animation covers the dartboard) or 'Full Page' (it covers the whole page, over a blurred background)
 - **Bulk Upload with Trigger Assignment**: When uploading multiple GIF files, you can assign the same trigger to all files at once when "Generate triggers from filenames" is disabled, making it easy to set up larger animation sets
+
+Clicking an animation dismisses it early, so a long GIF never has to be waited out mid-leg.
 
 #### Supported Triggers
 Animations can be triggered by various game events using these tags:
 
 - **Points**: `0` to `180` (total points scored in a turn)
+- **Ranges**: `100-180` (any turn total within the range; `range_100_180` also works)
 - **Singles**: `s0` to `s20` and `25` (single segments, `25` for bull)
 - **Doubles**: `d1` to `d20` (double segments, `bull` for bullseye)
 - **Triples**: `t1` to `t20` (triple segments)
