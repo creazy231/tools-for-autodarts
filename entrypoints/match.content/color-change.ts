@@ -1,65 +1,69 @@
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { waitForElement } from "@/utils";
+import { SELECTORS } from "@/utils/selectors";
+import { addStyles, removeStyles } from "@/utils";
 
-let colorChangeInterval: NodeJS.Timeout | null = null;
+/**
+ * Colors — recolour the score cards, the throw bar and the page behind them.
+ *
+ * v1 walked the player display twice a second and wrote inline styles onto
+ * every element it found. That was already a poll where it did not need to be
+ * one, and on the rebuilt site it would not survive anyway: React re-renders
+ * the score cards on every dart. One stylesheet does the whole job.
+ *
+ * The site paints the active player's card with a gradient image rather than a
+ * background colour, so that has to be turned off explicitly or it covers
+ * whatever colour is set here.
+ */
+const STYLE_ID = "color-change";
 
 export async function colorChange() {
-  console.log("Autodarts Tools: color change");
-  handleChangeColor().catch(console.error);
-  colorChangeInterval = setInterval(handleChangeColor, 500);
-}
-
-async function handleChangeColor() {
   try {
     const config = await AutodartsToolsConfig.getValue();
+    if (!config.colors.enabled) return;
 
-    const elements: HTMLElement[] = [];
+    const { background, text, matchBackground } = config.colors;
+    const card = SELECTORS.match.playerCards[0];
+    const scoreCard = SELECTORS.match.playerScoreCard[0];
+    const turnBar = SELECTORS.match.turnBar[0];
+    const turnBarPanel = SELECTORS.match.turnBarPanel[0];
 
-    const playerDisplay = await waitForElement("#ad-ext-player-display") as HTMLElement;
-    const playerScores = playerDisplay.querySelectorAll(".ad-ext-player");
-    const playerInfos = playerDisplay.querySelectorAll("div:nth-of-type(2)");
-    const body = document.querySelector("body") as HTMLElement;
+    const rules = [ `
+      /* score cards — the gradient is a background-image, so name it directly */
+      ${card} ${scoreCard} {
+        background-image: none !important;
+        background-color: ${background} !important;
+        color: ${text} !important;
+      }
+      ${card} ${scoreCard} :is(div, span, p) {
+        color: ${text} !important;
+      }
+      /* the three dart slots and the turn total above the board */
+      ${turnBar}, ${turnBar} span {
+        color: ${text} !important;
+      }
+      /* the panel behind them too, or it shows in the gaps — and the site
+         turns it red on a bust, which reads as broken next to a chosen scheme */
+      ${turnBar}, ${turnBarPanel}, ${turnBarPanel} > div {
+        background-color: ${background} !important;
+      }
+    ` ];
 
-    playerScores.forEach(element => elements.push(element as HTMLElement));
-    playerInfos.forEach(element => elements.push(element as HTMLElement));
-
-    const playerNames = playerDisplay.querySelectorAll("a");
-    playerNames.forEach(element => elements.push(element as HTMLElement));
-
-    const turnThrows = document.querySelector("#ad-ext-turn")?.childNodes;
-    if (turnThrows) turnThrows.forEach(element => elements.push(element as HTMLElement));
-
-    const turnScoreElement = turnThrows![0] as HTMLElement;
-    const turnScore = turnScoreElement.querySelector("p");
-    if (turnScore) elements.push(turnScore as HTMLElement);
-
-    // for each in elements set variable: `--adt-accent-hover: red;`
-    elements.forEach((element) => {
-      element.style.setProperty("background", config.colors.background);
-      element.style.color = `${config.colors.text}`;
-    });
-
-    // Apply only text color to player name elements (no background)
-    const playerNameElements = document.querySelectorAll(".ad-ext-player-name");
-    playerNameElements.forEach((element) => {
-      (element as HTMLElement).style.color = `${config.colors.text}`;
-    });
-
-    if (body && config.colors.enabled && config.colors.matchBackground) {
-      body.style.setProperty("background-color", config.colors.matchBackground, "important");
-      body.style.setProperty("background-image", "none", "important");
+    if (matchBackground) {
+      rules.push(`
+        body, #root > div {
+          background-color: ${matchBackground} !important;
+          background-image: none !important;
+        }
+      `);
     }
+
+    addStyles(rules.join("\n"), STYLE_ID);
+    console.log("Autodarts Tools: Colors - applied");
   } catch (e) {
-    console.error("Autodarts Tools: Color Change - Error changing color: ", e);
-    if (colorChangeInterval) clearInterval(colorChangeInterval);
+    console.error("Autodarts Tools: Colors - Error: ", e);
   }
 }
 
-export async function onRemove() {
-  if (colorChangeInterval) clearInterval(colorChangeInterval);
-  const body = document.querySelector("body") as HTMLElement;
-  if (body) {
-    body.style.removeProperty("background-color");
-    body.style.removeProperty("background-image");
-  }
+export function onRemove() {
+  removeStyles(STYLE_ID);
 }

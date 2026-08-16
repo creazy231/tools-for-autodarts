@@ -1,132 +1,82 @@
+import { SELECTORS, qs } from "@/utils/selectors";
 import { waitForElement } from "@/utils";
-import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+
+/**
+ * Automatic Fullscreen — a fullscreen toggle in the match header.
+ *
+ * v1 cloned the settings button out of the Chakra menu bar and spliced it into
+ * a `ul` that the rebuilt header does not have. This builds its own button and
+ * matches the header's other icon buttons instead.
+ *
+ * Entering automatically is attempted but not relied on: browsers only grant
+ * fullscreen from a user gesture, and arriving at a match from the lobby's
+ * Start Game click is usually far enough removed that the request is refused.
+ * The button is always there as the fallback, which is what actually worked in
+ * v1 too.
+ */
+const BUTTON_ID = "adt-fullscreen-toggle";
+
+const ENTER_PATH = "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z";
+const EXIT_PATH = "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z";
+
+let onFullscreenChange: (() => void) | null = null;
 
 export async function automaticFullscreen() {
+  if (document.getElementById(BUTTON_ID)) return;
   console.log("Autodarts Tools: Setting up automatic fullscreen");
 
-  await waitForElement("#ad-ext-player-display");
-  const gameData = await AutodartsToolsGameData.getValue();
+  const header = await waitForElement(SELECTORS.match.header, 15000).catch(() => null);
+  if (!header) return console.error("Autodarts Tools: Automatic Fullscreen - no match header found");
 
-  let isFullscreen: boolean = false;
+  // The icon buttons live in the header's right-hand group; a sibling of the
+  // existing ones inherits their hit area and spacing for free.
+  const iconGroup = qs<HTMLElement>(SELECTORS.match.headerIconGroup, header) ?? header;
+  const sibling = iconGroup.querySelector("button");
 
-  const menuBar = await waitForElement([
-    "#root > div > div:nth-of-type(2) > div .chakra-wrap",
-    "#root > div > div:nth-of-type(2) > div > div > div",
-  ]);
-  if (!menuBar) return console.error("Autodarts Tools: No menu bar found");
+  const button = document.createElement("button");
+  button.id = BUTTON_ID;
+  button.type = "button";
+  button.title = "Toggle fullscreen";
+  button.setAttribute("aria-label", "Toggle fullscreen");
+  button.className = sibling?.className ?? "";
 
-  const settingsBtn = document.querySelector("#ad-ext-game-variant");
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", "20");
+  svg.setAttribute("height", "20");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", ENTER_PATH);
+  svg.appendChild(path);
+  button.appendChild(svg);
 
-  let fullscreenBtn: HTMLButtonElement;
-  let fullscreenBtnSVG: SVGElement;
+  const syncIcon = () => path.setAttribute("d", document.fullscreenElement ? EXIT_PATH : ENTER_PATH);
 
-  if (!document.querySelector("#adt-fullscreen-toggle")) {
-    fullscreenBtn = document.createElement("button");
-    fullscreenBtn.id = "adt-fullscreen-toggle";
-    fullscreenBtn.className = settingsBtn?.className || "";
-
-    fullscreenBtnSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    fullscreenBtnSVG.setAttribute("viewBox", "0 0 24 24");
-    fullscreenBtnSVG.style.height = "1.2em";
-    fullscreenBtnSVG.style.width = "1.2em";
-    fullscreenBtnSVG.style.fill = "var(--tag-color)";
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z");
-    fullscreenBtnSVG.appendChild(path);
-
-    fullscreenBtn.appendChild(fullscreenBtnSVG);
-  } else {
-    fullscreenBtn = document.querySelector(
-      "#adt-fullscreen-toggle",
-    ) as HTMLButtonElement;
-    fullscreenBtnSVG = fullscreenBtn.querySelector("svg") as SVGElement;
-  }
-
-  const menuBarUL
-    = gameData.match?.variant === "Bull-off"
-      ? document
-        .querySelector("#ad-ext-game-variant")
-        ?.parentElement?.parentElement?.querySelector("div:last-of-type")
-        || menuBar.querySelector("div:nth-of-type(3) > div")
-      : menuBar.querySelector("ul");
-  if (!menuBarUL) return console.error("Autodarts Tools: No menu bar ul found");
-  console.log(menuBarUL);
-  console.log(menuBarUL.firstChild);
-
-  if (gameData.match?.variant === "Bull-off") {
-    (menuBarUL.firstChild as Element)?.prepend(fullscreenBtn);
-  } else {
-    menuBarUL.insertBefore(
-      fullscreenBtn,
-      menuBarUL.children[menuBarUL.children.length - 1],
-    );
-  }
-
-  // Toggle fullscreen function
-  const toggleFullscreen = (forceState?: boolean) => {
-    const shouldEnterFullscreen
-      = forceState !== undefined ? forceState : !document.fullscreenElement;
-
-    if (shouldEnterFullscreen && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.error(
-          `Error attempting to enable fullscreen mode: ${err.message}`,
-        );
-      });
-      // Update SVG to show exit fullscreen icon
-      fullscreenBtnSVG.children[0].setAttribute(
-        "d",
-        "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z",
-      );
-      isFullscreen = true;
-    } else if (!shouldEnterFullscreen && document.fullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-      // Update SVG to show enter fullscreen icon
-      fullscreenBtnSVG.children[0].setAttribute(
-        "d",
-        "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z",
-      );
-      isFullscreen = false;
-    }
-  };
-
-  fullscreenBtn.addEventListener("click", () => toggleFullscreen());
-
-  // Listen for fullscreen change event to update button icon
-  document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement) {
-      // Update SVG to show enter fullscreen icon when exiting fullscreen
-      fullscreenBtnSVG.children[0].setAttribute(
-        "d",
-        "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z",
-      );
-      isFullscreen = false;
-    } else {
-      // Update SVG to show exit fullscreen icon when entering fullscreen
-      fullscreenBtnSVG.children[0].setAttribute(
-        "d",
-        "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z",
-      );
-      isFullscreen = true;
-    }
+  button.addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(console.error);
+    else document.documentElement.requestFullscreen().catch(err => console.warn("Autodarts Tools: Automatic Fullscreen -", err.message));
   });
 
-  // Initial fullscreen activation when the feature is enabled
-  toggleFullscreen(true);
+  onFullscreenChange = syncIcon;
+  document.addEventListener("fullscreenchange", onFullscreenChange);
+
+  iconGroup.insertBefore(button, iconGroup.firstChild);
+
+  document.documentElement.requestFullscreen()
+    .then(syncIcon)
+    .catch(() => console.log("Autodarts Tools: Automatic Fullscreen - the browser wants a click first; use the header button"));
 }
 
 export async function automaticFullscreenOnRemove() {
   console.log("Autodarts Tools: Cleaning up automatic fullscreen");
 
-  const fullscreenBtn = document.querySelector("#adt-fullscreen-toggle");
-  fullscreenBtn?.remove();
+  document.getElementById(BUTTON_ID)?.remove();
+  if (onFullscreenChange) {
+    document.removeEventListener("fullscreenchange", onFullscreenChange);
+    onFullscreenChange = null;
+  }
 
-  // Exit fullscreen mode if active
   if (document.fullscreenElement) {
-    document.exitFullscreen().catch((err) => {
-      console.error(`Error attempting to exit fullscreen mode: ${err.message}`);
-    });
+    document.exitFullscreen().catch(err => console.error(`Error attempting to exit fullscreen mode: ${err.message}`));
   }
 }

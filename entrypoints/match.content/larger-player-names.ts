@@ -1,22 +1,48 @@
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { waitForElement } from "@/utils";
+import { SELECTORS } from "@/utils/selectors";
+import { addStyles, removeStyles } from "@/utils";
+
+/**
+ * Larger Player Names.
+ *
+ * A stylesheet rather than inline styles, which is the difference between this
+ * working and not: the rebuilt score card is React, and it re-renders the name
+ * on every throw — anything written onto the element itself is gone by the next
+ * dart.
+ *
+ * The site sizes the name with `text-[18px]` inside a fixed `h-3.75` box that
+ * the glyphs overflow, so growing only the font crops it top and bottom. The
+ * height and the plate behind it have to come along.
+ */
+const STYLE_ID = "larger-player-names";
 
 export async function largerPlayerNames() {
-  await waitForElement("#ad-ext-turn");
   try {
     const config = await AutodartsToolsConfig.getValue();
+    if (!config.largerPlayerNames.enabled) return;
 
-    if (!config.largerPlayerNames.enabled) {
-      return;
-    }
+    const rem = config.largerPlayerNames.value || 1.5;
+    const card = SELECTORS.match.playerCards[0];
+    const name = SELECTORS.match.playerName[0];
 
-    const playerNamesSize = config.largerPlayerNames.value || 1.5;
-    document.querySelectorAll(".ad-ext-player-name").forEach((nameEl) => {
-      if (nameEl instanceof HTMLElement) {
-        nameEl.style.fontSize = `${playerNamesSize}rem`;
+    addStyles(`
+      ${card} ${name} {
+        font-size: ${rem}rem !important;
+        height: auto !important;
+        line-height: 1.15 !important;
       }
-    });
+      /* the name plate is a fixed-height pill; let it follow the text */
+      ${card} :has(> ${name}) {
+        height: auto !important;
+      }
+    `, STYLE_ID);
+
+    console.log("Autodarts Tools: Larger Player Names - applied");
   } catch (e) {
     console.error("Autodarts Tools: Larger Player Names - Error: ", e);
   }
+}
+
+export function largerPlayerNamesOnRemove() {
+  removeStyles(STYLE_ID);
 }

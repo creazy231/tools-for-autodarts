@@ -5,12 +5,12 @@ import { colorChange, onRemove as colorChangeOnRemove } from "./color-change";
 import Takeout from "./Takeout.vue";
 import { nextPlayerOnTakeOutStuck, nextPlayerOnTakeOutStuckOnRemove } from "./next-player-on-take-out-stuck";
 import { automaticNextLeg, automaticNextLegOnRemove } from "./automatic-next-leg";
-import { smallerScores } from "./smaller-scores";
+import { smallerScores, smallerScoresOnRemove } from "./smaller-scores";
 import { hideMenuInMatch, hideMenuInMatchOnRemove } from "./hide-menu-in-match";
 import { automaticFullscreen, automaticFullscreenOnRemove } from "./automatic-fullscreen";
-import { largerPlayerMatchData } from "./larger-player-match-data";
-import { largerLegsSets } from "./larger-legs-sets";
-import { largerPlayerNames } from "./larger-player-names";
+import { largerPlayerMatchData, largerPlayerMatchDataOnRemove } from "./larger-player-match-data";
+import { largerLegsSets, largerLegsSetsOnRemove } from "./larger-legs-sets";
+import { largerPlayerNames, largerPlayerNamesOnRemove } from "./larger-player-names";
 import { winnerAnimation, winnerAnimationOnRemove } from "./winner-animation";
 import { soundFx, soundFxOnRemove } from "./sound-fx";
 import { wledFx, wledFxOnRemove } from "./wled";
@@ -54,7 +54,17 @@ let gameDataWatcher: any;
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set the
  * flag there as each feature is ported.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "animations", "caller", "soundFx" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([
+  "animations",
+  "caller",
+  "soundFx",
+  "colors",
+  "smallerScores",
+  "largerLegsSets",
+  "largerPlayerNames",
+  "largerPlayerMatchData",
+  "automaticFullscreen",
+]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -284,6 +294,10 @@ function clearMatch(fromBullOff: boolean = false) {
   tools.quickCorrection?.remove();
   tools.instantReplay?.remove();
   colorChangeOnRemove();
+  smallerScoresOnRemove();
+  largerLegsSetsOnRemove();
+  largerPlayerNamesOnRemove();
+  largerPlayerMatchDataOnRemove();
   if (!fromBullOff) hideMenuInMatchOnRemove();
   if (!fromBullOff) automaticFullscreenOnRemove();
   winnerAnimationOnRemove();

@@ -306,13 +306,66 @@ export const SELECTORS = {
       "main div.aspect-square",
     ],
 
+    /**
+     * One per player: the whole flanking column, score card plus chalkboard.
+     *
+     * v1 marked these `.ad-ext-player`. The rebuilt screen emits no hook, so
+     * the anchors are the column's own width class first and its shape second
+     * — the only element whose grandchild is the rounded score card.
+     */
+    playerCards: [
+      "main div.w-100",
+      "main div:has(> div > div.rounded-t-2xl)",
+    ],
+    /** The score card within a player column — the part that carries colour. */
+    playerScoreCard: [ "div.rounded-t-2xl > div" ],
+    /** Whose turn it is: the site paints that one card with its gradient. */
+    activePlayerCard: [ "main div[class*='bg-raspberry']" ],
+    /** Player name, relative to a card. */
+    playerName: [ "span.font-display" ],
+    /**
+     * The remaining score, relative to a card.
+     *
+     * Fixed height with `overflow-hidden`, so anything that grows the type here
+     * has to grow the line box with it or the digits are clipped.
+     */
+    playerScore: [ "div.font-number.font-bold" ],
+    /** Legs (or sets) won, the small boxed number beside the score. */
+    playerLegsSets: [ "div.rounded-sm.size-8" ],
+    /** The "Leg 0.0 / Match 0.0" averages row. */
+    playerMatchData: [ "div.hidden:has(> div.flex.gap-2)" ],
+    /** The site's own checkout route, shown down the side of the card. */
+    checkoutSuggestion: [ ".text-checkout-suggestion" ],
+    /** Per-player scoring history, under the score card. */
+    chalkboard: [ "div.grid-rows-6" ],
+
+    /**
+     * The bar above the board: three dart slots then the turn total.
+     * v1's equivalent was `#ad-ext-turn` and its `.ad-ext-turn-throw` children.
+     */
+    turnBar: [ "main div.max-w-25" ],
+    /**
+     * The rounded panel the dart slots sit in.
+     *
+     * Worth recolouring alongside the slots: it shows in the gaps between them,
+     * and the site turns it red on a bust, which reads as broken next to a
+     * colour scheme of the user's choosing.
+     */
+    turnBarPanel: [ "main div.rounded-2xl:has(> div > div.max-w-25)" ],
+
+    /** The match screen's own header — Exit on the left, icons on the right. */
+    header: [ "#root header" ],
+    /**
+     * That header's right-hand icon cluster, where we add our own buttons.
+     * The header itself is `pointer-events-none`; this group is what re-enables
+     * them, so a button added here is clickable without any styling of ours.
+     */
+    headerIconGroup: [ "div.pointer-events-auto:has(> button)", "div.flex.items-center.gap-2" ],
+
     /** autodarts-emitted hooks on the match screen (v1). */
     playerDisplay: [ "#ad-ext-player-display" ],
     turn: [ "#ad-ext-turn" ],
     gameVariant: [ "#ad-ext-game-variant" ],
-    playerCards: [ ".ad-ext-player" ],
-    playerName: [ ".ad-ext-player-name" ],
-    playerScore: [ ".ad-ext-player-score" ],
     playerWinner: [ ".ad-ext-player-winner" ],
 
     /** Top menu bar of the match view. */
