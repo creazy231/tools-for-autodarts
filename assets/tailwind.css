@@ -246,6 +246,19 @@ body {
   outline: none;
 }
 
+/*
+ * Width modifiers.
+ *
+ * Plain classes rather than Tailwind's `max-w-*` utilities, because everything
+ * in this file is declared after `@tailwind utilities`. Same specificity, later
+ * in source order — so `.adt-modal` silently beat every `max-w-*` a modal asked
+ * for, and every size prop in AppModal and SettingsModal was a no-op.
+ */
+.adt-modal-xs { max-width: 20rem; }
+.adt-modal-sm { max-width: 28rem; }
+.adt-modal-lg { max-width: 56rem; }
+.adt-modal-xl { max-width: 72rem; }
+
 .adt-modal-backdrop {
   position: fixed;
   inset: 0;

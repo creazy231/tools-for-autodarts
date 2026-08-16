@@ -45,6 +45,11 @@ let currentAudioIndex2 = 0;
 // Tracking URLs that need to be revoked
 const blobUrlsToRevoke: string[] = [];
 
+/** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
+function isOnALobbyPage(): boolean {
+  return /\/lobb(?:y|ies)\//.test(window.location.href);
+}
+
 function checkBoardStatus(boardData: IBoard): void {
   const boardEvent = boardData.event;
   const boardStatus = boardData.status;
@@ -103,16 +108,15 @@ export async function soundFx() {
     if (!lobbyDataWatcherUnwatch) {
       lobbyDataWatcherUnwatch = AutodartsToolsLobbyData.watch(async (_lobbyData: ILobbies | undefined, _oldLobbyData: ILobbies | undefined) => {
         if (!_lobbyData || !_oldLobbyData || !config?.soundFx?.enabled) return;
+        // The rebuilt site's lobby is `/lobby/<id>`. Matching only the old
+        // spelling meant these two never fired on it.
+        if (!isOnALobbyPage()) return;
 
         if ((_lobbyData.players?.length ?? 0) > (_oldLobbyData.players?.length ?? 0) && (_lobbyData.players?.length ?? 0) > 1) {
-          const currentURL = window.location.href;
-          if (!currentURL.includes("lobbies")) return;
           playSound("ambient_lobby_in", 2);
         }
 
         if ((_lobbyData.players?.length ?? 0) < (_oldLobbyData.players?.length ?? 0) && (_lobbyData.players?.length ?? 0) > 0) {
-          const currentURL = window.location.href;
-          if (!currentURL.includes("lobbies")) return;
           playSound("ambient_lobby_out", 2);
         }
       });

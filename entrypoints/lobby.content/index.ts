@@ -37,7 +37,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set
  * the flag there as each feature is ported.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby", "qrCode" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby", "qrCode", "soundFx" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;

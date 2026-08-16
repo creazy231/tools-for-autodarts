@@ -13,16 +13,20 @@
         v-if="!hideBackdrop"
         class="adt-modal-backdrop"
       />
+      <!--
+        Sizes are `adt-modal-*` classes, not Tailwind `max-w-*` utilities: this
+        file's stylesheet declares `.adt-modal` after `@tailwind utilities`, so
+        a utility here loses the cascade and the size prop did nothing at all.
+      -->
       <div
         :class="twMerge(
           'adt-modal relative mx-4',
 
-          // Size variants
-          size === 'xs' && 'w-full max-w-xs',
-          size === 'sm' && 'w-full max-w-md',
-          size === 'md' && 'w-full max-w-lg',
-          size === 'lg' && 'w-full max-w-2xl',
-          size === 'xl' && 'w-full max-w-4xl',
+          // Size variants. `md` is the base width, so it carries no modifier.
+          size === 'xs' && 'adt-modal-xs',
+          size === 'sm' && 'adt-modal-sm',
+          size === 'lg' && 'adt-modal-lg',
+          size === 'xl' && 'adt-modal-xl',
         )"
       >
         <AppButton
@@ -38,7 +42,12 @@
           {{ title }}
         </h2>
 
-        <div class="mb-6">
+        <!--
+          `.adt-modal` is `max-height: 85vh; overflow: hidden`, so without a
+          scroller here a form taller than that was simply cut off — footer
+          buttons included.
+        -->
+        <div class="adt-modal-body mb-6">
           <slot />
         </div>
 

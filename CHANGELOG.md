@@ -15,7 +15,14 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
 
+### Fixed
+- Modal size props never did anything. `.adt-modal` fixes the width to 674px and is declared after `@tailwind utilities`, so it beat every `max-w-*` a modal asked for — including the wide shell the settings dialogs have always requested. Sizes are now `adt-modal-*` classes that cascade properly
+- Settings dialogs taller than 85% of the window were cut off with no way to scroll to the rest, footer buttons included
+- Sound FX's lobby join and leave sounds never fired on the rebuilt site: the check was for the old `/lobbies/` route, and the new one is `/lobby/`
+
 ### Changed
+- Brought Caller and Sound FX back on the rebuilt site. Both read game data and never touched the old markup, so the port was the gate plus the lobby-route fix above
+  - Their settings dialogs are now the widest of the set — 1152px, up from 674px — because both pair a grid of sounds with a column of options; every other settings dialog goes to 896px, the width it always asked for
 - Ported Animations to the rebuilt site — the first in-match feature to make the move
   - The animation is placed over the rebuilt match screen's dartboard in *Board Only* mode; v1 found that area through `#ad-ext-turn`, a hook the rebuilt site does not emit
   - The overlay is now anchored in `body` rather than inside the match layout, which the site re-renders around the board on every throw

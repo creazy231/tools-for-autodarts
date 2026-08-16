@@ -25,6 +25,7 @@
       v-if="activeSettings && getComponentForSetting(activeSettings)"
       :show="showSettingsModal"
       :title="getSettingTitle(activeSettings)"
+      :width="getSettingWidth(activeSettings)"
     >
       <component @setting-change="handleSettingChange" :is="getComponentForSetting(activeSettings)" :config="config" />
     </SettingsModal>
@@ -249,6 +250,12 @@ interface Feature {
   hasSettings: boolean;
   /** Ported to the rebuilt site. Absent means "not yet" — the card renders inert. */
   v2Ready?: boolean;
+  /**
+   * Give this feature's settings dialog the widest shell. For the panels that
+   * pair a grid of tiles with a column of options and do not fit the standard
+   * one.
+   */
+  wideSettings?: boolean;
 }
 
 interface FeatureGroup {
@@ -324,8 +331,8 @@ const featureGroups: FeatureGroup[] = [
     tab: 3,
     features: [
       { id: "animations", title: "Animations Settings", component: Animations, hasSettings: true, v2Ready: true },
-      { id: "caller", title: "Caller Settings", component: Caller, hasSettings: true },
-      { id: "sound-fx", title: "Sound FX Settings", component: SoundFx, hasSettings: true },
+      { id: "caller", title: "Caller Settings", component: Caller, hasSettings: true, v2Ready: true, wideSettings: true },
+      { id: "sound-fx", title: "Sound FX Settings", component: SoundFx, hasSettings: true, v2Ready: true, wideSettings: true },
       { id: "wled-fx", title: "WLED Settings", component: Wled, hasSettings: true },
     ],
     settingIds: [ "animations", "caller", "sound-fx", "wled-fx" ],
@@ -424,6 +431,14 @@ function handleSettingChange() {
 }
 
 // Function to get the component for a setting
+function getSettingWidth(settingId) {
+  for (const group of featureGroups) {
+    const feature = group.features.find(f => f.id === settingId);
+    if (feature) return feature.wideSettings ? "widest" : "wide";
+  }
+  return "wide";
+}
+
 function getComponentForSetting(settingId) {
   for (const group of featureGroups) {
     const feature = group.features.find(f => f.id === settingId && f.hasSettings);

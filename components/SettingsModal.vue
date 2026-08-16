@@ -9,7 +9,7 @@
   >
     <div v-if="show" class="fixed inset-0 z-[1400] flex items-center justify-center p-4">
       <div @click="$emit('close')" class="adt-modal-backdrop" />
-      <div :class="[ 'adt-modal relative', wide ? 'max-w-4xl' : '' ]">
+      <div :class="[ 'adt-modal relative', width === 'wide' && 'adt-modal-lg', width === 'widest' && 'adt-modal-xl' ]">
         <button
           @click="$emit('close')"
           class="adt-modal-close"
@@ -41,10 +41,19 @@ defineProps({
     type: String,
     required: true,
   },
-  /** Settings panels are denser than v2's own dialogs; opt into a wider shell. */
-  wide: {
-    type: Boolean,
-    default: true,
+  /**
+   * Settings panels are denser than v2's own dialogs, so they get a wider
+   * shell than the base modal. `widest` is for the panels that are a grid of
+   * tiles plus a column of options — Caller and Sound FX — where the base
+   * width leaves the tiles two to a row with nowhere to put the controls.
+   *
+   * This replaces a `wide` boolean that applied `max-w-4xl`, which never took
+   * effect: see the width modifiers in assets/tailwind.css.
+   */
+  width: {
+    type: String,
+    default: "wide",
+    validator: (value: string) => [ "default", "wide", "widest" ].includes(value),
   },
 });
 
