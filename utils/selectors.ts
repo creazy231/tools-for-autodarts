@@ -352,6 +352,14 @@ export const SELECTORS = {
      * colour scheme of the user's choosing.
      */
     turnBarPanel: [ "main div.rounded-2xl:has(> div > div.max-w-25)" ],
+    /**
+     * The three dart slots, in throw order — the ones grouped together to the
+     * left of the turn total. Scoping to that group is what separates them
+     * from the total, which is a sibling of the group rather than of them.
+     */
+    dartSlots: [ "main div.justify-evenly > div.max-w-25" ],
+    /** The turn total, the slot after the three darts. */
+    turnTotal: [ "main div.rounded-2xl > div.max-w-25" ],
 
     /** The match screen's own header — Exit on the left, icons on the right. */
     header: [ "#root header" ],

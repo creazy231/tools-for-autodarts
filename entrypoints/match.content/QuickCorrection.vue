@@ -12,7 +12,7 @@
       ref="correctionRef"
       class="correction-bg rounded-[var(--adt-radius-md)] p-3 text-[var(--adt-text)] shadow-lg"
       :style="{
-        position: 'absolute',
+        position: 'fixed',
         left: `${correctionContainerX}px`,
         top: `${correctionContainerY}px`,
         width: `calc(${correctionContainerWidth}px + 7rem)`,
@@ -100,6 +100,7 @@
 
 <script setup lang="ts">
 import { waitForElement } from "@/utils";
+import { SELECTORS, qsa } from "@/utils/selectors";
 import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
@@ -225,6 +226,28 @@ const throw2 = ref<HTMLElement | null>(null);
 const throw3 = ref<HTMLElement | null>(null);
 const correctionRef = ref<HTMLElement | null>(null);
 
+/**
+ * Re-read the three dart slots from the page.
+ *
+ * They are looked up on every use rather than cached once: the rebuilt turn
+ * bar re-renders as darts land, so a reference taken at mount goes stale.
+ */
+function syncSlots() {
+  const slots = qsa<HTMLElement>(SELECTORS.match.dartSlots);
+  throw1.value = slots[0] ?? null;
+  throw2.value = slots[1] ?? null;
+  throw3.value = slots[2] ?? null;
+}
+
+/** Capture-phase, so a click on the slot's inner spans still counts. */
+function onDocumentClick(event: MouseEvent) {
+  const target = event.target as HTMLElement | null;
+  const slot = target?.closest<HTMLElement>(SELECTORS.match.dartSlots[0]);
+  if (!slot) return;
+  syncSlots();
+  openCorrection(slot);
+}
+
 const open = ref<boolean>(false);
 const correctionContainerWidth = ref<number>(0);
 const correctionContainerX = ref<number>(0);
@@ -245,6 +268,7 @@ watch(open, (newVal) => {
 
 onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyDown);
+  document.removeEventListener("click", onDocumentClick, true);
 });
 
 function handleKeyDown(event: KeyboardEvent) {
@@ -401,16 +425,15 @@ onMounted(async () => {
   const config = await AutodartsToolsConfig.getValue();
   correctionScale.value = config?.quickCorrection?.scale ?? 1;
 
-  const throwsContainer = await waitForElement("#ad-ext-turn");
-  throw1.value = throwsContainer.querySelector("div:nth-of-type(2)");
-  throw2.value = throwsContainer.querySelector("div:nth-of-type(3)");
-  throw3.value = throwsContainer.querySelector("div:nth-of-type(4)");
+  await waitForElement(SELECTORS.match.dartSlots, 15000);
+  syncSlots();
 
-  [ throw1.value, throw2.value, throw3.value ].forEach((throwEl) => {
-    if (throwEl) {
-      throwEl.addEventListener("click", () => openCorrection(throwEl));
-    }
-  });
+  /**
+   * One delegated listener rather than three on the slots themselves: the
+   * rebuilt bar is React and replaces those nodes on every dart, which takes
+   * any listener bound to them with it.
+   */
+  document.addEventListener("click", onDocumentClick, true);
 
   window.addEventListener("keydown", (event) => {
     if (open.value) return;
@@ -418,17 +441,20 @@ onMounted(async () => {
     switch (event.key) {
       case "/":
       case "NumpadDivide":
-        if (throw1.value) throw1.value.click();
+        syncSlots();
+        if (throw1.value) openCorrection(throw1.value);
         event.preventDefault();
         break;
       case "*":
       case "NumpadMultiply":
-        if (throw2.value) throw2.value.click();
+        syncSlots();
+        if (throw2.value) openCorrection(throw2.value);
         event.preventDefault();
         break;
       case "-":
       case "NumpadSubtract":
-        if (throw3.value) throw3.value.click();
+        syncSlots();
+        if (throw3.value) openCorrection(throw3.value);
         event.preventDefault();
         break;
     }
@@ -436,7 +462,7 @@ onMounted(async () => {
 });
 
 async function openCorrection(throwElement?: HTMLElement) {
-  if (!throwElement?.classList.contains("ad-ext-turn-throw")) return;
+  if (!throwElement) return;
 
   // Determine throw index (0, 1, or 2)
   let throwIndex = -1;
@@ -571,9 +597,19 @@ async function openCorrection(throwElement?: HTMLElement) {
 
     correctionContainerY.value = initialY;
 
-    const throwText = config.enhancedScoringDisplay.enabled
-      ? (throwElement.querySelector("p > div > div:last-of-type") as HTMLElement)?.innerText.trim()
-      : (throwElement as HTMLElement).innerText.trim();
+    /**
+     * The slot's own text is the notation — "T20", "BULL", "M5".
+     *
+     * v1 needed a second path here because Enhanced Scoring Display rewrote
+     * these slots and buried the notation in markup of its own. That version
+     * adds the points as generated content instead, which never appears in
+     * `innerText`, so one read covers both cases. Reading the old path on the
+     * rebuilt site returned nothing and threw before the grid could open.
+     */
+    // `textContent`, not `innerText`: the rebuilt slot splits the notation into
+    // a bed span and a number span inside a flex row, and `innerText` honours
+    // that layout by putting a line break between them — "T\n20" matches no grid.
+    const throwText = (throwElement.textContent ?? "").replace(/\s+/g, "");
 
     currentThrowText.value = throwText;
     findGridForThrow(throwText);
@@ -585,6 +621,7 @@ async function openCorrection(throwElement?: HTMLElement) {
 function findGridForThrow(throwText: string) {
   currentGrid.value = [];
   currentGridIndex.value = -1;
+  if (!throwText) return;
 
   // Handle missed darts (M14 -> treat as S14)
   let searchText = throwText;

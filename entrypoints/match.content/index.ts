@@ -65,6 +65,8 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "largerPlayerMatchData",
   "automaticFullscreen",
   "winnerAnimation",
+  "enhancedScoringDisplay",
+  "quickCorrection",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -539,11 +541,16 @@ async function initCheckoutGuide(ctx) {
 }
 
 async function initQuickCorrection(ctx) {
-  await waitForElement("#root > div > div:nth-of-type(2)");
+  await waitForElement(SELECTORS.app.contentRoot, 15000).catch(() => {
+    console.warn("Autodarts Tools: Quick Correction - page did not render in time");
+  });
   tools.quickCorrection = await createShadowRootUi(ctx, {
     name: "autodarts-tools-quick-correction",
     position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
+    // The grid places itself from viewport rects, so it needs to be clear of
+    // the match layout — see QuickCorrection.vue.
+    anchor: "body",
+    append: "last",
     onMount: (container: any) => {
       console.log("Autodarts Tools: Quick Correction initialized");
       const app = createApp(QuickCorrection);
