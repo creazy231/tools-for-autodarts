@@ -53,6 +53,11 @@ let gameDataWatcher: any;
  *
  * Mirrors `v2Ready` in components/PageConfig.vue — add the key here and set the
  * flag there as each feature is ported.
+ *
+ * This gate is deliberately not conditioned on the site version, so an unported
+ * feature is off on v1 too even though its implementation still works there.
+ * v1 is being retired; the unported code goes with it. Do not add a
+ * `detectSiteVersion()` check here to bring those features back on v1.
  */
 const PORTED_TO_V2 = new Set<keyof IConfig>([
   "animations",
