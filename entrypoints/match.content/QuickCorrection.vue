@@ -10,7 +10,7 @@
     <div
       v-if="open"
       ref="correctionRef"
-      class="correction-bg rounded-[var(--adt-radius-md)] p-3 text-[var(--adt-text)] shadow-lg"
+      class="adt-popover p-3"
       :style="{
         position: 'fixed',
         left: `${correctionContainerX}px`,
@@ -965,17 +965,12 @@ async function applyCorrection(value: string) {
 }
 </script>
 
-<style>
-.correction-bg {
-  background-color: rgba(25, 32, 71, 0.90);
-  background-image:
-    radial-gradient(50% 30% at 86% 0%, rgba(49, 51, 112, 0.89) 0%, rgba(64, 52, 134, 0) 90%),
-    radial-gradient(50% 70% at 70% 22%, rgba(38, 89, 154, 0.9) 0%, rgba(64, 52, 134, 0) 90%),
-    radial-gradient(50% 70% at 112% 44%, rgba(44, 67, 108, 0.85) 0%, rgba(64, 52, 134, 0) 90%),
-    radial-gradient(90% 90% at -12% 89%, rgba(15, 47, 80, 0.88) 0%, rgba(64, 52, 134, 0) 90%),
-    radial-gradient(50% 70% at -2% 53%, rgba(52, 32, 95, 0.89) 0%, rgba(64, 52, 134, 0) 90%),
-    radial-gradient(50% 70% at 36% 22%, rgba(64, 52, 134, 0.83) 0%, rgba(64, 52, 134, 0) 90%),
-    radial-gradient(50% 40% at 66% 59%, rgba(32, 111, 185, 0.87) 7%, rgba(32, 111, 185, 0) 90%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-</style>
+<!--
+  No styles of its own: the grid is a popover, so it takes `.adt-popover` —
+  surface-overlay fill, radius-lg, the popover shadow.
+
+  It used to carry a stack of seven radial gradients. The design system allows
+  exactly three gradients in the whole product and separates surfaces by fill
+  rather than by decoration, so that background was the one thing on this
+  screen that did not belong to it.
+-->
