@@ -15,12 +15,12 @@ import { winnerAnimation, winnerAnimationOnRemove } from "./winner-animation";
 import { soundFx, soundFxOnRemove } from "./sound-fx";
 import { wledFx, wledFxOnRemove } from "./wled";
 import { caller, callerOnRemove } from "./caller";
+import { gotcha, gotchaOnRemove } from "./gotcha";
 import Zoom from "./Zoom.vue";
 import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
 import InstantReplay from "./InstantReplay.vue";
-import Gotcha from "./Gotcha.vue";
 import CheckoutGuide from "./CheckoutGuide.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
@@ -67,6 +67,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "winnerAnimation",
   "enhancedScoringDisplay",
   "quickCorrection",
+  "gotcha",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -82,7 +83,6 @@ const tools = {
   quickCorrection: null as any,
   enhancedScoringDisplay: null as any,
   instantReplay: null as any,
-  gotcha: null as any,
   checkoutGuide: null as any,
 };
 
@@ -236,7 +236,7 @@ async function initMatch(ctx, url: string, matchId?: string) {
   }
 
   if (isOn(config, "gotcha")) {
-    await initGotcha(ctx).catch(console.error);
+    await initScript(gotcha, url).catch(console.error);
   }
 
   if (isOn(config, "checkoutGuide")) {
@@ -292,7 +292,6 @@ function clearMatch(fromBullOff: boolean = false) {
   tools.takeout?.remove();
   tools.animations?.remove();
   tools.zoom?.remove();
-  tools.gotcha?.forEach((e) =>  e.remove());
   tools.checkoutGuide?.forEach((e) =>  e.remove());
   tools.quickCorrection?.remove();
   tools.instantReplay?.remove();
@@ -311,6 +310,7 @@ function clearMatch(fromBullOff: boolean = false) {
   discordStreamOnRemove();
   automaticNextLegOnRemove();
   enhancedScoringDisplayOnRemove();
+  gotchaOnRemove();
   matchInitialized = false;
 }
 
@@ -470,40 +470,6 @@ async function initZoom(ctx) {
   });
 
   tools.zoom.mount();
-}
-
-async function initGotcha(ctx) {
-  const selector = "div.ad-ext-player";
-  await waitForElement(selector);
-  const elements = document.querySelectorAll(selector);
-  const shadowRootPromises = Array.from(elements).map(async (e, index) => {
-    if (!e.id) {
-      e.id = `ad-ext-player-${index}`;
-    }
-    return await createShadowRootUi(
-      ctx,
-      {
-        name: "autodarts-tools-gotcha",
-        position: "inline",
-        anchor: `#${e.id} .ad-ext-player-score`,
-        onMount: (container: any) => {
-          console.log("Autodarts Tools: Gotcha: initialized");
-          const app = createApp(Gotcha, { playerIndex: index });
-          app.mount(container);
-          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            container.classList.add("dark");
-          }
-          return app;
-        },
-        onRemove: (app: any) => {
-          app?.unmount();
-          console.log("Autodarts Tools: Gotcha: removed");
-        },
-      }
-    );
-  });
-  tools.gotcha = await Promise.all(shadowRootPromises);
-  tools.gotcha.forEach((e) =>  e.mount());
 }
 
 async function initCheckoutGuide(ctx) {

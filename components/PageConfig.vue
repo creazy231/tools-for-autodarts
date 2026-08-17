@@ -311,7 +311,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true, v2Ready: true },
       { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
-      { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false },
+      { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false, v2Ready: true },
       { id: "checkout-guide", title: "Checkout Guide Settings", component: CheckoutGuide, hasSettings: false },
     ],
     settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay" ],
