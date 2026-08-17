@@ -16,12 +16,12 @@ import { soundFx, soundFxOnRemove } from "./sound-fx";
 import { wledFx, wledFxOnRemove } from "./wled";
 import { caller, callerOnRemove } from "./caller";
 import { gotcha, gotchaOnRemove } from "./gotcha";
+import { checkoutGuide, checkoutGuideOnRemove } from "./checkout-guide";
 import Zoom from "./Zoom.vue";
 import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
 import InstantReplay from "./InstantReplay.vue";
-import CheckoutGuide from "./CheckoutGuide.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
 
@@ -73,6 +73,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "enhancedScoringDisplay",
   "quickCorrection",
   "gotcha",
+  "checkoutGuide",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -88,7 +89,6 @@ const tools = {
   quickCorrection: null as any,
   enhancedScoringDisplay: null as any,
   instantReplay: null as any,
-  checkoutGuide: null as any,
 };
 
 export default defineContentScript({
@@ -245,7 +245,7 @@ async function initMatch(ctx, url: string, matchId?: string) {
   }
 
   if (isOn(config, "checkoutGuide")) {
-    await initCheckoutGuide(ctx).catch(console.error);
+    await initScript(checkoutGuide, url).catch(console.error);
   }
 
   // Discord's lobby half — the webhook announcements — is ported and enabled in
@@ -297,7 +297,6 @@ function clearMatch(fromBullOff: boolean = false) {
   tools.takeout?.remove();
   tools.animations?.remove();
   tools.zoom?.remove();
-  tools.checkoutGuide?.forEach((e) =>  e.remove());
   tools.quickCorrection?.remove();
   tools.instantReplay?.remove();
   colorChangeOnRemove();
@@ -316,6 +315,7 @@ function clearMatch(fromBullOff: boolean = false) {
   automaticNextLegOnRemove();
   enhancedScoringDisplayOnRemove();
   gotchaOnRemove();
+  checkoutGuideOnRemove();
   matchInitialized = false;
 }
 
@@ -475,40 +475,6 @@ async function initZoom(ctx) {
   });
 
   tools.zoom.mount();
-}
-
-async function initCheckoutGuide(ctx) {
-  const selector = ".ad-ext-player-score";
-  await waitForElement(selector);
-  const elements = document.querySelectorAll(selector);
-  const shadowRootPromises = Array.from(elements).map(async (e, index) => {
-    if (!e.id) {
-      e.id = `ad-ext-player-${index}`;
-    }
-    return await createShadowRootUi(
-      ctx,
-      {
-        name: "autodarts-tools-checkout-guide",
-        position: "inline",
-        anchor: `#${e.id} .ad-ext-player-score`,
-        onMount: (container: any) => {
-          console.log("Autodarts Tools: CheckoutGuide: initialized");
-          const app = createApp(CheckoutGuide, { playerIndex: index });
-          app.mount(container);
-          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            container.classList.add("dark");
-          }
-          return app;
-        },
-        onRemove: (app: any) => {
-          app?.unmount();
-          console.log("Autodarts Tools: CheckoutGuide: removed");
-        },
-      }
-    );
-  });
-  tools.checkoutGuide = await Promise.all(shadowRootPromises);
-  tools.checkoutGuide.forEach((e) =>  e.mount());
 }
 
 async function initQuickCorrection(ctx) {

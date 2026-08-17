@@ -116,6 +116,9 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - A gap no single dart can cover is shown as the gap itself, e.g. `+37`
   - Sits beside the score, in the spot the site keeps for checkout suggestions
 - **Checkout Guide**: Displays suggested checkout darts in each player's score box
+  - Autodarts shows these itself while *Show checkout guide* is on in the match settings; this keeps them on screen when it is off
+  - Stays out of the way whenever the site is already drawing them, so a route is never shown twice
+  - Every player gets their own route, not a copy of whoever is throwing
 
 ### 🔊 Audio Features
 - **Caller**: Voice announcements for scores, checkouts, and each dart thrown during gameplay

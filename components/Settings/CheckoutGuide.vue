@@ -6,6 +6,11 @@
         <div>
           <div class="space-y-3 text-white/70">
             <p>Displays suggested checkouts for every player.</p>
+            <p>
+              Autodarts shows these itself while <em>Show checkout guide</em> is on in the match
+              settings. This keeps them on screen when it is off — and stays out of the way when
+              it is on, so you never see the same route twice.
+            </p>
           </div>
         </div>
       </div>
