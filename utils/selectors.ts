@@ -326,6 +326,21 @@ export const SELECTORS = {
       "main div.w-100",
       "main div:has(> div > div.rounded-t-2xl)",
     ],
+    /**
+     * The box whose height decides how big the board is drawn — the same
+     * element in every layout the site has, and the only one that works.
+     *
+     * It is `position: absolute` and the board is sized from it, so pulling one
+     * edge in shrinks the board and moves it off that edge. Its own child, the
+     * flex box that centres the board, does not: shrink that and the square
+     * simply overflows it, moving without getting any smaller.
+     *
+     * Named by the path down to the board rather than by class, since the
+     * wide-screen layout reaches it through a grid and the narrow ones through
+     * a flex column.
+     */
+    boardStage: [ "main div:has(> div.absolute.inset-0 > div > [role='img'][aria-label='Dartboard'])" ],
+
     /** The score card within a player column — the part that carries colour. */
     playerScoreCard: [ "div.rounded-t-2xl > div" ],
     /** Whose turn it is: the site paints that one card with its gradient. */

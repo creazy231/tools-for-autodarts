@@ -33,11 +33,11 @@ import { SELECTORS, qs } from "@/utils/selectors";
 const HOST_ID = "adt-zoom";
 const STYLE_ID = "zoom";
 /**
- * The moved action bar gets a sheet of its own. Its `top` is remeasured as the
- * layout shifts, and replacing a stylesheet restarts every animation the sheet
- * declares — so the tile animations must not be in the one being rewritten.
+ * Whatever has to be remeasured as the layout shifts goes in a sheet of its own.
+ * Replacing a stylesheet restarts every animation it declares, so the tile
+ * animations must not be in the one being rewritten.
  */
-const ACTION_BAR_STYLE_ID = "zoom-action-bar";
+const LAYOUT_STYLE_ID = "zoom-layout";
 
 /**
  * Where a throw's coordinates sit on the board, as a fraction of its width.
@@ -78,6 +78,7 @@ const STYLES = `
     left: 50%;
     transform: translateX(-50%);
     flex-direction: row;
+    min-height: clamp(5rem, 12vmin, 10rem);
   }
 
   #${HOST_ID}[data-position="top"] .adt-zoom-tile {
@@ -93,6 +94,8 @@ const STYLES = `
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     padding: 0 0.5rem 0.5rem;
+    box-sizing: border-box;
+    min-height: calc(clamp(4.5rem, 14vh, 10rem) + 0.5rem);
   }
 
   #${HOST_ID}[data-position="bottom"] .adt-zoom-tile {
@@ -165,6 +168,41 @@ const STYLES = `
 `;
 
 /**
+ * Room for the bottom strip, taken out of the whole match area.
+ *
+ * The strip spans the window, so everything has to end above it — not just the
+ * board. In the narrow landscape layout the player's panel is a full-height
+ * column down the left, which shrinking the board alone left half-covered.
+ * `main` is `overflow-hidden` with `h-full` children, so padding its foot takes
+ * the lot with it. Its top is not touched: the throw display lives in there and
+ * the top strip is positioned off it, which would chase its own tail.
+ */
+function matchAreaStyles(clearance: number): string {
+  return `
+    ${SELECTORS.app.contentRoot[0]} {
+      padding-bottom: ${clearance}px !important;
+    }
+  `;
+}
+
+/**
+ * Room for the top strip, taken out of the board.
+ *
+ * Only the board is in the way up there — the panels are beside it or above it
+ * in every layout. The board is sized from a box pinned with `inset: 0`, so
+ * pulling its top edge down shrinks the board and moves it clear. Its own child,
+ * the flex box that centres the board, will not do: shrink that and the square
+ * overflows it, moving without getting smaller.
+ */
+function boardRoomStyles(clearance: number): string {
+  return `
+    ${SELECTORS.match.boardStage[0]} {
+      top: ${clearance}px !important;
+    }
+  `;
+}
+
+/**
  * The bottom strip needs the whole width, and the site puts its undo and Next
  * buttons there. Rather than cover them, the bar is moved to the empty space at
  * the top right — with CSS, so React keeps the element exactly where it thinks
@@ -191,12 +229,12 @@ function actionBarStyles(top: number): string {
   `;
 }
 
-
 let gameDataWatcherUnwatch: (() => void) | undefined;
 let boardImagesWatcherUnwatch: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let host: HTMLElement | null = null;
 let actionBarTop = 0;
+let boardInset = 0;
 let config: IConfig["zoom"] | null = null;
 let userId: string | null = null;
 let boardImages: string[] = [];
@@ -211,6 +249,7 @@ export async function zoom() {
   userId = await getUserIdFromToken();
 
   actionBarTop = 0;
+  boardInset = 0;
   addStyles(STYLES, STYLE_ID);
   mount();
 
@@ -250,8 +289,9 @@ export function zoomOnRemove() {
   config = null;
   boardImages = [];
   actionBarTop = 0;
+  boardInset = 0;
   removeStyles(STYLE_ID);
-  removeStyles(ACTION_BAR_STYLE_ID);
+  removeStyles(LAYOUT_STYLE_ID);
 }
 
 function mount(): void {
@@ -268,6 +308,7 @@ function render(gameData: IGameData): void {
   const throws = visitInProgress(gameData) ?? [];
   if (!throws.length || !shouldShow(gameData)) {
     host.replaceChildren();
+    place();
     return;
   }
 
@@ -368,28 +409,38 @@ function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLEle
 }
 
 /**
- * The top strip hangs off the throw display, which moves with the layout; the
- * bottom one is pinned by the stylesheet but has to push the site's buttons out
- * of its way first.
+ * Everything that depends on where things currently are: the top strip hangs
+ * off the throw display, the board gives up the room the strip needs, and in
+ * the bottom layout the site's buttons move out of the strip's way.
+ *
+ * Nothing here is measured against something this then moves. The strip's own
+ * height is reserved by the stylesheet whether or not a dart has landed, the
+ * throw display is unaffected by either rule below, and the row is the size of
+ * the window.
  */
 function place(): void {
   if (!host || !config) return;
 
   host.setAttribute("data-position", config.position);
+
   const turnBar = qs<HTMLElement>(SELECTORS.match.turnBarPanel)?.getBoundingClientRect();
+  if (config.position === "top") host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;
+  else host.style.top = "";
 
-  if (config.position === "top") {
-    host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;
-    return;
-  }
-
-  host.style.top = "";
+  const strip = host.getBoundingClientRect();
+  const clearance = Math.round(strip.height + 8);
 
   // Clear of the throw display, and never higher than the window's own header.
-  const top = Math.round(Math.max(56, (turnBar?.bottom ?? 0) + 8));
-  if (top === actionBarTop) return;
+  const top = config.position === "bottom" ? Math.round(Math.max(56, (turnBar?.bottom ?? 0) + 8)) : 0;
+
+  if (clearance === boardInset && top === actionBarTop) return;
+  boardInset = clearance;
   actionBarTop = top;
-  addStyles(actionBarStyles(top), ACTION_BAR_STYLE_ID);
+
+  const rules = config.position === "top"
+    ? [ boardRoomStyles(clearance) ]
+    : [ matchAreaStyles(clearance), actionBarStyles(top) ];
+  addStyles(rules.join("\n"), LAYOUT_STYLE_ID);
 }
 
 /** v1's two filters: whose darts to magnify, and whether to bother off a finish. */
