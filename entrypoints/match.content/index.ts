@@ -16,7 +16,7 @@ import { wledFx, wledFxOnRemove } from "./wled";
 import { caller, callerOnRemove } from "./caller";
 import { gotcha, gotchaOnRemove } from "./gotcha";
 import { checkoutGuide, checkoutGuideOnRemove } from "./checkout-guide";
-import Zoom from "./Zoom.vue";
+import { zoom, zoomOnRemove } from "./zoom";
 import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
@@ -76,6 +76,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "takeout",
   "nextPlayerOnTakeOutStuck",
   "automaticNextLeg",
+  "zoom",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -86,7 +87,6 @@ function isOn(config: IConfig, feature: keyof IConfig): boolean {
 const tools = {
   streamingMode: null as any,
   animations: null as any,
-  zoom: null as any,
   quickCorrection: null as any,
   enhancedScoringDisplay: null as any,
   instantReplay: null as any,
@@ -226,7 +226,7 @@ async function initMatch(ctx, url: string, matchId?: string) {
   }
 
   if (isOn(config, "zoom")) {
-    await initZoom(ctx).catch(console.error);
+    await initScript(zoom, url).catch(console.error);
   }
 
   if (isOn(config, "quickCorrection")) {
@@ -292,7 +292,6 @@ function clearMatch(fromBullOff: boolean = false) {
 
   tools.streamingMode?.remove();
   tools.animations?.remove();
-  tools.zoom?.remove();
   tools.quickCorrection?.remove();
   tools.instantReplay?.remove();
   colorChangeOnRemove();
@@ -312,6 +311,7 @@ function clearMatch(fromBullOff: boolean = false) {
   gotchaOnRemove();
   checkoutGuideOnRemove();
   takeoutOnRemove();
+  zoomOnRemove();
   matchInitialized = false;
 }
 
@@ -422,34 +422,6 @@ async function initAnimations(ctx) {
   });
 
   tools.animations.mount();
-}
-
-async function initZoom(ctx) {
-  await waitForElement("#root > div > div:nth-of-type(2)");
-  const config = await AutodartsToolsConfig.getValue();
-
-  const selector = (config.zoom.position === "bottom-right" || config.zoom.position === "bottom-left") ? "#root > div > div:nth-of-type(2)" : "#root > div > div:nth-of-type(1)";
-
-  tools.zoom = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-zoom",
-    position: "inline",
-    anchor: selector,
-    onMount: (container: any) => {
-      console.log("Autodarts Tools: Zoom initialized");
-      const app = createApp(Zoom);
-      app.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
-      return app;
-    },
-    onRemove: (app: any) => {
-      app?.unmount();
-      console.log("Autodarts Tools: Zoom removed");
-    },
-  });
-
-  tools.zoom.mount();
 }
 
 async function initQuickCorrection(ctx) {

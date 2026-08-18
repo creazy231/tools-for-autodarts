@@ -307,6 +307,15 @@ export const SELECTORS = {
     ],
 
     /**
+     * The dartboard itself — four stacked inline SVGs, not an image.
+     *
+     * Layer 0 is the segments, 1 and 2 the printed artwork, 3 the hit
+     * highlight. Cloning the lot costs well under a millisecond, so Darts Zoom
+     * takes a copy per dart rather than trying to be clever about layers.
+     */
+    board: [ "main [role='img'][aria-label='Dartboard']" ],
+
+    /**
      * One per player: the whole flanking column, score card plus chalkboard.
      *
      * v1 marked these `.ad-ext-player`. The rebuilt screen emits no hook, so

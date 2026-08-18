@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1787047674908;
+export const GENERATED_AT = 1787055548958;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1787047612267;
+export const NEWEST_SOURCE_AT = 1787055338780;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -260,66 +260,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "file": "entrypoints/match.content/StreamingMode.vue",
     "line": 512,
     "fn": "waitForElement"
-  },
-  {
-    "selector": "#root .navigation",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 129,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-game-variant",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 153,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".showAnimations",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 157,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".showAnimations",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 158,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "button[aria-label='Live mode']",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 291,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 400,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 407,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "div",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 415,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "div",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 422,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/Zoom.vue",
-    "line": 462,
-    "fn": "querySelector"
   },
   {
     "selector": "[data-slot]",

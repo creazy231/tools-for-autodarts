@@ -305,7 +305,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "larger-player-match-data", title: "Larger Player Match Data Settings", component: LargerPlayerMatchData, hasSettings: true, v2Ready: true },
       { id: "winner-animation", title: "Winner Animation Settings", component: WinnerAnimation, hasSettings: false, v2Ready: true },
       { id: "automatic-fullscreen", title: "Automatic Fullscreen Settings", component: AutomaticFullscreen, hasSettings: false, v2Ready: true },
-      { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true },
+      { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true, v2Ready: true },
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true, v2Ready: true },
       { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
