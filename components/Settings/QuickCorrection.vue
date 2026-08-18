@@ -79,10 +79,8 @@
 import AppToggle from "../AppToggle.vue";
 import AppSlider from "../AppSlider.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/quick-correction.png");
 
 // Computed property for scale
@@ -103,26 +101,6 @@ function formatScaleLabel(value: number): string {
   const percentage = Math.round(value * 100);
   return `${percentage}%`;
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-
-  // Initialize quickCorrection if it doesn't exist
-  if (config.value && !config.value.quickCorrection) {
-    config.value.quickCorrection = {
-      enabled: false,
-      scale: 1,
-    };
-  }
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Quick Correction setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

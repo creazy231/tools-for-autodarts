@@ -63,10 +63,8 @@
 import AppToggle from "../AppToggle.vue";
 import AppInput from "../AppInput.vue";
 
-import { AutodartsToolsConfig, type IConfig, defaultConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 
 async function toggleFeature() {
   if (!config.value) return;
@@ -81,17 +79,4 @@ async function toggleFeature() {
     emit("toggle", "automatic-next-leg");
   }
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-  if (!config.value?.automaticNextLeg) config.value.automaticNextLeg = defaultConfig.automaticNextLeg;
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Automatic Next Leg setting changed");
-}, { deep: true });
 </script>

@@ -52,10 +52,9 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/team-lobby.png");
 
 async function toggleFeature() {
@@ -71,16 +70,4 @@ async function toggleFeature() {
     emit("toggle", "team-lobby");
   }
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Team Lobby setting changed");
-}, { deep: true });
 </script>

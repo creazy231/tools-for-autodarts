@@ -106,27 +106,10 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
-import { AutodartsToolsConfig, defaultConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/colors.png");
-
-onMounted(async () => {
-  const stored = await AutodartsToolsConfig.getValue();
-  // Settings saved before a colour existed have no value for it, and an empty
-  // <input type="color"> reads as black rather than as what is on screen.
-  stored.colors.actionBar ||= defaultConfig.colors.actionBar;
-  config.value = stored;
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Streaming Mode setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

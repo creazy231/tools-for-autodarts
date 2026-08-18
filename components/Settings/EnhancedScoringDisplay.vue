@@ -57,14 +57,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
-
 import AppToggle from "../AppToggle.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/enhanced-scoring-display.png");
 
 async function toggleFeature() {
@@ -80,16 +76,4 @@ async function toggleFeature() {
     emit("toggle", "enhanced-scoring-display");
   }
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Enhanced Scoring Display setting changed");
-}, { deep: true });
 </script>

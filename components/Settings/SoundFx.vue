@@ -461,7 +461,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import Sortable from "sortablejs";
 import { useStorage } from "@vueuse/core";
 import AppToggle from "../AppToggle.vue";
@@ -472,7 +472,7 @@ import AppInput from "../AppInput.vue";
 import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppSlider from "../AppSlider.vue";
-import { AutodartsToolsConfig, type IConfig, type ISound } from "@/utils/storage";
+import { type ISound } from "@/utils/storage";
 import { useNotification } from "@/composables/useNotification";
 import { useTTS } from "@/composables/useTTS";
 import {
@@ -484,7 +484,7 @@ import {
   saveSoundFxToIndexedDB,
 } from "@/utils/helpers";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
+const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "sound-fx");
 
 const textareaPlaceholder = `180
@@ -494,7 +494,7 @@ s25
 ...
 `;
 
-const config = ref<IConfig>();
+const { config, ready } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/sound-fx.png");
 const showSoundModal = ref(false);
 const isEditMode = ref(false);
@@ -567,20 +567,12 @@ const lowercaseText = computed({
 });
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   await nextTick();
   initSortable();
   await nextTick();
   allowAdd.value = true;
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Sound FX setting changed");
-}, { deep: true });
 
 // Initialize Sortable.js
 function initSortable() {
@@ -1026,11 +1018,6 @@ async function processFiles() {
       }
     }
 
-    // Update config
-    await AutodartsToolsConfig.setValue(toRaw(config.value));
-    emit("settingChange");
-    console.log("Sound FX setting changed");
-
     // Show notification
     showNotification(`Successfully added ${selectedFiles.value.length} sounds`);
   } catch (error) {
@@ -1091,11 +1078,6 @@ async function deleteAllSounds() {
 
   // Clear all sounds from the config
   config.value.soundFx.sounds = [];
-
-  // Update config
-  await AutodartsToolsConfig.setValue(toRaw(config.value));
-  emit("settingChange");
-  console.log("Sound FX setting changed");
 
   // Close modal and show notification
   closeDeleteAllModal();

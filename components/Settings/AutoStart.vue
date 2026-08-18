@@ -29,11 +29,9 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
-import { type IConfig } from "@/utils/storage";
-import { AutodartsToolsConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("images/auto-start.png");
 
 async function toggleFeature() {
@@ -50,16 +48,5 @@ async function toggleFeature() {
   }
 }
 
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
 // Watch for prop changes to update local config
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Auto Start setting changed");
-}, { deep: true });
 </script>

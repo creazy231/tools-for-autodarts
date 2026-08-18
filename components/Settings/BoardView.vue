@@ -64,10 +64,8 @@
 import AppToggle from "../AppToggle.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 
-import { AutodartsToolsConfig, defaultConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 
 async function toggleFeature() {
   if (!config.value) return;
@@ -80,19 +78,4 @@ async function toggleFeature() {
     emit("toggle", "board-view");
   }
 }
-
-onMounted(async () => {
-  const stored = await AutodartsToolsConfig.getValue();
-  // Settings saved before this feature existed have nothing for it.
-  stored.boardView ||= { ...defaultConfig.boardView };
-  config.value = stored;
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Autodarts Tools: Board View:", config.value?.boardView.enabled ? "enabled" : "disabled");
-}, { deep: true });
 </script>

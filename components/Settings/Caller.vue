@@ -645,7 +645,7 @@ import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppToggle from "../AppToggle.vue";
 import AppSlider from "../AppSlider.vue";
-import { AutodartsToolsConfig, type IConfig, type ISound } from "@/utils/storage";
+import { type ISound } from "@/utils/storage";
 import { useNotification } from "@/composables/useNotification";
 import { useTTS } from "@/composables/useTTS";
 import {
@@ -661,7 +661,7 @@ import {
 
 // Import JSZip for handling zip files
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
+const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "caller");
 
 const textareaPlaceholder = `180
@@ -670,7 +670,7 @@ s50
 s25
 ...`;
 
-const config = ref<IConfig>();
+const { config, ready } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/caller.png");
 const showSoundModal = ref(false);
 const isEditMode = ref(false);
@@ -804,7 +804,7 @@ const lowercaseText = computed({
 });
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   await nextTick();
   initSortable();
   await nextTick();
@@ -817,14 +817,6 @@ watch(selectedPresetURL, (newValue) => {
     baseURL.value = newValue;
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Caller setting changed");
-}, { deep: true });
 
 // Initialize Sortable.js
 function initSortable() {
@@ -1179,11 +1171,6 @@ async function processFiles() {
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Update config and wait for 100ms
-    await AutodartsToolsConfig.setValue(toRaw(config.value));
-    emit("settingChange");
-    console.log("Caller setting changed");
-
     // Show notification
     showNotification(`Successfully added ${selectedFiles.value.length} sounds`);
   } catch (error) {
@@ -1243,11 +1230,6 @@ async function deleteAllSounds() {
 
   // Clear all sounds from the config
   config.value.caller.sounds = [];
-
-  // Update config
-  await AutodartsToolsConfig.setValue(toRaw(config.value));
-  emit("settingChange");
-  console.log("Caller setting changed");
 
   // Close modal and show notification
   closeDeleteAllModal();
@@ -1752,10 +1734,6 @@ async function fetchSoundsFromURL() {
         showNotification(`Successfully imported ${sounds.length} sounds from ZIP file`);
       }
 
-      // Update config
-      await AutodartsToolsConfig.setValue(toRaw(config.value));
-      emit("settingChange");
-
       // Close modal
       closeImportURLModal();
     } catch (error) {
@@ -1918,11 +1896,6 @@ async function fetchSoundsFromURL() {
     }
 
     await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Update config
-    await AutodartsToolsConfig.setValue(toRaw(config.value!));
-    emit("settingChange");
-    console.log("Caller setting changed");
 
     // Show success notification
     showNotification(`Successfully imported ${importedCount.value} sounds from URL`);

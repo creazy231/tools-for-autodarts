@@ -40,10 +40,8 @@
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits(["toggle", "settingChange"]);
-const config = ref<IConfig>();
+const emit = defineEmits(["toggle"]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/gotcha.png");
 
 async function toggleFeature() {
@@ -59,16 +57,4 @@ async function toggleFeature() {
     emit("toggle", "gotcha");
   }
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Autodarts Tools: Gotcha:", config.value?.gotcha.enabled ? "enabled" : "disabled");
-}, { deep: true });
 </script>

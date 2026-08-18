@@ -27,7 +27,7 @@
       :title="getSettingTitle(activeSettings)"
       :width="getSettingWidth(activeSettings)"
     >
-      <component @setting-change="handleSettingChange" :is="getComponentForSetting(activeSettings)" :config="config" />
+      <component :is="getComponentForSetting(activeSettings)" />
     </SettingsModal>
 
     <div class="mx-auto mb-16 max-w-[1366px] space-y-8">
@@ -150,7 +150,6 @@
         <template v-if="mounted">
           <div
             v-if="!showDangerZone"
-            :key="reloadKey"
             class="grid grid-cols-1 gap-5 lg:grid-cols-2"
           >
 
@@ -182,7 +181,6 @@
               <component
                 :is="feature.component"
                 :data-feature-index="idx + 1"
-                @setting-change="updateConfig"
                 @toggle="handleToggle(feature)"
                 class="feature-card"
               />
@@ -196,7 +194,7 @@
 
 <script setup lang="ts">
 import type { Component } from "vue";
-import { useDebounceFn, useStorage } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 
 import DiscordWebhooks from "./Settings/DiscordWebhooks.vue";
 import AutoStart from "./Settings/AutoStart.vue";
@@ -344,31 +342,8 @@ const tabs = ref([ "Lobbies", "Matches", "Boards", "Sounds & Animations" ]);
 const activeSettings = useStorage("adt:active-settings", null);
 const activeTab = useStorage("adt:active-tab", 0);
 const showSettingsModal = ref(false);
-const reloadKey = ref(0);
 
-// Create a debounced function for updating reloadKey
-const debouncedReload = useDebounceFn(() => {
-  // Get the current scroll position before updating reloadKey
-  const scrollContainers = [ document.querySelector("#root > div > div:nth-of-type(2)"), document.querySelector("html") ];
-  const scrollPositions = scrollContainers.map(container => container?.scrollTop || 0);
-
-  // Update reloadKey
-  reloadKey.value++;
-
-  // Restore scroll position after DOM update
-  nextTick(() => {
-    setTimeout(() => {
-      scrollContainers.forEach((container, index) => {
-        if (container) {
-          container.scrollTop = scrollPositions[index];
-        }
-      });
-    }, 250);
-  });
-}, 250); // 250ms debounce time
-
-// Initialize config with default values to avoid null issues
-const config = ref<IConfig>(defaultConfig);
+const { config, ready } = useConfig();
 const importFileInput = ref<HTMLInputElement>();
 
 const mounted = useMounted();
@@ -388,19 +363,6 @@ const { notification, showNotification, hideNotification } = useNotification();
 function goBack() {
   window.history.back();
 }
-
-onMounted(async () => {
-  const loadedConfig = await AutodartsToolsConfig.getValue();
-  if (loadedConfig) {
-    config.value = loadedConfig;
-  }
-});
-
-watch(config, async () => {
-  // Save the config to storage
-  await AutodartsToolsConfig.setValue(toRaw(config.value));
-  debouncedReload();
-}, { deep: true });
 
 function handleToggle(feature) {
   // Features not yet ported to v2 are inert — their selectors still target the
@@ -423,11 +385,6 @@ function getSettingTitle(settingId) {
     }
   }
   return "Settings";
-}
-
-// Function to handle setting changes
-function handleSettingChange() {
-  updateConfig();
 }
 
 // Function to get the component for a setting
@@ -464,7 +421,7 @@ function closeSettingsModal() {
 }
 
 async function exportSettings() {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   if (!config.value) return;
 
   interface ExportData {
@@ -721,7 +678,7 @@ function resetAllSettings() {
 }
 
 async function copyToClipboard() {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   if (!config.value) return;
 
   interface ExportData {
@@ -917,11 +874,6 @@ function pasteFromClipboard() {
       console.error("Failed to read from clipboard:", err);
       showNotification("Failed to read from clipboard", "error");
     });
-}
-
-async function updateConfig() {
-  config.value = await AutodartsToolsConfig.getValue();
-  debouncedReload();
 }
 </script>
 

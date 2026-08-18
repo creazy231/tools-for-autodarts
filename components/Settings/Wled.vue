@@ -397,7 +397,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, toRaw, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import Sortable from "sortablejs";
 import { useStorage } from "@vueuse/core";
 
@@ -411,17 +411,17 @@ import AppRadioGroup from "../AppRadioGroup.vue";
 import AppDropdown from "../AppDropDown.vue";
 
 import { useNotification } from "@/composables/useNotification";
-import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
+import { type IWled } from "@/utils/storage";
 import { setEffect } from "@/entrypoints/match.content/wled";
 import { WledType } from "#imports";
 
-const emit = defineEmits(["toggle", "settingChange"]);
+const emit = defineEmits(["toggle"]);
 useStorage("adt:active-settings", "wled-fx");
 
 const triggerPlaceholder = "gameon\ntakeout\nbusted\ngameshot\nmatchshot\n...";
 const boardIdsPlaceholder = "6a501a61-53a5-468a-a56a-17134ace3099\n6128583a-66d8-46a7-87be-97f045ce7456\n...";
 
-const config = ref<IConfig>();
+const { config, ready } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/ad_wled_logo.png");
 const showEffectModal = ref(false);
 const isEditMode = ref(false);
@@ -482,7 +482,7 @@ const wledBoardIds = computed({
 });
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   await nextTick();
   initSortable();
   await nextTick();
@@ -494,14 +494,6 @@ watch(() => newEffect.value.url, async () => {
     await fetchPresets();
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Autodarts Tools: WLED: setting changed");
-}, { deep: true });
 
 // Initialize Sortable.js
 function initSortable() {

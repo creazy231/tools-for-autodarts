@@ -195,16 +195,14 @@ import AppButton from "../AppButton.vue";
 import AppToggle from "../AppToggle.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config, ready } = useConfig();
 const streamingModeBackgroundFileSelect = ref() as Ref<HTMLInputElement>;
 const backgroundMode = ref(true);
 const imageUrl = browser.runtime.getURL("/images/streaming-mode.png");
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   // Initialize backgroundMode based on config
   if (config.value) {
     backgroundMode.value = config.value.streamingMode.backgroundImage;
@@ -217,14 +215,6 @@ watch(backgroundMode, (newValue) => {
     config.value.streamingMode.backgroundImage = newValue;
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Streaming Mode setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;
@@ -280,8 +270,5 @@ async function handleResetPositions() {
     x: 0,
     y: 0,
   };
-
-  // Save the updated config
-  await AutodartsToolsConfig.setValue(toRaw(config.value));
 }
 </script>

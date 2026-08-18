@@ -65,22 +65,20 @@
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
 import AppInput from "../AppInput.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config, ready } = useConfig();
 const sizeValue = ref("");
 const imageUrl = browser.runtime.getURL("/images/larger-legs-sets.png");
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   // Initialize the size value from config
   if (config.value?.largerLegsSets?.value) {
     sizeValue.value = config.value.largerLegsSets.value.toString();
   }
 });
 
-// Update config when size value changes
 watch(sizeValue, (newValue) => {
   if (config.value) {
     // Convert string to number
@@ -88,14 +86,6 @@ watch(sizeValue, (newValue) => {
     config.value.largerLegsSets.value = numValue;
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Larger Legs & Sets setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

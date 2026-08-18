@@ -54,24 +54,11 @@
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
 import AppToggle from "../AppToggle.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
+const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "winner-animation");
-const config = ref<IConfig>();
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/winner-animation.png");
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Winner Animation setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

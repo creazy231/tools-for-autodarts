@@ -230,10 +230,8 @@ import AppButton from "../AppButton.vue";
 import AppSelect from "../AppSelect.vue";
 import AppSlider from "../AppSlider.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const videoPreview = ref<HTMLVideoElement | null>(null);
 const mediaStream = ref<MediaStream | null>(null);
 const hasCameraPermission = ref(false);
@@ -303,12 +301,6 @@ const isCameraSupported = computed(() => {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 });
 
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-
-  // Only load config on mount, don't check camera permissions yet
-});
-
 // Watch for changes in the data-feature-index attribute to detect when settings are opened
 watch(() => !getCurrentInstance()?.attrs["data-feature-index"], async (isSettingsPanel, wasPanelBefore) => {
   // Check if we're transitioning from feature card to settings panel
@@ -323,14 +315,6 @@ onUnmounted(() => {
     mediaStream.value.getTracks().forEach(track => track.stop());
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Instant Replay setting changed");
-}, { deep: true });
 
 async function checkCameraPermission() {
   if (!isCameraSupported.value) {

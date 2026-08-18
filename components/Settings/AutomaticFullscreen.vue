@@ -49,12 +49,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
 import AppToggle from "../AppToggle.vue";
-import { AutodartsToolsConfig, type IConfig, defaultConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 
 async function toggleFeature() {
   if (!config.value) return;
@@ -69,17 +67,4 @@ async function toggleFeature() {
     emit("toggle", "automatic-fullscreen");
   }
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-  if (!config.value?.automaticFullscreen) config.value.automaticFullscreen = defaultConfig.automaticFullscreen;
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Automatic Fullscreen setting changed");
-}, { deep: true });
 </script>

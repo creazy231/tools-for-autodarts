@@ -66,23 +66,21 @@
 import { useStorage } from "@vueuse/core";
 import AppToggle from "../AppToggle.vue";
 import AppInput from "../AppInput.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
+const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "larger-player-match-data");
-const config = ref<IConfig>();
+const { config, ready } = useConfig();
 const sizeValue = ref("");
 const imageUrl = browser.runtime.getURL("/images/larger-player-match-data.png");
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   // Initialize the size value from config
   if (config.value?.largerPlayerMatchData?.value) {
     sizeValue.value = config.value.largerPlayerMatchData.value.toString();
   }
 });
 
-// Update config when size value changes
 watch(sizeValue, (newValue) => {
   if (config.value) {
     // Convert string to number
@@ -90,14 +88,6 @@ watch(sizeValue, (newValue) => {
     config.value.largerPlayerMatchData.value = numValue;
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Larger Player Match Data setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

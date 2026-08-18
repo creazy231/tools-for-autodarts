@@ -52,23 +52,10 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/smaller-scores.png");
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Shuffle Players setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

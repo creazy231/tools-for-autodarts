@@ -62,21 +62,19 @@
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
 import AppInput from "../AppInput.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config, ready } = useConfig();
 const sizeValue = ref("");
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   // Initialize the size value from config
   if (config.value?.largerPlayerNames?.value) {
     sizeValue.value = config.value.largerPlayerNames.value.toString();
   }
 });
 
-// Update config when size value changes
 watch(sizeValue, (newValue) => {
   if (config.value) {
     // Convert string to number
@@ -84,14 +82,6 @@ watch(sizeValue, (newValue) => {
     config.value.largerPlayerNames.value = numValue;
   }
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Larger Player Names setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

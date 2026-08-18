@@ -100,23 +100,10 @@
 import AppToggle from "../AppToggle.vue";
 import AppInput from "../AppInput.vue";
 import AppButton from "../AppButton.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/recent-local-players.png");
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Recent Local Players setting changed");
-}, { deep: true });
 
 // Function to remove a player from the list
 function removePlayer(index: number) {

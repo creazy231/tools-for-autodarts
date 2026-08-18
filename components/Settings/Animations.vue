@@ -409,7 +409,7 @@
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
 import Sortable from "sortablejs";
-import { computed, nextTick, onMounted, ref, toRaw, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 import AppButton from "../AppButton.vue";
 import AppInput from "../AppInput.vue";
@@ -421,12 +421,12 @@ import AppToggle from "../AppToggle.vue";
 
 import { useNotification } from "@/composables/useNotification";
 import { deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
-import { AutodartsToolsConfig, type IAnimation, type IConfig, defaultConfig } from "@/utils/storage";
+import { type IAnimation } from "@/utils/storage";
 
-const emit = defineEmits([ "toggle", "settingChange" ]);
+const emit = defineEmits([ "toggle" ]);
 const { notification, showNotification, hideNotification } = useNotification();
 useStorage("adt:active-settings", "animations");
-const config = ref<IConfig>();
+const { config, ready } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
@@ -578,7 +578,7 @@ function setupIntersectionObserver() {
 }
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  await ready();
   await nextTick();
   initSortable();
   await nextTick();
@@ -602,14 +602,6 @@ onUnmounted(() => {
   }
   animationSources.value = {};
 });
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value ?? defaultConfig));
-  emit("settingChange");
-  console.log("Animations setting changed");
-}, { deep: true });
 
 function initSortable() {
   if (!animationsContainer.value) return;
@@ -927,10 +919,6 @@ async function processGifFiles() {
       }
     }
 
-    // Save config
-    await AutodartsToolsConfig.setValue(toRaw(config.value));
-    emit("settingChange");
-
     // Close modal and update UI
     closeGifUploadModal();
     showNotification(`Added ${successCount} GIFs`, "success");
@@ -969,11 +957,6 @@ async function deleteAllAnimations() {
 
   // Clear all animations from the config
   config.value.animations.data = [];
-
-  // Update config
-  await AutodartsToolsConfig.setValue(toRaw(config.value));
-  emit("settingChange");
-  console.log("Animations setting changed");
 
   // Close modal and show notification
   closeDeleteAllModal();

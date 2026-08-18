@@ -113,11 +113,9 @@ import AppRadioGroup from "../AppRadioGroup.vue";
 import AppInput from "../AppInput.vue";
 import AppToggle from "../AppToggle.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
+const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "discord-webhooks");
-const config = ref<IConfig>();
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/discord-webhooks.png");
 
 // Computed property for minutes with type handling
@@ -129,27 +127,6 @@ const minutes = computed({
     }
   },
 });
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-
-  // Initialize autoStartAfterTimer if it doesn't exist
-  if (config.value && !config.value.discord.autoStartAfterTimer) {
-    config.value.discord.autoStartAfterTimer = {
-      enabled: false,
-      minutes: 5,
-      stream: false,
-    };
-  }
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Discord Webhooks setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;

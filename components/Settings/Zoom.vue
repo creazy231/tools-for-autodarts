@@ -184,10 +184,8 @@ import AppSlider from "../AppSlider.vue";
 import AppToggle from "../AppToggle.vue";
 import AppInput from "../AppInput.vue";
 
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
-
-const emit = defineEmits([ "toggle", "settingChange" ]);
-const config = ref<IConfig>();
+const emit = defineEmits([ "toggle" ]);
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/zoom.png");
 
 // Computed property for zoom level with mapping between 1-6 and the actual zoom value
@@ -209,18 +207,6 @@ function formatZoomLabel(value: number): string {
   const percentage = Math.round(((value - 1) / 5) * 100);
   return `${percentage}%`;
 }
-
-onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
-});
-
-watch(config, async (_, oldValue) => {
-  if (!oldValue) return;
-
-  await AutodartsToolsConfig.setValue(toRaw(config.value!));
-  emit("settingChange");
-  console.log("Zoom setting changed");
-}, { deep: true });
 
 async function toggleFeature() {
   if (!config.value) return;
