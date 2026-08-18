@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Darts Zoom gained a third position, **On Board**, which adds nothing to the screen: autodarts' own board zooms in on each dart as it lands and pulls back out again, on a configurable timer — 5 seconds by default — or the moment the visit ends or passes to another player. It works on whatever the site is showing, the camera view included, since it moves the board's own layers rather than drawing a copy
+  - It moves them with the `scale` and `translate` properties rather than `transform`, which the site already uses on one of those layers: these compose with what is there instead of losing to it or, with `!important`, wiping it out. The values go through custom properties on the root element — rewriting a `<style>` element drops the rule for an instant, which cancels the transition and makes the board snap back before it moves
 - Added a "Tools for Autodarts" entry to the user drawer on the rebuilt site, below "Legal", opening the settings page at `/tools`
 - Added a DOM element picker for development, used to drive the port to the rebuilt autodarts site
   - `Alt+Shift+P` arms it; hover an element, `↑`/`↓` walk up and down the tree without needing to click, `E` or a click captures, `C` copies every capture to the clipboard as Markdown

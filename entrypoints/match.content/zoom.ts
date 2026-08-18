@@ -62,7 +62,22 @@ const RING_FRACTION = 0.37778;
  * Never below 1: under that the board would be narrower than the tile and sit in
  * a gap of its own.
  */
-const POSITION_ZOOM = { top: 1.25, bottom: 0.5 } as const;
+const POSITION_ZOOM = { top: 1.25, bottom: 0.5, board: 1 } as const;
+
+/**
+ * The board position moves the board with the `scale` and `translate`
+ * properties rather than with `transform`, because the site already uses
+ * `transform` on one of the board's own layers — writing there would either
+ * lose to it or, with `!important`, wipe it out. These compose with whatever
+ * the site has instead of replacing it.
+ *
+ * They are pushed through custom properties on the root element: rewriting a
+ * `<style>` element drops the rule for an instant, which cancels the transition
+ * and makes the board snap back before it moves, and a variable on the root is
+ * somewhere React never looks.
+ */
+const BOARD_SCALE = "--adt-zoom-board-scale";
+const BOARD_TRANSLATE = "--adt-zoom-board-translate";
 
 const STYLES = `
   #${HOST_ID} {
@@ -229,11 +244,28 @@ function actionBarStyles(top: number): string {
   `;
 }
 
+/**
+ * The board's own contents, zoomed inside the circle it is already clipped to.
+ * Its children are the layers — four SVGs, or the camera view when a board is
+ * attached — all pinned to the same box, so one rule moves them together.
+ */
+const BOARD_STYLES = `
+  ${SELECTORS.match.board[0]} > * {
+    scale: var(${BOARD_SCALE}, 1);
+    translate: var(${BOARD_TRANSLATE}, 0 0);
+    transform-origin: center;
+    transition: scale 400ms ease, translate 400ms ease;
+  }
+`;
+
 let gameDataWatcherUnwatch: (() => void) | undefined;
 let boardImagesWatcherUnwatch: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let host: HTMLElement | null = null;
 let actionBarTop = 0;
+let resetTimer: ReturnType<typeof setTimeout> | undefined;
+/** The dart the board is currently held on, so a redraw does not restart it. */
+let heldOn = "";
 let boardInset = 0;
 let config: IConfig["zoom"] | null = null;
 let userId: string | null = null;
@@ -245,12 +277,13 @@ export async function zoom() {
   const stored = await AutodartsToolsConfig.getValue();
   // The migration narrows this too, but a content script can load before it has
   // run in this browser, and an unknown value must not mean "no layout".
-  config = { ...stored.zoom, position: stored.zoom?.position === "top" ? "top" : "bottom" };
+  const position = stored.zoom?.position;
+  config = { ...stored.zoom, position: position === "top" || position === "board" ? position : "bottom" };
   userId = await getUserIdFromToken();
 
   actionBarTop = 0;
   boardInset = 0;
-  addStyles(STYLES, STYLE_ID);
+  addStyles(config.position === "board" ? `${STYLES}\n${BOARD_STYLES}` : STYLES, STYLE_ID);
   mount();
 
   // A fresh visit starts with no frames; the handler fills these as the board
@@ -284,6 +317,7 @@ export function zoomOnRemove() {
     onReposition = null;
   }
 
+  releaseBoard();
   host?.remove();
   host = null;
   config = null;
@@ -306,7 +340,11 @@ function render(gameData: IGameData): void {
   if (!host || !config) return;
 
   const throws = visitInProgress(gameData) ?? [];
-  if (!throws.length || !shouldShow(gameData)) {
+  const showing = Boolean(throws.length) && shouldShow(gameData);
+
+  if (config.position === "board") return holdBoardOn(showing ? throws[throws.length - 1] : null, throws.length - 1);
+
+  if (!showing) {
     host.replaceChildren();
     place();
     return;
@@ -333,6 +371,46 @@ function render(gameData: IGameData): void {
   });
 
   place();
+}
+
+/**
+ * Hold the site's own board on the dart that just landed, then let it go.
+ *
+ * It lets go on a timer — the visit is usually still in progress and you want
+ * the whole board back to throw at — and immediately when the visit ends or
+ * passes to someone else, which is what `null` means here.
+ */
+function holdBoardOn(thrown: IThrow | null, index: number): void {
+  const stamp = thrown ? stampOf(thrown, index) : "";
+  if (stamp === heldOn) return;
+  heldOn = stamp;
+
+  clearTimeout(resetTimer);
+  resetTimer = undefined;
+
+  if (!thrown) return releaseBoard();
+
+  const scale = Math.max(1, (config?.level ?? 3) * POSITION_ZOOM.board);
+  const x = thrown.coords?.x ?? 0;
+  const y = thrown.coords?.y ?? 0;
+
+  // `translate` lands outside the scale rather than inside it, so the offset
+  // has to carry the scale itself — otherwise the dart stops short of the middle
+  // by exactly that factor.
+  const root = document.documentElement.style;
+  root.setProperty(BOARD_SCALE, String(scale));
+  root.setProperty(BOARD_TRANSLATE, `${-scale * RING_FRACTION * x * 100}% ${scale * RING_FRACTION * y * 100}%`);
+
+  const seconds = config?.resetAfter ?? 5;
+  if (seconds > 0) resetTimer = setTimeout(releaseBoard, seconds * 1000);
+}
+
+function releaseBoard(): void {
+  clearTimeout(resetTimer);
+  resetTimer = undefined;
+  heldOn = "";
+  document.documentElement.style.removeProperty(BOARD_SCALE);
+  document.documentElement.style.removeProperty(BOARD_TRANSLATE);
 }
 
 /**
@@ -422,6 +500,7 @@ function place(): void {
   if (!host || !config) return;
 
   host.setAttribute("data-position", config.position);
+  if (config.position === "board") return;
 
   const turnBar = qs<HTMLElement>(SELECTORS.match.turnBarPanel)?.getBoundingClientRect();
   if (config.position === "top") host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;

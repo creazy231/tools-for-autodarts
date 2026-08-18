@@ -17,10 +17,11 @@
               <div class="flex">
                 <AppRadioGroup
                   v-model="config.zoom.position"
-                  class="grid max-w-sm grid-cols-2"
+                  class="grid max-w-sm grid-cols-3"
                   :options="[
                     { label: 'Bottom', value: 'bottom' },
                     { label: 'Top', value: 'top' },
+                    { label: 'On Board', value: 'board' },
                   ]"
                 />
               </div>
@@ -28,8 +29,27 @@
                 <em>Bottom</em> gives each dart a third of the window along the foot of the screen, and
                 moves autodarts' undo and next buttons up to the free space in the top right so they
                 are not covered. <em>Top</em> keeps them where they are and puts a smaller row under
-                the throw display.
+                the throw display. <em>On Board</em> adds nothing to the screen at all — autodarts'
+                own board zooms in on each dart as it lands, and pulls back out again.
               </p>
+            </div>
+
+            <div v-if="config.zoom.position === 'board'" class="mt-4">
+              <h4 class="mb-2 font-semibold">
+                Hold For
+              </h4>
+              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
+                <AppInput
+                  @update:model-value="config.zoom.resetAfter = Number($event)"
+                  :model-value="String(config.zoom.resetAfter ?? 5)"
+                  placeholder="5"
+                  type="number"
+                  size="sm"
+                  input-class="w-full"
+                />
+                <p>Seconds the board stays zoomed on a dart before pulling back out. It also pulls
+                  back out as soon as the visit ends or passes to another player.</p>
+              </div>
             </div>
 
             <div class="mt-4">
@@ -156,6 +176,7 @@
 import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSlider from "../AppSlider.vue";
 import AppToggle from "../AppToggle.vue";
+import AppInput from "../AppInput.vue";
 
 import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
 

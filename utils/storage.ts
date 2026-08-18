@@ -120,8 +120,10 @@ export interface IConfig {
   };
   zoom: {
     enabled: boolean;
-    position: "top" | "bottom";
+    position: "top" | "bottom" | "board";
     level: number;
+    /** Seconds the board stays zoomed on a dart, in the `board` position. */
+    resetAfter: number;
     mode: "live" | "image";
     zoomOn: "everyone" | "opponents";
     showMarker: boolean;
@@ -445,6 +447,7 @@ export const defaultConfig: IConfig = {
   zoom: {
     enabled: false,
     position: "bottom",
+    resetAfter: 5,
     level: 3,
     mode: "live",
     zoomOn: "everyone",
@@ -724,7 +727,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 2;
+const CONFIG_VERSION = 3;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -740,6 +743,18 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
        *
        * Colors also gained a colour for the match screen's action bar.
        */
+      /**
+       * Darts Zoom gained a third position, which zooms the site's own board
+       * and holds it there for a few seconds before letting go.
+       */
+      3: (config: IConfig): IConfig => ({
+        ...config,
+        zoom: {
+          ...config.zoom,
+          resetAfter: config.zoom?.resetAfter ?? defaultConfig.zoom.resetAfter,
+        },
+      }),
+
       2: (config: IConfig): IConfig => ({
         ...config,
         zoom: {
