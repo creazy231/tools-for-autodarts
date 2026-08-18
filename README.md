@@ -92,7 +92,10 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Larger Player Names**: Increase the font size of player names for better visibility during matches
 
 ### 🎮 Gameplay Features
-- **Takeout Visualization**: Visual notification when takeout is in progress
+- **Takeout Visualization**: Visual notification while the board is waiting for the darts to be pulled
+  - A **Removing Darts…** panel in the middle of the screen, in the site's own warning colour and display face
+  - Click it to put it away; it stays away for that takeout and returns on the next one
+  - Clicking it also presses the board's **Reset**, for a takeout the board never sees finish
 - **Automatic Next Player**: Switches to the next player after a configurable delay when takeout is stuck
 - **Automatic Next Leg/Set**: Automatically advances to the next leg or set after takeout
 - **Smaller Font for Inactive Players**: Reduces the font size of scores for players not currently throwing

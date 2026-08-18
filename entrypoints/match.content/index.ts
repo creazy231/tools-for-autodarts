@@ -2,7 +2,7 @@ import "~/assets/tailwind.css";
 import { createApp } from "vue";
 
 import { colorChange, onRemove as colorChangeOnRemove } from "./color-change";
-import Takeout from "./Takeout.vue";
+import { takeout, takeoutOnRemove } from "./takeout";
 import { nextPlayerOnTakeOutStuck, nextPlayerOnTakeOutStuckOnRemove } from "./next-player-on-take-out-stuck";
 import { automaticNextLeg, automaticNextLegOnRemove } from "./automatic-next-leg";
 import { smallerScores, smallerScoresOnRemove } from "./smaller-scores";
@@ -74,6 +74,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "quickCorrection",
   "gotcha",
   "checkoutGuide",
+  "takeout",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -83,7 +84,6 @@ function isOn(config: IConfig, feature: keyof IConfig): boolean {
 
 const tools = {
   streamingMode: null as any,
-  takeout: null as any,
   animations: null as any,
   zoom: null as any,
   quickCorrection: null as any,
@@ -197,7 +197,7 @@ async function initMatch(ctx, url: string, matchId?: string) {
   }
 
   if (isOn(config, "takeout")) {
-    await initTakeout(ctx).catch(console.error);
+    await initScript(takeout, url).catch(console.error);
   }
 
   if (isOn(config, "nextPlayerOnTakeOutStuck")) {
@@ -294,7 +294,6 @@ function clearMatch(fromBullOff: boolean = false) {
   }
 
   tools.streamingMode?.remove();
-  tools.takeout?.remove();
   tools.animations?.remove();
   tools.zoom?.remove();
   tools.quickCorrection?.remove();
@@ -316,6 +315,7 @@ function clearMatch(fromBullOff: boolean = false) {
   enhancedScoringDisplayOnRemove();
   gotchaOnRemove();
   checkoutGuideOnRemove();
+  takeoutOnRemove();
   matchInitialized = false;
 }
 
@@ -371,27 +371,6 @@ function startActiveMatchObserver(ctx) {
   }
 
   return observer;
-}
-
-async function initTakeout(ctx) {
-  tools.takeout = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-takeout",
-    position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
-    onMount: (container) => {
-      console.log("Autodarts Tools: Takeout initialized");
-      const takeout = createApp(Takeout);
-      takeout.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
-      return takeout;
-    },
-    onRemove: (takeout) => {
-      takeout?.unmount();
-    },
-  });
-  tools.takeout.mount();
 }
 
 async function initStreamingMode(ctx) {

@@ -147,8 +147,7 @@ td:nth-of-type(2) > span > div p
 `sound-fx.ts` · `caller.ts`
 
 **Files that need no work** (zero site selectors, WebSocket-driven):
-`wled.ts` · `smaller-scores.ts` · `discord-stream.ts` · `Takeout.vue` ·
-`Gotcha.vue` · `CheckoutGuide.vue`
+`wled.ts` · `smaller-scores.ts` · `discord-stream.ts`
 
 ## 6. The v2 anchor vocabulary
 

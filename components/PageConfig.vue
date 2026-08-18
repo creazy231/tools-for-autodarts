@@ -296,7 +296,7 @@ const featureGroups: FeatureGroup[] = [
     tab: 1,
     features: [
       { id: "colors", title: "Colors Settings", component: Colors, hasSettings: true, v2Ready: true },
-      { id: "takeout-notification", title: "Takeout Notification Settings", component: TakeoutNotification, hasSettings: false },
+      { id: "takeout-notification", title: "Takeout Notification Settings", component: TakeoutNotification, hasSettings: false, v2Ready: true },
       { id: "next-player-on-takeout-stuck", title: "Next Player On Takeout Stuck Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true },
       { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true },
       { id: "smaller-scores", title: "Smaller Scores Settings", component: SmallerScores, hasSettings: false, v2Ready: true },

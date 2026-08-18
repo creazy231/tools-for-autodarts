@@ -340,6 +340,17 @@ export const SELECTORS = {
     chalkboard: [ "div.grid-rows-6" ],
 
     /**
+     * The board's own Reset control, which clears a stuck takeout.
+     *
+     * Text is the only anchor: it appears alongside the camera view and only
+     * while a board is attached, so it is absent from every capture taken with
+     * a virtual board. Matched case-insensitively via `qsText`, and treated as
+     * optional by the one caller — see takeout.ts.
+     */
+    boardReset: [ "button" ],
+    boardResetText: [ "Reset", "Zurücksetzen", "Resetten", "Réinitialiser" ],
+
+    /**
      * The bar above the board: three dart slots then the turn total.
      * v1's equivalent was `#ad-ext-turn` and its `.ad-ext-turn-throw` children.
      */

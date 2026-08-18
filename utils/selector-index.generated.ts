@@ -15,22 +15,22 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1786818649968;
+export const GENERATED_AT = 1787040641170;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1786818428918;
+export const NEWEST_SOURCE_AT = 1787040422281;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "html",
     "file": "components/PageConfig.vue",
-    "line": 345,
+    "line": 352,
     "fn": "querySelector"
   },
   {
     "selector": "[data-id]",
     "file": "components/Settings/Animations.vue",
-    "line": 577,
+    "line": 573,
     "fn": "querySelectorAll"
   },
   {
@@ -82,63 +82,9 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelector"
   },
   {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/Animations.vue",
-    "line": 115,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".showAnimations",
-    "file": "entrypoints/match.content/Animations.vue",
-    "line": 115,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-player-display",
+    "selector": "button",
     "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 7,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "#ad-ext-game-variant",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 18,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#adt-fullscreen-toggle",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 23,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "svg",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 42,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-game-variant",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 48,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "div:last-of-type",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 49,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "ul",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 51,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#adt-fullscreen-toggle",
-    "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 123,
+    "line": 34,
     "fn": "querySelector"
   },
   {
@@ -202,70 +148,16 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelector"
   },
   {
-    "selector": "#ad-ext-player-display",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 18,
-    "fn": "waitForElement"
+    "selector": "main",
+    "file": "entrypoints/match.content/checkout-guide.ts",
+    "line": 137,
+    "fn": "closest"
   },
   {
-    "selector": ".ad-ext-player",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 19,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "body",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 21,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "a",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 26,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 29,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "p",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 33,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext-player-name",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 43,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "body",
-    "file": "entrypoints/match.content/color-change.ts",
-    "line": 60,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/enhanced-scoring-display.ts",
-    "line": 13,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "#ad-ext-turn > .ad-ext-turn-throw > p",
-    "file": "entrypoints/match.content/enhanced-scoring-display.ts",
-    "line": 41,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "#ad-ext-turn > .suggestion > p",
-    "file": "entrypoints/match.content/enhanced-scoring-display.ts",
-    "line": 46,
-    "fn": "querySelectorAll"
+    "selector": "main",
+    "file": "entrypoints/match.content/gotcha.ts",
+    "line": 123,
+    "fn": "closest"
   },
   {
     "selector": "#adt-menu-hide",
@@ -330,43 +222,43 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 98,
+    "line": 143,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 98,
+    "line": 143,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 98,
+    "line": 143,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 283,
+    "line": 335,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 283,
+    "line": 335,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 283,
+    "line": 335,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "#ad-ext-player-display",
     "file": "entrypoints/match.content/index.ts",
-    "line": 346,
+    "line": 377,
     "fn": "waitForElement"
   },
   {
@@ -380,72 +272,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "file": "entrypoints/match.content/InstantReplay.vue",
     "line": 210,
     "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/larger-legs-sets.ts",
-    "line": 5,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": ".ad-ext-player",
-    "file": "entrypoints/match.content/larger-legs-sets.ts",
-    "line": 14,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": ".chakra-stack span",
-    "file": "entrypoints/match.content/larger-legs-sets.ts",
-    "line": 15,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": ".ad-ext-player-name",
-    "file": "entrypoints/match.content/larger-legs-sets.ts",
-    "line": 17,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext-player-name",
-    "file": "entrypoints/match.content/larger-legs-sets.ts",
-    "line": 18,
-    "fn": "closest"
-  },
-  {
-    "selector": "p",
-    "file": "entrypoints/match.content/larger-legs-sets.ts",
-    "line": 23,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/larger-player-match-data.ts",
-    "line": 5,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": ".ad-ext-player",
-    "file": "entrypoints/match.content/larger-player-match-data.ts",
-    "line": 14,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": "div:last-of-type > p",
-    "file": "entrypoints/match.content/larger-player-match-data.ts",
-    "line": 15,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/larger-player-names.ts",
-    "line": 5,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": ".ad-ext-player-name",
-    "file": "entrypoints/match.content/larger-player-names.ts",
-    "line": 14,
-    "fn": "querySelectorAll"
   },
   {
     "selector": "button",
@@ -466,45 +292,33 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelectorAll"
   },
   {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/QuickCorrection.vue",
-    "line": 404,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "p > div > div:last-of-type",
-    "file": "entrypoints/match.content/QuickCorrection.vue",
-    "line": 575,
-    "fn": "querySelector"
-  },
-  {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 385,
+    "line": 389,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 390,
+    "line": 394,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 458,
+    "line": 462,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification-close",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 478,
+    "line": 482,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 511,
+    "line": 515,
     "fn": "querySelector"
   },
   {
@@ -547,78 +361,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "selector": "#ad-ext-game-variant",
     "file": "entrypoints/match.content/StreamingMode.vue",
     "line": 512,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/match.content/Takeout.vue",
-    "line": 55,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Reset",
-    "file": "entrypoints/match.content/Takeout.vue",
-    "line": 55,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 102,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": ".ad-ext-player-score",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 105,
-    "fn": "querySelectorAll"
-  },
-  {
-    "selector": ".ad-ext_winner-animation",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 112,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext_winner-score-wrapper",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 115,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext_winner-animation",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 118,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext-player-winner",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 147,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext-player-score",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 148,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".ad-ext_winner-score-wrapper",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 153,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-game-variant",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 192,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/winner-animation.ts",
-    "line": 219,
     "fn": "waitForElement"
   },
   {
