@@ -11,6 +11,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "node scripts/load-reference-extension.mjs & wxt --port 4000",
+    "dev:fake-camera": "ADT_FAKE_CAMERA=1 node scripts/load-reference-extension.mjs & ADT_FAKE_CAMERA=1 wxt --port 4000",
     "dev:firefox": "wxt -b firefox --port 4000",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",

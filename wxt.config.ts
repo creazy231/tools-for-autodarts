@@ -39,6 +39,20 @@ const DEVTOOLS = process.env.ADT_DEVTOOLS === "1";
  */
 const REFERENCE = process.env.ADT_REFERENCE === "1";
 
+/**
+ * `ADT_FAKE_CAMERA=1 yarn dev` hands the dev browser a synthetic webcam.
+ *
+ * Instant Replay records whatever camera you point at your board, and there is
+ * no way to exercise it without one — worse, macOS refuses Chrome the camera
+ * outright unless it has been granted in System Settings, which no amount of
+ * granting inside the browser can get around. Chrome will generate a stream
+ * instead, which is enough to drive the whole feature: it records, it plays,
+ * and the picture is a rolling test pattern rather than a dartboard.
+ *
+ * Off by default, and dev only — `yarn build` never sees it.
+ */
+const FAKE_CAMERA = process.env.ADT_FAKE_CAMERA === "1";
+
 /** Both extra build targets ship the picker. */
 const WITH_PICKER = DEVTOOLS || REFERENCE;
 
@@ -80,7 +94,10 @@ export default defineConfig({
     // scripts/load-reference-extension.mjs. Chrome 137+ ignores
     // --load-extension, and web-ext already passes its own --disable-features
     // list, so overriding that from here would fight with it.
-    chromiumArgs: [ "--remote-debugging-port=9222" ],
+    chromiumArgs: [
+      "--remote-debugging-port=9222",
+      ...(FAKE_CAMERA ? [ "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream" ] : []),
+    ],
   },
   modules: [ "@wxt-dev/webextension-polyfill" ],
   imports: {
