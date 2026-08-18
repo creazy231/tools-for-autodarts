@@ -66,6 +66,11 @@
                   ]"
                 />
               </div>
+              <p class="mt-1 text-sm text-white/60">
+                This also puts autodarts' board on the matching view when a game starts, since the
+                close-ups are taken from whatever it is showing. Switch <em>Board View</em> on and
+                that feature decides instead — it is the one in charge, and this stops touching it.
+              </p>
             </div>
 
             <div class="mt-4">

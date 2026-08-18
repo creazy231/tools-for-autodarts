@@ -15,16 +15,16 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1787083072335;
+export const GENERATED_AT = 1787084697696;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1787082900622;
+export const NEWEST_SOURCE_AT = 1787084693451;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "html",
     "file": "components/PageConfig.vue",
-    "line": 350,
+    "line": 352,
     "fn": "querySelector"
   },
   {
@@ -138,43 +138,43 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 144,
+    "line": 146,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 144,
+    "line": 146,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 144,
+    "line": 146,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 331,
+    "line": 338,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 331,
+    "line": 338,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 331,
+    "line": 338,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "#ad-ext-player-display",
     "file": "entrypoints/match.content/index.ts",
-    "line": 373,
+    "line": 380,
     "fn": "waitForElement"
   },
   {

@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added **Board View**: start every game — bull-off included — on the camera, or the drawn board, you want to be looking at. Autodarts has one button for this and it only cycles, so this presses it until your choice comes up, remembering the views it has already been through: a board with one camera cannot show camera 3, and asking for it stops after one lap rather than pressing forever
+  - Darts Zoom's *View Mode* now does the same for its own live/image setting, since its close-ups are taken from whatever the board is showing. With Board View switched on, that feature is the one in charge and Zoom stops touching the button, so the two never press it in turn
 - Darts Zoom gained a third position, **On Board**, which adds nothing to the screen: autodarts' own board zooms in on each dart as it lands and pulls back out again, on a configurable timer — 5 seconds by default — or the moment the visit ends or passes to another player. It works on whatever the site is showing, the camera view included, since it moves the board's own layers rather than drawing a copy
   - It moves them with the `scale` and `translate` properties rather than `transform`, which the site already uses on one of those layers: these compose with what is there instead of losing to it or, with `!important`, wiping it out. The values go through custom properties on the root element — rewriting a `<style>` element drops the rule for an instant, which cancels the transition and makes the board snap back before it moves
 - Added a "Tools for Autodarts" entry to the user drawer on the rebuilt site, below "Legal", opening the settings page at `/tools`

@@ -17,6 +17,7 @@ import { caller, callerOnRemove } from "./caller";
 import { gotcha, gotchaOnRemove } from "./gotcha";
 import { checkoutGuide, checkoutGuideOnRemove } from "./checkout-guide";
 import { zoom, zoomOnRemove } from "./zoom";
+import { boardView, boardViewOnRemove } from "./board-view";
 import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
@@ -77,6 +78,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "nextPlayerOnTakeOutStuck",
   "automaticNextLeg",
   "zoom",
+  "boardView",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -225,6 +227,10 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initScript(winnerAnimation, url).catch(console.error);
   }
 
+  if (isOn(config, "boardView")) {
+    await initScript(boardView, url).catch(console.error);
+  }
+
   if (isOn(config, "zoom")) {
     await initScript(zoom, url).catch(console.error);
   }
@@ -312,6 +318,7 @@ function clearMatch(fromBullOff: boolean = false) {
   checkoutGuideOnRemove();
   takeoutOnRemove();
   zoomOnRemove();
+  boardViewOnRemove();
   matchInitialized = false;
 }
 

@@ -118,6 +118,10 @@ export interface IConfig {
     enabled: boolean;
     sounds: ISound[];
   };
+  boardView: {
+    enabled: boolean;
+    view: "image" | "camera-1" | "camera-2" | "camera-3";
+  };
   zoom: {
     enabled: boolean;
     position: "top" | "bottom" | "board";
@@ -444,6 +448,10 @@ export const defaultConfig: IConfig = {
     enabled: false,
   },
 
+  boardView: {
+    enabled: false,
+    view: "camera-1",
+  },
   zoom: {
     enabled: false,
     position: "bottom",
@@ -727,7 +735,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 3;
+const CONFIG_VERSION = 4;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -743,6 +751,12 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
        *
        * Colors also gained a colour for the match screen's action bar.
        */
+      /** Board View is new, and a saved config has nothing for it. */
+      4: (config: IConfig): IConfig => ({
+        ...config,
+        boardView: config.boardView ?? defaultConfig.boardView,
+      }),
+
       /**
        * Darts Zoom gained a third position, which zooms the site's own board
        * and holds it there for a few seconds before letting go.

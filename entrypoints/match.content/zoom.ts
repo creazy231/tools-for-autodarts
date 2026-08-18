@@ -8,6 +8,7 @@ import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsBoardImages } from "@/utils/board-image-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
+import { setBoardView } from "./board-view";
 import { SELECTORS, qs } from "@/utils/selectors";
 
 /**
@@ -24,6 +25,10 @@ import { SELECTORS, qs } from "@/utils/selectors";
  * handler — that is the "live" mode, and it is the one part of this that needs
  * real hardware. When a frame is missing, or the mode is "image", the cloned
  * SVG board stands in; if even that is gone, the extension's own board.png does.
+ *
+ * The mode also decides what the board itself shows, since a copy of it is what
+ * gets magnified: see board-view.ts, which presses the site's own button until
+ * a camera — or the drawn board — is up.
  *
  * v1 mounted a Vue app and, for the centre position, cloned `#ad-ext-turn` and
  * wrote zoom tiles into its children — a hook the rebuilt site does not emit,
@@ -285,6 +290,11 @@ export async function zoom() {
   boardInset = 0;
   addStyles(config.position === "board" ? `${STYLES}\n${BOARD_STYLES}` : STYLES, STYLE_ID);
   mount();
+
+  // The close-ups come from whatever the board is showing, so put it on the
+  // right thing first — unless Board View is switched on, in which case that
+  // has already chosen and the two must not press the same button in turn.
+  if (!stored.boardView?.enabled) await setBoardView(config.mode === "live" ? "live" : "image");
 
   // A fresh visit starts with no frames; the handler fills these as the board
   // pushes them.

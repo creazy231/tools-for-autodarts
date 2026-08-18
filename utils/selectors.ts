@@ -448,6 +448,16 @@ export const SELECTORS = {
     /** The turn total, the slot after the three darts. */
     turnTotal: [ "main div.rounded-2xl > div.max-w-25" ],
 
+    /**
+     * The button that cycles what the board shows: camera 1, 2, 3, then the
+     * vector board and round again. Its label is the camera number, or empty
+     * for the vector board — which is the only way to read the current state,
+     * as it carries no aria-label, title or data attribute of its own.
+     *
+     * A board with fewer cameras has a shorter cycle, so never count on four.
+     */
+    cameraButton: [ "main button:has([data-icon='camera'])" ],
+
     /** The match screen's own header — Exit on the left, icons on the right. */
     header: [ "#root header" ],
     /**

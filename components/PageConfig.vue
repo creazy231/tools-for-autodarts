@@ -220,6 +220,7 @@ import ExternalBoards from "./Settings/ExternalBoards.vue";
 import SoundFx from "./Settings/SoundFx.vue";
 import Wled from "./Settings/Wled.vue";
 import Zoom from "./Settings/Zoom.vue";
+import BoardView from "./Settings/BoardView.vue";
 import QuickCorrection from "./Settings/QuickCorrection.vue";
 import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
@@ -306,13 +307,14 @@ const featureGroups: FeatureGroup[] = [
       { id: "winner-animation", title: "Winner Animation Settings", component: WinnerAnimation, hasSettings: false, v2Ready: true },
       { id: "automatic-fullscreen", title: "Automatic Fullscreen Settings", component: AutomaticFullscreen, hasSettings: false, v2Ready: true },
       { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true, v2Ready: true },
+      { id: "board-view", title: "Board View Settings", component: BoardView, hasSettings: true, v2Ready: true },
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true, v2Ready: true },
       { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
       { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false, v2Ready: true },
       { id: "checkout-guide", title: "Checkout Guide Settings", component: CheckoutGuide, hasSettings: false, v2Ready: true },
     ],
-    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay" ],
+    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "board-view", "quick-correction", "instant-replay" ],
   },
   // Boards (Tab 2)
   {
