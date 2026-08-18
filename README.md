@@ -87,7 +87,9 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Darts Zoom**: A close-up of where each dart of the current visit landed, one tile per dart
   - Two positions: **Bottom** (default) gives each dart a third of the window along the foot of the screen, and moves autodarts' undo and next buttons up to the free space in the top right so they are not covered; **Top** leaves those buttons alone and puts a smaller row under the throw display
   - View mode toggle between the live camera feed and autodarts' own dartboard — the board is drawn as vector art, so the close-up stays sharp at any zoom and shows the site's hit highlight
-  - Adjustable zoom level, and an optional centre dot marking the exact point
+  - Adjustable zoom level, scaled to the position: the bottom strip is a third of the window wide, so the same level there magnifies far more than a small tile would, and it is eased off to suit — the top row goes the other way
+  - New darts fade in as they land (rising from the foot of the screen in the bottom strip); darts already on screen are left alone
+  - An optional centre dot marks the exact point
   - Can be limited to your opponents' darts, or to visits where a checkout is on
   - Clears when the visit is handed over; a busted visit stays up, since the darts are still in the board
 - **Automatic Fullscreen**: Automatically enables fullscreen mode during matches for an immersive experience

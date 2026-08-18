@@ -32,6 +32,12 @@ import { SELECTORS, qs } from "@/utils/selectors";
  */
 const HOST_ID = "adt-zoom";
 const STYLE_ID = "zoom";
+/**
+ * The moved action bar gets a sheet of its own. Its `top` is remeasured as the
+ * layout shifts, and replacing a stylesheet restarts every animation the sheet
+ * declares — so the tile animations must not be in the one being rewritten.
+ */
+const ACTION_BAR_STYLE_ID = "zoom-action-bar";
 
 /**
  * Where a throw's coordinates sit on the board, as a fraction of its width.
@@ -42,6 +48,21 @@ const STYLE_ID = "zoom";
  * four decimal places. `+y` is up, so it is subtracted rather than added.
  */
 const RING_FRACTION = 0.37778;
+
+/**
+ * How hard to zoom for each position, on top of the configured level.
+ *
+ * The level alone cannot mean the same thing in both: the board copy is as wide
+ * as its tile, and the bottom tile is a third of the window while the top one is
+ * a few centimetres. The same scale there magnifies four times as much, which
+ * left the bottom strip showing barely three segments. Scaled back it shows
+ * around two thirds of the board's width, and the top row — which has the space
+ * to spare — goes the other way.
+ *
+ * Never below 1: under that the board would be narrower than the tile and sit in
+ * a gap of its own.
+ */
+const POSITION_ZOOM = { top: 1.25, bottom: 0.5 } as const;
 
 const STYLES = `
   #${HOST_ID} {
@@ -88,7 +109,15 @@ const STYLES = `
     border-radius: calc(var(--radius, 0.625rem) + 4px);
     background: var(--color-black-90, #01040b);
     box-shadow: 0 0 0 1px rgb(247 248 250 / 15%);
-    animation: adt-zoom-in 300ms ease-out;
+  }
+
+  #${HOST_ID}[data-position="top"] .adt-zoom-tile {
+    animation: adt-zoom-fade 300ms ease-out;
+  }
+
+  /* the bottom strip rises into place from off the foot of the window */
+  #${HOST_ID}[data-position="bottom"] .adt-zoom-tile {
+    animation: adt-zoom-rise 320ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /*
@@ -124,9 +153,14 @@ const STYLES = `
     background: rgb(96 165 250 / 80%);
   }
 
-  @keyframes adt-zoom-in {
+  @keyframes adt-zoom-fade {
     from { opacity: 0; }
     to   { opacity: 1; }
+  }
+
+  @keyframes adt-zoom-rise {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: none; }
   }
 `;
 
@@ -215,7 +249,9 @@ export function zoomOnRemove() {
   host = null;
   config = null;
   boardImages = [];
+  actionBarTop = 0;
   removeStyles(STYLE_ID);
+  removeStyles(ACTION_BAR_STYLE_ID);
 }
 
 function mount(): void {
@@ -236,8 +272,35 @@ function render(gameData: IGameData): void {
   }
 
   const board = qs<HTMLElement>(SELECTORS.match.board);
-  host.replaceChildren(...throws.map((thrown, index) => tile(thrown, index, board)));
+
+  // A visit that has gone backwards — a correction, or the start of a new one —
+  // loses the tiles it no longer has darts for.
+  while (host.children.length > throws.length) host.lastElementChild?.remove();
+
+  // Everything else is left exactly as it is. Rebuilding the lot on every update
+  // would restart the animation on darts that landed several seconds ago, and
+  // would re-clone a board that has moved on since.
+  throws.forEach((thrown, index) => {
+    const existing = host!.children[index] as HTMLElement | undefined;
+    const stamp = stampOf(thrown, index);
+    if (existing?.dataset.adtThrow === stamp) return;
+
+    const fresh = tile(thrown, index, board);
+    fresh.dataset.adtThrow = stamp;
+    if (existing) host!.replaceChild(fresh, existing);
+    else host!.appendChild(fresh);
+  });
+
   place();
+}
+
+/**
+ * What makes a tile out of date: the dart moving, or its camera frame arriving
+ * after the tile was already built from the board instead.
+ */
+function stampOf(thrown: IThrow, index: number): string {
+  const source = config?.mode === "live" && boardImages[index] ? "frame" : "board";
+  return `${thrown.segment?.name ?? ""}:${thrown.coords?.x ?? 0}:${thrown.coords?.y ?? 0}:${source}`;
 }
 
 /**
@@ -292,7 +355,8 @@ function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLEle
   // Translate first, then scale about the middle: the dart ends up where the
   // marker is, magnified. Percentages are of the copy's own box, so this holds
   // at any tile size.
-  view.style.transform = `scale(${config?.level ?? 3}) translate(${-RING_FRACTION * x * 100}%, ${RING_FRACTION * y * 100}%)`;
+  const scale = Math.max(1, (config?.level ?? 3) * POSITION_ZOOM[config?.position ?? "bottom"]);
+  view.style.transform = `scale(${scale}) translate(${-RING_FRACTION * x * 100}%, ${RING_FRACTION * y * 100}%)`;
 
   element.appendChild(view);
   if (config?.showMarker) {
@@ -325,7 +389,7 @@ function place(): void {
   const top = Math.round(Math.max(56, (turnBar?.bottom ?? 0) + 8));
   if (top === actionBarTop) return;
   actionBarTop = top;
-  addStyles(`${STYLES}\n${actionBarStyles(top)}`, STYLE_ID);
+  addStyles(actionBarStyles(top), ACTION_BAR_STYLE_ID);
 }
 
 /** v1's two filters: whose darts to magnify, and whether to bother off a finish. */
