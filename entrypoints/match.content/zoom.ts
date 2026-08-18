@@ -411,8 +411,8 @@ function holdBoardOn(thrown: IThrow | null, index: number): void {
   root.setProperty(BOARD_SCALE, String(scale));
   root.setProperty(BOARD_TRANSLATE, `${-scale * RING_FRACTION * x * 100}% ${scale * RING_FRACTION * y * 100}%`);
 
-  const seconds = config?.resetAfter ?? 5;
-  if (seconds > 0) resetTimer = setTimeout(releaseBoard, seconds * 1000);
+  const hold = config?.resetAfterMs ?? 1000;
+  if (hold > 0) resetTimer = setTimeout(releaseBoard, hold);
 }
 
 function releaseBoard(): void {

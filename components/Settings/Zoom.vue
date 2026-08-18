@@ -40,15 +40,16 @@
               </h4>
               <div class="grid grid-cols-[5rem_auto] items-center gap-4">
                 <AppInput
-                  @update:model-value="config.zoom.resetAfter = Number($event)"
-                  :model-value="String(config.zoom.resetAfter ?? 5)"
-                  placeholder="5"
+                  @update:model-value="config.zoom.resetAfterMs = Number($event)"
+                  :model-value="String(config.zoom.resetAfterMs ?? 1000)"
+                  placeholder="1000"
                   type="number"
                   size="sm"
                   input-class="w-full"
                 />
-                <p>Seconds the board stays zoomed on a dart before pulling back out. It also pulls
-                  back out as soon as the visit ends or passes to another player.</p>
+                <p>Milliseconds the board stays zoomed on a dart before pulling back out — 1000 is
+                  one second. It also pulls back out as soon as the visit ends or passes to another
+                  player.</p>
               </div>
             </div>
 

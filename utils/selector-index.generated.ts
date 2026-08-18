@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1787084697696;
+export const GENERATED_AT = 1787085604913;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1787084693451;
+export const NEWEST_SOURCE_AT = 1787085405653;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {

@@ -126,8 +126,8 @@ export interface IConfig {
     enabled: boolean;
     position: "top" | "bottom" | "board";
     level: number;
-    /** Seconds the board stays zoomed on a dart, in the `board` position. */
-    resetAfter: number;
+    /** Milliseconds the board stays zoomed on a dart, in the `board` position. */
+    resetAfterMs: number;
     mode: "live" | "image";
     zoomOn: "everyone" | "opponents";
     showMarker: boolean;
@@ -455,7 +455,7 @@ export const defaultConfig: IConfig = {
   zoom: {
     enabled: false,
     position: "bottom",
-    resetAfter: 5,
+    resetAfterMs: 1000,
     level: 3,
     mode: "live",
     zoomOn: "everyone",
@@ -735,14 +735,52 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 4;
+const CONFIG_VERSION = 5;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
   {
     defaultValue: defaultConfig,
     version: CONFIG_VERSION,
+    /**
+     * Migrations run on whatever shape was saved at the time, which is only
+     * `IConfig` for the last one. A field one step writes may have been renamed
+     * by a later step, and a field a later step renames does not exist in the
+     * current type at all — so these are typed loosely on purpose.
+     */
     migrations: {
+      /**
+       * Darts Zoom's hold time went from seconds to milliseconds, a second
+       * being long enough to look at a dart and too long to wait for the board
+       * back. A number left at the old default becomes the new one; a number
+       * someone actually chose keeps the duration they chose.
+       */
+      5: (config: any) => {
+        const seconds = config.zoom?.resetAfter;
+        const zoom = {
+          ...config.zoom,
+          resetAfterMs: seconds == null || seconds === 5 ? defaultConfig.zoom.resetAfterMs : seconds * 1000,
+        };
+        delete zoom.resetAfter;
+        return { ...config, zoom };
+      },
+
+      /** Board View is new, and a saved config has nothing for it. */
+      4: (config: any) => ({
+        ...config,
+        boardView: config.boardView ?? defaultConfig.boardView,
+      }),
+
+      /**
+       * Darts Zoom gained a third position, which zooms the site's own board
+       * and holds it there for a while before letting go. That hold was in
+       * seconds at the time; v5 above converts it.
+       */
+      3: (config: any) => ({
+        ...config,
+        zoom: { ...config.zoom, resetAfter: config.zoom?.resetAfter ?? 5 },
+      }),
+
       /**
        * Darts Zoom's four positions became two. The rebuilt match screen has no
        * free corners — the score cards reach the bottom of the window — so the
@@ -751,25 +789,7 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
        *
        * Colors also gained a colour for the match screen's action bar.
        */
-      /** Board View is new, and a saved config has nothing for it. */
-      4: (config: IConfig): IConfig => ({
-        ...config,
-        boardView: config.boardView ?? defaultConfig.boardView,
-      }),
-
-      /**
-       * Darts Zoom gained a third position, which zooms the site's own board
-       * and holds it there for a few seconds before letting go.
-       */
-      3: (config: IConfig): IConfig => ({
-        ...config,
-        zoom: {
-          ...config.zoom,
-          resetAfter: config.zoom?.resetAfter ?? defaultConfig.zoom.resetAfter,
-        },
-      }),
-
-      2: (config: IConfig): IConfig => ({
+      2: (config: any) => ({
         ...config,
         zoom: {
           ...config.zoom,
