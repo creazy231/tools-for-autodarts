@@ -14,7 +14,7 @@
  * ----------
  * Every entry is an ORDERED list of candidates, v2 first, v1 last:
  *
- *   waitForElement(SELECTORS.match.menuBar)     // takes string[] natively
+ *   waitForElement(SELECTORS.app.contentRoot)   // takes string[] natively
  *   qs(SELECTORS.lobby.playerRows)              // querySelector with fallback
  *   qsa(SELECTORS.lobby.playerRows)             // querySelectorAll with fallback
  *
@@ -338,6 +338,15 @@ export const SELECTORS = {
     checkoutSuggestion: [ ".text-checkout-suggestion" ],
     /** Per-player scoring history, under the score card. */
     chalkboard: [ "div.grid-rows-6" ],
+    /**
+     * The visible card inside a player column, score card plus chalkboard.
+     *
+     * The column is stretched to the height of the whole row and centres this
+     * within it, so anything drawn on the column — a ring, a caption — is
+     * anchored to the row rather than to what you can actually see. Query it
+     * relative to a card from {@link playerCards}.
+     */
+    playerCardBody: [ ":scope > div.flex.w-full.flex-col", ":scope > div" ],
 
     /**
      * The board's own Reset control, which clears a stuck takeout.
@@ -352,6 +361,21 @@ export const SELECTORS = {
 
     /** Every button on the match screen, for the text fallbacks below. */
     matchButtons: [ "main button", "button" ],
+
+    /**
+     * The action bar along the bottom of the match screen — undo and Next sit
+     * in it, and the site fills it with a one-off `bg-[#042963]`.
+     *
+     * Anchored on being the rounded block whose grandchildren are buttons,
+     * which is what separates it from the turn bar above the board; the site's
+     * own colour is the last resort, being an arbitrary Tailwind value that a
+     * palette change would rewrite.
+     */
+    actionBar: [
+      "main div.rounded-2xl:has(> div > button[data-slot='button'])",
+      "main div.rounded-2xl:has(button[data-slot='button'])",
+      "main div[class*='bg-[#042963]']",
+    ],
 
     /**
      * The primary action in the turn bar — "Next", which ends the current
@@ -415,22 +439,6 @@ export const SELECTORS = {
     gameVariant: [ "#ad-ext-game-variant" ],
     playerWinner: [ ".ad-ext-player-winner" ],
 
-    /** Top menu bar of the match view. */
-    menuBar: [
-      // TODO(v2)
-      "#root > div > div:nth-of-type(2) > div .chakra-wrap",
-      "#root > div > div:nth-of-type(2) > div > div > div > div:last-of-type",
-    ],
-    /** The whole menu block, hidden by the HideMenu feature. */
-    menu: [
-      // TODO(v2)
-      "#root > div > div",
-    ],
-    /** Legs/sets counters inside a player card (query relative to the card). */
-    legsSetsSpans: [
-      // TODO(v2)
-      ".chakra-stack span",
-    ],
   },
 
   /** Boards page — entrypoints/boards.content. Still at /boards on v2. */

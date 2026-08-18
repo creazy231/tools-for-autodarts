@@ -4,7 +4,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData, GameMode } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { SELECTORS, qsa } from "@/utils/selectors";
+import { SELECTORS, qs, qsa } from "@/utils/selectors";
 
 /**
  * Winner Animation — mark the winning card and say what it took.
@@ -15,8 +15,13 @@ import { SELECTORS, qsa } from "@/utils/selectors";
  *
  * So the whole effect is CSS keyed on one attribute. The attribute is the only
  * thing JS writes, and a MutationObserver puts it back if a re-render drops it;
- * the border, the "Game Shot!" line and the darts-thrown note are all generated
- * content, which React cannot clear because it never sees it.
+ * the ring and the darts-thrown note are generated content, which React cannot
+ * clear because it never sees it.
+ *
+ * The attribute goes on the card body rather than the player column. The column
+ * is stretched to the height of the whole row and centres the card inside it,
+ * so a ring drawn on the column stood a good 160px clear of the card at the top
+ * and the bottom, and the caption floated near the top of the window.
  */
 const WINNER_FLAG = "data-adt-winner";
 const MESSAGE_ATTR = "data-adt-winner-message";
@@ -44,7 +49,7 @@ const STYLES = `
     animation: adt-winner-steam 20s linear infinite;
   }
 
-  /* "Game Shot!", plus whatever the leg deserved */
+  /* what the leg was worth — the rebuilt site says "GAME SHOT" itself */
   [${WINNER_FLAG}]::after {
     content: attr(${MESSAGE_ATTR});
     position: absolute;
@@ -102,42 +107,62 @@ async function apply(gameData: IGameData): Promise<void> {
   const config: IConfig = await AutodartsToolsConfig.getValue();
   if (!config.winnerAnimation.enabled) return clear();
 
-  const card = qsa<HTMLElement>(SELECTORS.match.playerCards)[winner];
-  if (!card) return;
+  const body = cardBody(winner);
+  if (!body) return;
 
   clear();
-  card.setAttribute(WINNER_FLAG, "");
-  card.setAttribute(MESSAGE_ATTR, message(gameData));
+  mark(body, message(gameData));
 
   // React re-renders the cards as the leg wraps up; put the flag back if the
   // element we marked is replaced.
   reapplyObserver?.disconnect();
   reapplyObserver = new MutationObserver(() => {
-    const current = qsa<HTMLElement>(SELECTORS.match.playerCards)[winner];
+    const current = cardBody(winner);
     if (current && !current.hasAttribute(WINNER_FLAG)) {
       clear();
-      current.setAttribute(WINNER_FLAG, "");
-      current.setAttribute(MESSAGE_ATTR, message(gameData));
+      mark(current, message(gameData));
     }
   });
-  const host = card.parentElement;
+  const host = qsa<HTMLElement>(SELECTORS.match.playerCards)[winner]?.parentElement;
   if (host) reapplyObserver.observe(host, { childList: true, subtree: true });
 }
 
-/** "Game Shot!" on its own, or with what the leg was worth. */
+/**
+ * The visible card within the winning player's column.
+ *
+ * `attr()` only reads the attributes of the element the pseudo-element belongs
+ * to, so the flag has to live on the same node the ring and caption are drawn
+ * on — which is this one, not the column around it.
+ */
+function cardBody(index: number): HTMLElement | null {
+  const card = qsa<HTMLElement>(SELECTORS.match.playerCards)[index];
+  if (!card) return null;
+  return qs<HTMLElement>(SELECTORS.match.playerCardBody, card) ?? card;
+}
+
+function mark(element: HTMLElement, text: string): void {
+  element.setAttribute(WINNER_FLAG, "");
+  if (text) element.setAttribute(MESSAGE_ATTR, text);
+  else element.removeAttribute(MESSAGE_ATTR);
+}
+
+/** What the leg was worth, or nothing when there is nothing to add. */
 function message(gameData: IGameData): string {
   const match = gameData.match!;
   const darts = match.stats?.[match.gameWinner]?.matchStats?.dartsThrown;
 
-  if (gameData.gameMode !== GameMode.X01 || !darts) return "Game Shot!";
+  // The rebuilt card already carries a "GAME SHOT" banner of the site's own,
+  // right under where this sits, so saying it again is noise. What the site
+  // does not say is how many darts it took.
+  if (gameData.gameMode !== GameMode.X01 || !darts) return "";
 
   const settings = match.settings as { baseScore?: number };
   const base = settings?.baseScore;
   // A 501 leg in nine darts is the perfect leg; 301 in six is its equivalent.
   const perfect = (base === 501 && darts === 9) || (base === 301 && darts === 6);
 
-  if (perfect) return `Game Shot!\n${darts} Darter — Perfect Leg!`;
-  return `Game Shot!\n${darts} Darts`;
+  if (perfect) return `${darts} Darter — Perfect Leg!`;
+  return `${darts} Darts`;
 }
 
 function clear() {

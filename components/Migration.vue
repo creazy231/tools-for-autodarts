@@ -254,7 +254,6 @@ async function migrateSettings() {
     config.takeout = oldConfig.takeout;
     config.smallerScores = oldConfig.inactiveSmall;
     config.externalBoards = oldConfig.externalBoards;
-    config.hideMenuInMatch = { enabled: oldConfig.menuDisabled };
     config.largerLegsSets = oldConfig.legsSetsLarger;
     config.largerPlayerMatchData = oldConfig.playerMatchData;
     config.automaticNextLeg = oldConfig.automaticNextLeg;

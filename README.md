@@ -80,13 +80,14 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 
 ### 🎨 Match Customization
 - **Color Customization**: Change the colors of dart throws, scores, and match background for a personalized gaming environment
+  - Four pickers: score card background, text, match background, and the bottom bar that holds the undo and next buttons
+  - The bottom bar starts at the color autodarts uses, so nothing changes there until you pick one
 - **Streaming Mode**: Includes green screen support, board visualization, and thrown darts display
 - **Virtual Board Surround**: Adds a customizable surround to the dartboard
 - **Darts Zoom**: Shows a zoomed view of your dart throws in the bottom corners or center of the screen
   - Configurable position (bottom-right, bottom-left, or center)
   - View mode toggle between live camera feed and static board image
   - Adjustable zoom level for detailed throw analysis
-- **Hide Menu**: Provides more space for the game view
 - **Automatic Fullscreen**: Automatically enables fullscreen mode during matches for an immersive experience
 - **Adjustable UI Elements**: Modify the size of legs, sets, and match information
 - **Larger Player Names**: Increase the font size of player names for better visibility during matches
@@ -109,8 +110,10 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Paste either the board's ID or a link containing it; the ID is picked out for you
   - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
+  - An animated border around the winning card, with the number of darts it took above it
 - **Enhanced Scoring Display**: Improves dart throw visuals with larger numbers and scoring notation
   - Shows dart notation (S/D/T, BULL) beneath point values
+  - Only touches darts you have actually thrown — autodarts' checkout suggestion for the darts still to come is left at its own size
   - Includes smooth animations when scores update
 - **Animations**: Display custom animations for special events like 180s, bulls, busts, and leg wins during gameplay
 - **Quick Correction**: Easily fix misrecognized dart throws with an intuitive interface

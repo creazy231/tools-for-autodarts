@@ -6,7 +6,6 @@ import { takeout, takeoutOnRemove } from "./takeout";
 import { nextPlayerOnTakeOutStuck, nextPlayerOnTakeOutStuckOnRemove } from "./next-player-on-take-out-stuck";
 import { automaticNextLeg, automaticNextLegOnRemove } from "./automatic-next-leg";
 import { smallerScores, smallerScoresOnRemove } from "./smaller-scores";
-import { hideMenuInMatch, hideMenuInMatchOnRemove } from "./hide-menu-in-match";
 import { automaticFullscreen, automaticFullscreenOnRemove } from "./automatic-fullscreen";
 import { largerPlayerMatchData, largerPlayerMatchDataOnRemove } from "./larger-player-match-data";
 import { largerLegsSets, largerLegsSetsOnRemove } from "./larger-legs-sets";
@@ -182,10 +181,6 @@ async function initMatch(ctx, url: string, matchId?: string) {
 
   const config = await AutodartsToolsConfig.getValue();
 
-  if (isOn(config, "hideMenuInMatch")) {
-    await initScript(hideMenuInMatch, url).catch(console.error);
-  }
-
   if (isOn(config, "automaticFullscreen")) {
     await initScript(automaticFullscreen, url).catch(console.error);
   }
@@ -305,7 +300,6 @@ function clearMatch(fromBullOff: boolean = false) {
   largerLegsSetsOnRemove();
   largerPlayerNamesOnRemove();
   largerPlayerMatchDataOnRemove();
-  if (!fromBullOff) hideMenuInMatchOnRemove();
   if (!fromBullOff) automaticFullscreenOnRemove();
   winnerAnimationOnRemove();
   callerOnRemove();

@@ -47,6 +47,7 @@ export interface IConfig {
     background: string;
     text: string;
     matchBackground: string;
+    actionBar: string;
   };
   recentLocalPlayers: {
     enabled: boolean;
@@ -68,9 +69,6 @@ export interface IConfig {
       id: string;
       name: string;
     }[];
-  };
-  hideMenuInMatch: {
-    enabled: boolean;
   };
   automaticFullscreen: {
     enabled: boolean;
@@ -386,6 +384,9 @@ export const defaultConfig: IConfig = {
     background: "#3182CE",
     text: "#FFFFFF",
     matchBackground: "#3c3c3c",
+    // the site's own fill for that bar, so switching Colors on does not change
+    // it until a colour is actually picked
+    actionBar: "#042963",
   },
   recentLocalPlayers: {
     enabled: false,
@@ -410,9 +411,6 @@ export const defaultConfig: IConfig = {
   externalBoards: {
     enabled: false,
     boards: [],
-  },
-  hideMenuInMatch: {
-    enabled: false,
   },
   automaticFullscreen: {
     enabled: false,

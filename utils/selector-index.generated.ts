@@ -15,16 +15,16 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1787043643941;
+export const GENERATED_AT = 1787047674908;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1787043643628;
+export const NEWEST_SOURCE_AT = 1787047612267;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "html",
     "file": "components/PageConfig.vue",
-    "line": 352,
+    "line": 350,
     "fn": "querySelector"
   },
   {
@@ -136,105 +136,45 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "closest"
   },
   {
-    "selector": "#adt-menu-hide",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 5,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-player-display",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 8,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "#root > div > div",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 13,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 18,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "svg",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 19,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#ad-ext-game-variant",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 34,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "div:last-of-type",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 34,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "ul",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 34,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#adt-menu-hide",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 59,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "#root > div > div",
-    "file": "entrypoints/match.content/hide-menu-in-match.ts",
-    "line": 63,
-    "fn": "querySelector"
-  },
-  {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 145,
+    "line": 144,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 145,
+    "line": 144,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 145,
+    "line": 144,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 337,
+    "line": 331,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 337,
+    "line": 331,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 337,
+    "line": 331,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "#ad-ext-player-display",
     "file": "entrypoints/match.content/index.ts",
-    "line": 379,
+    "line": 373,
     "fn": "waitForElement"
   },
   {

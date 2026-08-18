@@ -9,6 +9,10 @@
         <div>
           <div class="space-y-3 text-white/70">
             <p>Customize the colors of dart throws and scores.</p>
+            <p>
+              <em>Bottom bar</em> is the bar that holds the undo and next buttons below the board.
+              It starts at the color autodarts uses, so nothing changes there until you pick one.
+            </p>
 
             <div class="mt-4 space-y-4">
               <div class="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -42,8 +46,18 @@
                     class="pointer-events-none absolute inset-0 flex items-center justify-center p-2 text-center text-xs drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
                   >Match background</span>
                 </div>
+                <div class="relative min-h-14 w-full">
+                  <input
+                    v-model="config.colors.actionBar"
+                    type="color"
+                    class="size-full overflow-hidden rounded-md border-none border-transparent p-0 outline-none"
+                  >
+                  <span
+                    class="pointer-events-none absolute inset-0 flex items-center justify-center p-2 text-center text-xs drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+                  >Bottom bar</span>
+                </div>
                 <div
-                  class="col-span-1 flex h-14 w-full items-center justify-center rounded-md text-5xl font-bold"
+                  class="col-span-2 flex h-14 w-full items-center justify-center rounded-md text-5xl font-bold lg:col-span-4"
                   :style="{
                     backgroundColor: config.colors.background,
                     color: config.colors.text,
@@ -92,14 +106,18 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
-import { AutodartsToolsConfig, type IConfig } from "@/utils/storage";
+import { AutodartsToolsConfig, defaultConfig, type IConfig } from "@/utils/storage";
 
 const emit = defineEmits([ "toggle", "settingChange" ]);
 const config = ref<IConfig>();
 const imageUrl = browser.runtime.getURL("/images/colors.png");
 
 onMounted(async () => {
-  config.value = await AutodartsToolsConfig.getValue();
+  const stored = await AutodartsToolsConfig.getValue();
+  // Settings saved before a colour existed have no value for it, and an empty
+  // <input type="color"> reads as black rather than as what is on screen.
+  stored.colors.actionBar ||= defaultConfig.colors.actionBar;
+  config.value = stored;
 });
 
 watch(config, async (_, oldValue) => {

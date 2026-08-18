@@ -14,20 +14,24 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 - Removed Shuffle Players — the rebuilt site has its own Shuffle button in the lobby's *Players* header
+- Removed Hide Menu In Match — it hid a navigation block the rebuilt match screen does not have
 
 ### Fixed
+- Enhanced Scoring Display shrank autodarts' own checkout suggestion. The suggestion for the darts still to come is drawn in the same three slots as the darts already thrown, and the feature restyled all three — so a suggestion came out at caption size. It now only touches the slots that hold a dart
+- The Winner Animation's border stood roughly 160px clear of the card at the top and the bottom, and its caption floated near the top of the window. The player column is stretched to the height of the whole row and centres the card inside it, so the ring was drawn around the row rather than around what you can see; it goes on the card itself now. The caption no longer says "Game Shot!" either — the rebuilt card carries a GAME SHOT banner of its own directly below it — and gives just the darts it took
 - Text ran straight over the icon in every settings field that has one — the webhook URL, sound and effect names, animation URLs, the TTS text. Same cause as the modal widths below: `.adt-input` sets its padding after `@tailwind utilities`, so the `pl-9` those fields relied on lost the cascade. A leading icon now goes in `AppInput`'s `icon` slot, which owns the spacing, and sits against the input rather than being laid over the whole field — where a field had a label it was drawn over that too
 - Modal size props never did anything. `.adt-modal` fixes the width to 674px and is declared after `@tailwind utilities`, so it beat every `max-w-*` a modal asked for — including the wide shell the settings dialogs have always requested. Sizes are now `adt-modal-*` classes that cascade properly
 - Settings dialogs taller than 85% of the window were cut off with no way to scroll to the rest, footer buttons included
 - Sound FX's lobby join and leave sounds never fired on the rebuilt site: the check was for the old `/lobbies/` route, and the new one is `/lobby/`
 
 ### Changed
-- Ported fourteen of the eighteen Matches features to the rebuilt site, and checked the other four one by one
+- Colors now paints the bar along the bottom of the match screen — the one holding undo and next — and has its own picker for it, separate from the score cards. It starts at the colour autodarts uses, so switching Colors on does not change it until a colour is chosen
+- Ported fourteen of the seventeen Matches features to the rebuilt site, and checked the other three one by one
   - **Colors**, **Smaller Scores**, **Larger Player Names**, **Larger Legs/Sets**, **Larger Player Match Data** are stylesheets now instead of styles written onto elements. The rebuilt score cards are React and re-render on every dart, so anything set on the element itself was gone by the next throw; Colors also drops the twice-a-second poll that only existed to paper over that
   - The rebuilt cards needed more than a remap: the active player is marked by a gradient background image rather than a class, and the score, name and legs counter each sit in a fixed-height box sized for the site's own type, so every rule grows or shrinks its box with the text
   - **Automatic Fullscreen** builds its own button for the match header instead of cloning Chakra's settings button into a `ul` that no longer exists. Entering automatically is attempted but not relied on — browsers grant fullscreen only from a user gesture
   - **Winner Animation** is CSS keyed on a single attribute, so the ring and the "Game Shot! / N Darts" line are generated content React cannot clear. v1 restructured the card, which the rebuilt site undoes
-  - **Hide Menu In Match** is not ported and no longer needed: the rebuilt match screen ships no navigation to hide
+  - **Hide Menu In Match** is gone rather than ported: the rebuilt match screen ships no navigation to hide
   - **Checkout Guide** now fills a gap rather than duplicating the site. The rebuilt site draws the route beside every player's score itself, per player and live — but only while its own *Show checkout guide* switch is on, and turning that off removes the column entirely. The routes keep arriving either way, so the feature draws them when the site does not and leaves any card the site is already drawing on alone. v1's version was the weaker of the two: it only ever had `state.checkoutGuide`, the route of whoever was throwing, so every other card kept a stale one until that player's turn came round again
   - **Instant Replay** and **Streaming Mode** are unchanged and still disabled — both are driven by the board camera, so neither can be built or checked without one
   - **Enhanced Scoring Display** now shows what each dart was worth over the notation the site prints — 60 above T20, 50 above BULL — and enlarges the turn total. Nothing in the page is touched: the values go into a stylesheet as generated content keyed on each slot's position, rewritten as the turn changes, because v1 rewrote those slots' markup and React rebuilds them on every dart

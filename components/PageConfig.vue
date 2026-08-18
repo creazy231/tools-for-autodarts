@@ -209,7 +209,6 @@ import NextPlayerOnTakeoutStuck from "./Settings/NextPlayerOnTakeoutStuck.vue";
 import AutomaticNextLeg from "./Settings/AutomaticNextLeg.vue";
 import SmallerScores from "./Settings/SmallerScores.vue";
 import StreamingMode from "./Settings/StreamingMode.vue";
-import HideMenuInMatch from "./Settings/HideMenuInMatch.vue";
 import AutomaticFullscreen from "./Settings/AutomaticFullscreen.vue";
 import LargerLegsSets from "./Settings/LargerLegsSets.vue";
 import LargerPlayerMatchData from "./Settings/LargerPlayerMatchData.vue";
@@ -300,7 +299,6 @@ const featureGroups: FeatureGroup[] = [
       { id: "next-player-on-takeout-stuck", title: "Next Player On Takeout Stuck Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
       { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true, v2Ready: true },
       { id: "smaller-scores", title: "Smaller Scores Settings", component: SmallerScores, hasSettings: false, v2Ready: true },
-      { id: "hide-menu-in-match", title: "Hide Menu In Match Settings", component: HideMenuInMatch, hasSettings: false },
       { id: "streaming-mode", title: "Streaming Mode Settings", component: StreamingMode, hasSettings: true },
       { id: "larger-legs-sets", title: "Larger Legs Sets Settings", component: LargerLegsSets, hasSettings: true, v2Ready: true },
       { id: "larger-player-names", title: "Larger Player Names Settings", component: LargerPlayerNames, hasSettings: true, v2Ready: true },

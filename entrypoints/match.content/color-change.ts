@@ -1,9 +1,9 @@
-import { AutodartsToolsConfig } from "@/utils/storage";
+import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 import { SELECTORS } from "@/utils/selectors";
 import { addStyles, removeStyles } from "@/utils";
 
 /**
- * Colors — recolour the score cards, the throw bar and the page behind them.
+ * Colors — recolour the score cards, both bars and the page behind them.
  *
  * v1 walked the player display twice a second and wrote inline styles onto
  * every element it found. That was already a poll where it did not need to be
@@ -22,10 +22,14 @@ export async function colorChange() {
     if (!config.colors.enabled) return;
 
     const { background, text, matchBackground } = config.colors;
+    // `defaultValue` only applies when the whole config is absent, so a config
+    // saved before this setting existed simply has no value for it.
+    const actionBar = config.colors.actionBar || defaultConfig.colors.actionBar;
     const card = SELECTORS.match.playerCards[0];
     const scoreCard = SELECTORS.match.playerScoreCard[0];
     const turnBar = SELECTORS.match.turnBar[0];
     const turnBarPanel = SELECTORS.match.turnBarPanel[0];
+    const bottomBar = SELECTORS.match.actionBar[0];
 
     const rules = [ `
       /* score cards — the gradient is a background-image, so name it directly */
@@ -47,6 +51,15 @@ export async function colorChange() {
         background-color: ${background} !important;
       }
     ` ];
+
+    if (actionBar) {
+      rules.push(`
+        /* the bar along the bottom, which holds undo and Next */
+        ${bottomBar} {
+          background-color: ${actionBar} !important;
+        }
+      `);
+    }
 
     if (matchBackground) {
       rules.push(`

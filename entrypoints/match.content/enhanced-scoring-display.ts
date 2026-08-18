@@ -17,6 +17,10 @@ import { SELECTORS } from "@/utils/selectors";
  * touched at all. The values go into a stylesheet as generated content, keyed
  * on each slot's position, and the sheet is rewritten whenever the turn
  * changes. React has nothing to undo.
+ *
+ * Keyed on position means keyed on the slots that have a dart in them: the
+ * remaining slots carry the site's checkout suggestion for the darts still to
+ * come, and those are left exactly as the site draws them.
  */
 const STYLE_ID = "enhanced-scoring-display";
 
@@ -43,40 +47,51 @@ function render(gameData: IGameData): void {
   const slot = SELECTORS.match.dartSlots[0];
   const total = SELECTORS.match.turnTotal[0];
 
-  const layout = `
-    /* stack the value over the notation; ::before is the first flex item */
-    ${slot} {
-      flex-direction: column !important;
-      justify-content: center !important;
-      gap: 0 !important;
-      line-height: 1 !important;
-    }
-    /* the notation the site prints becomes the caption */
-    ${slot} > span:not([aria-hidden="true"]) {
-      font-size: 0.8rem !important;
-      opacity: 0.65;
-    }
-    ${slot}::before {
-      font-size: 1.9rem;
-      font-weight: 800;
-      line-height: 1;
-    }
+  // Only the slots holding a dart that has been thrown. The slots after those
+  // hold the site's checkout suggestion for the darts still to come — same
+  // elements, different meaning — and restyling them shrank the site's own
+  // suggestion to caption size.
+  const scored = ((turn?.throws ?? []) as IThrow[])
+    .map((thrown, index) => ({ nth: index + 1, points: pointsOf(thrown.segment?.name ?? "") }))
+    .filter((entry): entry is { nth: number; points: number } => entry.points !== null);
+
+  const rules = [ `
     ${total} > span {
       font-size: 2.6rem !important;
       font-weight: 800 !important;
     }
-  `;
+  ` ];
 
-  const throws = (turn?.throws ?? []) as IThrow[];
-  const values = throws
-    .map((t, index) => {
-      const points = pointsOf(t.segment?.name ?? "");
-      if (points === null) return "";
-      return `${slot}:nth-child(${index + 1})::before { content: "${points}"; }`;
-    })
-    .filter(Boolean);
+  if (scored.length) {
+    const slots = scored.map(entry => `${slot}:nth-child(${entry.nth})`).join(", ");
+    const notation = scored.map(entry => `${slot}:nth-child(${entry.nth}) > span:not([aria-hidden="true"])`).join(", ");
 
-  addStyles([ layout, ...values ].join("\n"), STYLE_ID);
+    rules.push(`
+      /* stack the value over the notation; ::before is the first flex item */
+      ${slots} {
+        flex-direction: column !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        line-height: 1 !important;
+      }
+      /* the notation the site prints becomes the caption */
+      ${notation} {
+        font-size: 0.8rem !important;
+        opacity: 0.65;
+      }
+      ${slots}::before {
+        font-size: 1.9rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+    `);
+
+    for (const entry of scored) {
+      rules.push(`${slot}:nth-child(${entry.nth})::before { content: "${entry.points}"; }`);
+    }
+  }
+
+  addStyles(rules.join("\n"), STYLE_ID);
 }
 
 /**

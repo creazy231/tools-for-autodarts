@@ -142,7 +142,7 @@ td:nth-of-type(2) > span > div p
 ```
 
 **Files carrying the most risk**, in order:
-`winner-animation.ts` · `Zoom.vue` · `hide-menu-in-match.ts` ·
+`winner-animation.ts` · `Zoom.vue` ·
 `automatic-fullscreen.ts` · `color-change.ts` · `StreamingMode.vue` ·
 `sound-fx.ts` · `caller.ts`
 
