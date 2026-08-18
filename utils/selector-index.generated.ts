@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1787040641170;
+export const GENERATED_AT = 1787043643941;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1787040422281;
+export const NEWEST_SOURCE_AT = 1787043643628;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -88,34 +88,10 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelector"
   },
   {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/automatic-next-leg.ts",
-    "line": 25,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/match.content/automatic-next-leg.ts",
-    "line": 37,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Next Leg",
-    "file": "entrypoints/match.content/automatic-next-leg.ts",
-    "line": 37,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Nächstes Leg",
-    "file": "entrypoints/match.content/automatic-next-leg.ts",
-    "line": 37,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Volgende leg",
-    "file": "entrypoints/match.content/automatic-next-leg.ts",
-    "line": 37,
-    "fn": "waitForElementWithTextContent"
+    "selector": "main",
+    "file": "entrypoints/match.content/button-countdown.ts",
+    "line": 80,
+    "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
@@ -222,43 +198,43 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 143,
+    "line": 145,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 143,
+    "line": 145,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 143,
+    "line": 145,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board has no active match",
     "file": "entrypoints/match.content/index.ts",
-    "line": 335,
+    "line": 337,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Board hat kein aktives Spiel",
     "file": "entrypoints/match.content/index.ts",
-    "line": 335,
+    "line": 337,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "Bord heeft geen actieve wedstrijd",
     "file": "entrypoints/match.content/index.ts",
-    "line": 335,
+    "line": 337,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "#ad-ext-player-display",
     "file": "entrypoints/match.content/index.ts",
-    "line": 377,
+    "line": 379,
     "fn": "waitForElement"
   },
   {
@@ -272,24 +248,6 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "file": "entrypoints/match.content/InstantReplay.vue",
     "line": 210,
     "fn": "querySelector"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/match.content/next-player-on-take-out-stuck.ts",
-    "line": 83,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Next",
-    "file": "entrypoints/match.content/next-player-on-take-out-stuck.ts",
-    "line": 83,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "button",
-    "file": "entrypoints/match.content/next-player-on-take-out-stuck.ts",
-    "line": 87,
-    "fn": "querySelectorAll"
   },
   {
     "selector": ".adt-notification",

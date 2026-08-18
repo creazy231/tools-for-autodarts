@@ -1,67 +1,85 @@
-import type { IConfig } from "@/utils/storage";
+import type { IBoard } from "@/utils/board-data-storage";
 import type { IGameData } from "@/utils/game-data-storage";
 
+import { createButtonCountdown } from "./button-countdown";
+import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
+import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { waitForElement, waitForElementWithTextContent } from "@/utils";
+import { SELECTORS, qs, qsText } from "@/utils/selectors";
 
-let gameDataWatcherUnwatch: any;
-let boardDataWatcherUnwatch: any;
+/**
+ * Automatic Next Leg — start the next leg once the darts are out of the board.
+ *
+ * The wait after a leg is won is the darts still being in the board, so the
+ * cue is the board saying the takeout finished rather than the win itself.
+ * From there a countdown runs on the site's own Next Leg button and presses it.
+ *
+ * v1 gated on `#ad-ext-turn`, a hook the rebuilt site does not emit, so it
+ * never got past its first await here; it also found the button by label and
+ * clicked the element it captured seconds earlier, which the rebuilt screen has
+ * long since replaced. The button is now found by the `forward-step` glyph
+ * FontAwesome stamps on it — which also covers "Next Set" — and is resolved
+ * again on every tick. See button-countdown.ts.
+ */
+const COUNT_ATTR = "data-adt-next-leg-countdown";
+const STYLE_ID = "automatic-next-leg";
 
-let gameData: IGameData;
-let nextLegInterval: NodeJS.Timeout | undefined;
+const countdown = createButtonCountdown(COUNT_ATTR, STYLE_ID);
 
-function cleanupCountdown() {
-  if (nextLegInterval) {
-    clearInterval(nextLegInterval);
-    nextLegInterval = undefined;
-  }
-  const existingEl = document.getElementById("ad-ext_next-leg-text");
-  existingEl?.remove();
-}
+let boardDataWatcherUnwatch: (() => void) | undefined;
+let gameDataWatcherUnwatch: (() => void) | undefined;
+let gameData: IGameData | undefined;
+let seconds = 0;
 
 export async function automaticNextLeg() {
-  console.warn("Autodarts Tools: Automatic Next Leg - TEST THIS WITH LIVE BOARD");
+  console.log("Autodarts Tools: Automatic Next Leg");
 
-  await waitForElement("#ad-ext-turn");
-  try {
-    const config: IConfig = await AutodartsToolsConfig.getValue();
+  const config = await AutodartsToolsConfig.getValue();
+  seconds = config.automaticNextLeg.sec;
 
-    gameDataWatcherUnwatch = AutodartsToolsGameData.watch(async (_gameData: IGameData, _oldGameData: IGameData) => {
-      gameData = _gameData;
-    });
+  countdown.install();
 
-    boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (_boardData: IBoard, _oldBoardData: IBoard) => {
-      cleanupCountdown();
+  gameData = await AutodartsToolsGameData.getValue();
+  gameDataWatcherUnwatch?.();
+  gameDataWatcherUnwatch = AutodartsToolsGameData.watch((value: IGameData) => {
+    gameData = value;
+  });
 
-      if (_boardData.event === "Takeout finished" && (gameData.match?.gameWinner ?? -1) >= 0) {
-        const nextLegBtn = await waitForElementWithTextContent("button", ["Next Leg", "Nächstes Leg", "Volgende leg"]);
-        if (!nextLegBtn) return;
-        let startSec = config.automaticNextLeg.sec;
-
-        const nextLegBtnTextEl = document.createElement("span");
-        nextLegBtnTextEl.id = "ad-ext_next-leg-text";
-        nextLegBtnTextEl.style.whiteSpace = "pre";
-        nextLegBtnTextEl.textContent = ` (${startSec})`;
-        nextLegBtn.appendChild(nextLegBtnTextEl);
-
-        nextLegInterval = setInterval(() => {
-          startSec--;
-          nextLegBtnTextEl.textContent = ` (${startSec})`;
-
-          if (startSec <= 0) {
-            cleanupCountdown();
-            (nextLegBtn as HTMLElement).click();
-          }
-        }, 1000);
-      }
-    });
-  } catch (e) {
-    console.error("Autodarts Tools: Automatic Next Leg - Error: ", e);
-  }
+  boardDataWatcherUnwatch?.();
+  boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(onBoard);
 }
 
 export function automaticNextLegOnRemove() {
-  cleanupCountdown();
-  gameDataWatcherUnwatch?.();
+  console.log("Autodarts Tools: Automatic Next Leg removed!");
+
   boardDataWatcherUnwatch?.();
+  boardDataWatcherUnwatch = undefined;
+  gameDataWatcherUnwatch?.();
+  gameDataWatcherUnwatch = undefined;
+  gameData = undefined;
+
+  countdown.destroy();
+}
+
+function onBoard(boardData: IBoard): void {
+  countdown.stop();
+  if (boardData.event !== "Takeout finished" || !legIsWon()) return;
+
+  countdown.start(findNextLegButton, seconds);
+}
+
+function legIsWon(): boolean {
+  return (gameData?.match?.gameWinner ?? -1) >= 0;
+}
+
+/**
+ * Null once the leg is no longer won — which is what happens the moment the
+ * button is pressed, by us or by anyone else. The countdown stops on its own
+ * rather than pressing whatever has taken the button's place.
+ */
+function findNextLegButton(): HTMLElement | null {
+  if (!legIsWon()) return null;
+
+  return qs<HTMLElement>(SELECTORS.match.nextLegButton)
+    ?? qsText<HTMLElement>(SELECTORS.match.matchButtons, SELECTORS.match.nextLegButtonText);
 }

@@ -350,6 +350,34 @@ export const SELECTORS = {
     boardReset: [ "button" ],
     boardResetText: [ "Reset", "Zurücksetzen", "Resetten", "Réinitialiser" ],
 
+    /** Every button on the match screen, for the text fallbacks below. */
+    matchButtons: [ "main button", "button" ],
+
+    /**
+     * The primary action in the turn bar — "Next", which ends the current
+     * visit. The only filled button on the match screen, so the fill is the
+     * anchor; the site disables it when there is nothing to advance to.
+     */
+    nextButton: [
+      "main button[data-slot='button'].bg-blue-60",
+      "main button.bg-blue-60",
+    ],
+    nextButtonText: [ "Next", "Weiter", "Volgende" ],
+
+    /**
+     * Advances to the next leg once one is won.
+     *
+     * FontAwesome stamps `data-icon` on the glyph it renders, which names the
+     * action without depending on the label — and the label is exactly what the
+     * site's language switcher rewrites. The same icon carries the set button,
+     * so this finds "Next Set" too.
+     */
+    nextLegButton: [
+      "main button[data-slot='button']:has([data-icon='forward-step'])",
+      "main button:has([data-icon='forward-step'])",
+    ],
+    nextLegButtonText: [ "Next Leg", "Nächstes Leg", "Volgende leg", "Next Set", "Nächstes Set" ],
+
     /**
      * The bar above the board: three dart slots then the turn total.
      * v1's equivalent was `#ad-ext-turn` and its `.ad-ext-turn-throw` children.

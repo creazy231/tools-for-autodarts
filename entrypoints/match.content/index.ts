@@ -75,6 +75,8 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "gotcha",
   "checkoutGuide",
   "takeout",
+  "nextPlayerOnTakeOutStuck",
+  "automaticNextLeg",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {

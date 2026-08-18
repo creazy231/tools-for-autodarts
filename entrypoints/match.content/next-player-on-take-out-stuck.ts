@@ -1,154 +1,93 @@
 import type { IBoard } from "@/utils/board-data-storage";
 
-import { AutodartsToolsConfig } from "@/utils/storage";
-import { waitForElementWithTextContent } from "@/utils";
+import { createButtonCountdown } from "./button-countdown";
 import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
+import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { AutodartsToolsConfig } from "@/utils/storage";
+import { SELECTORS, qs, qsText } from "@/utils/selectors";
 
-let boardDataWatcherUnwatch: any;
+/**
+ * Auto Next Player on Takeout — press "Next" when a takeout never ends.
+ *
+ * A board that loses sight of a dart sits in "Takeout in progress" forever and
+ * the visit never closes. This starts a countdown on the site's own Next button
+ * as soon as takeout begins, and presses it if the board has not come back by
+ * then. Clicking anywhere calls it off — you are already dealing with it.
+ *
+ * The port is the anchoring and the timer. v1 found the button by its label,
+ * appended a `<span>` to it for the count and clicked that same element several
+ * seconds later; on the rebuilt site the turn bar is React and is replaced on
+ * every dart, so the span is discarded and the click lands on a detached node.
+ * See button-countdown.ts, which resolves the button again on every tick.
+ *
+ * v1 also replaced `Document.prototype.addEventListener` globally to keep a
+ * registry of listeners, and used it to find its own handler again at teardown.
+ * That patch outlived the feature, applied to every listener on the page, and
+ * is gone: holding the handler in a variable does the same job.
+ */
+const COUNT_ATTR = "data-adt-next-countdown";
+const STYLE_ID = "next-player-on-take-out-stuck";
 
-// Create a map to store event listeners
-const eventListenersMap = new Map();
+/** The board status that means darts are being pulled. */
+const TAKEOUT_STATUS = "Takeout in progress";
 
-// Create a wrapper around addEventListener
-// @ts-expect-error
-Document.prototype.realAddEventListener = Document.prototype.addEventListener;
-Document.prototype.addEventListener = function (eventName, callback) {
-// @ts-expect-error
-  this.realAddEventListener(eventName, callback);
+const countdown = createButtonCountdown(COUNT_ATTR, STYLE_ID);
 
-  if (!eventListenersMap.has(eventName)) {
-    eventListenersMap.set(eventName, []);
-  }
-
-  eventListenersMap.get(eventName).push(callback);
-};
-
-// Create a function to check if an event listener has been defined
-function hasEventListener(eventName, callback) {
-  const listeners = eventListenersMap.get(eventName);
-  return listeners && listeners.includes(callback);
-}
+let boardDataWatcherUnwatch: (() => void) | undefined;
+let onUserClick: (() => void) | null = null;
+let seconds = 0;
 
 export async function nextPlayerOnTakeOutStuck() {
-  try {
-    console.warn("Autodarts Tools: Next player on take out stuck");
+  console.log("Autodarts Tools: Auto Next Player on Takeout");
 
-    const config = await AutodartsToolsConfig.getValue();
+  const config = await AutodartsToolsConfig.getValue();
+  seconds = config.nextPlayerOnTakeOutStuck.sec;
 
-    let takeOutTimout: NodeJS.Timeout;
+  countdown.install();
 
-    function remove() {
-      const element = document.getElementById("ad-ext_next-text");
-      element?.remove();
-      if (takeOutTimout) clearInterval(takeOutTimout);
-    }
+  // Re-running without a teardown in between would otherwise leave the previous
+  // handler on the document for good.
+  if (onUserClick) document.removeEventListener("click", onUserClick);
+  onUserClick = () => countdown.stop();
+  document.addEventListener("click", onUserClick);
 
-    // Make sure event listeners are properly registered and maintained in fullscreen mode
-    if (!hasEventListener("click", remove)) {
-      document.addEventListener("click", remove);
-    }
+  await onBoard(await AutodartsToolsBoardData.getValue());
 
-    // Handle fullscreen changes
-    function handleFullscreenChange() {
-      if (document.fullscreenElement) {
-        console.log("Autodarts Tools: Fullscreen mode detected, ensuring next player on takeout stuck still works");
-        // Re-register click event if needed in fullscreen
-        if (!hasEventListener("click", remove)) {
-          document.addEventListener("click", remove);
-        }
-      }
-    }
-
-    // Add fullscreen change handler if not already present
-    if (!hasEventListener("fullscreenchange", handleFullscreenChange)) {
-      document.addEventListener("fullscreenchange", handleFullscreenChange);
-    }
-
-    boardDataWatcherUnwatch?.();
-
-    boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (boardData: IBoard) => {
-      const nextBtnTextEl = document.getElementById("ad-ext_next-text");
-      nextBtnTextEl?.remove();
-
-      if (takeOutTimout) clearInterval(takeOutTimout);
-
-      const gameData = await AutodartsToolsGameData.getValue();
-      if (gameData.match?.variant === "Bull-off") return;
-
-      if (boardData.status === "Takeout in progress") {
-        console.warn("Autodarts Tools: Takeout in progress");
-
-        // Use a more robust selector that works in both normal and fullscreen modes
-        // Increase timeout to allow more time for DOM to settle in fullscreen mode
-        let nextBtn = await waitForElementWithTextContent("button", "Next", 2000);
-        if (!nextBtn) {
-          console.warn("Autodarts Tools: Next button not found, retrying with different approach");
-          // Try another approach if the button wasn't found
-          const buttons = document.querySelectorAll("button");
-          for (const btn of buttons) {
-            if (btn.textContent?.trim() === "Next") {
-              nextBtn = btn as HTMLElement;
-              break;
-            }
-          }
-          if (!nextBtn) return;
-        }
-
-        let startSec = config.nextPlayerOnTakeOutStuck.sec;
-
-        const nextBtnTextEl = document.createElement("span");
-        nextBtnTextEl.id = "ad-ext_next-text";
-        nextBtnTextEl.style.whiteSpace = "pre";
-        nextBtnTextEl.textContent = ` (${startSec})`;
-        nextBtn.appendChild(nextBtnTextEl);
-
-        takeOutTimout = setInterval(() => {
-          startSec--;
-          nextBtnTextEl.textContent = ` (${startSec})`;
-
-          if (startSec <= 0) {
-            if (takeOutTimout) {
-              nextBtnTextEl.textContent = ""; // Reset the button text
-              clearInterval(takeOutTimout);
-            }
-            if (nextBtn instanceof HTMLElement) {
-              console.log("Autodarts Tools: Auto-clicking Next button");
-              nextBtn.click();
-            }
-            const element = document.getElementById("ad-ext_next-text");
-            element?.remove();
-          }
-        }, 1000);
-      } else {
-        if (takeOutTimout) clearInterval(takeOutTimout);
-        remove();
-      }
-    });
-  } catch (e) {
-    console.error("Autodarts Tools: Next player on takeout stuck - Error: ", e);
-  }
+  boardDataWatcherUnwatch?.();
+  boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(onBoard);
 }
 
 export function nextPlayerOnTakeOutStuckOnRemove() {
-  if (boardDataWatcherUnwatch) {
-    boardDataWatcherUnwatch();
+  console.log("Autodarts Tools: Auto Next Player on Takeout removed!");
+
+  boardDataWatcherUnwatch?.();
+  boardDataWatcherUnwatch = undefined;
+
+  if (onUserClick) {
+    document.removeEventListener("click", onUserClick);
+    onUserClick = null;
   }
 
-  // Clean up fullscreen event listener
-  const fullscreenHandler = eventListenersMap.get("fullscreenchange")?.find(
-    callback => callback.name === "handleFullscreenChange",
-  );
+  countdown.destroy();
+}
 
-  if (fullscreenHandler) {
-    document.removeEventListener("fullscreenchange", fullscreenHandler);
-  }
+/**
+ * Every board message restarts the decision: any status other than a takeout
+ * in progress means there is nothing to rescue.
+ */
+async function onBoard(boardData: IBoard): Promise<void> {
+  countdown.stop();
+  if (boardData.status !== TAKEOUT_STATUS) return;
 
-  // Clean up click handler
-  const clickHandler = eventListenersMap.get("click")?.find(
-    callback => callback.name === "remove",
-  );
+  // The bull-off has no "next player" to advance to.
+  const gameData = await AutodartsToolsGameData.getValue();
+  if (gameData?.match?.variant === "Bull-off") return;
 
-  if (clickHandler) {
-    document.removeEventListener("click", clickHandler);
-  }
+  countdown.start(findNextButton, seconds);
+}
+
+/** The fill first, the label as the fallback a language switch needs. */
+function findNextButton(): HTMLElement | null {
+  return qs<HTMLElement>(SELECTORS.match.nextButton)
+    ?? qsText<HTMLElement>(SELECTORS.match.matchButtons, SELECTORS.match.nextButtonText);
 }

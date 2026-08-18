@@ -96,8 +96,13 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - A **Removing Darts…** panel in the middle of the screen, in the site's own warning colour and display face
   - Click it to put it away; it stays away for that takeout and returns on the next one
   - Clicking it also presses the board's **Reset**, for a takeout the board never sees finish
-- **Automatic Next Player**: Switches to the next player after a configurable delay when takeout is stuck
-- **Automatic Next Leg/Set**: Automatically advances to the next leg or set after takeout
+- **Automatic Next Player**: Presses *Next* for you when a takeout never finishes
+  - A countdown appears on the site's own *Next* button as soon as takeout starts — configurable, 10 seconds by default
+  - Clicking anywhere calls it off; so does the board coming back before it runs out
+  - Skipped during the bull-off, which has no next player to move to
+- **Automatic Next Leg/Set**: Starts the next leg once the darts are out of the board
+  - Counts down on the site's own *Next Leg* button — configurable, 5 seconds by default — and presses it
+  - Waits for the board to report the takeout finished, not just for the leg to be won, so the countdown does not run while you are still pulling darts
 - **Smaller Font for Inactive Players**: Reduces the font size of scores for players not currently throwing
 - **External Boards Support**: Follow a board that is not your own — save any board by name and open its live view in one click
   - Adds an **External Boards** section to the *My Devices* page
