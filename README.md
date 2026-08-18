@@ -85,7 +85,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Streaming Mode**: Includes green screen support, board visualization, and thrown darts display
 - **Virtual Board Surround**: Adds a customizable surround to the dartboard
 - **Darts Zoom**: A close-up of where each dart of the current visit landed, one tile per dart
-  - Configurable position along the bottom of the screen: bottom-right, bottom-left, or centre
+  - Two positions: **Bottom** (default) gives each dart a third of the window along the foot of the screen, and moves autodarts' undo and next buttons up to the free space in the top right so they are not covered; **Top** leaves those buttons alone and puts a smaller row under the throw display
   - View mode toggle between the live camera feed and autodarts' own dartboard — the board is drawn as vector art, so the close-up stays sharp at any zoom and shows the site's hit highlight
   - Adjustable zoom level, and an optional centre dot marking the exact point
   - Can be limited to your opponents' darts, or to visits where a checkout is on

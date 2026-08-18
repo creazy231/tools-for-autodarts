@@ -52,25 +52,57 @@ const STYLES = `
     pointer-events: none;
   }
 
-  #${HOST_ID}[data-position="bottom-right"] { right: 1rem; bottom: 1rem; flex-direction: column; }
-  #${HOST_ID}[data-position="bottom-left"]  { left: 1rem;  bottom: 1rem; flex-direction: column; }
-  #${HOST_ID}[data-position="center"]       { left: 50%; transform: translateX(-50%); flex-direction: row; }
+  /* below the throw display, at the width of the tiles themselves */
+  #${HOST_ID}[data-position="top"] {
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+  }
+
+  #${HOST_ID}[data-position="top"] .adt-zoom-tile {
+    width: clamp(5rem, 12vmin, 10rem);
+    aspect-ratio: 1;
+  }
+
+  /* a strip across the foot of the window, a third of it per dart */
+  #${HOST_ID}[data-position="bottom"] {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0 0.5rem 0.5rem;
+  }
+
+  #${HOST_ID}[data-position="bottom"] .adt-zoom-tile {
+    width: 100%;
+    height: clamp(4.5rem, 14vh, 10rem);
+  }
 
   .adt-zoom-tile {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
-    width: clamp(5rem, 12vmin, 10rem);
-    aspect-ratio: 1;
     border-radius: calc(var(--radius, 0.625rem) + 4px);
     background: var(--color-black-90, #01040b);
     box-shadow: 0 0 0 1px rgb(247 248 250 / 15%);
     animation: adt-zoom-in 300ms ease-out;
   }
 
-  /* the copy of the board, moved so the dart sits in the middle */
+  /*
+   * The copy of the board, moved so the dart sits in the middle.
+   *
+   * It is square and as wide as the tile, whatever shape the tile is. In the
+   * bottom strip that means it overflows top and bottom and you see a wide band
+   * through the board — the dart with the segments either side of it — rather
+   * than a squashed board.
+   */
   .adt-zoom-view {
+    flex: none;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 1;
     transform-origin: center;
   }
 
@@ -98,10 +130,39 @@ const STYLES = `
   }
 `;
 
+/**
+ * The bottom strip needs the whole width, and the site puts its undo and Next
+ * buttons there. Rather than cover them, the bar is moved to the empty space at
+ * the top right — with CSS, so React keeps the element exactly where it thinks
+ * it is and every handler on it still works. `w-full` has to go with it, or a
+ * fixed element stretches to the viewport instead of to its buttons.
+ *
+ * The top is measured rather than fixed: the throw display grows with the
+ * number of players and can reach most of the way across, at which point a bar
+ * pinned near the top of the window would sit on top of it.
+ */
+function actionBarStyles(top: number): string {
+  return `
+    ${SELECTORS.match.actionBar[0]} {
+      position: fixed !important;
+      top: ${top}px !important;
+      right: 1rem !important;
+      left: auto !important;
+      bottom: auto !important;
+      width: auto !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      z-index: 191;
+    }
+  `;
+}
+
+
 let gameDataWatcherUnwatch: (() => void) | undefined;
 let boardImagesWatcherUnwatch: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let host: HTMLElement | null = null;
+let actionBarTop = 0;
 let config: IConfig["zoom"] | null = null;
 let userId: string | null = null;
 let boardImages: string[] = [];
@@ -110,9 +171,12 @@ export async function zoom() {
   console.log("Autodarts Tools: Darts Zoom");
 
   const stored = await AutodartsToolsConfig.getValue();
-  config = stored.zoom;
+  // The migration narrows this too, but a content script can load before it has
+  // run in this browser, and an unknown value must not mean "no layout".
+  config = { ...stored.zoom, position: stored.zoom?.position === "top" ? "top" : "bottom" };
   userId = await getUserIdFromToken();
 
+  actionBarTop = 0;
   addStyles(STYLES, STYLE_ID);
   mount();
 
@@ -240,25 +304,28 @@ function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLEle
 }
 
 /**
- * All three positions live along the bottom edge, "centre" included.
- *
- * v1 put the centre row under the throw display. On the rebuilt screen the
- * board starts immediately below that, so a row there covers the top of the
- * board — the part you most want to see when a dart is up by the 20. Centred
- * above the action bar keeps it prominent and clear of the scoring area, and
- * lines it up with the two corner positions.
+ * The top strip hangs off the throw display, which moves with the layout; the
+ * bottom one is pinned by the stylesheet but has to push the site's buttons out
+ * of its way first.
  */
 function place(): void {
   if (!host || !config) return;
 
   host.setAttribute("data-position", config.position);
-  if (config.position !== "center") {
-    host.style.bottom = "";
+  const turnBar = qs<HTMLElement>(SELECTORS.match.turnBarPanel)?.getBoundingClientRect();
+
+  if (config.position === "top") {
+    host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;
     return;
   }
 
-  const bar = qs<HTMLElement>(SELECTORS.match.actionBar)?.getBoundingClientRect();
-  host.style.bottom = bar ? `${Math.round(window.innerHeight - bar.top + 8)}px` : "";
+  host.style.top = "";
+
+  // Clear of the throw display, and never higher than the window's own header.
+  const top = Math.round(Math.max(56, (turnBar?.bottom ?? 0) + 8));
+  if (top === actionBarTop) return;
+  actionBarTop = top;
+  addStyles(`${STYLES}\n${actionBarStyles(top)}`, STYLE_ID);
 }
 
 /** v1's two filters: whose darts to magnify, and whether to bother off a finish. */

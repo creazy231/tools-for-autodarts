@@ -120,7 +120,7 @@ export interface IConfig {
   };
   zoom: {
     enabled: boolean;
-    position: "bottom-right" | "bottom-left" | "center";
+    position: "top" | "bottom";
     level: number;
     mode: "live" | "image";
     zoomOn: "everyone" | "opponents";
@@ -444,7 +444,7 @@ export const defaultConfig: IConfig = {
 
   zoom: {
     enabled: false,
-    position: "bottom-right",
+    position: "bottom",
     level: 3,
     mode: "live",
     zoomOn: "everyone",
@@ -715,10 +715,43 @@ export const defaultConfig: IConfig = {
   },
 };
 
+/**
+ * Settings shape version. Bump this and add a migration whenever a saved config
+ * would otherwise be read wrong — a removed option, a narrowed set of values, a
+ * new field that has to be filled in. `defaultValue` does not help there: it is
+ * only used when the whole config is missing, never merged field by field.
+ *
+ * Migrations run once, as soon as this item is defined, and `getValue` waits
+ * for them, so no caller has to know about them.
+ */
+const CONFIG_VERSION = 2;
+
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
   {
     defaultValue: defaultConfig,
+    version: CONFIG_VERSION,
+    migrations: {
+      /**
+       * Darts Zoom's four positions became two. The rebuilt match screen has no
+       * free corners — the score cards reach the bottom of the window — so the
+       * close-ups now take a full-width strip, either below the throw display
+       * or along the bottom. Anything saved before that becomes the default.
+       *
+       * Colors also gained a colour for the match screen's action bar.
+       */
+      2: (config: IConfig): IConfig => ({
+        ...config,
+        zoom: {
+          ...config.zoom,
+          position: config.zoom?.position === "top" ? "top" : "bottom",
+        },
+        colors: {
+          ...config.colors,
+          actionBar: config.colors?.actionBar || defaultConfig.colors.actionBar,
+        },
+      }),
+    },
   },
 );
 

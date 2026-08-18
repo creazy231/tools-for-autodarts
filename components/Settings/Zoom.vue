@@ -17,14 +17,19 @@
               <div class="flex">
                 <AppRadioGroup
                   v-model="config.zoom.position"
-                  class="grid max-w-sm grid-cols-3"
+                  class="grid max-w-sm grid-cols-2"
                   :options="[
-                    { label: 'Bottom Right', value: 'bottom-right' },
-                    { label: 'Bottom Left', value: 'bottom-left' },
-                    { label: 'Center', value: 'center' },
+                    { label: 'Bottom', value: 'bottom' },
+                    { label: 'Top', value: 'top' },
                   ]"
                 />
               </div>
+              <p class="mt-1 text-sm text-white/60">
+                <em>Bottom</em> gives each dart a third of the window along the foot of the screen, and
+                moves autodarts' undo and next buttons up to the free space in the top right so they
+                are not covered. <em>Top</em> keeps them where they are and puts a smaller row under
+                the throw display.
+              </p>
             </div>
 
             <div class="mt-4">
