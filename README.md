@@ -117,7 +117,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
   - An animated border around the winning card, with the number of darts it took above it
 - **Enhanced Scoring Display**: Improves dart throw visuals with larger numbers and scoring notation
-  - Shows dart notation (S/D/T, BULL) beneath point values
+  - Shows dart notation (S/D/T, BULL) beneath point values, with the whole cell scaled up so a thrown dart reads from the oche
   - Only touches darts you have actually thrown — autodarts' checkout suggestion for the darts still to come is left at its own size
   - Includes smooth animations when scores update
 - **Animations**: Display custom animations for special events like 180s, bulls, busts, and leg wins during gameplay

@@ -63,23 +63,34 @@ function render(gameData: IGameData): void {
   ` ];
 
   if (scored.length) {
+    // Each of these has to carry its own suffix. `a, b::before` attaches the
+    // pseudo-element to `b` only, and `a` quietly takes the rule itself — which
+    // is how the first slot ended up scaled as a whole cell.
     const slots = scored.map(entry => `${slot}:nth-child(${entry.nth})`).join(", ");
+    const values = scored.map(entry => `${slot}:nth-child(${entry.nth})::before`).join(", ");
     const notation = scored.map(entry => `${slot}:nth-child(${entry.nth}) > span:not([aria-hidden="true"])`).join(", ");
 
     rules.push(`
-      /* stack the value over the notation; ::before is the first flex item */
+      /*
+       * Stack the value over the notation; ::before is the first flex item.
+       *
+       * The whole cell is scaled rather than just the number: a transform does
+       * not lay out, so the slot keeps its size and the ones beside it stay
+       * where they are — the turn bar spaces them well apart enough to take it.
+       */
       ${slots} {
         flex-direction: column !important;
         justify-content: center !important;
         gap: 0 !important;
         line-height: 1 !important;
+        transform: scale(1.5);
       }
       /* the notation the site prints becomes the caption */
       ${notation} {
         font-size: 0.8rem !important;
         opacity: 0.65;
       }
-      ${slots}::before {
+      ${values} {
         font-size: 1.9rem;
         font-weight: 800;
         line-height: 1;
