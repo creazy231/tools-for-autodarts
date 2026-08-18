@@ -95,6 +95,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - An optional centre dot marks the exact point
   - Can be limited to your opponents' darts, or to visits where a checkout is on
   - Clears when the visit is handed over; a busted visit stays up, since the darts are still in the board
+  - Stands down entirely during the bull-off, taking up no room at all until the match proper begins
 - **Board View**: Start every game — bull-off included — showing the camera, or the drawn board, you actually want
   - Autodarts has one button for this and it only cycles (camera 1, 2, 3, drawn board, round again); this presses it for you until your choice comes up
   - Boards with fewer cameras have a shorter cycle, so asking for one that is not there leaves the view alone rather than pressing forever
@@ -132,7 +133,14 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Numpad keyboard shortcuts for fast corrections
   - Color-coded buttons matching dart board segments
   - Keyboard shortcuts for accessing throws (/, *, -) and making corrections
-- **Instant Replay**: Records webcam footage and automatically shows replays of winning throws
+- **Instant Replay**: Plays the winning dart back from your own webcam whenever a leg is won
+  - Point any webcam at your board and pick it in the settings; a rolling recording is kept while you are in a match, and the last few seconds are played over the screen once the leg ends
+  - This is your webcam, not the board's camera — the browser cannot reach that one. Nothing is uploaded and nothing is written to disk; the recording lives in memory and is dropped when the match does
+  - **Duration** sets how many seconds leading up to the winning dart to play (5–30). A little more may be shown, never less
+  - **Start delay** sets how long to wait after the leg is won before the replay appears (0–10 seconds), leaving room for autodarts' own celebration
+  - Shows over the whole page or over the board alone, with adjustable zoom and framing for the picture
+  - Click the replay to dismiss it early; correcting the winning throw takes it away by itself
+  - Skipped for the bull-off
 - **Gotcha Helper**: Shows how far ahead the other players are in the Gotcha game variant
   - Marks every player ahead of whoever is throwing with the single dart that lands exactly on their score and resets them — `T20`, `D11`, `BULL`
   - A gap no single dart can cover is shown as the gap itself, e.g. `+37`

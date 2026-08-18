@@ -349,6 +349,12 @@ function mount(): void {
 function render(gameData: IGameData): void {
   if (!host || !config) return;
 
+  // The bull-off is one dart each at the bull to decide who throws first. A
+  // close-up of it says nothing you cannot already see, and the strip would
+  // take room out of a screen that is about to be torn down and rebuilt for the
+  // match proper — so the feature stands down entirely until that happens.
+  if (gameData?.match?.variant === "Bull-off") return sleep();
+
   const throws = visitInProgress(gameData) ?? [];
   const showing = Boolean(throws.length) && shouldShow(gameData);
 
@@ -381,6 +387,22 @@ function render(gameData: IGameData): void {
   });
 
   place();
+}
+
+/**
+ * Everything off, and nothing reserved: no tiles, no board hold, and none of
+ * the room the strip normally takes out of the layout.
+ *
+ * The two measurements are pushed off their real values rather than to zero,
+ * because {@link place} skips its work when nothing has changed and would
+ * otherwise never put the layout rules back.
+ */
+function sleep(): void {
+  host?.replaceChildren();
+  releaseBoard();
+  boardInset = -1;
+  actionBarTop = -1;
+  removeStyles(LAYOUT_STYLE_ID);
 }
 
 /**

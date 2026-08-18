@@ -143,8 +143,10 @@ export interface IConfig {
   instantReplay: {
     enabled: boolean;
     deviceId: string;
+    /** Seconds of footage to play back. */
     duration: number;
-    delay: number;
+    /** Seconds to wait after the leg is won before the replay covers the screen. */
+    startDelay: number;
     viewMode?: "full-page" | "board-only";
     zoom: number;
     positionX: number;
@@ -473,7 +475,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
     deviceId: "",
     duration: 10,
-    delay: 5,
+    startDelay: 3,
     viewMode: "board-only",
     zoom: 1,
     positionX: 0,
@@ -735,7 +737,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 5;
+const CONFIG_VERSION = 6;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -749,6 +751,27 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Instant Replay's `delay` is gone.
+       *
+       * It meant how far behind live the picture ran, because what v1 showed
+       * was the camera feed lagging rather than a clip of anything. A clip has
+       * its own length — `duration`, which already means what that was reaching
+       * for — so the only wait left is the one v1 hardcoded at three seconds:
+       * how long the site's own celebration gets before the replay covers it.
+       *
+       * A number saved against the old meaning says nothing about the new one,
+       * so this starts from the default rather than carrying it across.
+       */
+      6: (config: any) => {
+        const instantReplay = {
+          ...config.instantReplay,
+          startDelay: defaultConfig.instantReplay.startDelay,
+        };
+        delete instantReplay.delay;
+        return { ...config, instantReplay };
+      },
+
       /**
        * Darts Zoom's hold time went from seconds to milliseconds, a second
        * being long enough to look at a dart and too long to wait for the board

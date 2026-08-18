@@ -8,7 +8,15 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div class="space-y-3 text-white/70">
-            <p>Adjust your instant replay settings here.</p>
+            <p>
+              Point a webcam at your board and the last few seconds are replayed over the screen
+              whenever a leg is won. Click the replay to dismiss it early.
+            </p>
+            <p class="text-sm text-white/60">
+              The camera records for as long as you are in a match, and nothing ever leaves your
+              computer. This is your own webcam, not the board's camera — the browser cannot reach
+              that one.
+            </p>
 
             <div v-if="!hasCameraPermission && !cameraError">
               <p class="mb-2">
@@ -61,7 +69,7 @@
 
                 <div class="relative w-36">
                   <AppInput
-                    @update:model-value="config.instantReplay.duration = Math.min(Math.max(Number($event), 0), 60)"
+                    @update:model-value="config.instantReplay.duration = Math.min(Math.max(Number($event), 5), 30)"
                     :model-value="String(config.instantReplay.duration)"
                     type="number"
                     label="Duration (seconds)"
@@ -72,15 +80,16 @@
                   />
                 </div>
                 <p class="text-sm text-white/60">
-                  Set how many seconds of video should be saved for instant replay (5-30 seconds).
+                  How many seconds leading up to the winning dart to play back (5-30 seconds).
+                  A little more may be shown, never less.
                 </p>
 
                 <div class="relative w-36">
                   <AppInput
-                    @update:model-value="config.instantReplay.delay = Math.min(Math.max(Number($event), 0), 60)"
-                    :model-value="String(config.instantReplay.delay)"
+                    @update:model-value="config.instantReplay.startDelay = Math.min(Math.max(Number($event), 0), 10)"
+                    :model-value="String(config.instantReplay.startDelay)"
                     type="number"
-                    label="Delay (seconds)"
+                    label="Start delay (seconds)"
                     min="0"
                     max="10"
                     class="w-full"
@@ -88,7 +97,8 @@
                   />
                 </div>
                 <p class="text-sm text-white/60">
-                  Set how many seconds before the event to start the replay (0-10 seconds).
+                  How long to wait after the leg is won before the replay appears (0-10 seconds),
+                  leaving room for the site's own celebration.
                 </p>
 
                 <div>
@@ -198,7 +208,7 @@
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Records your webcam footage and allows you to review throws with customizable duration and delay.
+            Plays the winning dart back from your own webcam whenever a leg is won.
           </p>
         </div>
         <div class="flex">

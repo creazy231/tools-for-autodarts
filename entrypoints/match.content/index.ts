@@ -18,10 +18,10 @@ import { gotcha, gotchaOnRemove } from "./gotcha";
 import { checkoutGuide, checkoutGuideOnRemove } from "./checkout-guide";
 import { zoom, zoomOnRemove } from "./zoom";
 import { boardView, boardViewOnRemove } from "./board-view";
+import { instantReplay, instantReplayOnRemove } from "./instant-replay";
 import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
-import InstantReplay from "./InstantReplay.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
 
@@ -79,6 +79,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "automaticNextLeg",
   "zoom",
   "boardView",
+  "instantReplay",
 ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
@@ -91,7 +92,6 @@ const tools = {
   animations: null as any,
   quickCorrection: null as any,
   enhancedScoringDisplay: null as any,
-  instantReplay: null as any,
 };
 
 export default defineContentScript({
@@ -240,7 +240,7 @@ async function initMatch(ctx, url: string, matchId?: string) {
   }
 
   if (isOn(config, "instantReplay")) {
-    await initInstantReplay(ctx).catch(console.error);
+    await initScript(instantReplay, url).catch(console.error);
   }
 
   if (isOn(config, "gotcha")) {
@@ -299,7 +299,6 @@ function clearMatch(fromBullOff: boolean = false) {
   tools.streamingMode?.remove();
   tools.animations?.remove();
   tools.quickCorrection?.remove();
-  tools.instantReplay?.remove();
   colorChangeOnRemove();
   smallerScoresOnRemove();
   largerLegsSetsOnRemove();
@@ -319,6 +318,7 @@ function clearMatch(fromBullOff: boolean = false) {
   takeoutOnRemove();
   zoomOnRemove();
   boardViewOnRemove();
+  instantReplayOnRemove();
   matchInitialized = false;
 }
 
@@ -458,28 +458,4 @@ async function initQuickCorrection(ctx) {
   });
 
   tools.quickCorrection.mount();
-}
-
-async function initInstantReplay(ctx) {
-  await waitForElement("#root > div > div:nth-of-type(2)");
-  tools.instantReplay = await createShadowRootUi(ctx, {
-    name: "autodarts-tools-instant-replay",
-    position: "inline",
-    anchor: "#root > div > div:nth-of-type(2)",
-    onMount: (container: any) => {
-      console.log("Autodarts Tools: Instant Replay initialized");
-      const app = createApp(InstantReplay);
-      app.mount(container);
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        container.classList.add("dark");
-      }
-      return app;
-    },
-    onRemove: (app: any) => {
-      app?.unmount();
-      console.log("Autodarts Tools: Instant Replay removed");
-    },
-  });
-
-  tools.instantReplay.mount();
 }
