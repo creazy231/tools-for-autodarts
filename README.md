@@ -381,6 +381,7 @@ Effects can be triggered by various game events using these triggers:
 - **`bot_throw`**: Triggered when a CPU/bot player throws
 - **`gameshot_[player name]`**: player specific gameshot trigger
 - **`matchshot_[player name]`**: player specific matchshot trigger
+- **`opponent_turn`**: At the start of each non-present opponent's turn. This trigger affects Bots and Players on remote boards. This is triggered instead of the generic `gameon` effect.
 
 ##### Board-Specific Effects
 - **Board IDs**: Configure specific board IDs to limit effects to certain boards

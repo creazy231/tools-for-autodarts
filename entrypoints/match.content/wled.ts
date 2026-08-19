@@ -194,12 +194,20 @@ async function processGameData(
   // gameon is the default effect to play when no other event happened
   let nextEffect: string | IWled = "gameon";
 
+  const currentPlayer = gameData.match.players?.[gameData.match.player];
+  const isBot = currentPlayer?.cpuPPR !== null;
+  const playerName = currentPlayer?.name;
+  currentBoardId = currentPlayer?.boardId;
+
+  const isOpponentTurn = isBot || (config.wledFx.boardIds.length > 0 && !config.wledFx.boardIds.includes(currentBoardId));
+  const opponentTurnEffectEnabled = config.wledFx.opponentTurnEffectEnabled;
+
+  if (opponentTurnEffectEnabled && isOpponentTurn && isTriggerPresent("opponent_turn")) {
+    nextEffect = "opponent_turn";
+  }
+
   // Play player effect when it's the next players turn
   if (gameData.match.turns[0].throws.length === 0) {
-    const currentPlayer = gameData.match.players?.[gameData.match.player];
-    const isBot = currentPlayer?.cpuPPR !== null;
-    const playerName = currentPlayer?.name;
-
     if (isBot) {
       console.log("Autodarts Tools: WLED: Bot player detected");
       nextEffect = "bot_throw";
@@ -231,8 +239,6 @@ async function processGameData(
     // found effect for match variant
     nextEffect = effect;
   }
-
-  currentBoardId = gameData.match.players?.[gameData.match.player].boardId;
 
   if (
     config.wledFx.boardIds.length > 0
