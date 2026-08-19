@@ -56,6 +56,16 @@ const FAKE_CAMERA = process.env.ADT_FAKE_CAMERA === "1";
 /** Both extra build targets ship the picker. */
 const WITH_PICKER = DEVTOOLS || REFERENCE;
 
+/**
+ * Whether this build has its logging stripped.
+ *
+ * Only what the stores get. `yarn dev` obviously needs its console, and so do
+ * the devtools and reference builds — they are production builds that exist to
+ * be debugged in a real browser against a real board, which is exactly the
+ * situation where the log is the only thing you have.
+ */
+const stripLogging = (mode: string) => mode !== "development" && !WITH_PICKER;
+
 const HOSTS: "v1" | "v2" | "both" = REFERENCE ? "v1" : "both";
 
 const REFERENCE_OUT = resolve(".output-reference", "chrome-mv3");
@@ -218,7 +228,17 @@ export default defineConfig({
       }
     },
   },
-  vite: () => ({
+  vite: env => ({
+    /*
+     * Strip `console.*` and `debugger` from store builds.
+     *
+     * `esbuild` is a TOP-LEVEL Vite option, not a `build.*` one. It used to sit
+     * nested inside `build`, where nothing reads it, so the drop never happened
+     * and every published build shipped its logging whole — 416 `console.log`
+     * calls in the 3.0.1 Chrome build, some of them naming lobby and match ids.
+     * Nesting it fails silently, which is why it went unnoticed for so long.
+     */
+    ...(stripLogging(env.mode) ? { esbuild: { drop: [ "console", "debugger" ] } } : {}),
     define: {
       // Gates the DOM picker. In `yarn dev` the picker's own
       // `import.meta.env.DEV` check covers it; this flag is what lets a
@@ -276,9 +296,6 @@ export default defineConfig({
     build: {
       minify: "esbuild",
       target: "esnext",
-      esbuild: {
-        drop: [ "console", "debugger" ],
-      },
     },
   }),
 });

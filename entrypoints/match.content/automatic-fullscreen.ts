@@ -53,7 +53,7 @@ export async function automaticFullscreen() {
   const syncIcon = () => path.setAttribute("d", document.fullscreenElement ? EXIT_PATH : ENTER_PATH);
 
   button.addEventListener("click", () => {
-    if (document.fullscreenElement) document.exitFullscreen().catch(console.error);
+    if (document.fullscreenElement) document.exitFullscreen().catch(e => console.error(e));
     else document.documentElement.requestFullscreen().catch(err => console.warn("Autodarts Tools: Automatic Fullscreen -", err.message));
   });
 

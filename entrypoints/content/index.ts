@@ -80,7 +80,7 @@ export default defineContentScript({
     try {
       const storage = await browser.storage.local.get("config");
       if (storage.config) {
-        await initMigrationModal(ctx).catch(console.error);
+        await initMigrationModal(ctx).catch(e => console.error(e));
       }
     } catch (error) {
       console.error("Failed to check for migration data:", error);
@@ -90,7 +90,7 @@ export default defineContentScript({
 
     try {
       if (config && config.version !== defaultConfig.version) {
-        await migrationConfig().catch(console.error);
+        await migrationConfig().catch(e => console.error(e));
       }
     } catch (error) {
       console.error("Failed to check for migration data:", error);

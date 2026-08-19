@@ -79,6 +79,8 @@ Do **not** import these manually — they are globally available.
 ### Build Notes
 
 - Path aliases `@`, `~`, and `src` all resolve to the repo root (set in `wxt.config.ts`)
+- Store builds (`yarn build`) strip `console.*` and `debugger` through esbuild's `drop`, so nothing the extension logs reaches published users. `yarn dev`, `yarn build:devtools` and `yarn build:reference` keep their logging — the last two exist to be debugged in a real browser. Log freely, but assume nobody in the stores can read it
+- `esbuild` is a **top-level** Vite option, not a `build.*` one. Nesting it under `build` is accepted silently and does nothing at all — that is how the `drop` above went missing for several releases
 
 ### Companion Services (separate sub-projects, not part of the extension build)
 

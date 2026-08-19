@@ -6,7 +6,7 @@ export async function migrationConfig() {
   if (!config) return;
 
   const currentConfigVersion = config.version;
-  await migrateConfig(currentConfigVersion).catch(console.error);
+  await migrateConfig(currentConfigVersion).catch(e => console.error(e));
 }
 
 async function migrateConfig(currentConfigVersion: number) {

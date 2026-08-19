@@ -30,7 +30,7 @@ export default defineContentScript({
 
         console.log("Autodarts Tools: Game Mode", gameModeTitle.textContent);
       } else if (/\/tournaments\/[0-9a-f-]+/.test(url)) {
-        await initScript(qrCodeTournament, url).catch(console.error);
+        await initScript(qrCodeTournament, url).catch(e => console.error(e));
       } else {
         await onQrCodeTournamentRemove();
       }

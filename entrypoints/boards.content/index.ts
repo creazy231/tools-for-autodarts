@@ -35,7 +35,7 @@ export default defineContentScript({
       console.log("Autodarts Tools: Boards Ready");
 
       const config: IConfig = await AutodartsToolsConfig.getValue();
-      if (config.externalBoards.enabled) await initExternalBoards(ctx).catch(console.error);
+      if (config.externalBoards.enabled) await initExternalBoards(ctx).catch(e => console.error(e));
       else await removeExternalBoards();
     });
   },

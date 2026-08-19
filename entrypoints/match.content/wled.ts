@@ -152,7 +152,7 @@ export async function wledFx() {
 
     if (!boardDataWatcherUnwatch) {
       boardDataWatcherUnwatch = AutodartsToolsBoardData.watch((boardData: IBoard) => {
-        checkStatus(boardData).catch(console.error);
+        checkStatus(boardData).catch(e => console.error(e));
       });
     }
 

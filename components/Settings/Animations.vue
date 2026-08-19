@@ -768,7 +768,7 @@ function removeAnimation(index: number) {
     // If animation is stored in OPFS, delete it
     const animation = config.value.animations.data[index];
     if (animation.animationId && isOPFSAvailable()) {
-      deleteAnimationFromOPFS(animation.animationId).catch(console.error);
+      deleteAnimationFromOPFS(animation.animationId).catch(e => console.error(e));
       // Also remove from sources cache
       delete animationSources.value[animation.animationId];
     }

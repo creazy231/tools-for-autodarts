@@ -148,7 +148,7 @@ export default defineContentScript({
 
         if (activeMatch) {
           console.log("Autodarts Tools: Match found, initializing match");
-          initMatch(ctx, url, matchId).catch(console.error);
+          initMatch(ctx, url, matchId).catch(e => console.error(e));
 
           if (!gameDataWatcher) {
             gameDataWatcher = AutodartsToolsGameData.watch(async (value, oldValue) => {
@@ -185,102 +185,102 @@ async function initMatch(ctx, url: string, matchId?: string) {
   const config = await AutodartsToolsConfig.getValue();
 
   if (isOn(config, "automaticFullscreen")) {
-    await initScript(automaticFullscreen, url).catch(console.error);
+    await initScript(automaticFullscreen, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "streamingMode")) {
-    await initStreamingMode(ctx).catch(console.error);
+    await initStreamingMode(ctx).catch(e => console.error(e));
   }
 
   if (isOn(config, "colors")) {
-    await initScript(colorChange, url).catch(console.error);
+    await initScript(colorChange, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "takeout")) {
-    await initScript(takeout, url).catch(console.error);
+    await initScript(takeout, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "nextPlayerOnTakeOutStuck")) {
-    await initScript(nextPlayerOnTakeOutStuck, url).catch(console.error);
+    await initScript(nextPlayerOnTakeOutStuck, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "automaticNextLeg")) {
-    await initScript(automaticNextLeg, url).catch(console.error);
+    await initScript(automaticNextLeg, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "smallerScores")) {
-    await initScript(smallerScores, url).catch(console.error);
+    await initScript(smallerScores, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "largerLegsSets")) {
-    await initScript(largerLegsSets, url).catch(console.error);
+    await initScript(largerLegsSets, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "largerPlayerMatchData")) {
-    await initScript(largerPlayerMatchData, url).catch(console.error);
+    await initScript(largerPlayerMatchData, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "largerPlayerNames")) {
-    await initScript(largerPlayerNames, url).catch(console.error);
+    await initScript(largerPlayerNames, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "winnerAnimation")) {
-    await initScript(winnerAnimation, url).catch(console.error);
+    await initScript(winnerAnimation, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "boardView")) {
-    await initScript(boardView, url).catch(console.error);
+    await initScript(boardView, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "zoom")) {
-    await initScript(zoom, url).catch(console.error);
+    await initScript(zoom, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "quickCorrection")) {
-    await initQuickCorrection(ctx).catch(console.error);
+    await initQuickCorrection(ctx).catch(e => console.error(e));
   }
 
   if (isOn(config, "instantReplay")) {
-    await initScript(instantReplay, url).catch(console.error);
+    await initScript(instantReplay, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "gotcha")) {
-    await initScript(gotcha, url).catch(console.error);
+    await initScript(gotcha, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "checkoutGuide")) {
-    await initScript(checkoutGuide, url).catch(console.error);
+    await initScript(checkoutGuide, url).catch(e => console.error(e));
   }
 
   // Discord's lobby half — the webhook announcements — is ported and enabled in
   // entrypoints/lobby.content. This is the other half, which starts a stream
   // once the match begins, and it is not.
   if (matchId && isOn(config, "discord") && config.discord.autoStartAfterTimer?.stream) {
-    if (config.discord.autoStartAfterTimer?.matchId === matchId || config.discord.autoStartAfterTimer?.matchId?.includes(matchId)) await initScript(discordStream, url).catch(console.error);
+    if (config.discord.autoStartAfterTimer?.matchId === matchId || config.discord.autoStartAfterTimer?.matchId?.includes(matchId)) await initScript(discordStream, url).catch(e => console.error(e));
   }
 
   // *********************** YOU CAN ADD HERE ***********************
 
   if (isOn(config, "enhancedScoringDisplay")) {
-    await initScript(enhancedScoringDisplay, url).catch(console.error);
+    await initScript(enhancedScoringDisplay, url).catch(e => console.error(e));
   }
 
   // ****************************************************************
 
   if (isOn(config, "animations")) {
-    await initAnimations(ctx).catch(console.error);
+    await initAnimations(ctx).catch(e => console.error(e));
   }
 
   if (isOn(config, "caller")) {
-    await initScript(caller, url).catch(console.error);
+    await initScript(caller, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "soundFx")) {
-    await initScript(soundFx, url).catch(console.error);
+    await initScript(soundFx, url).catch(e => console.error(e));
   }
 
   if (isOn(config, "wledFx")) {
-    await initScript(wledFx, url).catch(console.error);
+    await initScript(wledFx, url).catch(e => console.error(e));
   }
 }
 
@@ -361,7 +361,7 @@ function startActiveMatchObserver(ctx) {
 
       if (!matchInitialized && matchId) {
         console.log("Autodarts Tools Observer: Match found, initializing match because activeMatch is true");
-        initMatch(ctx, url, matchId).catch(console.error);
+        initMatch(ctx, url, matchId).catch(e => console.error(e));
       }
     }
   });

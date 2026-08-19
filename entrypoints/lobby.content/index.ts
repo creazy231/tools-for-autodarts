@@ -94,43 +94,43 @@ export default defineContentScript({
         });
 
         if (isOn(config, "discord")) {
-          await initScript(discordWebhooks, url).catch(console.error);
+          await initScript(discordWebhooks, url).catch(e => console.error(e));
         }
 
         if (isOn(config, "autoStart")) {
           // Needs ctx: its toggle is a Vue app in a shadow root, not a cloned
           // page button.
-          await initScript(() => autoStart(ctx), url).catch(console.error);
+          await initScript(() => autoStart(ctx), url).catch(e => console.error(e));
         }
 
         if (isOn(config, "qrCode")) {
-          await initScript(() => qrCode(ctx), url).catch(console.error);
+          await initScript(() => qrCode(ctx), url).catch(e => console.error(e));
         }
 
         if (isOn(config, "recentLocalPlayers")) {
-          await initScript(() => recentLocalPlayers(ctx), url).catch(console.error);
+          await initScript(() => recentLocalPlayers(ctx), url).catch(e => console.error(e));
         }
 
         if (isOn(config, "teamLobby")) {
-          await initScript(teamLobby, url).catch(console.error);
+          await initScript(teamLobby, url).catch(e => console.error(e));
         }
 
         if (isOn(config, "soundFx")) {
-          await initScript(soundFx, url).catch(console.error);
+          await initScript(soundFx, url).catch(e => console.error(e));
         }
 
         if (isOn(config, "wledFx")) {
-          await initScript(wledFx, url).catch(console.error);
+          await initScript(wledFx, url).catch(e => console.error(e));
         }
       } else if (/\/tournaments\//.test(url)) {
         console.log("Autodarts Tools: Tournament Ready");
 
         if (isOn(config, "soundFx")) {
-          await initScript(soundFx, url).catch(console.error);
+          await initScript(soundFx, url).catch(e => console.error(e));
         }
 
         if (isOn(config, "wledFx")) {
-          await initScript(wledFx, url).catch(console.error);
+          await initScript(wledFx, url).catch(e => console.error(e));
         }
       } else {
         await onDiscordWebhooksRemove();

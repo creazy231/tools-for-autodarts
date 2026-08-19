@@ -21,7 +21,7 @@ export default defineContentScript({
           // Try to parse JSON data
           const jsonData = JSON.parse(data);
           console.log("[Content Script] Parsed JSON data:", jsonData);
-          processWebSocketMessage(jsonData.channel, jsonData.data).catch(console.error);
+          processWebSocketMessage(jsonData.channel, jsonData.data).catch(e => console.error(e));
         } catch (e) {
           // Not JSON data, don't log
         }
