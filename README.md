@@ -184,6 +184,7 @@ You can assign sounds to be played based on these triggers:
   - `outside`: When a dart lands outside the scoring area
   - `next_player`: Plays when switching to the next player (fallback if no player name sound is found)
   - `bot`: Plays instead of player name when the player is a CPU/bot player
+  - `bulloff`: Once when the bull-off begins, not again as the throw passes between players
   - `playername`: Player name sounds play automatically when it's their turn. Example: If your name is `creazy.eth` on Autodarts, simply use `creazy.eth` (supports spaces or `_` like `player_name` or `player name`)
 - **Board Status**:
   - `board_started`: When the board has started

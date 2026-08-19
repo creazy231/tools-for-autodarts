@@ -21,6 +21,16 @@ const DEBOUNCE_DELAY = 200;
 // Cooldown tracking for gameshot/matchshot sounds (to prevent multiple triggers from AI referee)
 let lastGameshotTimestamp: number = 0;
 const GAMESHOT_COOLDOWN_MS = 10000; // 10 seconds cooldown
+/**
+ * The bull-off is announced once, when it begins.
+ *
+ * Every update while it is running is the same bull-off — the throw landing,
+ * the turn passing to the other player, a tie sending them both back to the
+ * oche — so only the first one calls. It is armed again by the first update of
+ * the match proper, which is also when the site hands the match screen over and
+ * every match feature is torn down and rebuilt.
+ */
+let bullOffAnnounced = false;
 // Flag to track if we've shown the interaction notification
 let interactionNotificationShown = false;
 // Reference to notification element
@@ -121,6 +131,7 @@ export function callerOnRemove() {
 
   // Reset gameshot cooldown timestamp
   lastGameshotTimestamp = 0;
+  bullOffAnnounced = false;
 
   // Cancel any ongoing TTS
   if (window.speechSynthesis) {
@@ -406,7 +417,15 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
     return;
   }
 
-  if (gameData.match.variant === "Bull-off") return;
+  if (gameData.match.variant === "Bull-off") {
+    if (!bullOffAnnounced) {
+      bullOffAnnounced = true;
+      playSound("bulloff");
+    }
+    return;
+  }
+
+  bullOffAnnounced = false;
 
   // This is for cricket to prevent playing the score when not changed since last round
   if (gameData.match.turns[0].throws.length === 0) {
