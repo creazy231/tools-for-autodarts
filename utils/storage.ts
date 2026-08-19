@@ -122,9 +122,12 @@ export interface IConfig {
   /**
    * Autodarts' own dart-landed sound, kept for throws you cannot already hear.
    *
-   * Its switch is drawn into the site's In Game Settings rather than onto a
-   * settings card of ours — see entrypoints/match.content/quiet-own-darts.ts —
-   * so this is where that switch is remembered and nothing else reads it.
+   * Its switch is drawn into autodarts' own sound settings rather than onto a
+   * settings card of ours — see utils/quiet-own-darts-switch.ts — so this is
+   * where that switch is remembered and nothing else reads it.
+   *
+   * Off by default: until someone asks for it, the site should sound exactly
+   * the way autodarts built it to.
    */
   quietOwnDarts: {
     enabled: boolean;
@@ -603,7 +606,7 @@ export const defaultConfig: IConfig = {
     ],
   },
   quietOwnDarts: {
-    enabled: true,
+    enabled: false,
   },
   soundFx: {
     enabled: false,

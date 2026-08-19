@@ -164,7 +164,12 @@ Autodarts plays a thud whenever a dart lands, wherever in the world it was throw
 
 This turns the sound off for the darts within earshot and leaves it for everybody else.
 
-Its switch is not on this extension's settings page — it sits in autodarts' own **In Game Settings**, directly under the *Dart landed* setting it qualifies, labelled **Only on others' turns**. Press the gear in the match header to find it. It is on by default, and is remembered between matches.
+Its switch is not on this extension's settings page — it sits in autodarts' own sound settings, directly under the *Dart landed* setting it qualifies, labelled **Only on others' turns**. Both places autodarts keeps those settings have it:
+
+- **In Game Settings**, behind the gear in the match header, for changing your mind mid-leg
+- **Settings → Sound Effects** (`/settings/sound-effects`), for setting it up outside a game
+
+It is **off by default**, so the site sounds exactly as autodarts built it until you ask for otherwise. Either switch sets the other, and the choice is remembered between matches.
 
 **What counts as within earshot**
 - Your own throws

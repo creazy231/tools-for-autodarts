@@ -492,29 +492,25 @@ export const SELECTORS = {
      */
     headerIconGroup: [ "div.pointer-events-auto:has(> button)", "div.flex.items-center.gap-2" ],
 
-    /**
-     * The site's own In Game Settings dialog, behind the gear in the match
-     * header. Narrowed by the switches it holds so it cannot be confused with
-     * a confirmation dialog, with the bare role kept as the fallback for a
-     * browser without `:has()`.
-     */
-    settingsDialog: [ "[role='dialog']:has([data-slot='switch'])", "[role='dialog']" ],
-
-    /**
-     * One switch in that dialog. Its row is the parent — the label sits beside
-     * it, not around it.
-     */
-    settingsSwitch: [ "[data-slot='switch']" ],
-
-    /** The travelling part of a switch, which carries its own state attribute. */
-    settingsSwitchThumb: [ "[data-slot='switch-thumb']" ],
-
     /** autodarts-emitted hooks on the match screen (v1). */
     playerDisplay: [ "#ad-ext-player-display" ],
     turn: [ "#ad-ext-turn" ],
     gameVariant: [ "#ad-ext-game-variant" ],
     playerWinner: [ ".ad-ext-player-winner" ],
 
+  },
+
+  /**
+   * Autodarts' own sound settings, which it draws in two places: the In Game
+   * Settings dialog behind the gear in a match, and /settings/sound-effects.
+   * Both mark their switches the same way; only the layout around them differs.
+   * See utils/quiet-own-darts-switch.ts.
+   */
+  soundSettings: {
+    /** One switch. Its row is the parent — the label sits beside it, not around it. */
+    switch: [ "[data-slot='switch']" ],
+    /** The travelling part of a switch, which carries its own state attribute. */
+    switchThumb: [ "[data-slot='switch-thumb']" ],
   },
 
   /** Boards page — entrypoints/boards.content. Still at /boards on v2. */

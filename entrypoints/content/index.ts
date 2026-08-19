@@ -11,6 +11,7 @@ import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsUrlStat
 import { isiOS } from "@/utils/helpers";
 import Migration from "@/components/Migration.vue";
 import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
+import { quietOwnDartsSwitch, quietOwnDartsSwitchOnRemove } from "@/utils/quiet-own-darts-switch";
 
 let migrationModalUI: any;
 
@@ -20,6 +21,15 @@ export default defineContentScript({
   async main(ctx) {
     await waitForElement(SELECTORS.app.root, 15000);
     AutodartsToolsUrlStatus.setValue(window.location.href.split("#")[0] || "undefined");
+
+    // Quiet Own Darts puts its switch in autodarts' own sound settings, which
+    // exist in two places on two different routes — the in-match dialog and
+    // /settings/sound-effects. This is the one content script that runs on
+    // both, so it is the one that draws it. Ahead of the overlay rather than
+    // after it, so a page where that fails to mount still gets the switch.
+    // See utils/quiet-own-darts-switch.ts.
+    await quietOwnDartsSwitch().catch(e => console.error(e));
+    ctx.onInvalidated(quietOwnDartsSwitchOnRemove);
 
     // Create a custom event listener for the auth cookie
     ctx.addEventListener(window, "auth-cookie-available", (event: CustomEvent) => {
