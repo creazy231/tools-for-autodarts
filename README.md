@@ -526,7 +526,7 @@ Animations can be triggered by various game events using these tags:
 
 - **Points**: `0` to `180` (total points scored in a turn)
 - **Ranges**: `100-180` (any turn total within the range; `range_100_180` also works)
-- **Singles**: `s0` to `s20` and `25` (single segments, `25` for bull)
+- **Singles**: `s0` to `s20`, and `s25` or `25` for the single bull. Prefer `s25`: `25` also fires whenever a visit totals 25 points, while `s25` only ever fires for the bull. Setups that already use `25` keep working — `s25` takes over only if you have an animation on it
 - **Doubles**: `d1` to `d20` (double segments, `bull` for bullseye)
 - **Triples**: `t1` to `t20` (triple segments)
 - **Special Events**:
@@ -538,7 +538,7 @@ Animations can be triggered by various game events using these tags:
 #### Combination Tags
 You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`
 
-Example: `s20_s5_d20` would trigger when a player throws single 20, then single 5, then double 20.
+Example: `s20_s5_d20` would trigger when a player throws single 20, then single 5, then double 20. Use `s25` for a single bull and `bull` for a bullseye — e.g. `s25_s25_bull`.
 
 You can add multiple triggers for the same animation by entering each trigger on a new line in the animation settings.
 

@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import type { IGameData } from "@/utils/game-data-storage";
+import type { IThrow } from "@/utils/websocket-helpers";
 
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/helpers";
@@ -136,15 +137,17 @@ async function processGameData(gameData: IGameData): Promise<void> {
   const currentThrow = turn.throws[turn.throws.length - 1];
   if (!currentThrow) return;
 
-  const throwName: string = currentThrow.segment.name; // S1
+  const throwName: string = dartName(currentThrow); // s1
   const isLastThrow: boolean = turn.throws.length >= 3;
   const winner: boolean = gameData.match.gameWinner >= 0;
   const busted: boolean = turn.busted;
   const points: number = turn.points;
-  const miss: boolean = throwName.toLowerCase().startsWith("m");
-  const combination: string = turn.throws.map(t => t.segment.name.toLowerCase()).join("_");
+  const miss: boolean = throwName.startsWith("m");
+  const combination: string = turn.throws.map(dartName).join("_");
 
-  play(throwName.toLowerCase());
+  // `25` is what setups have always used for the single bull, so it goes on
+  // meaning that; `s25` takes over only when an animation is waiting on it.
+  play(throwName === "s25" && !hasTrigger("s25") ? "25" : throwName);
   if (winner) play("gameshot");
   if (busted) play("busted");
   if (isLastThrow && !busted) {
@@ -153,6 +156,28 @@ async function processGameData(gameData: IGameData): Promise<void> {
     play(combination);
   }
   if (miss) play("outside");
+}
+
+/**
+ * What a dart is called in a trigger.
+ *
+ * Autodarts names the outer bull "25" — the same string a 25-point visit fires,
+ * so an animation on `25` went off for both and no name meant the bull on its
+ * own. `s25` is that name: WLED, the Caller and Sound FX all answer to it
+ * already, and the trigger validator has always accepted it. Only the bull is
+ * ever called "25", and its bed is what separates the single from the bullseye,
+ * which autodarts reports as "bull" instead.
+ */
+function dartName(dart: IThrow): string {
+  const name = dart.segment.name.toLowerCase();
+  return name === "25" && dart.segment.bed === "Single" ? "s25" : name;
+}
+
+/** Whether an enabled animation is waiting on this exact trigger. */
+function hasTrigger(trigger: string): boolean {
+  return Boolean(config.value?.animations?.data?.some(
+    animation => animation.enabled && Array.isArray(animation.triggers) && animation.triggers.includes(trigger),
+  ));
 }
 
 /** Pick an animation for a trigger, at random when several match. */
