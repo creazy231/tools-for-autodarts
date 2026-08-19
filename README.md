@@ -123,6 +123,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
   - An animated border around the winning card, with the number of darts it took above it
+  - Works on every screen size. On a tablet, a phone or a short window there is no room above the card, so the border is drawn just inside its edge and the darts count is left off rather than laid across the score
 - **Enhanced Scoring Display**: Improves dart throw visuals with larger numbers and scoring notation
   - Shows dart notation (S/D/T, BULL) beneath point values, with the whole cell scaled up so a thrown dart reads from the oche
   - Only touches darts you have actually thrown — autodarts' checkout suggestion for the darts still to come is left at its own size

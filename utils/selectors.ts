@@ -373,6 +373,24 @@ export const SELECTORS = {
     playerCardBody: [ ":scope > div.flex.w-full.flex-col", ":scope > div" ],
 
     /**
+     * The coloured card face, one per player — the only per-player element the
+     * site renders in every layout it has.
+     *
+     * The match screen has three: wide columns either side of the board, a
+     * 320px sidebar of stacked cards, and a bar of cards across the top. Only
+     * the widest emits {@link playerCards}; below it there is no per-player
+     * wrapper left to hang anything on but this one, whose classes are
+     * identical in all three.
+     *
+     * It clips its own overflow, so anything drawn on it has to stay inside
+     * its edge — see the compact ring in match.content/winner-animation.ts.
+     */
+    playerCardSurface: [
+      "main div.isolate.\\@container",
+      "main div.isolate:has(span.font-display):has(div.font-number)",
+    ],
+
+    /**
      * The board's own Reset control, which clears a stuck takeout.
      *
      * Text is the only anchor: it appears alongside the camera view and only
