@@ -86,8 +86,17 @@ async function onBoard(boardData: IBoard): Promise<void> {
   countdown.start(findNextButton, seconds);
 }
 
-/** The fill first, the label as the fallback a language switch needs. */
+/**
+ * The label first, the fill as the fallback a language switch needs.
+ *
+ * It used to be the other way round, which pressed the wrong button: the camera
+ * and undo buttons share Next's `bg-blue-60` and come before it in the document,
+ * so the fill selector matched one of those and the label was never consulted.
+ * Without a board the camera is disabled and the misfire went unnoticed; with
+ * one it is live, and pressing it opened the camera instead of advancing the
+ * player.
+ */
 function findNextButton(): HTMLElement | null {
-  return qs<HTMLElement>(SELECTORS.match.nextButton)
-    ?? qsText<HTMLElement>(SELECTORS.match.matchButtons, SELECTORS.match.nextButtonText);
+  return qsText<HTMLElement>(SELECTORS.match.matchButtons, SELECTORS.match.nextButtonText)
+    ?? qs<HTMLElement>(SELECTORS.match.nextButton);
 }

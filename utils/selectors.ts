@@ -402,13 +402,20 @@ export const SELECTORS = {
     ],
 
     /**
-     * The primary action in the turn bar — "Next", which ends the current
-     * visit. The only filled button on the match screen, so the fill is the
-     * anchor; the site disables it when there is nothing to advance to.
+     * The primary action in the turn bar — "Next", which ends the current visit.
+     *
+     * The fill is not the anchor it was taken for: the camera and undo buttons
+     * beside it carry the same `bg-blue-60`, and both come earlier in the
+     * document, so a bare fill selector returns one of those instead. Next is
+     * the only one of the three that is a label rather than a glyph, which is
+     * what `:not(:has(svg))` separates out.
+     *
+     * Its caller tries the label first — see next-player-on-take-out-stuck.ts —
+     * so this is the fallback for a language `nextButtonText` does not list.
      */
     nextButton: [
-      "main button[data-slot='button'].bg-blue-60",
-      "main button.bg-blue-60",
+      "main button[data-slot='button'].bg-blue-60:not(:has(svg))",
+      "main button.bg-blue-60:not(:has(svg))",
     ],
     nextButtonText: [ "Next", "Weiter", "Volgende" ],
 
