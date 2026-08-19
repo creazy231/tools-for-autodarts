@@ -41,7 +41,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * entrypoints/match.content/index.ts. v1 is being retired, and the unported
  * implementations go with it.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby", "qrCode", "soundFx" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby", "qrCode", "soundFx", "wledFx" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;

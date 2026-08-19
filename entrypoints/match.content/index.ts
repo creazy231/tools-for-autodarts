@@ -63,6 +63,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "animations",
   "caller",
   "soundFx",
+  "wledFx",
   "colors",
   "smallerScores",
   "largerLegsSets",

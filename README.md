@@ -377,7 +377,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
 - **CSV Import**: Bulk import effects using CSV format: `[name];[url];[trigger1];[trigger2]...`
 - **Drag & Drop**: Reorder effects by dragging them in the settings interface
-- **URL Validation**: All URLs must use HTTPS for security reasons
+- **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
 
 #### Supported Triggers
 Effects can be triggered by various game events using these triggers:
@@ -402,6 +402,7 @@ Effects can be triggered by various game events using these triggers:
 - **`matchshot`**: When a player wins the entire match
 - **`matchshot+[throwName]`**: When a player wins the entire match with the specified throw (e.g. `matchshot+bull`)
 - **`busted`**: When a player busts (scores more than needed)
+- **`bulloff`**: Once when the bull-off begins, not again as the throw passes between players
 - **`idle`**: When leaving the match (cleanup effect)
 
 ##### Point Totals
@@ -418,9 +419,13 @@ Effects can be triggered by various game events using these triggers:
 - **Format**: `[dart1]_[dart2]_[dart3]` (e.g., `t20_t20_t20` for three triple 20s)
 - Triggered only when all three darts are thrown in the exact sequence
 
+##### Other Game Modes
+- **`target[N]`**: The number a player is on in Around The Clock, Round The World, Shanghai and Bob's 27 — `target7` for the 7, `targetbull` for the bull in a Double or Triple Around The Clock
+- These modes fall back to the X01 triggers above when no `target` effect matches, so `gameshot`, `matchshot` and the individual dart triggers work there too
+
 ##### Lobby Events
-- **`lobby_in`**: When a player joins the lobby
-- **`lobby_out`**: When a player leaves the lobby
+- **`lobby_in`**: When a player joins the lobby — from the second player on, so opening a lobby and adding yourself does not set it off
+- **`lobby_out`**: When a player leaves the lobby, as long as somebody is still in it
 
 ##### Tournament Events
 - **`tournament_ready`**: Triggered when tournament start event is received via websocket
@@ -434,9 +439,10 @@ Effects can be triggered by various game events using these triggers:
 - **`matchshot_[player name]`**: player specific matchshot trigger
 
 ##### Board-Specific Effects
-- **Board IDs**: Configure specific board IDs to limit effects to certain boards
+- **Board IDs**: Configure specific board IDs to limit effects to certain boards. Leave the list empty and effects play everywhere
 - **`other`**: Special trigger for throws on boards not in the configured board ID list
 - **Format**: Board IDs are UUIDs (e.g., `6a501a61-53a5-468a-a56a-17134ace3099`)
+- The board is worked out from the page you are on — the board page names it in its own URL, a match page follows whoever is throwing
 
 #### Smart Effect Selection
 - **Multiple Effects**: If multiple effects share the same trigger, one is randomly selected

@@ -14,22 +14,40 @@ let lobbyDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
 let tournamentDataWatcherUnwatch: any;
 let config: IConfig;
-let currentBoardId: string;
+
+/**
+ * The board the effects are being filtered against, when Board IDs narrows them.
+ *
+ * This used to be assigned in one place only — from game data, part-way through
+ * processGameData — so board-status effects were dropped until the first game
+ * message of the match arrived, and dropped forever on a `/boards/<id>` page,
+ * where no game data is addressed to this tab. Someone who had listed their own
+ * board got no board events at all there. It is now seeded at startup as well,
+ * from whichever of the two sources the page has.
+ */
+let currentBoardId: string | undefined;
 
 let debounceTimer: number | null = null;
 const DEBOUNCE_DELAY = 200;
 
+/** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
+function isOnALobbyPage(): boolean {
+  return /\/lobb(?:y|ies)\//.test(window.location.href);
+}
+
+/** A board page names its board in the URL: `/boards/<id>`. */
+function boardIdFromUrl(): string | undefined {
+  return window.location.href.match(/\/boards\/([0-9a-f-]+)/i)?.[1];
+}
+
+/** Whether effects should play here — an empty Board IDs list means everywhere. */
+function isConfiguredBoard(): boolean {
+  if (!config.wledFx.boardIds.length) return true;
+  return currentBoardId !== undefined && config.wledFx.boardIds.includes(currentBoardId);
+}
+
 function eventTrigger(trigger: string) {
-  if (isTriggerPresent(trigger) &&
-    (
-      config!.wledFx.boardIds.length === 0 ||
-      (
-        config!.wledFx.boardIds.length > 0 &&
-        config!.wledFx.boardIds.includes(currentBoardId)
-      )
-    )
-  )
-    setEffectByTrigger(trigger);
+  if (isTriggerPresent(trigger) && isConfiguredBoard()) setEffectByTrigger(trigger);
 }
 
 async function checkStatus(boardData: IBoard): Promise<void> {
@@ -74,6 +92,12 @@ export async function wledFx() {
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
 
+    // Board events start arriving before the first game message, and on a board
+    // page instead of one — so settle which board this is up front rather than
+    // waiting for processGameData to get to it.
+    currentBoardId = boardIdFromUrl()
+      ?? gameData.match?.players?.[gameData.match.player]?.boardId;
+
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch(
         (gameData: IGameData, oldGameData: IGameData) => {
@@ -105,8 +129,9 @@ export async function wledFx() {
       lobbyDataWatcherUnwatch = AutodartsToolsLobbyData.watch(
         async (_lobbyData: ILobbies | undefined, _oldLobbyData: ILobbies | undefined) => {
           if (!_lobbyData || !_oldLobbyData || !config.wledFx?.enabled) return;
-          const currentURL = window.location.href;
-          if (!currentURL.includes("lobbies")) return;
+          // The rebuilt site's lobby is `/lobby/<id>`. Matching only the old
+          // spelling meant these two never fired on it.
+          if (!isOnALobbyPage()) return;
 
           if (
             (_lobbyData.players?.length ?? 0) > (_oldLobbyData.players?.length ?? 0)
@@ -232,13 +257,11 @@ async function processGameData(
     nextEffect = effect;
   }
 
-  currentBoardId = gameData.match.players?.[gameData.match.player].boardId;
+  // A board page is pinned to the board it names; a match page follows whoever
+  // is throwing.
+  currentBoardId = boardIdFromUrl() ?? gameData.match.players?.[gameData.match.player]?.boardId;
 
-  if (
-    config.wledFx.boardIds.length > 0
-    && isTriggerPresent("other")
-    && !config.wledFx.boardIds.includes(currentBoardId)
-  ) {
+  if (!isConfiguredBoard() && isTriggerPresent("other")) {
     nextEffect = "other";
   }
 
