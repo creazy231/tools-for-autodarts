@@ -157,6 +157,24 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Sound Upload**: Add your own custom sounds for personalized feedback
 - **Text-to-Speech (TTS)**: Generate custom caller and sound FX audio directly from text using your device's built-in voices
 - **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events
+- **Quiet Own Darts**: Silences autodarts' own *Dart landed* sound for the darts thrown at your board, which you can already hear
+
+### 🤫 Quiet Own Darts
+Autodarts plays a thud whenever a dart lands, wherever in the world it was thrown. For a remote opponent that is the only sign anything happened; for the board in front of you it arrives a moment after the real one and tells you nothing you did not just hear.
+
+This turns the sound off for the darts within earshot and leaves it for everybody else.
+
+Its switch is not on this extension's settings page — it sits in autodarts' own **In Game Settings**, directly under the *Dart landed* setting it qualifies, labelled **Only on others' turns**. Press the gear in the match header to find it. It is on by default, and is remembered between matches.
+
+**What counts as within earshot**
+- Your own throws
+- A guest player typed into the lobby, playing on your board
+- A friend with an account of their own, throwing at your board
+
+Everyone else — a remote opponent, a bot — keeps the sound. When you are only watching a board rather than playing, that board's darts count as within earshot too.
+
+> [!NOTE]  
+> This only affects autodarts' own dart-landed sound. The extension's Sound FX and Caller are configured separately, and its `opponent_throw` trigger already covers the same ground for anyone who prefers a sound of their own.
 
 ### 🗣️ Caller Feature
 The Caller feature provides voice announcements during your darts gameplay, similar to professional darts tournaments:

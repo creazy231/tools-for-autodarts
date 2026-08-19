@@ -160,7 +160,7 @@ export default defineConfig({
         matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
       },
       {
-        resources: [ "websocket-capture.js", "auth-cookie.js" ],
+        resources: [ "websocket-capture.js", "auth-cookie.js", "quiet-own-darts.js" ],
         matches: [ "*://play.autodarts.com/*", "*://play-v2.autodarts.com/*" ],
       },
     ],

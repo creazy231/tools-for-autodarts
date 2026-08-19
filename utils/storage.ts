@@ -119,6 +119,16 @@ export interface IConfig {
     enabled: boolean;
     sounds: ISound[];
   };
+  /**
+   * Autodarts' own dart-landed sound, kept for throws you cannot already hear.
+   *
+   * Its switch is drawn into the site's In Game Settings rather than onto a
+   * settings card of ours — see entrypoints/match.content/quiet-own-darts.ts —
+   * so this is where that switch is remembered and nothing else reads it.
+   */
+  quietOwnDarts: {
+    enabled: boolean;
+  };
   boardView: {
     enabled: boolean;
     view: "image" | "camera-1" | "camera-2" | "camera-3";
@@ -592,6 +602,9 @@ export const defaultConfig: IConfig = {
       },
     ],
   },
+  quietOwnDarts: {
+    enabled: true,
+  },
   soundFx: {
     enabled: false,
     sounds: [
@@ -739,7 +752,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 6;
+const CONFIG_VERSION = 7;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -753,6 +766,12 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /** Quiet Own Darts is new, and a saved config has nothing for it. */
+      7: (config: any) => ({
+        ...config,
+        quietOwnDarts: config.quietOwnDarts ?? defaultConfig.quietOwnDarts,
+      }),
+
       /**
        * Instant Replay's `delay` is gone.
        *

@@ -24,6 +24,7 @@ import StreamingMode from "./StreamingMode.vue";
 import QuickCorrection from "./QuickCorrection.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
+import { quietOwnDarts, quietOwnDartsOnRemove } from "./quiet-own-darts";
 
 import type { IConfig } from "@/utils/storage";
 
@@ -271,6 +272,11 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initAnimations(ctx).catch(e => console.error(e));
   }
 
+  // No `isOn` gate: its switch is drawn into autodarts' own In Game Settings
+  // rather than onto a card of ours, so the feature has to be running for
+  // anyone to find it — including anyone who wants it off.
+  await initScript(quietOwnDarts, url).catch(e => console.error(e));
+
   if (isOn(config, "caller")) {
     await initScript(caller, url).catch(e => console.error(e));
   }
@@ -320,6 +326,7 @@ function clearMatch(fromBullOff: boolean = false) {
   zoomOnRemove();
   boardViewOnRemove();
   instantReplayOnRemove();
+  quietOwnDartsOnRemove();
   matchInitialized = false;
 }
 
