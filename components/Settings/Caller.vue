@@ -54,6 +54,16 @@
                   v-model="config.caller.callCheckout"
                 />
               </div>
+
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex items-center gap-2">
+                  <span>Prefer combined throws</span>
+                </div>
+                <AppToggle
+                  @update:model-value="config.caller.preferCombinedThrows = !config.caller.preferCombinedThrows"
+                  v-model="config.caller.preferCombinedThrows"
+                />
+              </div>
             </div>
 
             <div class="mt-2 flex items-center gap-2 text-sm">

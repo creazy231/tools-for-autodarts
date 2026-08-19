@@ -582,7 +582,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
         }
       }
       // Only play points sound if there's more than one player
-      playSound(points.toString());
+      const hasCombinedSound = config.caller.preferCombinedThrows && config.caller.sounds?.some(sound =>
+        sound.enabled && sound.triggers && sound.triggers.includes(combinedThrows),
+      );
+      if (!hasCombinedSound) {
+        playSound(points.toString());
+      }
       playSound(combinedThrows);
     } else {
       if (config.caller.callEveryDart) {

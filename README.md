@@ -163,6 +163,7 @@ The Caller feature provides voice announcements during your darts gameplay, simi
 #### Configuration Options
 - **Call Every Dart**: Announces each dart as it's thrown, rather than waiting for the end of a turn
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
+- **Prefer Combined Throws**: When enabled and a sound for the exact dart combination (e.g. `s20_s5_s1`) exists, the generic points sound (e.g. `26`) is skipped for that throw
 - **Custom Sound Library**: Add, edit, and organize voice clips for different game events
 - **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text using the built-in "Generate TTS" button — no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.
 - **Bulk Upload with Trigger Assignment**: When uploading multiple files, you can assign the same trigger to all files at once, making it easy to set up larger sound sets without manually assigning triggers to each file individually
