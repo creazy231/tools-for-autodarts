@@ -38,12 +38,19 @@ export async function teamLobby() {
 
   await apply(await AutodartsToolsLobbyData.getValue());
 
+  // Leaving one lobby for another re-runs this without a teardown in between,
+  // so both handles have to be released before they are overwritten — otherwise
+  // each lobby of a session leaves behind a live storage watcher and a
+  // full-document observer that nothing can reach any more. Reported by
+  // @MaB-MaN in #230.
+  unwatchLobbyData?.();
   unwatchLobbyData = AutodartsToolsLobbyData.watch((data?: ILobbies) => {
     void apply(data);
   });
 
   // A player's row renders a moment after the update that brought them in, and
   // its board button is only clickable once it is there.
+  rowObserver?.disconnect();
   rowObserver = new MutationObserver(() => claimBoards());
   rowObserver.observe(document.body, { childList: true, subtree: true });
 }

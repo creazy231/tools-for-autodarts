@@ -277,6 +277,13 @@ const currentBoardImage = ref<string>("");
 
 const streamingModeButton: Ref<HTMLAnchorElement | null> = ref(null);
 
+// Storage watchers outlive the component unless their handles are kept, and
+// this one is mounted and unmounted per match — so every match played would
+// otherwise add another pair firing on every dart, each holding a dead
+// component instance alive with it. Reported by @MaB-MaN in #230.
+let gameDataUnwatch: (() => void) | null = null;
+let boardImagesUnwatch: (() => void) | null = null;
+
 const showAvg = computed(() => config.value?.streamingMode.avg);
 
 // Helper to get number of throws in current turn
@@ -411,7 +418,8 @@ onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
   gameData.value = await AutodartsToolsGameData.getValue();
 
-  AutodartsToolsGameData.watch((value) => {
+  gameDataUnwatch?.();
+  gameDataUnwatch = AutodartsToolsGameData.watch((value) => {
     gameData.value = value;
 
     // Update game title when game data changes
@@ -419,7 +427,8 @@ onMounted(async () => {
   });
 
   // Set up board image watcher
-  AutodartsToolsBoardImages.watch((boardImages: IBoardImages) => {
+  boardImagesUnwatch?.();
+  boardImagesUnwatch = AutodartsToolsBoardImages.watch((boardImages: IBoardImages) => {
     if (boardImages.images.length > 0) {
       currentBoardImage.value = boardImages.images[boardImages.images.length - 1];
     }
@@ -475,6 +484,18 @@ watch([ coordsElementScale, scoreBoardScale, coordsElementX, coordsElementY, sco
   await AutodartsToolsConfig.setValue(toRaw(config.value!));
   console.log("Streaming Mode setting changed");
 }, { deep: true });
+
+onUnmounted(() => {
+  gameDataUnwatch?.();
+  gameDataUnwatch = null;
+
+  boardImagesUnwatch?.();
+  boardImagesUnwatch = null;
+
+  // Injected into the page rather than rendered by this component, so unmounting
+  // does not take it with it.
+  document.querySelector("#adt-stream-mode-button")?.remove();
+});
 
 // Helper function to update game title
 function updateGameTitle() {

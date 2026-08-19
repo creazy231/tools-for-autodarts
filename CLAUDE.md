@@ -76,6 +76,16 @@ WXT + Vite plugins auto-import:
 
 Do **not** import these manually — they are globally available.
 
+### Build Notes
+
+- Path aliases `@`, `~`, and `src` all resolve to the repo root (set in `wxt.config.ts`)
+
+### Companion Services (separate sub-projects, not part of the extension build)
+
+- **`socket/`** — Socket.io server (Bun) deployed at `adt-socket.tobias-thiele.de`; tracks online friends/presence data shared between extension users
+- **`proxy/`** — Express server (Docker) that forwards Discord webhook requests via an `x-target-url` header
+- **`scripts/`** — Release automation (Safari/Xcode builds, App Store submission, AltStore source updates — see `scripts/README.md`)
+
 ## Code Conventions
 
 ### Vue Component Order
@@ -119,6 +129,8 @@ Version bump in `package.json` triggers the CI pipeline (`.github/workflows/rele
 2. Builds Safari extension → IPA uploaded to release
 3. Signs and submits to App Store (main branch only)
 4. Auto-updates AltStore source JSON
+
+Update `CHANGELOG.md` alongside the version bump.
 
 ## Key Files
 

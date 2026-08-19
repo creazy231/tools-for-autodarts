@@ -90,6 +90,12 @@ async function mountButton() {
   await waitForElement(SELECTORS.lobby.playersCardHeader, 10000);
   inject();
 
+  // Going from one lobby straight into another re-runs the feature without a
+  // teardown in between, and this observer watches the whole document — leaving
+  // the previous one connected means every lobby of a session adds another
+  // full-page observer that fires on every DOM change for as long as the tab
+  // lives. Reported by @MaB-MaN in #230.
+  headerObserver?.disconnect();
   headerObserver = new MutationObserver(() => inject());
   headerObserver.observe(document.body, { childList: true, subtree: true });
 }
@@ -182,6 +188,8 @@ function watchForStartButton() {
     }
   };
 
+  // Same as the header observer above: one per lobby entered, never released.
+  startButtonObserver?.disconnect();
   startButtonObserver = new MutationObserver(attach);
   startButtonObserver.observe(document.body, { childList: true, subtree: true });
   attach();

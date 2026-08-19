@@ -57,6 +57,11 @@ export async function automaticFullscreen() {
     else document.documentElement.requestFullscreen().catch(err => console.warn("Autodarts Tools: Automatic Fullscreen -", err.message));
   });
 
+  // The guard at the top of this function only catches a re-run while the
+  // button is still on screen. If the match screen re-rendered it away first,
+  // the run continues and would leave the previous handler on the document with
+  // nothing left holding it. Reported by @MaB-MaN in #230.
+  if (onFullscreenChange) document.removeEventListener("fullscreenchange", onFullscreenChange);
   onFullscreenChange = syncIcon;
   document.addEventListener("fullscreenchange", onFullscreenChange);
 
