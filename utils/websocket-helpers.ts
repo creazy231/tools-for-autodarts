@@ -171,6 +171,21 @@ export interface IX01Settings extends IMatchSettings {
   outMode: string;
 }
 
+/**
+ * Gotcha counts up to a target instead of down to zero, so its settings say how
+ * far there is to go and how you have to land on it. That is the whole payload
+ * — no `mode`, no `gameMode`, no in-mode — so it neither extends
+ * {@link IMatchSettings} nor joins the union on {@link IMatch}: putting it
+ * there would only stop the `settings.mode` reads inside other variants'
+ * branches from narrowing. Read it off a match with a cast, as
+ * utils/checkout.ts does.
+ */
+export interface IGotchaSettings {
+  targetScore: number;
+  outMode: "Straight" | "Double" | "Master";
+  maxRounds: number;
+}
+
 export interface IMatch {
   body?: any;
   id: string;

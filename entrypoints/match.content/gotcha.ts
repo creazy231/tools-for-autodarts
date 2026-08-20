@@ -3,6 +3,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { dartFor } from "@/utils/checkout";
 
 /**
  * Gotcha Helper — name the dart that resets the player who is ahead.
@@ -26,9 +27,13 @@ const STYLE_ID = "gotcha";
 /**
  * The site's own checkout chip, matched token for token:
  * `bg-black-70 rounded-lg h-8 px-3 font-number text-xl leading-none uppercase`,
- * in the `left-3` column it reserves for them. Gotcha has no checkout, so that
- * column is free, and the hint lands where the eye already looks for "throw
- * this". The custom properties are the site's, so a palette change carries.
+ * in the `left-3` column it reserves for them, where the eye already looks for
+ * "throw this". The custom properties are the site's, so a palette change
+ * carries.
+ *
+ * The Checkout Guide draws its Gotcha route in the same column, but only ever
+ * on the card of whoever is throwing — and that card is the one this leaves
+ * alone, since nobody is ahead of themselves. So the two never meet.
  */
 const STYLES = `
   [${HINT_ATTR}]::after {
@@ -135,20 +140,4 @@ function watchDom(): void {
 
 function clear(): void {
   for (const el of document.querySelectorAll(`[${HINT_ATTR}]`)) el.removeAttribute(HINT_ATTR);
-}
-
-/**
- * The single dart worth exactly `points`, in the site's own segment notation.
- *
- * Singles first, so 18 reads "S18" rather than the D9 or T6 that also land it.
- * A gap no single dart can cover — 29, or anything past 60 — is written as the
- * gap itself, which is still the thing worth knowing.
- */
-function dartFor(points: number): string {
-  if (points === 50) return "BULL";
-  if (points === 25) return "25";
-  if (points <= 20) return `S${points}`;
-  if (points <= 40 && points % 2 === 0) return `D${points / 2}`;
-  if (points <= 60 && points % 3 === 0) return `T${points / 3}`;
-  return `+${points}`;
 }

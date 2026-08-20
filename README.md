@@ -150,6 +150,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Autodarts shows these itself while *Show checkout guide* is on in the match settings; this keeps them on screen when it is off
   - Stays out of the way whenever the site is already drawing them, so a route is never shown twice
   - Every player gets their own route, not a copy of whoever is throwing
+  - **Gotcha** gets a route too, which autodarts works out for no one: the darts that land exactly on the target score, honouring Straight, Double and Master out. It is shown for whoever is throwing, and the Caller announces the number with it
 
 ### 🔊 Audio Features
 - **Caller**: Voice announcements for scores, checkouts, and each dart thrown during gameplay

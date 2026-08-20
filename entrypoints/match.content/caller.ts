@@ -1,6 +1,7 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/storage";
 import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
+import { gotchaCheckout } from "@/utils/checkout";
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
@@ -502,16 +503,21 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
     }
   }
 
-  // Check for checkout guide
-  if (gameData.match.state?.checkoutGuide?.length) {
+  // What is left to finish, for the "you require" call.
+  //
+  // X01 counts down, so the score on the card already is the remainder, and the
+  // site sending a route for it is what says a checkout is on at all. Gotcha
+  // counts up to a target and the site sends no route for it whatsoever, so
+  // both halves are worked out here — see utils/checkout.ts.
+  const currentScore = gameData.match.variant === "Gotcha"
+    ? gotchaCheckout(gameData.match, gameData.match.player)?.remaining ?? 0
+    : (gameData.match.state?.checkoutGuide?.length ? gameData.match.gameScores[gameData.match.player] : 0);
+
+  if (currentScore > 0) {
     console.log("Autodarts Tools: Checkout guide available");
 
-    // Get the current player's score from gameScores
-    const currentPlayerIndex = gameData.match.player;
-    const currentScore = gameData.match.gameScores[currentPlayerIndex];
-
     // Only play "you require" when there are 0 throws in the current turn
-    if (config.caller.callCheckout && currentScore > 0 && gameData.match.turns[0].throws.length === 0) {
+    if (config.caller.callCheckout && gameData.match.turns[0].throws.length === 0) {
       console.log(`Autodarts Tools: Playing checkout guide sound for ${currentScore}`);
 
       // First check for short form yr_XXX sound (e.g., "yr_120")

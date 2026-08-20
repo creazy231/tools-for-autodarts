@@ -3,6 +3,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { gotchaCheckout } from "@/utils/checkout";
 
 /**
  * Checkout Guide — keep the route on screen for every player.
@@ -18,6 +19,12 @@ import { SELECTORS, qs, qsa } from "@/utils/selectors";
  * had `state.checkoutGuide`, the singular route belonging to whoever was
  * throwing. It wrote that into the card whose turn it was and left every other
  * card showing whatever it had been given last time round.
+ *
+ * Gotcha gets no route from anybody: you count up to a target there rather than
+ * down to zero, and the site keeps no `checkoutGuides` for it at any score or
+ * in any of its three out modes. So that one is worked out here — see
+ * utils/checkout.ts — and only for the player at the oche, who is the only one
+ * who can throw it, and whose card is the one the Gotcha Helper leaves free.
  *
  * Drawing is CSS, for the reason every other match feature is: the cards are
  * React and are rebuilt on every dart, so the value goes on as an attribute and
@@ -101,13 +108,19 @@ function render(gameData: IGameData): void {
   const perPlayer = state.checkoutGuides;
   const count = match.gameScores?.length ?? 0;
 
-  routes = Array.from({ length: count }, (_, index) => {
-    // Older payloads carry only the singular route, which belongs to whoever is
-    // throwing — so it is the only card it can honestly be put on.
-    const darts = perPlayer ? perPlayer[index] : (index === match.player ? state.checkoutGuide : null);
-    if (!darts?.length) return null;
-    return darts.map(dart => dart.name).join("\n");
-  });
+  if (match.variant === "Gotcha") {
+    const checkout = gotchaCheckout(match, match.player);
+    routes = Array.from({ length: count }, (_, index) =>
+      (index === match.player && checkout ? checkout.darts.join("\n") : null));
+  } else {
+    routes = Array.from({ length: count }, (_, index) => {
+      // Older payloads carry only the singular route, which belongs to whoever
+      // is throwing — so it is the only card it can honestly be put on.
+      const darts = perPlayer ? perPlayer[index] : (index === match.player ? state.checkoutGuide : null);
+      if (!darts?.length) return null;
+      return darts.map(dart => dart.name).join("\n");
+    });
+  }
 
   apply();
   watchDom();
