@@ -104,8 +104,13 @@ export async function takeout() {
   addStyles(STYLES, STYLE_ID);
   mount();
 
-  update(await AutodartsToolsBoardData.getValue());
-
+  // Nothing is read here on purpose. `board-data` is one record in
+  // `storage.local` that outlives the match, the tab and the session, so
+  // reading it at start-up put "Removing Darts" across the screen the moment
+  // any match page initialised carrying a takeout left over from somewhere
+  // else — with no board connected and, on a board page, no match at all.
+  // Only a board saying so right now can open this, which is how v1 behaved
+  // and why v1 never did that.
   boardDataWatcherUnwatch?.();
   boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(update);
 }

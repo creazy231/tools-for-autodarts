@@ -109,6 +109,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - A **Removing Darts…** panel in the middle of the screen, in the site's own warning colour and display face
   - Click it to put it away; it stays away for that takeout and returns on the next one
   - Clicking it also presses the board's **Reset**, for a takeout the board never sees finish
+  - Only ever shown for a takeout happening right now, on a board this page is about — the board you are watching when you follow one, otherwise a board playing in this match. A board elsewhere no longer puts it on your screen, and neither does one left mid-takeout by an earlier game
 - **Automatic Next Player**: Presses *Next* for you when a takeout never finishes
   - A countdown appears on the site's own *Next* button as soon as takeout starts — configurable, 10 seconds by default
   - Clicking anywhere calls it off; so does the board coming back before it runs out
@@ -121,6 +122,10 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Adds an **External Boards** section to the *My Devices* page
   - Paste either the board's ID or a link containing it; the ID is picked out for you
   - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
+- **Features While Following a Board**: Everything that describes a match also works while you watch one at `/boards/<id>/follow`
+  - Colours, smaller inactive scores, larger names, legs/sets and match data, Checkout Guide, Gotcha Helper, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
+  - **Automatic Next Player**, **Automatic Next Leg/Set** and **Quick Correction** stay off: they press the site's own controls, which belong to whoever is throwing rather than to whoever is watching
+  - Nothing starts until the board is actually in a match, and it starts by itself when one begins — you can sit on the page and wait
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
   - An animated border around the winning card, with the number of darts it took above it
   - Works on every screen size. On a tablet, a phone or a short window there is no room above the card, so the border is drawn just inside its edge and the darts count is left off rather than laid across the score

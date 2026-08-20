@@ -28,12 +28,12 @@ import { quietOwnDarts, quietOwnDartsOnRemove } from "./quiet-own-darts";
 
 import type { IConfig } from "@/utils/storage";
 
-import { waitForElement, waitForElementWithTextContent } from "@/utils";
+import { waitForElement } from "@/utils";
 import {
   AutodartsToolsConfig,
   AutodartsToolsUrlStatus,
 } from "@/utils/storage";
-import { SELECTORS } from "@/utils/selectors";
+import { SELECTORS, exists, qs } from "@/utils/selectors";
 import { fetchWithAuth, isSafari, isiOS } from "@/utils/helpers";
 import { processWebSocketMessage } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
@@ -84,9 +84,93 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "instantReplay",
 ]);
 
+/**
+ * Features that act on the match rather than describe it.
+ *
+ * These three reach for the site's own controls — Next, Next Leg, and the throw
+ * a correction rewrites — and on a board page those belong to whoever is at the
+ * oche, not to whoever is watching them. Everything else the match screen runs
+ * is drawing, sound or light, and reads the same from either side of it.
+ */
+const PLAYING_ONLY = new Set<keyof IConfig>([
+  "nextPlayerOnTakeOutStuck",
+  "automaticNextLeg",
+  "quickCorrection",
+]);
+
+/**
+ * Whether this page is watching a board rather than playing at one.
+ *
+ * `/boards/<id>/follow` is the board's own page on the rebuilt site — it is
+ * what the cards on /boards link to — and it shows the match that board is
+ * playing, from the outside. Playing happens at `/matches/<id>`.
+ */
+function isFollowingBoard(): boolean {
+  return /\/boards\/[0-9a-f-]+/i.test(window.location.href);
+}
+
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
+  if (PLAYING_ONLY.has(feature) && isFollowingBoard()) return false;
   return Boolean((config[feature] as { enabled?: boolean })?.enabled);
+}
+
+const MATCH_ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
+
+/**
+ * Whether a match is drawn on the screen right now.
+ *
+ * `playerCardSurface` rather than `playerCards`, because the match screen has
+ * three layouts and only the widest of them puts a column round each player —
+ * on a tablet or a narrow window there is nothing per-player left but the card
+ * face itself. Asking for the column instead answered "no match" all through a
+ * match on a small screen.
+ */
+function matchOnScreen(): boolean {
+  return exists(SELECTORS.match.playerCardSurface);
+}
+
+/** The match a board is playing right now, if it is playing one. */
+async function matchIdForBoard(boardId: string): Promise<string | undefined> {
+  try {
+    const response = await fetchWithAuth(`https://api.autodarts.com/bs/v0/boards/${boardId}`);
+    if (!response.ok) {
+      console.warn("Autodarts Tools: could not read board", boardId, response.status);
+      return undefined;
+    }
+    return (await response.json()).matchId || undefined;
+  } catch (error) {
+    console.error("Autodarts Tools: Error fetching board data:", error);
+    return undefined;
+  }
+}
+
+/**
+ * Which match this page is about, and whether there is one to work with.
+ *
+ * A match page names its match and always has one. A board page names a board,
+ * and its board is idle most of the time — so the board's own record is what
+ * answers, which is the site's answer rather than a guess at its markup, and it
+ * survives the language switcher.
+ *
+ * What it replaced did neither: it waited for an `h2` reading "Board has no
+ * active match", which the rebuilt site never renders — it says "No active
+ * match" in a `<p>`, and puts no `h2` on the page at all. So the wait always
+ * timed out, the absence of the heading was read as "there is a match", and
+ * every match feature started up on an empty board page.
+ *
+ * The screen still gets a moment to disagree, which covers both a board that
+ * has just this second started a match and an API call that did not answer.
+ */
+async function resolveMatch(url: string): Promise<{ matchId?: string; active: boolean }> {
+  const boardId = url.match(/\/boards\/([0-9a-f-]+)/i)?.[1];
+  if (!boardId) return { matchId: url.match(MATCH_ID)?.[0], active: true };
+
+  const matchId = await matchIdForBoard(boardId);
+  if (matchId) return { matchId, active: true };
+
+  const rendered = await waitForElement(SELECTORS.match.playerCardSurface, 1500).then(() => true).catch(() => false);
+  return { active: rendered };
 }
 
 const tools = {
@@ -111,21 +195,10 @@ export default defineContentScript({
           console.warn("Autodarts Tools: Match page did not render in time");
         });
 
-        // Extract lobby ID from URL and fetch lobby data
-        let matchId = url.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)?.[0];
+        const { matchId, active: activeMatch } = await resolveMatch(url);
+
         if (matchId) {
           try {
-            console.log("Autodarts Tools: Fetching match data with cookie authentication...");
-
-            if (url.includes("boards")) {
-              const apiUrl = `https://api.autodarts.com/bs/v0/boards/${matchId}`;
-              const response = await fetchWithAuth(apiUrl);
-
-              if (response.ok) {
-                matchId = (await response.json()).matchId;
-              }
-            }
-
             console.log("Autodarts Tools: Match ID:", matchId);
 
             const apiUrl = `https://api.autodarts.com/gs/v0/matches/${matchId}/state`;
@@ -144,8 +217,6 @@ export default defineContentScript({
             console.error("Autodarts Tools: Error fetching match data:", error);
           }
         }
-
-        const activeMatch = window.location.href.includes("boards") ? !(await waitForElementWithTextContent("h2", [ "Board has no active match", "Board hat kein aktives Spiel", "Bord heeft geen actieve wedstrijd" ], 1000).catch(() => undefined)) : true;
 
         if (activeMatch) {
           console.log("Autodarts Tools: Match found, initializing match");
@@ -335,42 +406,76 @@ async function initScript(fn: any, url: string) {
   await fn();
 }
 
+/**
+ * Notice a match starting or ending under a page we are already on.
+ *
+ * This matters most on a board page, which is where you sit and wait for
+ * someone to start throwing — the URL never changes, so nothing else would ever
+ * look again. It used to watch `#root > div > div:nth-of-type(2)`, which on the
+ * rebuilt site is an empty trailing div that never mutates, so it never fired.
+ *
+ * `main` does mutate — constantly, on every dart — so the callback has to be
+ * cheap. It settles for one `querySelector` in the steady state: only when what
+ * is on screen disagrees with what has been initialised is anything else asked,
+ * and only then is the board endpoint consulted.
+ */
 function startActiveMatchObserver(ctx) {
-  const targetNode = document.querySelector("#root > div > div:nth-of-type(2)");
-  const observer = new MutationObserver(async () => {
-    const url = window.location.href;
-    // Check for match/board URL pattern and exclude history pages
-    if (!(/\/(matches|boards)\/([0-9a-f-]+)/.test(url)) || url.includes("history")) return;
+  const targetNode = qs(SELECTORS.app.contentRoot);
+  let settle: ReturnType<typeof setTimeout> | null = null;
+  let busy = false;
 
-    // Check if the "Board has no active match" element no longer exists
-    const activeMatch = window.location.href.includes("boards") ? !(await waitForElementWithTextContent("h2", [ "Board has no active match", "Board hat kein aktives Spiel", "Bord heeft geen actieve wedstrijd" ], 1000).catch(() => undefined)) : true;
+  const observer = new MutationObserver(() => {
+    if (settle) clearTimeout(settle);
+    settle = setTimeout(async () => {
+      settle = null;
+      if (busy) return;
 
-    if (!activeMatch) {
-      console.log("Autodarts Tools Observer: No Active Match found, waiting for match to start");
-      if (matchInitialized) {
-        matchInitialized = false;
-        clearMatch();
-      }
-    } else {
-      const url = await AutodartsToolsUrlStatus.getValue();
-      let matchId = url.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)?.[0];
+      const url = window.location.href;
+      // Check for match/board URL pattern and exclude history pages
+      if (!(/\/(matches|boards)\/([0-9a-f-]+)/.test(url)) || url.includes("history")) return;
 
-      if (url.includes("boards")) {
-        const apiUrl = `https://api.autodarts.com/bs/v0/boards/${matchId}`;
-        const response = await fetchWithAuth(apiUrl);
+      // The cheap half: a match screen draws a card per player, and nothing
+      // else on these routes does. While that agrees with what is running there
+      // is nothing to decide, and the board endpoint is never asked.
+      if (matchOnScreen() === matchInitialized) return;
 
-        if (response.ok) {
-          matchId = (await response.json()).matchId;
+      busy = true;
+      try {
+        const { matchId, active } = await resolveMatch(url);
+
+        if (!active) {
+          console.log("Autodarts Tools Observer: No Active Match found, waiting for match to start");
+          if (matchInitialized) {
+            // Tearing the match down stops this observer with it, and a board
+            // page stays put while one match ends and the next begins — so it
+            // goes straight back on, or nothing would notice the next one.
+            //
+            // The same instance, rather than a fresh one from the factory:
+            // naming the factory in here makes it reference itself, and WXT
+            // reads an entrypoint's config by removing `main` and dropping
+            // whatever nothing points at any more. A function in a cycle is
+            // still pointed at, so the whole feature graph survives that pass
+            // and gets evaluated in node — where `utils/helpers.ts` builds an
+            // `Audio` as it loads, and `yarn build` dies on it.
+            clearMatch();
+            if (targetNode) {
+              observer.observe(targetNode, { childList: true, subtree: true });
+              activeMatchObserver = observer;
+            }
+          }
+          return;
         }
-      }
 
-      console.log("Autodarts Tools Observer: Match ID:", matchId);
+        console.log("Autodarts Tools Observer: Match ID:", matchId);
 
-      if (!matchInitialized && matchId) {
-        console.log("Autodarts Tools Observer: Match found, initializing match because activeMatch is true");
-        initMatch(ctx, url, matchId).catch(e => console.error(e));
+        if (!matchInitialized) {
+          console.log("Autodarts Tools Observer: Match found, initializing match because activeMatch is true");
+          await initMatch(ctx, url, matchId).catch(e => console.error(e));
+        }
+      } finally {
+        busy = false;
       }
-    }
+    }, 400);
   });
 
   // Add null check before observing

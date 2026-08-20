@@ -216,6 +216,59 @@ export interface IMatch {
   chalkboards?: IChalkboard[];
 }
 
+/**
+ * `event` values that belong to the channel rather than to a board.
+ *
+ * The site announces its own subscriptions on `autodarts.boards`, as
+ * `{event: "start", id: "<matchId>"}` and its `delete` counterpart — no status,
+ * no board, and an id that is not a board's. A board's own events read as
+ * "Throw detected", "Takeout started", "Takeout finished", which several
+ * features match on, so only these two words are turned away and only when the
+ * frame carries no board state at all.
+ */
+const CHANNEL_EVENTS = new Set([ "start", "delete" ]);
+
+/** A board page names its board in the URL: `/boards/<id>`. */
+function boardIdFromUrl(): string | undefined {
+  return window.location.href.match(/\/boards\/([0-9a-f-]+)/i)?.[1];
+}
+
+/**
+ * Whether a board frame describes a board this page is about.
+ *
+ * `autodarts.boards` is a shared channel and there is one {@link IBoard} record
+ * behind it, so without this every board the socket mentions wrote the state
+ * the whole extension reads — a takeout on a board with no connection to this
+ * page put "Removing Darts" across the screen. It was the only case in the
+ * switch below with no identity check; lobbies and matches both filter on the
+ * id in the URL.
+ *
+ * Rejection needs positive evidence, because a frame wrongly turned away is a
+ * feature that quietly stops working: a board is somebody else's only when we
+ * know of boards this page is about and it is none of them. A frame that names
+ * no board, and a page with no board to compare against, are both kept.
+ *
+ * Which boards those are is the page: watching one names it in the URL, and
+ * that is the board on screen whoever happens to be signed in. Otherwise it is
+ * whatever is playing in this match — an opponent's takeout holds this match up
+ * just as yours does — plus `selectedBoard`, the site's own note of which board
+ * this browser is pointed at, for the moments before the match data lands.
+ */
+async function isWatchedBoard(id: string | undefined): Promise<boolean> {
+  if (!id) return true;
+
+  const watched = boardIdFromUrl();
+  if (watched) return id === watched;
+
+  const match = (await AutodartsToolsGameData.getValue())?.match;
+  const known = new Set((match?.players ?? []).map(player => player.boardId).filter(Boolean));
+
+  const selected = localStorage.getItem("selectedBoard");
+  if (selected) known.add(selected);
+
+  return known.size ? known.has(id) : true;
+}
+
 export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | ITournament | string) {
   // do a switch on the channel
   switch (channel) {
@@ -264,13 +317,24 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
       break;
     }
     case "autodarts.boards": {
-      data = data as IBoard;
+      // Partial, because that is what arrives: a board sends the fields that
+      // changed, and the site sends frames that are not a board at all.
+      const board = data as Partial<IBoard>;
+
+      // Some of those frames are the channel talking about itself rather than
+      // about a board — see CHANNEL_EVENTS. Merging one in as though it were a
+      // board wiped real state and left a match id sitting in `id`.
+      const stateless = board.status === undefined && board.connected === undefined;
+      if (stateless && CHANNEL_EVENTS.has(board.event ?? "")) break;
+
+      if (!await isWatchedBoard(board.id)) break;
+
       const boardData = await AutodartsToolsBoardData.getValue();
 
       AutodartsToolsBoardData.setValue({
         ...boardData,
-        ...data,
-        status: data.status || "",
+        ...board,
+        status: board.status || "",
       });
 
       // Search DOM for img with blob: src URL after 250ms delay

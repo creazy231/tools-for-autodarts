@@ -51,8 +51,11 @@ export async function nextPlayerOnTakeOutStuck() {
   onUserClick = () => countdown.stop();
   document.addEventListener("click", onUserClick);
 
-  await onBoard(await AutodartsToolsBoardData.getValue());
-
+  // No start-up read of `board-data`: it is one record in `storage.local` that
+  // outlives the match, so a takeout left over from a previous one started this
+  // countdown as the match screen appeared and pressed Next on the opening
+  // visit. Only a board reporting a takeout now can start it. Same reason the
+  // notification does not read it either — see takeout.ts.
   boardDataWatcherUnwatch?.();
   boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(onBoard);
 }
