@@ -97,6 +97,8 @@ function injectRow(): void {
 
   existing?.remove();
   const row = buildRow(anchor);
+  if (!row) return;
+
   if (ownBlock(anchor)) anchor.parentElement!.append(row);
   else anchor.after(row);
   paintRow();
@@ -139,7 +141,29 @@ function isSiteOwned(el: Element): boolean {
   return !el.closest(`[${ROW_FLAG}]`);
 }
 
-/** The site's own Dart landed row, by its label first and by shape second. */
+/**
+ * How many switches have to be on screen before shape is worth reading.
+ *
+ * Both places that list sound effects list several — the settings page shows
+ * six, and the dialog its master switch and one per effect. Nowhere else on the
+ * site comes close: the lobby has a single Autoscoring switch, and
+ * /settings/general two. It is also the floor the group branch of
+ * {@link rowByStructure} already went by, so both halves now assume the same
+ * thing.
+ */
+const MIN_SOUND_SWITCHES = 4;
+
+/**
+ * The site's own Dart landed row, by its label first and by shape second.
+ *
+ * Shape is only consulted where the sound settings actually are. It used to be
+ * consulted on every page this script runs on, which is all of them, and the
+ * lobby has a lone Autoscoring switch sitting beside its description — the
+ * exact shape {@link ownBlock} looks for. So creating a game showed two
+ * Autoscoring rows: a copy of a control that is not a sound effect at all,
+ * still wearing the site's own wording because that row carries no `<label>`
+ * for {@link buildRow} to rewrite.
+ */
 function dartLandedRow(): HTMLElement | null {
   const rows = qsa<HTMLElement>(SELECTORS.soundSettings.switch)
     .filter(isSiteOwned)
@@ -150,8 +174,9 @@ function dartLandedRow(): HTMLElement | null {
     const label = row.querySelector("label")?.textContent?.trim().toLowerCase();
     return !!label && DART_LANDED_LABELS.includes(label);
   });
+  if (byLabel) return byLabel;
 
-  return byLabel ?? rowByStructure(rows);
+  return rows.length >= MIN_SOUND_SWITCHES ? rowByStructure(rows) : null;
 }
 
 /**
@@ -186,7 +211,14 @@ function rowByStructure(rows: HTMLElement[]): HTMLElement | null {
  * clone has no part in, so the state it shows and the click that changes it
  * are ours.
  */
-function buildRow(template: HTMLElement): HTMLElement {
+function buildRow(template: HTMLElement): HTMLElement | null {
+  // A row with no label is one we cannot rename, and a copy of a switch wearing
+  // the site's own wording is worse than no switch at all — it reads as the
+  // site listing the same setting twice, which is what a lone Autoscoring
+  // switch in the lobby turned into. The anchor above should never be one of
+  // those any more; this is here so that it cannot become one again.
+  if (!template.querySelector("label")) return null;
+
   const row = template.cloneNode(true) as HTMLElement;
   row.setAttribute(ROW_FLAG, "");
 
