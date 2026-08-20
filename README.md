@@ -100,7 +100,8 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Autodarts has one button for this and it only cycles (camera 1, 2, 3, drawn board, round again); this presses it for you until your choice comes up
   - Boards with fewer cameras have a shorter cycle, so asking for one that is not there leaves the view alone rather than pressing forever
   - While it is on, it is the one in charge: Darts Zoom's *View Mode* stops switching the board and only decides where its close-ups come from
-- **Automatic Fullscreen**: Automatically enables fullscreen mode during matches for an immersive experience
+- **Automatic Fullscreen**: Adds a fullscreen toggle to the match header, alongside the site's own icons
+  - It also goes fullscreen by itself on entering a match, but only when the browser allows it. Fullscreen may only be entered straight off a click, and arriving from the lobby's *Start Game* is usually too long ago to count — so most of the time the header button is the way in
 - **Adjustable UI Elements**: Modify the size of legs, sets, and match information
 - **Larger Player Names**: Increase the font size of player names for better visibility during matches
 

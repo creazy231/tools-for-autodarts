@@ -67,9 +67,34 @@ export async function automaticFullscreen() {
 
   iconGroup.insertBefore(button, iconGroup.firstChild);
 
+  enterIfAllowed(syncIcon);
+}
+
+/**
+ * Go fullscreen, but only when the browser would actually allow it.
+ *
+ * `requestFullscreen` needs transient activation, and asking without it does
+ * not merely reject — the browser writes "Failed to execute 'requestFullscreen'
+ * on 'Element': API can only be initiated by a user gesture" to the console
+ * itself, which no `.catch()` can take back. This ran on every match screen, so
+ * that line was in every match's console.
+ *
+ * `navigator.userActivation.isActive` is the same condition the browser is
+ * about to check, so consulting it first turns a refusal into no request at
+ * all. Arriving from the lobby's Start Game click is usually too long ago to
+ * still count, which is why the header button is the way in and always has
+ * been. Where the property does not exist — older Safari, and iOS, which has no
+ * element fullscreen at all — nothing is attempted rather than guessed at.
+ */
+function enterIfAllowed(syncIcon: () => void): void {
+  if (!navigator.userActivation?.isActive) {
+    console.log("Autodarts Tools: Automatic Fullscreen - no click to go on; use the header button");
+    return;
+  }
+
   document.documentElement.requestFullscreen()
     .then(syncIcon)
-    .catch(() => console.log("Autodarts Tools: Automatic Fullscreen - the browser wants a click first; use the header button"));
+    .catch(err => console.log("Autodarts Tools: Automatic Fullscreen -", err.message));
 }
 
 export async function automaticFullscreenOnRemove() {
