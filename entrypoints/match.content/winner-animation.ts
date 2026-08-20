@@ -4,7 +4,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData, GameMode } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { SELECTORS, qsaCount } from "@/utils/selectors";
 
 /**
  * Winner Animation — mark the winning card and say what it took.
@@ -24,14 +24,15 @@ import { SELECTORS, qs, qsa } from "@/utils/selectors";
  * and the bottom, and the caption floated near the top of the window.
  *
  * There are two treatments, because the match screen has three layouts. Wide
- * enough for columns either side of the board, the card floats clear of
- * everything and the ring is drawn around it with the caption above. Narrower —
- * a 320px sidebar of stacked cards, or a bar of cards across the top, which is
- * what every tablet and phone gets — the card is flush against the window
- * inside a parent that clips, so an outset ring loses two of its edges and
- * there is no room above for the caption at all. There the ring is drawn just
- * inside the card's own edge and the caption is dropped: the card is dense at
- * that size and anything else would land on top of the score.
+ * enough for columns either side of the board, each player gets a wrapper that
+ * neither clips nor is clipped, so the ring is drawn around the card with the
+ * caption above. Narrower — a 320px sidebar of stacked cards, or a bar of cards
+ * across the top, which is what every tablet and phone gets — there is no
+ * wrapper left and the card face is the card, and it clips its own overflow, so
+ * an outset ring would lose its edges and there is no room above for the
+ * caption anyway. There the ring is drawn just inside the card's own edge and
+ * the caption is dropped: the card is dense at that size and anything else
+ * would land on top of the score.
  */
 const WINNER_FLAG = "data-adt-winner";
 const MESSAGE_ATTR = "data-adt-winner-message";
@@ -149,9 +150,10 @@ async function apply(gameData: IGameData): Promise<void> {
   if (!config.winnerAnimation.enabled) return clear();
 
   const text = message(gameData);
+  const players = match.players?.length ?? 0;
   clear();
 
-  const refresh = () => put(winner, text);
+  const refresh = () => put(winner, players, text);
   refresh();
 
   /*
@@ -179,11 +181,11 @@ async function apply(gameData: IGameData): Promise<void> {
  * two attributes when nothing has moved, and only measures the card on the wide
  * layout — the compact one draws no caption and so needs no measurement.
  */
-function put(winner: number, text: string): void {
-  const target = winnerTarget(winner);
+function put(winner: number, players: number, text: string): void {
+  const target = winnerTarget(winner, players);
   if (!target) return;
 
-  const caption = target.mode === "wide" && hasHeadroom(target.el) ? text : "";
+  const caption = target.mode === "wide" && hasHeadroom(target.el, target.cards) ? text : "";
   if (target.el.getAttribute(WINNER_FLAG) === target.mode
     && (target.el.getAttribute(MESSAGE_ATTR) ?? "") === caption) return;
 
@@ -192,37 +194,55 @@ function put(winner: number, text: string): void {
 }
 
 /**
- * Whether there is room above the card to hang the caption.
+ * Whether the space the caption wants, directly above the card, is free.
  *
- * A short window keeps the wide layout but runs the card off the bottom of the
- * screen; on 1280x600 the card started at the very top and the caption, which
- * sits above it, was off the edge entirely. Drawing nothing beats that.
+ * Two things take it away. A short window keeps the wide layout but runs the
+ * card off the bottom of the screen; on 1280x600 the card started at the very
+ * top and the caption sat off the edge entirely. And a column holds as many
+ * cards as it needs to, stacked and touching, so from three players up the card
+ * above is right there — which is where "12 DARTS" landed, written across
+ * somebody else's score.
+ *
+ * Drawing nothing beats either. The ring is the part that says who won; the
+ * caption only adds what it took, and the compact layouts already do without.
  */
-function hasHeadroom(el: HTMLElement): boolean {
-  return el.getBoundingClientRect().top >= CAPTION_HEADROOM;
+function hasHeadroom(el: HTMLElement, cards: HTMLElement[]): boolean {
+  const box = el.getBoundingClientRect();
+  if (box.top < CAPTION_HEADROOM) return false;
+
+  return !cards.some((other) => {
+    if (other === el) return false;
+    const above = other.getBoundingClientRect();
+    const sameColumn = above.right > box.left && above.left < box.right;
+    return sameColumn && above.bottom > box.top - CAPTION_HEADROOM && above.bottom <= box.top;
+  });
 }
 
-/** Where the ring goes, and which of the two treatments the layout calls for. */
-interface WinnerTarget { el: HTMLElement; mode: "wide" | "compact" }
+/** Where the ring goes, which treatment to use, and the cards it sits among. */
+interface WinnerTarget { el: HTMLElement; mode: "wide" | "compact"; cards: HTMLElement[] }
 
 /**
  * The visible card for the winning player, in whichever layout is on screen.
  *
  * `attr()` only reads the attributes of the element the pseudo-element belongs
  * to, so the flag has to live on the same node the ring and caption are drawn
- * on — which is the card, not the column around it.
+ * on — which is the card, not the column around it. The column is not one per
+ * player anyway: the widest layout draws two of them however many are playing
+ * and stacks the cards inside, so with three players indexing the columns put
+ * the ring around player 3 when player 2 had won. Hence {@link qsaCount}, which
+ * will not hand back a set that is not one element per player.
  *
- * Player columns exist only on the widest layout. Below it the site drops to a
- * sidebar and then to a top bar, where the card face is all that is left per
- * player; it is the same element with the same classes in all three, so it
- * doubles as the anchor once the column has gone.
+ * Which of the two treatments to use follows from the element rather than from
+ * the layout it came out of: the ring can only be drawn outside a card that
+ * does not clip, and of the three layouts only the widest gives us one.
  */
-function winnerTarget(index: number): WinnerTarget | null {
-  const column = qsa<HTMLElement>(SELECTORS.match.playerCards)[index];
-  if (column) return { el: qs<HTMLElement>(SELECTORS.match.playerCardBody, column) ?? column, mode: "wide" };
+function winnerTarget(index: number, players: number): WinnerTarget | null {
+  const cards = qsaCount<HTMLElement>(SELECTORS.match.playerCard, players);
+  const el = cards[index];
+  if (!el) return null;
 
-  const surface = qsa<HTMLElement>(SELECTORS.match.playerCardSurface)[index];
-  return surface ? { el: surface, mode: "compact" } : null;
+  const clipped = getComputedStyle(el).overflow !== "visible";
+  return { el, cards, mode: clipped ? "compact" : "wide" };
 }
 
 function mark(target: WinnerTarget, text: string): void {

@@ -17,7 +17,7 @@ export async function largerLegsSets() {
     if (!config.largerLegsSets.enabled) return;
 
     const rem = config.largerLegsSets.value || 2.5;
-    const card = SELECTORS.match.playerCards[0];
+    const card = SELECTORS.match.playerColumn[0];
     const box = SELECTORS.match.playerLegsSets[0];
 
     addStyles(`

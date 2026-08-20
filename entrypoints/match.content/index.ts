@@ -120,14 +120,15 @@ const MATCH_ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
 /**
  * Whether a match is drawn on the screen right now.
  *
- * `playerCardSurface` rather than `playerCards`, because the match screen has
- * three layouts and only the widest of them puts a column round each player —
- * on a tablet or a narrow window there is nothing per-player left but the card
- * face itself. Asking for the column instead answered "no match" all through a
- * match on a small screen.
+ * `playerCard` rather than `playerColumn`, because the match screen has three
+ * layouts and only the widest of them puts a column round the players — on a
+ * tablet or a narrow window there is no column to find, and asking for one
+ * answered "no match" all through a match on a small screen. Existence is the
+ * whole question here, so the candidates are taken as {@link qsa} takes them:
+ * any of the three is a match on screen.
  */
 function matchOnScreen(): boolean {
-  return exists(SELECTORS.match.playerCardSurface);
+  return exists(SELECTORS.match.playerCard);
 }
 
 /** The match a board is playing right now, if it is playing one. */
@@ -169,7 +170,7 @@ async function resolveMatch(url: string): Promise<{ matchId?: string; active: bo
   const matchId = await matchIdForBoard(boardId);
   if (matchId) return { matchId, active: true };
 
-  const rendered = await waitForElement(SELECTORS.match.playerCardSurface, 1500).then(() => true).catch(() => false);
+  const rendered = await waitForElement(SELECTORS.match.playerCard, 1500).then(() => true).catch(() => false);
   return { active: rendered };
 }
 

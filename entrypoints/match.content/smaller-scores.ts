@@ -16,7 +16,7 @@ const STYLE_ID = "score-smaller";
 
 export async function smallerScores() {
   try {
-    const card = SELECTORS.match.playerCards[0];
+    const card = SELECTORS.match.playerColumn[0];
     const score = SELECTORS.match.playerScore[0];
 
     addStyles(`

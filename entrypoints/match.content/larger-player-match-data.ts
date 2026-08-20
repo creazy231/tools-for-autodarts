@@ -16,7 +16,7 @@ export async function largerPlayerMatchData() {
     if (!config.largerPlayerMatchData.enabled) return;
 
     const rem = config.largerPlayerMatchData.value || 1.5;
-    const card = SELECTORS.match.playerCards[0];
+    const card = SELECTORS.match.playerColumn[0];
     const row = SELECTORS.match.playerMatchData[0];
 
     addStyles(`

@@ -94,6 +94,36 @@ export function exists(set: SelectorSet, root: ParentNode = document): boolean {
 }
 
 /**
+ * querySelectorAll for a set that is supposed to return one element per thing,
+ * where the caller knows how many things there are.
+ *
+ * {@link qsa} takes the first candidate that matches anything, which is right
+ * when a candidate either fits the page or does not. It is wrong when a
+ * candidate can match the right kind of element and still be the wrong set —
+ * {@link SELECTORS.match.playerCard} has three, one per match layout, and in
+ * the layout the site is actually drawing the other two match a card each
+ * without matching a card *per player*. Taking the first non-empty answer there
+ * lines player 2 up against player 3's card, which is how the winner's ring
+ * came to be drawn around somebody else.
+ *
+ * So the count is part of the query: a candidate that does not return exactly
+ * `count` elements did not answer the question that was asked. Returning
+ * nothing when none of them do is deliberate — drawing on the wrong player is
+ * worse than drawing on none, and it is the failure the caller can see.
+ */
+export function qsaCount<T extends Element = HTMLElement>(
+  set: SelectorSet,
+  count: number,
+  root: ParentNode = document,
+): T[] {
+  for (const selector of set) {
+    const els = root.querySelectorAll<T>(selector);
+    if (els.length === count) return Array.from(els);
+  }
+  return [];
+}
+
+/**
  * querySelectorAll narrowed to elements whose trimmed text is one of `texts`.
  *
  * For the handful of v2 controls that carry no data-slot, id or aria-label of
@@ -316,15 +346,42 @@ export const SELECTORS = {
     board: [ "main [role='img'][aria-label='Dartboard']" ],
 
     /**
-     * One per player: the whole flanking column, score card plus chalkboard.
+     * A flanking column beside the board — NOT one per player.
      *
-     * v1 marked these `.ad-ext-player`. The rebuilt screen emits no hook, so
-     * the anchors are the column's own width class first and its shape second
-     * — the only element whose grandchild is the rounded score card.
+     * The widest layout draws two of these whatever the player count, and
+     * stacks the cards inside them: three players is two cards on the left and
+     * one on the right. Use it to scope styling to the cards as a group; for
+     * anything addressed to one player see {@link playerCard}.
      */
-    playerCards: [
+    playerColumn: [
       "main div.w-100",
       "main div:has(> div > div.rounded-t-2xl)",
+    ],
+
+    /**
+     * One element per player, in the order of `match.players`.
+     *
+     * Query with {@link qsaCount}, passing the player count — the candidates
+     * are three different layouts rather than three guesses at one, and only
+     * the count says which of them the site is currently drawing:
+     *
+     *   wide     card wrappers stacked inside the two columns
+     *   sidebar  a single 320px column of card faces
+     *   top bar  a row of compact cells, above the active player's own card
+     *
+     * The first candidate is the only one whose overflow is visible, which is
+     * what lets Winner Animation draw outside the card there and not in the
+     * other two — see match.content/winner-animation.ts.
+     *
+     * The wrapper is named through the card face because it has no class of
+     * its own worth trusting, and the face cannot be named structurally here:
+     * `:has()` cannot be nested inside `:has()`, so that one keeps `min-h-36`
+     * while the standalone candidates below name the face by what it contains.
+     */
+    playerCard: [
+      "main div:has(> div > div.\\@container.min-h-36)",
+      "main div.\\@container:has(span.font-display):has(div.font-number)",
+      "main div.overflow-clip:not(.\\@container):has(span.font-display):has(div.font-number)",
     ],
     /**
      * The box whose height decides how big the board is drawn — the same
@@ -343,6 +400,22 @@ export const SELECTORS = {
 
     /** The score card within a player column — the part that carries colour. */
     playerScoreCard: [ "div.rounded-t-2xl > div" ],
+
+    /**
+     * The coloured face of a card from {@link playerCard}, queried relative to
+     * it, for anything positioned against the card's own box.
+     *
+     * In two of the three layouts the card already is its face and this finds
+     * nothing, so every call site falls back to the card itself. In the widest
+     * one the card is a wrapper around the face; the wrapper is not positioned
+     * and does not clip, which is what lets Winner Animation draw outside it —
+     * and exactly why a chip pinned to the card's inside edge cannot use it.
+     *
+     * Not {@link playerScoreCard}, which names the rounded corners: the site
+     * rounds the top of the first card in a column and the bottom of the last,
+     * so on a stack of three the middle card has neither.
+     */
+    playerCardFace: [ "div.\\@container" ],
     /** Whose turn it is: the site paints that one card with its gradient. */
     activePlayerCard: [ "main div[class*='bg-raspberry']" ],
     /** Player name, relative to a card. */
@@ -362,34 +435,6 @@ export const SELECTORS = {
     checkoutSuggestion: [ ".text-checkout-suggestion" ],
     /** Per-player scoring history, under the score card. */
     chalkboard: [ "div.grid-rows-6" ],
-    /**
-     * The visible card inside a player column, score card plus chalkboard.
-     *
-     * The column is stretched to the height of the whole row and centres this
-     * within it, so anything drawn on the column — a ring, a caption — is
-     * anchored to the row rather than to what you can actually see. Query it
-     * relative to a card from {@link playerCards}.
-     */
-    playerCardBody: [ ":scope > div.flex.w-full.flex-col", ":scope > div" ],
-
-    /**
-     * The coloured card face, one per player — the only per-player element the
-     * site renders in every layout it has.
-     *
-     * The match screen has three: wide columns either side of the board, a
-     * 320px sidebar of stacked cards, and a bar of cards across the top. Only
-     * the widest emits {@link playerCards}; below it there is no per-player
-     * wrapper left to hang anything on but this one, whose classes are
-     * identical in all three.
-     *
-     * It clips its own overflow, so anything drawn on it has to stay inside
-     * its edge — see the compact ring in match.content/winner-animation.ts.
-     */
-    playerCardSurface: [
-      "main div.isolate.\\@container",
-      "main div.isolate:has(span.font-display):has(div.font-number)",
-    ],
-
     /**
      * The board's own Reset control, which clears a stuck takeout.
      *

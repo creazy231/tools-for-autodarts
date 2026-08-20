@@ -2,7 +2,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
-import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { SELECTORS, qs, qsaCount } from "@/utils/selectors";
 import { dartFor } from "@/utils/checkout";
 
 /**
@@ -105,10 +105,16 @@ function render(gameData: IGameData): void {
   watchDom();
 }
 
-/** Write the current hints onto the cards, and only where they changed. */
+/**
+ * Write the current hints onto the cards, and only where they changed.
+ *
+ * `qsaCount` rather than `qsa`: a hint names one player's gap, and the widest
+ * layout stacks several players into each of its two columns, so a set that is
+ * not one element per player is not a set these indices mean anything against.
+ */
 function apply(): void {
-  qsa<HTMLElement>(SELECTORS.match.playerCards).forEach((card, index) => {
-    const target = qs<HTMLElement>(SELECTORS.match.playerScoreCard, card) ?? card;
+  qsaCount<HTMLElement>(SELECTORS.match.playerCard, hints.length).forEach((card, index) => {
+    const target = qs<HTMLElement>(SELECTORS.match.playerCardFace, card) ?? card;
     const hint = hints[index] ?? null;
 
     if (hint === null) target.removeAttribute(HINT_ATTR);
@@ -125,7 +131,7 @@ function apply(): void {
 function watchDom(): void {
   if (reapplyObserver) return;
 
-  const host = qsa<HTMLElement>(SELECTORS.match.playerCards)[0]?.closest("main");
+  const host = qs<HTMLElement>(SELECTORS.match.playerCard)?.closest("main");
   if (!host) return;
 
   reapplyObserver = new MutationObserver(() => {

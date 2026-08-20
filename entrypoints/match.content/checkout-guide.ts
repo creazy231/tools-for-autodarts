@@ -2,7 +2,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
-import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { SELECTORS, qs, qsaCount } from "@/utils/selectors";
 import { gotchaCheckout } from "@/utils/checkout";
 
 /**
@@ -126,10 +126,16 @@ function render(gameData: IGameData): void {
   watchDom();
 }
 
-/** Write the routes onto the cards the site has left blank. */
+/**
+ * Write the routes onto the cards the site has left blank.
+ *
+ * `qsaCount` rather than `qsa`: a route belongs to one player, and the widest
+ * layout stacks several players into each of its two columns, so a set that is
+ * not one element per player is not a set these indices mean anything against.
+ */
 function apply(): void {
-  qsa<HTMLElement>(SELECTORS.match.playerCards).forEach((card, index) => {
-    const target = qs<HTMLElement>(SELECTORS.match.playerScoreCard, card) ?? card;
+  qsaCount<HTMLElement>(SELECTORS.match.playerCard, routes.length).forEach((card, index) => {
+    const target = qs<HTMLElement>(SELECTORS.match.playerCardFace, card) ?? card;
     // The site is drawing this card's route itself — adding ours would double it.
     const siteIsDrawing = qs(SELECTORS.match.checkoutSuggestion, card) !== null;
     const route = siteIsDrawing ? null : routes[index] ?? null;
@@ -147,7 +153,7 @@ function apply(): void {
 function watchDom(): void {
   if (reapplyObserver) return;
 
-  const host = qsa<HTMLElement>(SELECTORS.match.playerCards)[0]?.closest("main");
+  const host = qs<HTMLElement>(SELECTORS.match.playerCard)?.closest("main");
   if (!host) return;
 
   reapplyObserver = new MutationObserver(() => {

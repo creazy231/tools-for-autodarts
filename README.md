@@ -129,7 +129,8 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Nothing starts until the board is actually in a match, and it starts by itself when one begins — you can sit on the page and wait
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
   - An animated border around the winning card, with the number of darts it took above it
-  - Works on every screen size. On a tablet, a phone or a short window there is no room above the card, so the border is drawn just inside its edge and the darts count is left off rather than laid across the score
+  - Works with any number of players, and on every screen size
+  - The darts count needs clear space above the card, so it is left off rather than laid over something else — on a tablet, a phone or a short window, and on a card with another player stacked directly above it. The border is drawn either way, just inside the card's edge where there is no room around it
 - **Enhanced Scoring Display**: Improves dart throw visuals with larger numbers and scoring notation
   - Shows dart notation (S/D/T, BULL) beneath point values, with the whole cell scaled up so a thrown dart reads from the oche
   - Only touches darts you have actually thrown — autodarts' checkout suggestion for the darts still to come is left at its own size

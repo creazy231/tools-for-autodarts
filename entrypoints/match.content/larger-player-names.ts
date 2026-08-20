@@ -22,7 +22,7 @@ export async function largerPlayerNames() {
     if (!config.largerPlayerNames.enabled) return;
 
     const rem = config.largerPlayerNames.value || 1.5;
-    const card = SELECTORS.match.playerCards[0];
+    const card = SELECTORS.match.playerColumn[0];
     const name = SELECTORS.match.playerName[0];
 
     addStyles(`

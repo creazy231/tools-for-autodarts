@@ -25,7 +25,7 @@ export async function colorChange() {
     // `defaultValue` only applies when the whole config is absent, so a config
     // saved before this setting existed simply has no value for it.
     const actionBar = config.colors.actionBar || defaultConfig.colors.actionBar;
-    const card = SELECTORS.match.playerCards[0];
+    const card = SELECTORS.match.playerColumn[0];
     const scoreCard = SELECTORS.match.playerScoreCard[0];
     const turnBar = SELECTORS.match.turnBar[0];
     const turnBarPanel = SELECTORS.match.turnBarPanel[0];
