@@ -2,6 +2,7 @@ import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storag
 import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/storage";
 import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { gotchaCheckout } from "@/utils/checkout";
+import { LAYERS } from "@/utils/layers";
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
@@ -265,7 +266,7 @@ function showInteractionNotification(): void {
         position: fixed;
         bottom: 16px;
         right: 32px;
-        z-index: 50;
+        z-index: ${LAYERS.callerStatus};
         max-width: 28rem;
         border-radius: 6px;
         padding: 16px;

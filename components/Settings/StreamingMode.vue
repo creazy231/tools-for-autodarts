@@ -11,6 +11,26 @@
             <p>Configure the streaming mode settings for your broadcasts.</p>
 
             <div class="mt-4 space-y-4">
+              <!-- Which of the two scoreboards the overlay draws -->
+              <h4 class="font-semibold">
+                Design
+              </h4>
+
+              <div class="flex">
+                <AppRadioGroup
+                  v-model="config.streamingMode.design"
+                  :options="[
+                    { label: 'Classic', value: 'classic' },
+                    { label: 'Autodarts', value: 'v2' },
+                  ]"
+                />
+              </div>
+
+              <p class="text-sm text-white/50">
+                Autodarts follows the site's own design — flat surfaces, one blue for whoever is
+                throwing. Switching takes effect straight away, so you can compare both mid-match.
+              </p>
+
               <!-- Background Mode Selection -->
               <h4 class="font-semibold">
                 Background Type

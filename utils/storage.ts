@@ -22,6 +22,11 @@ export interface IConfig {
   };
   streamingMode: {
     enabled: boolean;
+    /**
+     * Which skin the overlay wears. Anything that is not "v2" draws the classic
+     * one, so a config stored before this existed needs no migration.
+     */
+    design: "classic" | "v2";
     backgroundImage: boolean;
     chromaKeyColor: string;
     image: string;
@@ -381,6 +386,7 @@ export const defaultConfig: IConfig = {
   },
   streamingMode: {
     enabled: false,
+    design: "classic",
     backgroundImage: false,
     chromaKeyColor: "#009933",
     image: "",
@@ -755,7 +761,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 7;
+const CONFIG_VERSION = 8;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -769,6 +775,21 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Streaming Mode has a second skin now, and a saved config chose neither.
+       *
+       * The overlay reads this as "v2 or else classic", so it would draw the
+       * right thing without this — but the settings page binds a radio group to
+       * it, and an unset one shows nothing selected until it is touched.
+       */
+      8: (config: any) => ({
+        ...config,
+        streamingMode: {
+          ...config.streamingMode,
+          design: config.streamingMode?.design ?? defaultConfig.streamingMode.design,
+        },
+      }),
+
       /** Quiet Own Darts is new, and a saved config has nothing for it. */
       7: (config: any) => ({
         ...config,

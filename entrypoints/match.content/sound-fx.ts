@@ -1,6 +1,7 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from "@/utils/storage";
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
+import { LAYERS } from "@/utils/layers";
 
 let gameDataWatcherUnwatch: any;
 let lobbyDataWatcherUnwatch: any;
@@ -399,7 +400,7 @@ function showInteractionNotification(): void {
         position: fixed;
         bottom: 16px;
         right: 32px;
-        z-index: 50;
+        z-index: ${LAYERS.soundStatus};
         max-width: 28rem;
         border-radius: 6px;
         padding: 16px;

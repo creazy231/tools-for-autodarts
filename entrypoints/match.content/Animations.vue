@@ -11,9 +11,9 @@
   <div
     @click="hide"
     v-if="visible"
-    class="fixed z-[180]"
+    class="fixed"
     :class="fullPage ? 'inset-0 backdrop-blur' : ''"
-    :style="overlayStyle"
+    :style="[ overlayStyle, { zIndex: LAYERS.animations } ]"
   >
     <img
       :src="currentUrl"
@@ -32,6 +32,7 @@ import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/helpers";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, type IAnimation, type IConfig } from "@/utils/storage";
+import { LAYERS } from "@/utils/layers";
 
 /** Matches the `duration-300` on the image. */
 const FADE_MS = 300;

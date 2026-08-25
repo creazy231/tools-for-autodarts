@@ -20,7 +20,7 @@
         maxHeight: 'calc(100vh - 32px)',
         transform: `translateX(-3.5rem) scale(${correctionScale})`,
         transformOrigin: 'top center',
-        zIndex: 10000,
+        zIndex: LAYERS.quickCorrection,
         overflow: 'hidden',
       }"
     >
@@ -105,6 +105,7 @@ import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getAuthToken } from "@/utils/helpers";
+import { LAYERS } from "@/utils/layers";
 
 interface Correction {
   x: number;

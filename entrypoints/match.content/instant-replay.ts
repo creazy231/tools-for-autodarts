@@ -5,6 +5,7 @@ import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { SELECTORS, qs } from "@/utils/selectors";
+import { LAYERS } from "@/utils/layers";
 
 /**
  * Instant Replay — play the winning throw back off your own webcam.
@@ -65,7 +66,7 @@ const STYLES = `
      * time: a leg ends with three darts in the board, so the board reports a
      * takeout in the same breath as the win.
      */
-    z-index: 210;
+    z-index: ${LAYERS.instantReplay};
     overflow: hidden;
     background: var(--color-black-90, #01040b);
     cursor: pointer;

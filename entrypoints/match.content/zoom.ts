@@ -10,6 +10,7 @@ import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { setBoardView } from "./board-view";
 import { SELECTORS, qs } from "@/utils/selectors";
+import { LAYERS } from "@/utils/layers";
 
 /**
  * Darts Zoom — a close-up of where each dart of the current visit landed.
@@ -87,7 +88,7 @@ const BOARD_TRANSLATE = "--adt-zoom-board-translate";
 const STYLES = `
   #${HOST_ID} {
     position: fixed;
-    z-index: 190;
+    z-index: ${LAYERS.zoom};
     display: flex;
     gap: 0.5rem;
     pointer-events: none;
@@ -244,7 +245,7 @@ function actionBarStyles(top: number): string {
       width: auto !important;
       min-width: 0 !important;
       margin: 0 !important;
-      z-index: 191;
+      z-index: ${LAYERS.zoomTile};
     }
   `;
 }

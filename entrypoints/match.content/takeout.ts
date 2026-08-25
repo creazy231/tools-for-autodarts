@@ -3,6 +3,7 @@ import type { IBoard } from "@/utils/board-data-storage";
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
 import { SELECTORS, qsText } from "@/utils/selectors";
+import { LAYERS } from "@/utils/layers";
 
 /**
  * Takeout Notification — say, in the middle of the screen, that the board is
@@ -33,7 +34,7 @@ const STYLES = `
   #${HOST_ID} {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    z-index: ${LAYERS.takeout};
     display: flex;
     align-items: center;
     justify-content: center;
