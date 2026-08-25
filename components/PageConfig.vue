@@ -298,7 +298,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "next-player-on-takeout-stuck", title: "Next Player On Takeout Stuck Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
       { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true, v2Ready: true },
       { id: "smaller-scores", title: "Smaller Scores Settings", component: SmallerScores, hasSettings: false, v2Ready: true },
-      { id: "streaming-mode", title: "Streaming Mode Settings", component: StreamingMode, hasSettings: true },
+      { id: "streaming-mode", title: "Streaming Mode Settings", component: StreamingMode, hasSettings: true, v2Ready: true },
       { id: "larger-legs-sets", title: "Larger Legs Sets Settings", component: LargerLegsSets, hasSettings: true, v2Ready: true },
       { id: "larger-player-names", title: "Larger Player Names Settings", component: LargerPlayerNames, hasSettings: true, v2Ready: true },
       { id: "larger-player-match-data", title: "Larger Player Match Data Settings", component: LargerPlayerMatchData, hasSettings: true, v2Ready: true },

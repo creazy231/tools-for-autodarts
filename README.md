@@ -82,7 +82,20 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Color Customization**: Change the colors of dart throws, scores, and match background for a personalized gaming environment
   - Four pickers: score card background, text, match background, and the bottom bar that holds the undo and next buttons
   - The bottom bar starts at the color autodarts uses, so nothing changes there until you pick one
-- **Streaming Mode**: Includes green screen support, board visualization, and thrown darts display
+- **Streaming Mode**: Replaces the whole match screen with a broadcast overlay — a chroma key background, the dartboard, and a scoreboard you place where you want it
+  - Switched on and off from the **stream icon in the match header**, next to the site's own icons. While the overlay is up it covers that header, so the overlay itself carries the way back out: the **✕** in its footer, or a click anywhere on the background
+  - **Background**: either a chroma key colour of your choice (green by default) or an image you upload
+  - **Board**: your choice of the live camera picture, or autodarts' own drawn board — the drawn one is a live copy, hit highlight and all, so it stays sharp at any size and works with no board attached. The camera option falls back to the drawn board whenever no camera is running
+    - While **Board View** is on, that feature chooses what the board shows and Streaming Mode leaves it alone
+  - **Scoreboard**: one row per player with legs, sets and remaining score, the player at the oche marked with a dart
+    - Rows stay in seating order for the whole match. Autodarts re-orders its player list every leg so whoever throws first comes first, which used to make the rows swap places mid-match
+    - It scales itself down on narrow windows so it always fits, on top of whatever the *Score Scale* slider asks for
+  - **Throws** (optional): the three darts of the visit in progress plus the turn total, or **Bust**. Darts of the previous player's visit are not shown once the throw has passed on
+  - **Checkout suggestions** (optional): the remaining route for the player at the oche, shifted along as each dart lands
+  - **Averages** (optional): leg / set / match average beside each name
+  - **Footer text**: your own line along the bottom, or *Game provided by Autodarts.com*
+  - Drag the board and the scoreboard anywhere; scale each with the sliders behind the gear in the footer. *Reset Positions* on the settings page puts them back, and takes effect on an overlay that is already up
+  - Everything on the settings page applies to a match already in progress — no need to leave and come back
 - **Virtual Board Surround**: Adds a customizable surround to the dartboard
 - **Darts Zoom**: A close-up of where each dart of the current visit landed, one tile per dart
   - Three positions. **Bottom** (default) gives each dart a third of the window along the foot of the screen, and moves autodarts' undo and next buttons up to the free space in the top right so they are not covered; **Top** leaves those buttons alone and puts a smaller row under the throw display

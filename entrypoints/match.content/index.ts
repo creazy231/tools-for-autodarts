@@ -82,6 +82,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "zoom",
   "boardView",
   "instantReplay",
+  "streamingMode",
 ]);
 
 /**
@@ -491,11 +492,23 @@ function startActiveMatchObserver(ctx) {
 }
 
 async function initStreamingMode(ctx) {
-  await waitForElement("#ad-ext-player-display");
+  // The app shell, not `#ad-ext-player-display` — that is a v1 hook the rebuilt
+  // site never emits, so this wait always timed out and the overlay was never
+  // mounted at all, however the feature was configured.
+  await waitForElement(SELECTORS.app.contentRoot, 15000).catch(() => {
+    console.warn("Autodarts Tools: Streaming Mode - page did not render in time");
+  });
+
   tools.streamingMode = await createShadowRootUi(ctx, {
     name: "autodarts-tools-streaming-mode",
     position: "inline",
-    anchor: "#root",
+    // Body, appended last: the overlay covers the whole viewport and pins
+    // itself from inside the shadow root (WXT resets the host with
+    // `all: initial !important`, so the host cannot be positioned). Anchored in
+    // `#root` it competed for stacking order with the site's own header and
+    // panels; a body-level sibling painted after `#root` covers all of it.
+    anchor: "body",
+    append: "last",
     onMount: (container: any) => {
       console.log("Autodarts Tools: Streaming Mode initialized");
       const app = createApp(StreamingMode);
