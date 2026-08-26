@@ -96,6 +96,11 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Numpad keyboard shortcuts for fast corrections
   - Color-coded buttons matching dart board segments
   - Keyboard shortcuts for accessing throws (/, *, -) and making corrections
+- **Keyboard Shortcuts**: Trigger match buttons with configurable keys
+  - Next Leg / Next Set (default: `n`)
+  - Reset board detection (default: `r`)
+  - Referee (default: `c`)
+  - Shortcuts are ignored while typing in input fields
 - **Instant Replay**: Records webcam footage and automatically shows replays of winning throws
 - **Gotcha Helper**: Shows how many points the other players are ahead in Gotcha game variant
   - Displays dart throws needed to catch up

@@ -161,6 +161,12 @@ export interface IConfig {
   checkoutGuide: {
     enabled: boolean;
   };
+  shortcuts: {
+    enabled: boolean;
+    nextLeg: string;
+    resetBoard: string;
+    referee: string;
+  };
 }
 
 export interface ISoundTTS {
@@ -343,7 +349,7 @@ export interface IWled {
 export type TBoardStatus = BoardStatus | undefined;
 
 export const defaultConfig: IConfig = {
-  version: 22,
+  version: 23,
   discord: {
     enabled: false,
     manually: false,
@@ -720,6 +726,12 @@ export const defaultConfig: IConfig = {
   },
   checkoutGuide: {
     enabled: false,
+  },
+  shortcuts: {
+    enabled: false,
+    nextLeg: "n",
+    resetBoard: "r",
+    referee: "c",
   },
 };
 
