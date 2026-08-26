@@ -24,6 +24,7 @@ import Gotcha from "./Gotcha.vue";
 import CheckoutGuide from "./CheckoutGuide.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
+import { keyboardShortcuts, keyboardShortcutsOnRemove } from "./keyboard-shortcuts";
 
 import { waitForElement, waitForElementWithTextContent } from "@/utils";
 import {
@@ -212,6 +213,10 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initScript(enhancedScoringDisplay, url).catch(console.error);
   }
 
+  if (config.shortcuts?.enabled) {
+    await initScript(keyboardShortcuts, url).catch(console.error);
+  }
+
   // ****************************************************************
 
   if (config.animations.enabled) {
@@ -263,6 +268,7 @@ function clearMatch(fromBullOff: boolean = false) {
   discordStreamOnRemove();
   automaticNextLegOnRemove();
   enhancedScoringDisplayOnRemove();
+  keyboardShortcutsOnRemove();
   matchInitialized = false;
 }
 

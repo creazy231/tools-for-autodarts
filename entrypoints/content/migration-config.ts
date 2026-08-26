@@ -192,6 +192,15 @@ async function migrateConfig(currentConfigVersion: number) {
           };
         }
         break;
+      case 22:
+        // Migration from version 22 to version 23
+        config.version = 23;
+        if (!config.shortcuts) {
+          config.shortcuts = {
+            ...defaultConfig.shortcuts,
+          };
+        }
+        break;
     }
 
     await AutodartsToolsConfig.setValue(config);

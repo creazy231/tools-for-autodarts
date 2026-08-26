@@ -223,6 +223,7 @@ import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
 import Gotcha from "./Settings/Gotcha.vue";
 import CheckoutGuide from "./Settings/CheckoutGuide.vue";
+import KeyboardShortcuts from "./Settings/KeyboardShortcuts.vue";
 
 import packageConfig from "../package.json";
 
@@ -277,8 +278,9 @@ const featureGroups = [
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true },
       { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false },
       { id: "checkout-guide", title: "Checkout Guide Settings", component: CheckoutGuide, hasSettings: false },
+      { id: "keyboard-shortcuts", title: "Keyboard Shortcuts Settings", component: KeyboardShortcuts, hasSettings: true },
     ],
-    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay" ],
+    settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "quick-correction", "instant-replay", "keyboard-shortcuts" ],
   },
   // Boards (Tab 2)
   {
