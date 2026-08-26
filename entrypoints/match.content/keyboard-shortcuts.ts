@@ -7,7 +7,8 @@ let keydownHandler: ((event: KeyboardEvent) => void) | undefined;
 const buttonLabels: Record<string, string[]> = {
   nextLeg: [ "next leg", "nächstes leg", "volgende leg", "next set", "nächster satz", "volgende set" ],
   resetBoard: [ "reset", "zurücksetzen" ],
-  referee: [ "referee", "schiedsrichter", "scheidsrechter" ],
+  // The referee button is identified by its aria-label "Call referee"
+  referee: [ "call referee", "referee", "schiedsrichter", "scheidsrechter" ],
 };
 
 function findButtonWithText(labels: string[]): HTMLElement | undefined {
