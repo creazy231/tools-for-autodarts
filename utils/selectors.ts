@@ -352,6 +352,9 @@ export const SELECTORS = {
      * stacks the cards inside them: three players is two cards on the left and
      * one on the right. Use it to scope styling to the cards as a group; for
      * anything addressed to one player see {@link playerCard}.
+     *
+     * It is also where the stack is centred, which matters to anything taking
+     * room out of the match area — see matchAreaStyles in zoom.ts.
      */
     playerColumn: [
       "main div.w-100",

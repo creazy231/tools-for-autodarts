@@ -197,11 +197,30 @@ const STYLES = `
  * `main` is `overflow-hidden` with `h-full` children, so padding its foot takes
  * the lot with it. Its top is not touched: the throw display lives in there and
  * the top strip is positioned off it, which would chase its own tail.
+ *
+ * Taking the room is not free. The widest layout centres a side's player cards
+ * in a column of their own, and centring splits any overflow evenly above and
+ * below — where `main` clips it. Shrinking that column by the strip's height
+ * therefore lifts its contents by half of it, and once the cards no longer fit,
+ * what leaves at the top is the panel the site draws over the winning card:
+ * the Next Leg and Next Set buttons, and there is no other way to start the
+ * next leg. Six players in a short window was enough — the button sat 51px
+ * above the window with the strip up and on screen without it.
+ *
+ * `safe` centring is the whole of the fix, and it is the site's own alignment
+ * either way: it centres exactly as before for as long as the cards fit, and
+ * falls back to the top edge the moment they do not, so what the site draws
+ * over the first card of a side cannot be pushed up out of reach. A column
+ * that was not already overflowing is left exactly as it was.
  */
 function matchAreaStyles(clearance: number): string {
   return `
     ${SELECTORS.app.contentRoot[0]} {
       padding-bottom: ${clearance}px !important;
+    }
+
+    ${SELECTORS.match.playerColumn[0]} {
+      justify-content: safe center !important;
     }
   `;
 }
