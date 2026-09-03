@@ -3,7 +3,9 @@
  *
  * Why this exists
  * ---------------
- * autodarts.com is being rebuilt (v1 Chakra UI -> v2 Tailwind + shadcn/ui).
+ * autodarts.com was rebuilt (v1 Chakra UI -> v2 Tailwind + shadcn/ui), and the
+ * rebuild now serves from play.autodarts.com. v1 survives at
+ * play-v1.autodarts.com but is not a host this extension claims.
  * Before this module the ~97 site-facing selectors were inline literals spread
  * across ~30 files, many of them structural chains like
  *   #root > div > div:nth-of-type(2) > div > div:nth-of-type(2) > ... > tbody > tr
@@ -18,9 +20,10 @@
  *   qs(SELECTORS.lobby.playerRows)              // querySelector with fallback
  *   qsa(SELECTORS.lobby.playerRows)             // querySelectorAll with fallback
  *
- * Keeping both versions in one list means a single build works on the old and
- * new site during the transition. Once v1 is retired, delete the trailing
- * candidates - no call site changes.
+ * Keeping both versions in one list meant a single build worked on the old and
+ * new site during the transition. That is over - the extension only loads on
+ * v2 now - so the trailing candidates are dead weight and can be deleted as
+ * each entry is revisited. No call site changes.
  *
  * Prefer stable anchors when filling in v2 entries, in this order:
  *   1. [data-slot="..."]   - shadcn/ui marks every primitive with one
@@ -47,15 +50,20 @@ export type SiteVersion = "v1" | "v2";
 /**
  * Which version of the site are we on?
  *
- * Detection is by rendered markup rather than hostname, because v2 will
- * eventually take over the play.autodarts.com hostname.
+ * Detection is by rendered markup, never hostname. v2 has taken over
+ * play.autodarts.com — the old `play-v2` subdomain is a 301 to it — so the
+ * hostname no longer distinguishes anything, and the check that read it used to
+ * answer "v1" for the live v2 site.
+ *
+ * Only Chakra can still say "v1", which the extension never sees in the wild:
+ * it does not load on play-v1.autodarts.com, where the old site now lives. The
+ * branch is kept for the archived v1 captures the picker tooling replays.
  */
 export function detectSiteVersion(): SiteVersion {
   // shadcn/ui stamps data-slot on every primitive; Chakra never emits it.
   if (document.querySelector("[data-slot]")) return "v2";
   if (document.querySelector("[class*='chakra-']")) return "v1";
-  // Fall back to hostname while the v2 preview lives on its own subdomain.
-  return location.hostname.includes("play-v2") ? "v2" : "v1";
+  return "v2";
 }
 
 // ---------------------------------------------------------------- query helpers

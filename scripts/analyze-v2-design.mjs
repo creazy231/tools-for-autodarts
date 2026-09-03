@@ -184,7 +184,7 @@ const ctx = ownBrowser ? await browser.newContext({ viewport: { width: 1600, hei
 const page = await ctx.newPage();
 await page.setViewportSize({ width: 1600, height: 1000 }).catch(() => {});
 
-const BASE = env.AUTODARTS_V2_URL || "https://play-v2.autodarts.com";
+const BASE = env.AUTODARTS_URL || "https://play.autodarts.com";
 
 async function ensureLoggedIn() {
   await page.goto(BASE, { waitUntil: "domcontentloaded", timeout: 60000 });

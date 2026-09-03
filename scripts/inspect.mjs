@@ -16,8 +16,7 @@
  * Chrome DevTools MCP servers in .mcp.json can attach and drive this same window.
  *
  * Usage:
- *   node scripts/inspect.mjs                      # v2 home, report what injected
- *   node scripts/inspect.mjs --v1                 # old site
+ *   node scripts/inspect.mjs                      # home, report what injected
  *   node scripts/inspect.mjs --url=/tournaments   # a specific route
  *   node scripts/inspect.mjs --keep-open          # leave the browser running
  *   node scripts/inspect.mjs --prod               # packaged build instead of dev
@@ -50,9 +49,7 @@ function creds() {
 }
 
 const env = creds();
-const BASE = flag("v1")
-  ? (env?.AUTODARTS_V1_URL || "https://play.autodarts.com")
-  : (env?.AUTODARTS_V2_URL || "https://play-v2.autodarts.com");
+const BASE = env?.AUTODARTS_URL || "https://play.autodarts.com";
 const route = opt("url") ?? "/";
 
 // ---------------------------------------------------------------- extension
@@ -67,10 +64,9 @@ try {
 console.log(describeExtension(ext));
 console.log();
 
-if (!ext.supportsV2 && !flag("v1")) {
-  console.error("Refusing to start: the build cannot load on play-v2, so anything you");
-  console.error("observe would be the bare site. Rebuild first (see the warning above),");
-  console.error("or pass --v1 to work against the old site.");
+if (!ext.supportsSite) {
+  console.error("Refusing to start: the build cannot load on the site, so anything you");
+  console.error("observe would be the bare page. Rebuild first (see the warning above).");
   process.exit(1);
 }
 
@@ -107,9 +103,9 @@ if (await isCdpOpen(CDP_PORT)) {
     ],
   });
 
-  // Chrome 137+ ignores --load-extension (see the note in
-  // load-reference-extension.mjs), so install over CDP instead. It is a
-  // browser-level command — a page session rejects it.
+  // Chrome 137+ ignores --load-extension (DisableLoadExtensionCommandLineSwitch
+  // is on by default), so install over CDP instead. It is a browser-level
+  // command — a page session rejects it.
   const cdp = await chromium.connectOverCDP(`http://127.0.0.1:${CDP_PORT}`);
   try {
     await (await cdp.newBrowserCDPSession()).send("Extensions.loadUnpacked", { path: ext.dir });

@@ -2,11 +2,20 @@
 
 Working document for adapting the extension to the rebuilt autodarts site.
 
-- **v1** — `https://play.autodarts.com` — Chakra UI + Emotion. Being retired.
-- **v2** — `https://play-v2.autodarts.com` — Tailwind + shadcn/ui on Base UI. The target.
+- **v2** — `https://play.autodarts.com` — Tailwind + shadcn/ui on Base UI. The
+  only host the extension claims.
+- **v1** — `https://play-v1.autodarts.com` — Chakra UI + Emotion. Still up, and
+  reachable from **Switch to classic design** in the user drawer. Retired as far
+  as this extension is concerned: it has never matched that host and will not.
+
+autodarts finished the switch: v2 took over `play.autodarts.com`, the
+`play-v2.autodarts.com` preview subdomain became a 301 to it, and v1 moved to
+`play-v1.autodarts.com`. A user who takes the classic-design escape hatch loses
+the extension — that is the intended trade, not a bug to chase.
 
 Everything below was verified against live captures on 2026-08-13, not inferred.
-Snapshots live in `snapshots/` (11 v1 pages, 7 v2 pages).
+Snapshots live in `snapshots/` (11 v1 pages, 7 v2 pages) — the v1 set is now
+unrecapturable history.
 
 ---
 
@@ -51,8 +60,8 @@ Route detection is currently hardcoded across entrypoints and all of it assumes 
 - `entrypoints/boards.content/index.ts` — `url.endsWith("/boards")`
 - `entrypoints/content/index.ts` — `/tools`, `/settings`
 - `utils/websocket-helpers.ts` — `/lobbies\/(id)/`, `/matches\/(id)/`, `/boards\/(id)/`
-- `wxt.config.ts` — `matches: ["*://play.autodarts.com/*"]` did **not** cover
-  `play-v2` (fixed; the extension now loads there)
+- `wxt.config.ts` — host scoping (settled: one host, `play.autodarts.com`, in
+  `utils/content-script-matches.ts`)
 
 Confirmed empirically with `node scripts/inspect.mjs`: on v2 the content scripts
 **do** run — the extension's own console logging fires — but nothing mounts. The
@@ -198,5 +207,6 @@ Re-capture snapshots any time with `node scripts/capture-dom.mjs --site=v2`.
 - **Lobby detail DOM is uncaptured** for the same reason.
 - **Boards / camera / settings routes were not found in v2** — either not built
   yet, or moved somewhere the crawl did not reach.
-- **`wxt.config.ts` does not match `play-v2.autodarts.com`**, so the extension
-  does not currently load on v2 at all. This is the first code change required.
+- ~~**`wxt.config.ts` does not match `play-v2.autodarts.com`**~~ — resolved
+  twice over. The host was added, and autodarts has since moved v2 onto
+  `play.autodarts.com`, so the extension is back to claiming one host.

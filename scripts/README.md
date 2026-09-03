@@ -1,9 +1,11 @@
 # Scripts Documentation
 
-## v2 Migration Tooling
+## Site Tooling
 
-Tooling for adapting the extension to the rebuilt autodarts site
-(v1 `play.autodarts.com` → v2 `play-v2.autodarts.com`).
+Tooling for working against the rebuilt autodarts site. The rebuild now serves
+from `play.autodarts.com`; the `play-v2.autodarts.com` preview subdomain is a
+301 to it, and the old Chakra site moved to `play-v1.autodarts.com`, which the
+extension does not claim.
 Background and findings: [`docs/v2-migration-map.md`](../docs/v2-migration-map.md).
 
 ### Credentials
@@ -14,53 +16,29 @@ deliberately *not* a `.env` file so WXT/Vite never loads it into a build:
 ```bash
 AUTODARTS_EMAIL=...
 AUTODARTS_PASSWORD=...
-AUTODARTS_V1_URL=https://play.autodarts.com
-AUTODARTS_V2_URL=https://play-v2.autodarts.com
+AUTODARTS_URL=https://play.autodarts.com   # optional override
 ```
 
-Login is email + password. Do **not** use the Google/Apple buttons on v2.
+Login is email + password. Do **not** use the Google/Apple buttons.
 
 ### Build targets
 
-| build | output | v1 | v2 | picker |
-|---|---|---|---|---|
-| `yarn build` (CI / stores) | `.output/` | yes | yes | no |
-| `yarn build:devtools` | `.output-devtools/` | yes | yes | yes |
-| `yarn build:reference` | `.output-reference/` | **yes** | no | yes |
-| `yarn dev` | `.output/chrome-mv3-dev` | no | **yes** | yes |
+Every build claims the one host, `play.autodarts.com`. They differ only in
+whether they ship the DOM picker and whether logging survives.
 
-The host split is what makes two builds shareable in one browser. Two copies of
-the extension on the same site would both inject — duplicate overlays, doubled
-notifications, doubled sounds. So `yarn dev` owns v2, the reference build owns
-v1, and they never overlap.
+| build | output | picker | logging |
+|---|---|---|---|
+| `yarn build` (CI / stores) | `.output/` | no | stripped |
+| `yarn build:devtools` | `.output-devtools/` | yes | kept |
+| `yarn dev` | `.output/chrome-mv3-dev` | yes | kept |
 
-Hosts come from `utils/content-script-matches.ts` (content-script `matches`) and
-a `build:manifestGenerated` hook in `wxt.config.ts` (host permissions, web
-accessible resources), since those are declared in different places.
+Only one extension may claim `play.autodarts.com` at a time. Two copies on the
+same site both inject — duplicate overlays, doubled notifications, doubled
+sounds — so never load a second build into the dev browser.
 
-### v1 and v2 side by side in one browser
-
-```bash
-yarn build:reference   # once, and again whenever v1 behaviour should be refreshed
-yarn dev               # opens one browser with BOTH extensions
-```
-
-`yarn dev` runs `scripts/load-reference-extension.mjs` alongside WXT. It waits
-for the CDP endpoint and installs the reference build, giving one browser where
-**v1 behaves exactly as the shipped extension does** and **v2 runs the code you
-are editing**, hot-reloaded. That is the setup for "look at how X works on v1 and
-port it to v2" — both are one tab away, and the picker is available on both.
-
-Log in once per site; `.chrome-profile-dev` persists it.
-
-The reference build is installed over CDP rather than `--load-extension`, which
-Chrome 137+ ignores (`DisableLoadExtensionCommandLineSwitch`). Verified on Chrome
-151: the flag reached the process and the extension still did not load.
-Overriding it needs `--disable-features`, but web-ext already passes its own
-`--disable-features` list and Chrome honours only the last one.
-
-Without a reference build `yarn dev` still works — it just opens with v2 only,
-and prints a note saying so.
+Hosts come from `utils/content-script-matches.ts`, which every entrypoint reads;
+`wxt.config.ts` declares the same host for the manifest's host permissions and
+web accessible resources.
 
 ### `yarn dev` — the browser to use for migration work
 
@@ -76,7 +54,7 @@ already loaded. Via `webExt` in `wxt.config.ts` it also:
 That last point is the whole trick. Debugging a browser running a different copy
 of the extension than the one you're editing wastes a lot of time.
 
-It opens v2 and v1 side by side. Note `yarn dev` needs a real terminal: it waits
+It opens `play.autodarts.com`. Note `yarn dev` needs a real terminal: it waits
 on stdin for its "press o + enter" prompt and exits immediately without a TTY.
 
 #### If the extension stops injecting
@@ -94,18 +72,15 @@ rm -rf .chrome-profile-dev     # you will need to log in again
 ```
 
 Rule this out before debugging the extension itself — stash your changes and
-retest if unsure. `scripts/load-reference-extension.mjs` now waits for WXT's
-extension to appear before adding the reference, and warns if fewer than two
-end up registered.
+retest if unsure.
 
 ### `inspect.mjs` — drive the site with the extension loaded
 
 Reports whether the extension actually injected, and what it logged.
 
 ```bash
-node scripts/inspect.mjs                      # v2 home
+node scripts/inspect.mjs                      # home
 node scripts/inspect.mjs --url=/tournaments
-node scripts/inspect.mjs --v1
 node scripts/inspect.mjs --keep-open          # leave the browser up on :9222
 node scripts/inspect.mjs --prod               # packaged build instead of dev
 ```
@@ -114,9 +89,10 @@ If a browser is already serving CDP on `:9222` (i.e. `yarn dev`'s), it **attache
 to that one** instead of starting a second browser. Otherwise it launches its own
 with the dev build, using the `.chrome-profile-pw/` profile.
 
-It refuses to start against v2 with a build whose manifest lacks the `play-v2`
+It refuses to start with a build whose manifest lacks the `play.autodarts.com`
 host, because the extension would silently not load and everything you observed
-would be the bare site.
+would be the bare site. That is what a build made before the `play-v2` → `play`
+move looks like: dev builds had this host deliberately stripped back then.
 
 ### `dev-chrome.sh` — browser without the dev server
 
@@ -124,8 +100,7 @@ Fallback for when you want the extension in a browser but aren't running
 `yarn dev` (no hot reload). Same CDP endpoint, profile in `.chrome-profile/`.
 
 ```bash
-./scripts/dev-chrome.sh           # v2
-./scripts/dev-chrome.sh --v1
+./scripts/dev-chrome.sh           # open the site
 ./scripts/dev-chrome.sh --clean   # wipe the saved profile
 ```
 
@@ -223,17 +198,18 @@ preferred, production is the fallback. It also checks two things that otherwise
 cost real debugging time:
 
 - **Is the dev server up?** The dev build loads without it but won't hot-reload.
-- **Is the build stale?** A build made before `play-v2` was added to the manifest
-  silently does not load on v2 at all. `dev-chrome.sh` performs the same check.
+- **Is the build stale?** A build made before the `play-v2` → `play` move has no
+  `play.autodarts.com` host and silently does not load at all.
+  `dev-chrome.sh` performs the same check.
 
 ### `capture-dom.mjs` — DOM baseline capture
 
 Snapshots the raw site (no extension loaded) so we have a durable record of the
-DOM the content scripts target. **v1 is not recapturable once retired.**
+DOM the content scripts target. **`snapshots/v1/` is read-only history — the v1
+site is gone and cannot be recaptured.**
 
 ```bash
-node scripts/capture-dom.mjs                 # both sites, all routes
-node scripts/capture-dom.mjs --site=v2
+node scripts/capture-dom.mjs                 # all routes
 node scripts/capture-dom.mjs --discover      # list reachable routes, capture nothing
 node scripts/capture-dom.mjs --route=/play   # one ad-hoc route
 node scripts/capture-dom.mjs --headless      # no visible window
@@ -256,8 +232,8 @@ Per route it writes into `snapshots/<site>/`:
 ### Selector registry
 
 `utils/selectors.ts` centralises every selector that targets the autodarts DOM.
-Entries are ordered candidate lists — v2 first, v1 last — so one build serves
-both sites during the transition:
+Entries are ordered candidate lists — v2 first, v1 last. The v1 tails are dead
+now that the old site is gone, and can be dropped as each entry is revisited:
 
 ```ts
 waitForElement(SELECTORS.match.menuBar)   // accepts string[] natively

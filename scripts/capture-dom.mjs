@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 /**
- * capture-dom.mjs — DOM baseline capture for the autodarts v1 -> v2 migration.
+ * capture-dom.mjs — DOM baseline capture for the autodarts site.
  *
  * Snapshots the *raw* autodarts site (no extension loaded) so we have a durable
- * record of the DOM the content scripts target. v1 is being retired, so its
- * snapshot is unrecoverable once the old site goes away — capture early, commit it.
+ * record of the DOM the content scripts target.
+ *
+ * Only v2 is captured. play.autodarts.com now serves the rebuild, play-v2 is a
+ * 301 to it, and the old Chakra site moved to play-v1.autodarts.com — which the
+ * extension does not target, so there is nothing to baseline there. Treat
+ * snapshots/v1/ as read-only history.
  *
  * For each route it writes, into snapshots/<site>/:
  *   <slug>.html        full outerHTML
@@ -12,8 +16,7 @@
  *   <slug>.probe.json  design tokens + stable-anchor inventory (the migration input)
  *
  * Usage:
- *   node scripts/capture-dom.mjs                     # both sites, default routes
- *   node scripts/capture-dom.mjs --site=v2           # one site
+ *   node scripts/capture-dom.mjs                     # default routes
  *   node scripts/capture-dom.mjs --discover          # crawl + print reachable routes, capture nothing
  *   node scripts/capture-dom.mjs --route=/play       # capture a single extra route
  *   node scripts/capture-dom.mjs --headless          # no visible window (CI / speed)
@@ -56,36 +59,9 @@ function loadSecrets() {
 // ------------------------------------------------------------- site definitions
 
 const SITES = {
-  v1: {
-    label: "v1 (Chakra UI — being retired)",
-    baseUrl: (e) => e.AUTODARTS_V1_URL || "https://play.autodarts.com",
-    // v1 renders the email/password form directly at /login. React generates the
-    // input ids (field-:r0:), so anchor on autocomplete instead.
-    async login(page, base, { email, password }) {
-      await page.goto(`${base}/login`, { waitUntil: "domcontentloaded", timeout: 60000 });
-      await page.waitForSelector("input[autocomplete=username]", { timeout: 30000 });
-      await page.fill("input[autocomplete=username]", email);
-      await page.fill("input[autocomplete='current-password']", password);
-      await page.click("button[type=submit]");
-    },
-    routes: [
-      [ "home", "/" ],
-      [ "lobbies", "/lobbies" ],
-      // lobbynew.content targets this one
-      [ "lobbies-new-x01", "/lobbies/new/x01" ],
-      [ "lobbies-new-cricket", "/lobbies/new/cricket" ],
-      [ "matches", "/matches" ],
-      [ "history-matches", "/history/matches" ],
-      [ "boards", "/boards" ],
-      [ "camera", "/camera" ],
-      [ "tournaments", "/tournaments" ],
-      [ "statistics", "/statistics" ],
-      [ "settings", "/settings" ],
-    ],
-  },
   v2: {
-    label: "v2 (Tailwind + shadcn/ui — the target)",
-    baseUrl: (e) => e.AUTODARTS_V2_URL || "https://play-v2.autodarts.com",
+    label: "v2 (Tailwind + shadcn/ui — the live site)",
+    baseUrl: (e) => e.AUTODARTS_URL || "https://play.autodarts.com",
     // v2 lands on an OAuth-first /landing page; /login has the email+password
     // form behind stable ids. No OAuth needed.
     async login(page, base, { email, password }) {
@@ -245,9 +221,9 @@ const opt = (name) => argv.find(a => a.startsWith(`--${name}=`))?.split("=").sli
 
 const env = loadSecrets();
 const creds = { email: env.AUTODARTS_EMAIL, password: env.AUTODARTS_PASSWORD };
-const which = opt("site") ?? "both";
+const which = opt("site") ?? "v2";
 const extraRoute = opt("route");
-const sites = which === "both" ? [ "v1", "v2" ] : [ which ];
+const sites = [ which ];
 
 // Visible by default — you should be able to watch the automation work.
 const headless = flag("headless");
@@ -261,7 +237,10 @@ const summary = {};
 
 for (const key of sites) {
   const site = SITES[key];
-  if (!site) { console.error(`Unknown site "${key}" (expected v1, v2 or both)`); process.exit(1); }
+  if (!site) {
+    console.error(`Unknown site "${key}" — only "v2" can be captured; v1 no longer exists.`);
+    process.exit(1);
+  }
 
   const base = site.baseUrl(env);
   const statePath = join(ROOT, ".secrets", `auth-${key}.json`);
@@ -328,4 +307,4 @@ await browser.close();
 
 console.log("\n== summary");
 for (const [ k, v ] of Object.entries(summary)) console.log(`   ${k}: ${JSON.stringify(v)}`);
-console.log(`\nSnapshots in snapshots/ — commit them; v1 is not recapturable once retired.`);
+console.log("\nSnapshots in snapshots/ — commit them; the v1 set is gone for good.");

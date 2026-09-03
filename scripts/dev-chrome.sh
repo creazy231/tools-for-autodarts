@@ -10,8 +10,7 @@
 # session persists across restarts. A dedicated profile dir is also mandatory:
 # Chrome 136+ refuses --remote-debugging-port on the default profile.
 #
-#   ./scripts/dev-chrome.sh          # open the v2 site (default)
-#   ./scripts/dev-chrome.sh --v1     # open the old site
+#   ./scripts/dev-chrome.sh          # open the site
 #   ./scripts/dev-chrome.sh --clean  # wipe the profile and start fresh
 #
 # Run `yarn dev` in another terminal first so the extension build exists and
@@ -24,14 +23,10 @@ PROFILE="$ROOT/.chrome-profile"
 PORT="${CDP_PORT:-9222}"
 CHROME="${CHROME_BIN:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 
-URL_V1="https://play.autodarts.com"
-URL_V2="https://play-v2.autodarts.com"
-URL="$URL_V2"
+URL="${AUTODARTS_URL:-https://play.autodarts.com}"
 
 for arg in "$@"; do
   case "$arg" in
-    --v1)    URL="$URL_V1" ;;
-    --v2)    URL="$URL_V2" ;;
     --clean) echo "Removing $PROFILE"; rm -rf "$PROFILE" ;;
     *)       echo "Unknown option: $arg"; exit 1 ;;
   esac
@@ -52,20 +47,19 @@ else
   exit 1
 fi
 
-# A build is an artifact and can lag the source. One made before play-v2 was
-# added to the manifest will silently not load on v2 at all — no error, the
-# extension simply isn't there. Catch that here rather than during debugging.
-if ! grep -q 'play-v2' "$EXT/manifest.json" 2>/dev/null; then
-  echo "!  The $BUILD build is STALE — its manifest has no play-v2 host."
-  echo "   The extension will silently NOT load on play-v2.autodarts.com."
+# A build is an artifact and can lag the source. One made while the rebuild
+# still lived on play-v2 had play.autodarts.com stripped from its manifest, so
+# it silently does not load at all — no error, the extension simply isn't there.
+# Catch that here rather than during debugging.
+if ! grep -q 'play\.autodarts\.com' "$EXT/manifest.json" 2>/dev/null; then
+  echo "!  The $BUILD build is STALE — its manifest has no play.autodarts.com host."
+  echo "   The extension will silently NOT load on the site."
   if [[ "$BUILD" == "dev" ]]; then
     echo "   Restart 'yarn dev' to rebuild it, then re-run this script."
   else
     echo "   Run 'yarn build' to rebuild it, then re-run this script."
   fi
-  [[ "$URL" == "$URL_V2" ]] && exit 1
-  echo "   Continuing anyway because you asked for v1."
-  echo
+  exit 1
 fi
 
 # Hot reload needs the WXT dev server; the dev build alone is not enough.

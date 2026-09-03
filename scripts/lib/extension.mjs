@@ -7,8 +7,10 @@
  *
  * The dev build is easy to get wrong in a way that wastes a lot of time: it is a
  * build artifact, so it can be stale relative to the source. A dev build made
- * before play-v2 was added to the manifest will silently fail to load on v2 at
- * all - no error, the extension just isn't there. This module checks for that.
+ * while the rebuild still lived on play-v2 is scoped to that subdomain and had
+ * play.autodarts.com stripped from its manifest, so it silently fails to load
+ * on the site at all - no error, the extension just isn't there. This module
+ * checks for that.
  */
 
 import { existsSync, readFileSync, statSync } from "node:fs";
@@ -28,8 +30,12 @@ const PROD_DIR = join(ROOT, ".output", "chrome-mv3");
  */
 export const WXT_DEV_PORT = Number(process.env.WXT_DEV_PORT ?? 4000);
 
-/** Host the migration targets. A build without it cannot run on v2. */
-const REQUIRED_HOST = "play-v2";
+/**
+ * The only host the extension serves. A build whose manifest lacks it cannot
+ * run on autodarts at all - which is exactly what a dev build predating the
+ * play-v2 -> play move looks like, since that build had this host stripped.
+ */
+const REQUIRED_HOST = "play.autodarts.com";
 
 function tryConnect(port, host, timeout) {
   return new Promise((res) => {
@@ -70,7 +76,7 @@ function inspect(dir) {
     // WXT dev builds register content scripts at runtime from the background
     // script (that's what makes HMR work), so content_scripts is empty there.
     // host_permissions is the reliable signal in both build modes.
-    supportsV2: raw.includes(REQUIRED_HOST),
+    supportsSite: raw.includes(REQUIRED_HOST),
   };
 }
 
@@ -79,7 +85,7 @@ function inspect(dir) {
  *
  * @param {object}  [opts]
  * @param {boolean} [opts.preferProd] load the production build instead
- * @returns {Promise<{dir:string, mode:"dev"|"production", supportsV2:boolean,
+ * @returns {Promise<{dir:string, mode:"dev"|"production", supportsSite:boolean,
  *                    builtAt:Date, devServer:boolean, warnings:string[]}>}
  */
 export async function resolveExtension({ preferProd = false } = {}) {
@@ -112,10 +118,11 @@ export async function resolveExtension({ preferProd = false } = {}) {
     );
   }
 
-  if (!chosen.supportsV2) {
+  if (!chosen.supportsSite) {
     warnings.push(
-      `This ${mode} build predates play-v2 support — its manifest has no "${REQUIRED_HOST}" host.\n`
-      + "  The extension will silently NOT load on play-v2.autodarts.com.\n"
+      `This ${mode} build is STALE — its manifest has no "${REQUIRED_HOST}" host.\n`
+      + "  It was built while the rebuild still lived on play-v2, which is now a\n"
+      + "  redirect, so the extension will silently NOT load on the site.\n"
       + (mode === "dev"
         ? "  Restart `yarn dev` to rebuild it."
         : "  Run `yarn build` to rebuild it."),
@@ -131,7 +138,7 @@ export function describeExtension(ext) {
     `Extension  : ${ext.dir}`,
     `Build mode : ${ext.mode}${ext.mode === "dev" ? (ext.devServer ? " (hot reload active)" : " (dev server DOWN — no hot reload)") : " (no hot reload)"}`,
     `Built at   : ${ext.builtAt.toLocaleString()}`,
-    `play-v2    : ${ext.supportsV2 ? "supported" : "NOT SUPPORTED — build is stale"}`,
+    `Site host  : ${ext.supportsSite ? REQUIRED_HOST : "MISSING — build is stale"}`,
   ];
   for (const w of ext.warnings) lines.push(`\n!  ${w}`);
   return lines.join("\n");
