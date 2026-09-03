@@ -289,8 +289,27 @@ let onReposition: (() => void) | null = null;
 let host: HTMLElement | null = null;
 let actionBarTop = 0;
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
-/** The dart the board is currently held on, so a redraw does not restart it. */
-let heldOn = "";
+/**
+ * Every dart the board has already zoomed in on, so that none of them can be
+ * zoomed in on twice.
+ *
+ * Keyed on the throw's own id, which is the one thing a correction leaves
+ * alone: editing a dart rewrites its `segment` and its `coords`, and hands
+ * every throw of the visit a fresh `createdAt`, but the id it landed with
+ * stays. Anything read off where the dart is would therefore take a correction
+ * for a new dart and zoom in on it all over again — and `activated`, which is
+ * how the rest of the features know an edit when they see one, is no help
+ * here: the corrected match arrives *after* it has gone back to -1.
+ *
+ * It is also what stops a redraw restarting the hold. The board lets go on a
+ * timer, so without this any later update — a takeout, the other player's
+ * board, a bot working through its visit — would zoom back in on a dart thrown
+ * seconds ago.
+ *
+ * Ids are unique for the life of a match, so nothing leaves here until the
+ * feature is torn down.
+ */
+const zoomed = new Set<string>();
 let boardInset = 0;
 let config: IConfig["zoom"] | null = null;
 let userId: string | null = null;
@@ -308,6 +327,7 @@ export async function zoom() {
 
   actionBarTop = 0;
   boardInset = 0;
+  zoomed.clear();
   addStyles(config.position === "board" ? `${STYLES}\n${BOARD_STYLES}` : STYLES, STYLE_ID);
   mount();
 
@@ -352,6 +372,7 @@ export function zoomOnRemove() {
   host = null;
   config = null;
   boardImages = [];
+  zoomed.clear();
   actionBarTop = 0;
   boardInset = 0;
   removeStyles(STYLE_ID);
@@ -378,7 +399,7 @@ function render(gameData: IGameData): void {
   const throws = visitInProgress(gameData) ?? [];
   const showing = Boolean(throws.length) && shouldShow(gameData);
 
-  if (config.position === "board") return holdBoardOn(showing ? throws[throws.length - 1] : null, throws.length - 1);
+  if (config.position === "board") return holdBoardOn(showing ? throws[throws.length - 1] : null);
 
   if (!showing) {
     host.replaceChildren();
@@ -431,16 +452,20 @@ function sleep(): void {
  * It lets go on a timer — the visit is usually still in progress and you want
  * the whole board back to throw at — and immediately when the visit ends or
  * passes to someone else, which is what `null` means here.
+ *
+ * Only a dart that has just been thrown gets a hold; see {@link zoomed} for
+ * what that rules out. Correcting the dart the board is already held on is
+ * left to run its timer out rather than snatched back early — the hold is a
+ * second at its default, and the board pulling out from under a correction
+ * would read as the feature reacting to it.
  */
-function holdBoardOn(thrown: IThrow | null, index: number): void {
-  const stamp = thrown ? stampOf(thrown, index) : "";
-  if (stamp === heldOn) return;
-  heldOn = stamp;
+function holdBoardOn(thrown: IThrow | null): void {
+  if (!thrown) return releaseBoard();
+  if (zoomed.has(thrown.id)) return;
+  zoomed.add(thrown.id);
 
   clearTimeout(resetTimer);
   resetTimer = undefined;
-
-  if (!thrown) return releaseBoard();
 
   const scale = Math.max(1, (config?.level ?? 3) * POSITION_ZOOM.board);
   const x = thrown.coords?.x ?? 0;
@@ -460,7 +485,6 @@ function holdBoardOn(thrown: IThrow | null, index: number): void {
 function releaseBoard(): void {
   clearTimeout(resetTimer);
   resetTimer = undefined;
-  heldOn = "";
   document.documentElement.style.removeProperty(BOARD_SCALE);
   document.documentElement.style.removeProperty(BOARD_TRANSLATE);
 }
