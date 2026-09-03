@@ -289,6 +289,24 @@ body {
   overflow-y: auto;
 }
 
+/* v2 shows a thin, low-contrast scrollbar rather than the platform default. */
+.adt-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.adt-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.adt-modal-body::-webkit-scrollbar-thumb {
+  background: var(--adt-border);
+  border-radius: 4px;
+}
+
+.adt-modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--adt-overlay-strong);
+}
+
 /* Ghost icon button, per Core/IconButton. */
 .adt-modal-close {
   position: absolute;

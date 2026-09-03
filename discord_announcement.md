@@ -1,32 +1,50 @@
-# :dart: Tools for Autodarts v2.4.0 :dart:
+# 🎯 Tools for Autodarts v3.0.4 🎯
 
-### :rotating_light: Important — Autodarts moved to autodarts.com
-Autodarts has changed its address from **autodarts.io** to **autodarts.com**. This release moves the entire extension over to the new domain.
+### 🚨 Autodarts rebuilt their site — this is the extension rebuilt to match
+The new design is live on **play.autodarts.com**, and every single feature had to be ported to it. **Without this update almost nothing works**, because the old version is looking for a page that no longer exists.
 
-**Without this update the extension will stop working**, because the old address now simply redirects to the new one — and the extension doesn't recognise the new site yet.
+Two bits of good news: **no new permissions to approve** this time, and **your settings, sounds, animations and WLED presets carry over** — bar two that changed meaning, listed further down.
 
-### :closed_lock_with_key: You'll be asked to approve permissions once
-Because the extension now needs access to `play.autodarts.com` instead of the old address, your browser will ask you to confirm this **one time** after updating:
+### ✨ New
 
-- **Chrome / Edge** — the extension stays paused until you accept the new permissions. Check the puzzle-piece icon in the toolbar, or open `chrome://extensions`
-- **Firefox** — accept the permission prompt shown after the update
-- **Safari (iOS / macOS)** — allow the extension on **autodarts.com** in Safari's extension settings (per-site access or *Allow on Every Website*)
+📹 **Board View** — start every game, bull-off included, on the camera or the drawn board you actually want to see. Autodarts' own button only cycles through the views; this presses it until yours comes up.
 
-This is completely normal for a domain change and won't happen again. **Your settings, sounds, animations and WLED presets all carry over untouched** — nothing needs to be set up again.
+🔍 **Darts Zoom, reworked** — a new **On Board** mode zooms Autodarts' own board in on each dart and adds nothing to the screen at all. **Bottom** and **Top** draw close-ups taken live from the site's board, so they stay sharp at any size and bring the hit highlight with them. Bottom is the new default.
 
-### :arrows_counterclockwise: What changed
+🔇 **Quiet Own Darts** — Autodarts plays a thud for every dart that lands anywhere. This silences the ones you can already hear for real and keeps everybody else's, so a remote opponent's thud actually means something. Its switch is in Autodarts' own sound settings, right under *Dart landed*.
 
-:globe_with_meridians: **Everything now runs on autodarts.com**
-Match and lobby pages, Quick Correction, board and match data, live board images, and login handling all point at the new domain.
+### 🔄 Reworked
 
-### :wrench: Fixes
+📺 **Streaming Mode** is back, and no longer needs a board camera — the board is copied live from Autodarts' own, darts and all. There's a second scoreboard **Design** to pick from, drawn from the site's own look, and the scoreboard now keeps its seating order and fits any window size.
 
-:loud_sound: **`opponent_throw` Sound FX no longer fires for players sharing your board**
-If a friend plays on your board using their own Autodarts account, their throws are no longer treated as a remote opponent's — so the sound no longer doubles up with the throw noise coming from your physical board. The trigger now only fires for opponents actually playing on a different board.
-_(Reported in #170 by @a-jey)_
+🎯 **Gotcha** finally gets checkout help. Autodarts works out a route for X01 only, so the extension does it for Gotcha — shown on your card, announced by the Caller — plus a helper marking every player you could knock back.
 
-### :handshake: Community
-Thanks to **@a-jey** for reporting the `opponent_throw` issue! :tada:
+
+⏪ **Instant Replay** plays a real clip now instead of a live feed running a few seconds behind — and it turns out it never needed a board, just your webcam.
+
+👥 **Recent Local Players** — saved guest names now appear as a strip under the lobby's player list, one click to add, and the site's six-name cap is gone.
+
+🎨 **Settings page** rebuilt in Autodarts' own design language, and it no longer flashes the whole grid every time you change something. New releases now open a short **What's New** summary the first time you visit it.
+
+### ⚠️ Worth a look before your next match
+- **Instant Replay**'s *Delay* is now *Start delay* and means something different — it starts fresh at 3 seconds
+- **Darts Zoom**'s *Center* position is gone, and its hold time is in milliseconds now
+- **Shuffle Players** and **Hide Menu In Match** were removed — the rebuilt site does both itself
+
+### 🔧 Notable fixes
+- 🔒 Published builds no longer write anything to the browser console *(#236)*
+- Gameshot and Winner animations mark the **right** player, in every layout and at every window size
+- **Removing Darts…** no longer appears when nobody is taking any darts out
+- Following a board works again, so match features run while you watch someone else play
+- WLED board filtering and the lobby in/out effects fire again
+- Sound FX lobby join/leave sounds fire again
+- Animations on `s25` (the outer bull) work, combinations included
+- Auto Next Player no longer opens the camera instead of pressing Next
+- Hopping straight from one lobby into another no longer leaks watchers on every DOM change
+
+🗣️ **Caller** — *Prefer combined throws* stops a visit being called twice when it has its own combination sound, and there's a new `bulloff` trigger.
+### 🤝 Community
+Huge thanks to **@minefubi** *(#220)*, **@driesbellen** *(#223)*, **@teppumteppum** *(#232)*, **@auajax** *(#228)*, **@MaB-MaN** *(#230)* and **@cameronbol** *(#234)* for the reports, diagnoses and pull requests behind this one 🎉
 
 ---
 
@@ -35,4 +53,6 @@ Please report any bugs in
 :flag_gb: https://discord.com/channels/802528604067201055/1255293651756650616/1255293651756650616
 or on GitHub: <https://github.com/creazy231/tools-for-autodarts/issues>
 
-_Updates getting rolled out right now. Keep an eye on the GitHub page for the status of each browser:_ <https://github.com/creazy231/tools-for-autodarts/tree/main?tab=readme-ov-file#tools-for-autodarts>
+Full changelog: <https://github.com/creazy231/tools-for-autodarts/blob/main/CHANGELOG.md>
+
+*Updates getting rolled out right now. Keep an eye on the GitHub page for the status of each browser:* <https://github.com/creazy231/tools-for-autodarts/tree/main?tab=readme-ov-file#tools-for-autodarts>

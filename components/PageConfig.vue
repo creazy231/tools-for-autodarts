@@ -19,6 +19,15 @@
       :type="notification.type"
     />
 
+    <!--
+      What's New.
+
+      Opens itself the first time this page is seen on a new release and writes
+      its own "seen" flag, so it needs nothing from here beyond being mounted —
+      the ref is only for re-opening it from the advanced panel below.
+    -->
+    <WhatsNew ref="whatsNew" />
+
     <!-- Settings Modal -->
     <SettingsModal
       @close="closeSettingsModal"
@@ -117,6 +126,24 @@
             >
               <span class="icon-[pixelarticons--heart] mr-2" />
               <span>Support on Ko-fi</span>
+            </AppButton>
+          </div>
+
+          <!-- Release Notes -->
+          <div class="adt-container space-y-4">
+            <h2 class="adt-card-title">
+              Release Notes
+            </h2>
+            <p class="text-white/70">
+              What changed in this release — shown once after an update, and here whenever you want it again.
+            </p>
+            <AppButton
+              @click="whatsNew?.reopen()"
+              type="default"
+              auto
+            >
+              <span class="icon-[pixelarticons--script-text] mr-2" />
+              <span>What's New</span>
             </AppButton>
           </div>
 
@@ -236,6 +263,7 @@ import AppAlert from "@/components/AppAlert.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import AppNotification from "@/components/AppNotification.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
+import WhatsNew from "@/components/WhatsNew.vue";
 import { useConfirmDialog } from "@/composables/useConfirmDialog";
 import { useNotification } from "@/composables/useNotification";
 import AppTabs from "@/components/AppTabs.vue";
@@ -631,6 +659,9 @@ function importSettings() {
 
 // State for danger zone
 const showDangerZone = ref(false);
+
+/** The What's New dialog, so the advanced panel can re-open it. */
+const whatsNew = ref<InstanceType<typeof WhatsNew>>();
 
 function openKofi() {
   window.open("https://ko-fi.com/creazy231", "_blank", "noopener,noreferrer");

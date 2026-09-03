@@ -29,9 +29,18 @@
           size === 'xl' && 'adt-modal-xl',
         )"
       >
+        <button
+          @click="$emit('close')"
+          v-if="!hideCloseButton && ghostClose"
+          class="adt-modal-close"
+          type="button"
+          aria-label="Close"
+        >
+          <span class="icon-[pixelarticons--close] text-lg" />
+        </button>
         <AppButton
           @click="$emit('close')"
-          v-if="!hideCloseButton"
+          v-else-if="!hideCloseButton"
           class="absolute right-3 top-3"
           size="xs"
           auto
@@ -90,6 +99,18 @@ defineProps({
     default: false,
   },
   hideCloseButton: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * Close with the design system's ghost icon button — the one `SettingsModal`
+   * uses — instead of this component's chip-filled `AppButton`.
+   *
+   * Opt-in rather than the default only because every other dialog built on
+   * this component already shows the filled one, and swapping them all is a
+   * change to make deliberately rather than in passing.
+   */
+  ghostClose: {
     type: Boolean,
     default: false,
   },

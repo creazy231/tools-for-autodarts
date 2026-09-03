@@ -597,6 +597,7 @@ You can add multiple triggers for the same animation by entering each trigger on
 ### 🔄 Utility Features
 - **Settings Import/Export**: Transfer your configuration between devices or create backups
 - **Clipboard Support**: Copy and paste settings for easy sharing
+- **What's New**: A summary of what changed, shown once the first time you open the settings page on a new release — what needs your attention, and what is worth switching on. Re-open it any time from **Release Notes** in the advanced panel behind the gear
 
 ## ⚙️ Configuration
 

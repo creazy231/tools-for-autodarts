@@ -920,6 +920,36 @@ export const AutodartsToolsStreamingModeStatus: WxtStorageItem<boolean, any> = s
 );
 
 /**
+ * The release whose notes the user has already seen.
+ *
+ * Compared against {@link WHATS_NEW_RELEASE}: anything else — an empty string on
+ * an install that predates this, or the release before last — opens the What's
+ * New dialog the next time the settings page is opened. Dismissing it writes the
+ * current release here.
+ *
+ * Deliberately its own item rather than a field on `IConfig`. Settings are
+ * exported, imported and pasted between users, and a "seen" flag is about this
+ * browser and nobody else's: carried along it would either hide the notes from
+ * someone who has never read them or show them again to someone who has. It also
+ * means *Reset All Settings* does not bring the dialog back.
+ */
+export const AutodartsToolsWhatsNewSeen: WxtStorageItem<string, any> = storage.defineItem(
+  "local:whats-new-seen",
+  {
+    defaultValue: "",
+  },
+);
+
+/**
+ * The release the What's New dialog is currently written for.
+ *
+ * The major on purpose: 3.0.4 and 3.1 are the same set of notes as 3.0, and
+ * nobody wants this dialog again after a patch. Bump it — and rewrite
+ * `WhatsNew.vue` — when there is a release worth stopping people for.
+ */
+export const WHATS_NEW_RELEASE = "3";
+
+/**
  * Map to track locks for each config key to prevent concurrent updates
  */
 const configLocks = new Map<keyof IConfig, number>();

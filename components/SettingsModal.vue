@@ -23,7 +23,7 @@
             {{ title }}
           </h2>
         </div>
-        <div class="adt-modal-body settings-content">
+        <div class="adt-modal-body">
           <slot />
         </div>
       </div>
@@ -60,22 +60,8 @@ defineProps({
 defineEmits([ "close" ]);
 </script>
 
-<style scoped>
-/* v2 shows a thin, low-contrast scrollbar rather than the platform default. */
-.settings-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.settings-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.settings-content::-webkit-scrollbar-thumb {
-  background: var(--adt-border);
-  border-radius: 4px;
-}
-
-.settings-content::-webkit-scrollbar-thumb:hover {
-  background: var(--adt-overlay-strong);
-}
-</style>
+<!--
+  The thin scrollbar this used to declare for itself now lives on
+  `.adt-modal-body` in assets/tailwind.css, so every dialog gets it rather than
+  only this one.
+-->
