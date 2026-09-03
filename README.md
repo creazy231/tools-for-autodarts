@@ -104,12 +104,12 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Everything on the settings page applies to a match already in progress — no need to leave and come back
 - **Virtual Board Surround**: Adds a customizable surround to the dartboard
 - **Darts Zoom**: A close-up of where each dart of the current visit landed, one tile per dart
-  - Three positions. **Bottom** (default) gives each dart a third of the window along the foot of the screen, and moves autodarts' undo and next buttons up to the free space in the top right so they are not covered; **Top** leaves those buttons alone and puts a smaller row under the throw display
+  - Three positions. **Bottom** (default) gives each dart a third of the window along the foot of the screen, and moves autodarts' undo and next buttons up to the free space in the top right so they are not covered; **Top** leaves those buttons alone and puts the same strip under the throw display, as wide as it is — and it follows the throw display when the site changes layout
   - **On Board** adds nothing to the screen at all: autodarts' own board — the camera view, or the vector board when no camera is running — zooms in on each dart as it lands and pulls back out again
     - Configurable hold time in milliseconds, 1000 by default; it also pulls back out the moment the visit ends or passes to another player
     - Only a dart that has just been thrown moves the board. Correcting one, or taking one back, leaves it where it is — a zoom is how you know a dart landed, so it should not go off while you are fixing the score
-  - View mode toggle between the live camera feed and autodarts' own dartboard — the board is drawn as vector art, so the close-up stays sharp at any zoom and shows the site's hit highlight. It also switches the board itself to match, unless **Board View** is on
-  - Adjustable zoom level, scaled to the position: the bottom strip is a third of the window wide, so the same level there magnifies far more than a small tile would, and it is eased off to suit — the top row goes the other way
+  - View mode: camera 1, 2, 3, or autodarts' own dartboard — the same choice **Board View** offers. A camera's close-ups are that camera's own picture; the drawn board's are a copy of the board, which is vector art, so they stay sharp at any zoom and show the site's hit highlight. It puts the board itself on your choice when a game starts and back again whenever the site changes it on its own, unless **Board View** is on — then that feature decides
+  - Adjustable zoom level, scaled to the position: the bottom strip is a third of the window wide, so the same level there magnifies far more than a narrower tile would, and it is eased off to suit; the top strip, a third of the throw display wide, takes the level as it is
   - New darts fade in as they land (rising from the foot of the screen in the bottom strip); darts already on screen are left alone
   - The board shrinks to make room, so the close-ups never cover it — at any window size, including tablets
   - An optional centre dot marks the exact point
@@ -118,12 +118,16 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Stands down entirely during the bull-off, taking up no room at all until the match proper begins
 - **Board View**: Start every game — bull-off included — showing the camera, or the drawn board, you actually want
   - Autodarts has one button for this and it only cycles (camera 1, 2, 3, drawn board, round again); this presses it for you until your choice comes up
+  - It waits for a button that can actually be pressed. While a bot, or a seat scored by hand, is at the oche the button is disabled and blank — and blank is not the drawn board, however much it looks like it
+  - It presses again whenever the site forgets the view: the screen being rebuilt after the bull-off, or the turn passing to a board the site has not been told about yet, both of which put camera 1 back on their own
+  - Cycling the view yourself — the button, or autodarts' own `1` / `2` / `3` keys — hands it over to you until the next leg begins
   - Boards with fewer cameras have a shorter cycle, so asking for one that is not there leaves the view alone rather than pressing forever
   - While it is on, it is the one in charge: Darts Zoom's *View Mode* stops switching the board and only decides where its close-ups come from
 - **Automatic Fullscreen**: Adds a fullscreen toggle to the match header, alongside the site's own icons
   - It also goes fullscreen by itself on entering a match, but only when the browser allows it. Fullscreen may only be entered straight off a click, and arriving from the lobby's *Start Game* is usually too long ago to count — so most of the time the header button is the way in
-- **Adjustable UI Elements**: Modify the size of legs, sets, and match information
+- **Adjustable UI Elements**: Modify the size of legs, sets, and match information — the "Leg / Match" averages row wraps onto a second line rather than being cut short when it no longer fits the card
 - **Larger Player Names**: Increase the font size of player names for better visibility during matches
+  - Both sizes are given in rem — 1 is the browser's base size, 16 pixels by default — and both work in every layout of the match screen, the sidebar of a narrower window included
 
 ### 🎮 Gameplay Features
 - **Takeout Visualization**: Visual notification while the board is waiting for the darts to be pulled
