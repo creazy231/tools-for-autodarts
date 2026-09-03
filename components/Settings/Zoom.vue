@@ -28,9 +28,10 @@
               <p class="mt-1 text-sm text-white/60">
                 <em>Bottom</em> gives each dart a third of the window along the foot of the screen, and
                 moves autodarts' undo and next buttons up to the free space in the top right so they
-                are not covered. <em>Top</em> keeps them where they are and puts a smaller row under
-                the throw display. <em>On Board</em> adds nothing to the screen at all — autodarts'
-                own board zooms in on each dart as it lands, and pulls back out again.
+                are not covered. <em>Top</em> keeps them where they are and puts the strip under the
+                throw display instead, as wide as it is. <em>On Board</em> adds nothing to the screen
+                at all — autodarts' own board zooms in on each dart as it lands, and pulls back out
+                again.
               </p>
             </div>
 
@@ -160,7 +161,7 @@
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Shows a zoomed view of your dart throws in the bottom corner of the screen or in the center of the screen.
+            A close-up of where each dart landed — along the foot of the screen, under the throw display, or on the board itself.
           </p>
         </div>
         <div class="flex">

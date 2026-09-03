@@ -8,7 +8,7 @@ import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsBoardImages } from "@/utils/board-image-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { setBoardView } from "./board-view";
+import { keepBoardView } from "./board-view";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { LAYERS } from "@/utils/layers";
 
@@ -58,17 +58,18 @@ const RING_FRACTION = 0.37778;
 /**
  * How hard to zoom for each position, on top of the configured level.
  *
- * The level alone cannot mean the same thing in both: the board copy is as wide
- * as its tile, and the bottom tile is a third of the window while the top one is
- * a few centimetres. The same scale there magnifies four times as much, which
- * left the bottom strip showing barely three segments. Scaled back it shows
- * around two thirds of the board's width, and the top row — which has the space
- * to spare — goes the other way.
+ * The level alone cannot mean the same thing everywhere: the board copy is as
+ * wide as its tile, so the same scale magnifies in proportion to the tile. The
+ * bottom strip is a third of the window per dart, where the level as written
+ * showed barely three segments; scaled back it shows around two thirds of the
+ * board's width. The top strip is a third of the throw display per dart — about
+ * a third of that — and the level is taken as it is, which shows a third of the
+ * board.
  *
  * Never below 1: under that the board would be narrower than the tile and sit in
  * a gap of its own.
  */
-const POSITION_ZOOM = { top: 1.25, bottom: 0.5, board: 1 } as const;
+const POSITION_ZOOM = { top: 1, bottom: 0.5, board: 1 } as const;
 
 /**
  * The board position moves the board with the `scale` and `translate`
@@ -94,17 +95,25 @@ const STYLES = `
     pointer-events: none;
   }
 
-  /* below the throw display, at the width of the tiles themselves */
+  /*
+   * Below the throw display and as wide as it is, a third of it per dart — the
+   * same band through the board as the bottom strip, sized for the oche rather
+   * than the desk. It began as a row of squares a few centimetres across, which
+   * reads as three small tiles you cannot make out from where you throw. The
+   * left and width are measured off the throw display in place(); these are the
+   * fallbacks for a screen without one.
+   */
   #${HOST_ID}[data-position="top"] {
-    left: 50%;
-    transform: translateX(-50%);
-    flex-direction: row;
-    min-height: clamp(5rem, 12vmin, 10rem);
+    left: 20vw;
+    width: 60vw;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    min-height: clamp(4.5rem, 14vh, 10rem);
   }
 
   #${HOST_ID}[data-position="top"] .adt-zoom-tile {
-    width: clamp(5rem, 12vmin, 10rem);
-    aspect-ratio: 1;
+    width: 100%;
+    height: clamp(4.5rem, 14vh, 10rem);
   }
 
   /* a strip across the foot of the window, a third of it per dart */
@@ -285,7 +294,10 @@ const BOARD_STYLES = `
 
 let gameDataWatcherUnwatch: (() => void) | undefined;
 let boardImagesWatcherUnwatch: (() => void) | undefined;
+let stopKeepingBoardView: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
+let layoutObserver: MutationObserver | undefined;
+let settle: ReturnType<typeof setTimeout> | undefined;
 let host: HTMLElement | null = null;
 let actionBarTop = 0;
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -332,9 +344,11 @@ export async function zoom() {
   mount();
 
   // The close-ups come from whatever the board is showing, so put it on the
-  // right thing first — unless Board View is switched on, in which case that
-  // has already chosen and the two must not press the same button in turn.
-  if (!stored.boardView?.enabled) await setBoardView(config.mode === "live" ? "live" : "image");
+  // right thing — and keep it there, since the site forgets the view on its
+  // own — unless Board View is switched on, in which case that has already
+  // chosen and the two must not press the same button in turn.
+  stopKeepingBoardView?.();
+  if (!stored.boardView?.enabled) stopKeepingBoardView = keepBoardView(config.mode === "live" ? "live" : "image");
 
   // A fresh visit starts with no frames; the handler fills these as the board
   // pushes them.
@@ -352,6 +366,22 @@ export async function zoom() {
 
   onReposition = () => place();
   window.addEventListener("resize", onReposition);
+
+  // A resize is not the end of it: the site picks its layout from the new width
+  // and redraws after the event, so what place() measured then is where the
+  // throw display *was*. It moving is a mutation under the app root, as is
+  // anything else that shifts it, so the strip follows it from here — the
+  // callback is one measurement, once the redraw has settled.
+  layoutObserver?.disconnect();
+  layoutObserver = new MutationObserver(() => {
+    if (settle) clearTimeout(settle);
+    settle = setTimeout(() => {
+      settle = undefined;
+      place();
+    }, 100);
+  });
+  const root = qs(SELECTORS.app.contentRoot);
+  if (root) layoutObserver.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: [ "class", "style" ] });
 }
 
 export function zoomOnRemove() {
@@ -366,6 +396,12 @@ export function zoomOnRemove() {
     window.removeEventListener("resize", onReposition);
     onReposition = null;
   }
+  layoutObserver?.disconnect();
+  layoutObserver = undefined;
+  if (settle) clearTimeout(settle);
+  settle = undefined;
+  stopKeepingBoardView?.();
+  stopKeepingBoardView = undefined;
 
   releaseBoard();
   host?.remove();
@@ -564,13 +600,14 @@ function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLEle
 
 /**
  * Everything that depends on where things currently are: the top strip hangs
- * off the throw display, the board gives up the room the strip needs, and in
- * the bottom layout the site's buttons move out of the strip's way.
+ * off the throw display and takes its width, the board gives up the room the
+ * strip needs, and in the bottom layout the site's buttons move out of the
+ * strip's way.
  *
  * Nothing here is measured against something this then moves. The strip's own
  * height is reserved by the stylesheet whether or not a dart has landed, the
- * throw display is unaffected by either rule below, and the row is the size of
- * the window.
+ * throw display is unaffected by either rule below, and the bottom strip is the
+ * size of the window.
  */
 function place(): void {
   if (!host || !config) return;
@@ -579,8 +616,15 @@ function place(): void {
   if (config.position === "board") return;
 
   const turnBar = qs<HTMLElement>(SELECTORS.match.turnBarPanel)?.getBoundingClientRect();
-  if (config.position === "top") host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;
-  else host.style.top = "";
+  if (config.position === "top") {
+    host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;
+    host.style.left = turnBar ? `${Math.round(turnBar.left)}px` : "";
+    host.style.width = turnBar ? `${Math.round(turnBar.width)}px` : "";
+  } else {
+    host.style.top = "";
+    host.style.left = "";
+    host.style.width = "";
+  }
 
   const strip = host.getBoundingClientRect();
   const clearance = Math.round(strip.height + 8);
