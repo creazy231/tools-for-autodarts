@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Sound FX, the Caller and WLED fire during matches again on Firefox and Safari. All three had gone quiet in 3.0.4 while the test buttons on the settings page kept working, which is exactly what [#238](https://github.com/creazy231/tools-for-autodarts/issues/238) describes. The cause was Quiet Own Darts, new in that release: it runs a script in the page's own world to reach howler, and on a Manifest V2 build — which is what Firefox and Safari get — the WXT helper that injects it wrote the script inline and then waited for a `load` event that inline scripts never fire. The wait never ended, and the three features queued behind it in the match start-up were never started; Animations, initialised ahead of it, were fine, and so was Chrome, whose Manifest V3 build injects the script by URL and does get the event. The WebSocket monitor waited on the same helper, harmlessly, because it wires up its listeners before injecting. Fixed upstream in WXT 0.20.22 ([wxt-dev/wxt#2183](https://github.com/wxt-dev/wxt/issues/2183)); the extension now builds with 0.20.27
+
 ## [3.0.4] - 2026-09-03
 
 ### Added
