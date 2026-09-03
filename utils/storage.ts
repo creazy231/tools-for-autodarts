@@ -147,7 +147,12 @@ export interface IConfig {
     level: number;
     /** Milliseconds the board stays zoomed on a dart, in the `board` position. */
     resetAfterMs: number;
-    mode: "live" | "image";
+    /**
+     * What the board shows while a game is on, and so where the close-ups come
+     * from: a camera's own picture, or a copy of the drawn board. The same
+     * choice Board View offers; that feature takes over when it is switched on.
+     */
+    mode: "image" | "camera-1" | "camera-2" | "camera-3";
     zoomOn: "everyone" | "opponents";
     showMarker: boolean;
     onlyOnCheckout: boolean;
@@ -480,7 +485,7 @@ export const defaultConfig: IConfig = {
     position: "bottom",
     resetAfterMs: 1000,
     level: 3,
-    mode: "live",
+    mode: "camera-1",
     zoomOn: "everyone",
     showMarker: true,
     onlyOnCheckout: false,
@@ -761,7 +766,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 9;
+const CONFIG_VERSION = 10;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -775,6 +780,25 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Darts Zoom's view mode chooses a camera now, the way Board View does,
+       * rather than "live" against "image". "Live" meant whichever camera the
+       * site's cycle reached first, which from a fresh screen is camera 1 — so
+       * that is what it becomes. "Image" is unchanged; anything else is the
+       * default.
+       */
+      10: (config: any) => {
+        const mode = config.zoom?.mode;
+        const modes = [ "image", "camera-1", "camera-2", "camera-3" ];
+        return {
+          ...config,
+          zoom: {
+            ...config.zoom,
+            mode: mode === "live" ? "camera-1" : modes.includes(mode) ? mode : defaultConfig.zoom.mode,
+          },
+        };
+      },
+
       /**
        * Larger Player Match Data's default goes from 1.5 to 2.
        *

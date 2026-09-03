@@ -9,6 +9,7 @@ import { AutodartsToolsBoardImages } from "@/utils/board-image-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { keepBoardView } from "./board-view";
+import type { BoardView } from "./board-view";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { LAYERS } from "@/utils/layers";
 
@@ -21,15 +22,17 @@ import { LAYERS } from "@/utils/layers";
  * close-up matches the board on screen exactly. A copy costs well under a
  * millisecond, so each dart gets its own.
  *
- * With a board attached the site shows the camera instead, and the frames it
- * pushes are already captured into board-image storage by the WebSocket
- * handler — that is the "live" mode, and it is the one part of this that needs
- * real hardware. When a frame is missing, or the mode is "image", the cloned
- * SVG board stands in; if even that is gone, the extension's own board.png does.
+ * With a board attached the site shows a camera instead, and the picture it is
+ * showing as each dart lands is already captured into board-image storage by
+ * the WebSocket handler — those are the camera modes, and they are the one part
+ * of this that needs real hardware. When a frame is missing, or the mode is
+ * "image", the cloned SVG board stands in; if even that is gone, the
+ * extension's own board.png does.
  *
- * The mode also decides what the board itself shows, since a copy of it is what
- * gets magnified: see board-view.ts, which presses the site's own button until
- * a camera — or the drawn board — is up.
+ * The mode is the same choice Board View offers — camera 1, 2, 3 or the drawn
+ * board — because it decides what the board itself shows: the frames are taken
+ * off whatever picture is up, so the board has to be on the camera you asked
+ * for. See board-view.ts, which presses the site's own button until it is.
  *
  * v1 mounted a Vue app and, for the centre position, cloned `#ad-ext-turn` and
  * wrote zoom tiles into its children — a hook the rebuilt site does not emit,
@@ -334,7 +337,7 @@ export async function zoom() {
   // The migration narrows this too, but a content script can load before it has
   // run in this browser, and an unknown value must not mean "no layout".
   const position = stored.zoom?.position;
-  config = { ...stored.zoom, position: position === "top" || position === "board" ? position : "bottom" };
+  config = { ...stored.zoom, position: position === "top" || position === "board" ? position : "bottom", mode: viewMode(stored.zoom?.mode) };
   userId = await getUserIdFromToken();
 
   actionBarTop = 0;
@@ -348,7 +351,10 @@ export async function zoom() {
   // own — unless Board View is switched on, in which case that has already
   // chosen and the two must not press the same button in turn.
   stopKeepingBoardView?.();
-  if (!stored.boardView?.enabled) stopKeepingBoardView = keepBoardView(config.mode === "live" ? "live" : "image");
+  if (!stored.boardView?.enabled) {
+    console.log(`Autodarts Tools: Darts Zoom - keeping the board on ${config.mode}`);
+    stopKeepingBoardView = keepBoardView(config.mode);
+  }
 
   // A fresh visit starts with no frames; the handler fills these as the board
   // pushes them.
@@ -413,6 +419,18 @@ export function zoomOnRemove() {
   boardInset = 0;
   removeStyles(STYLE_ID);
   removeStyles(LAYOUT_STYLE_ID);
+}
+
+/**
+ * The saved view mode, narrowed to what the board can show.
+ *
+ * The migration narrows this too, but a content script can load before it has
+ * run in this browser. "live" is what the mode used to be called before it
+ * chose a camera; it meant whichever camera came up first, which is camera 1.
+ */
+function viewMode(saved: unknown): Exclude<BoardView, "live"> {
+  if (saved === "image" || saved === "camera-1" || saved === "camera-2" || saved === "camera-3") return saved;
+  return "camera-1";
 }
 
 function mount(): void {
@@ -530,7 +548,7 @@ function releaseBoard(): void {
  * after the tile was already built from the board instead.
  */
 function stampOf(thrown: IThrow, index: number): string {
-  const source = config?.mode === "live" && boardImages[index] ? "frame" : "board";
+  const source = config?.mode !== "image" && boardImages[index] ? "frame" : "board";
   return `${thrown.segment?.name ?? ""}:${thrown.coords?.x ?? 0}:${thrown.coords?.y ?? 0}:${source}`;
 }
 
@@ -561,7 +579,7 @@ function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLEle
   const view = document.createElement("div");
   view.className = "adt-zoom-view";
 
-  const frame = config?.mode === "live" ? boardImages[index] : undefined;
+  const frame = config?.mode !== "image" ? boardImages[index] : undefined;
   if (frame) {
     const image = document.createElement("img");
     image.src = frame;

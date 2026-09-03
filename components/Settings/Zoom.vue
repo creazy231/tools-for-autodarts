@@ -61,17 +61,21 @@
               <div class="flex">
                 <AppRadioGroup
                   v-model="config.zoom.mode"
-                  class="grid max-w-sm grid-cols-2"
+                  class="grid max-w-md grid-cols-4"
                   :options="[
-                    { label: 'Live Board', value: 'live' },
-                    { label: 'Image Board', value: 'image' },
+                    { label: 'Camera 1', value: 'camera-1' },
+                    { label: 'Camera 2', value: 'camera-2' },
+                    { label: 'Camera 3', value: 'camera-3' },
+                    { label: 'Board', value: 'image' },
                   ]"
                 />
               </div>
               <p class="mt-1 text-sm text-white/60">
-                This also puts autodarts' board on the matching view when a game starts, since the
-                close-ups are taken from whatever it is showing. Switch <em>Board View</em> on and
-                that feature decides instead — it is the one in charge, and this stops touching it.
+                What autodarts' board shows while a game is on, and so where the close-ups come
+                from: a camera's tiles are that camera's own picture, the drawn board's are a copy
+                of the board. The board is put on your choice when a game starts, and put back
+                whenever the site changes it on its own. Switch <em>Board View</em> on and that
+                feature decides instead — it is the one in charge, and this stops touching it.
               </p>
             </div>
 
