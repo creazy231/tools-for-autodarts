@@ -16,13 +16,13 @@
                 <AppInput
                   v-model="sizeValue"
                   type="text"
-                  placeholder="Enter a size value (e.g., 1.5)"
+                  placeholder="Enter a size in rem (e.g., 2.5)"
                   class="w-full"
                 />
               </div>
               <p class="text-sm text-white/50">
-                This value will be used as a multiplier for the default font size.
-                For example, a value of 1.5 will make the player names 50% larger than the default size.
+                The size in rem — 1 is the browser's base size, 16 pixels by default. Autodarts draws the
+                names at about 1.1, so 2.5 is more than twice as large.
               </p>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { SELECTORS } from "@/utils/selectors";
+import { SELECTORS, anyOf } from "@/utils/selectors";
 import { addStyles, removeStyles } from "@/utils";
 
 /**
@@ -8,6 +8,9 @@ import { addStyles, removeStyles } from "@/utils";
  * The rebuilt card shows legs won as a small boxed number beside the score,
  * `size-8` — a fixed 2rem square. Growing the digit alone overflows it, so the
  * box is sized from the text instead.
+ *
+ * Scoped to the card rather than to the column round it: only the widest layout
+ * draws that column, so the rule used to do nothing below 1280px.
  */
 const STYLE_ID = "larger-legs-sets";
 
@@ -17,7 +20,7 @@ export async function largerLegsSets() {
     if (!config.largerLegsSets.enabled) return;
 
     const rem = config.largerLegsSets.value || 2.5;
-    const card = SELECTORS.match.playerColumn[0];
+    const card = anyOf(SELECTORS.match.scoreCard);
     const box = SELECTORS.match.playerLegsSets[0];
 
     addStyles(`

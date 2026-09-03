@@ -1,5 +1,5 @@
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { SELECTORS } from "@/utils/selectors";
+import { SELECTORS, anyOf } from "@/utils/selectors";
 import { addStyles, removeStyles } from "@/utils";
 
 /**
@@ -13,6 +13,9 @@ import { addStyles, removeStyles } from "@/utils";
  * The site sizes the name with `text-[18px]` inside a fixed `h-3.75` box that
  * the glyphs overflow, so growing only the font crops it top and bottom. The
  * height and the plate behind it have to come along.
+ *
+ * Scoped to the card rather than to the column round it: only the widest layout
+ * draws that column, so the rule used to do nothing below 1280px.
  */
 const STYLE_ID = "larger-player-names";
 
@@ -22,7 +25,7 @@ export async function largerPlayerNames() {
     if (!config.largerPlayerNames.enabled) return;
 
     const rem = config.largerPlayerNames.value || 1.5;
-    const card = SELECTORS.match.playerColumn[0];
+    const card = anyOf(SELECTORS.match.scoreCard);
     const name = SELECTORS.match.playerName[0];
 
     addStyles(`

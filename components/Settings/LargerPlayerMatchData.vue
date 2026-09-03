@@ -16,13 +16,14 @@
                 <AppInput
                   v-model="sizeValue"
                   type="text"
-                  placeholder="Enter a size value (e.g., 1.5)"
+                  placeholder="Enter a size in rem (e.g., 2)"
                   class="w-full"
                 />
               </div>
               <p class="text-sm text-white/50">
-                This value will be used as a multiplier for the default font size.
-                For example, a value of 1.5 will make the player match data 50% larger than the default size.
+                The size in rem — 1 is the browser's base size, 16 pixels by default. Autodarts draws the
+                averages at about 1.4, so 2 is noticeably larger and 3 is large. A row that no longer fits
+                the card wraps onto a second line.
               </p>
             </div>
           </div>

@@ -102,6 +102,18 @@ export function exists(set: SelectorSet, root: ParentNode = document): boolean {
 }
 
 /**
+ * A candidate list as one selector, for stylesheets.
+ *
+ * A rule cannot try candidates in turn the way {@link qs} does, and taking the
+ * first one — `set[0]` — pins the rule to whichever layout that candidate
+ * happens to name. `:is()` matches any of them, which is what a stylesheet that
+ * has to hold across the site's three match layouts needs.
+ */
+export function anyOf(set: SelectorSet): string {
+  return `:is(${set.join(", ")})`;
+}
+
+/**
  * querySelectorAll for a set that is supposed to return one element per thing,
  * where the caller knows how many things there are.
  *
@@ -483,6 +495,27 @@ export const SELECTORS = {
      * so on a stack of three the middle card has neither.
      */
     playerCardFace: [ "div.\\@container" ],
+    /**
+     * The face of every player's score card, in whichever layout the site is
+     * drawing — the element that carries the active player's gradient.
+     *
+     * For stylesheets, which cannot fall through a candidate list the way
+     * {@link qs} does: joined with {@link anyOf}, one rule reaches the cards in
+     * every layout at once. The type-scale features — Smaller Scores, Larger
+     * Legs / Sets, Larger Player Names, Larger Player Match Data — used to hang
+     * off {@link playerColumn} instead, and that column is drawn by the widest
+     * layout alone. Below 1280px, where the site puts the cards in a sidebar,
+     * none of them did anything at all.
+     *
+     * Not {@link playerCard}: its first candidate is the wide layout's wrapper
+     * round the face, which carries no gradient of its own, so a rule keyed on
+     * "the card without the gradient" would take the active player's wrapper
+     * for an idle card.
+     */
+    scoreCard: [
+      "main div.\\@container:has(span.font-display):has(div.font-number)",
+      "main div.overflow-clip:not(.\\@container):has(span.font-display):has(div.font-number)",
+    ],
     /** Whose turn it is: the site paints that one card with its gradient. */
     activePlayerCard: [ "main div[class*='bg-raspberry']" ],
     /** Player name, relative to a card. */
@@ -496,8 +529,20 @@ export const SELECTORS = {
     playerScore: [ "div.font-number.font-bold" ],
     /** Legs (or sets) won, the small boxed number beside the score. */
     playerLegsSets: [ "div.rounded-sm.size-8" ],
-    /** The "Leg 0.0 / Match 0.0" averages row. */
-    playerMatchData: [ "div.hidden:has(> div.flex.gap-2)" ],
+    /**
+     * The "Leg 0.0 / Match 0.0" averages row, relative to a card.
+     *
+     * The site fits it to the card: a `w-full text-center` div holding an
+     * inline-block span, onto which it writes a pixel font-size and shrinks it
+     * until the row fits the card's width. Earlier builds drew the row as a
+     * `hidden` div shown from a container width up, which the second candidate
+     * still names — Larger Player Match Data matched nothing but that one for
+     * a while, and so did nothing.
+     */
+    playerMatchData: [
+      "div.w-full.text-center:has(> span > div.flex.gap-2)",
+      "div.hidden:has(> div.flex.gap-2)",
+    ],
     /** The site's own checkout route, shown down the side of the card. */
     checkoutSuggestion: [ ".text-checkout-suggestion" ],
     /** Per-player scoring history, under the score card. */

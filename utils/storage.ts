@@ -450,7 +450,7 @@ export const defaultConfig: IConfig = {
   },
   largerPlayerMatchData: {
     enabled: false,
-    value: 1.5,
+    value: 2,
   },
   largerPlayerNames: {
     enabled: false,
@@ -761,7 +761,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 8;
+const CONFIG_VERSION = 9;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -775,6 +775,23 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Larger Player Match Data's default goes from 1.5 to 2.
+       *
+       * The number is a size in rem, and the rebuilt site draws the averages
+       * row at about 1.4rem on its widest layout — so at 1.5 the feature was a
+       * change of two pixels, and read as doing nothing. A value left at the
+       * old default becomes the new one; a size someone actually chose keeps
+       * the size they chose.
+       */
+      9: (config: any) => ({
+        ...config,
+        largerPlayerMatchData: {
+          ...config.largerPlayerMatchData,
+          value: config.largerPlayerMatchData?.value === 1.5 ? defaultConfig.largerPlayerMatchData.value : config.largerPlayerMatchData?.value,
+        },
+      }),
+
       /**
        * Streaming Mode has a second skin now, and a saved config chose neither.
        *
