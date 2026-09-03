@@ -14,8 +14,9 @@
 import { createApp, ref, watch } from "vue";
 
 import AutoStartToggle from "./AutoStartToggle.vue";
+import { startGameButton, waitForStartGameButton } from "./start-game";
 
-import { SELECTORS, qs, qsText, qsa } from "@/utils/selectors";
+import { SELECTORS, qs, qsa } from "@/utils/selectors";
 
 /** Players required before the lobby starts itself. */
 const MIN_PLAYERS = 2;
@@ -99,17 +100,12 @@ export async function onRemove() {
 // ------------------------------------------------------------------ anchors
 
 /**
- * The Start Game button.
+ * The `max-w-80` box the site wraps Start Game in to centre it.
  *
- * It carries no data-slot, id or aria-label of its own, so its label is the
- * only thing to match on — the one place in this feature a language switch
- * would break. Worth asking autodarts for a hook; see docs/v2-migration-map.md.
+ * The button is found by where it sits rather than by its label — see
+ * start-game.ts — so this mounts in a lobby that is still filling up, while
+ * the button still reads "Needs at least 2 players", and in any language.
  */
-function startGameButton(): HTMLButtonElement | null {
-  return qsText<HTMLButtonElement>(SELECTORS.lobby.startGameButton, SELECTORS.lobby.startGameText);
-}
-
-/** The `max-w-80` box the site wraps Start Game in to centre it. */
 function startGameWrapper(): HTMLElement | null {
   return startGameButton()?.parentElement ?? null;
 }
@@ -120,13 +116,8 @@ function actionBar(): HTMLElement | null {
 }
 
 async function waitForActionBar(timeout = 10000): Promise<HTMLElement | null> {
-  const deadline = Date.now() + timeout;
-  while (Date.now() < deadline) {
-    const bar = actionBar();
-    if (bar) return bar;
-    await new Promise(resolve => setTimeout(resolve, 200));
-  }
-  return null;
+  const button = await waitForStartGameButton(timeout);
+  return button?.parentElement?.parentElement ?? null;
 }
 
 // ------------------------------------------------------------------- layout

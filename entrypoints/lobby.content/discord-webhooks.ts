@@ -10,8 +10,10 @@
  * channel does not fill up with stale "come and play" posts.
  */
 
-import { waitForElement, waitForElementWithTextContent } from "@/utils";
-import { SELECTORS, qs, qsaText } from "@/utils/selectors";
+import { startGameButton, waitForStartGameButton } from "./start-game";
+
+import { waitForElement } from "@/utils";
+import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 
@@ -176,8 +178,9 @@ function restoreShuffleMargin() {
 /**
  * Watch for the Start Game button so a manual start can edit the message.
  *
- * Text is the only anchor that button offers — see SELECTORS.lobby — so this
- * is the one place in the feature that a language switch would break.
+ * The button is found by where it sits, not by its label — see start-game.ts
+ * — so the listener goes on while the lobby is still filling up and the button
+ * still says so, and in whatever language the site is shown in.
  */
 function watchForStartButton() {
   const attach = () => {
@@ -196,7 +199,8 @@ function watchForStartButton() {
 }
 
 function findStartButtons(): HTMLButtonElement[] {
-  return qsaText<HTMLButtonElement>(SELECTORS.lobby.startGameButton, SELECTORS.lobby.startGameText);
+  const button = startGameButton();
+  return button ? [ button ] : [];
 }
 
 async function onGameStarted() {
@@ -225,11 +229,10 @@ function startAutoStartTimer(minutes: number) {
 
   autoStartTimer = window.setTimeout(async () => {
     try {
-      const button = await waitForElementWithTextContent(
-        SELECTORS.lobby.startGameButton,
-        SELECTORS.lobby.startGameText,
-        5000,
-      );
+      const button = await waitForStartGameButton(5000);
+      if (!button) throw new Error("no Start Game button on this page");
+      // The site disables it while the lobby cannot start; a click would be silent.
+      if (button.disabled) throw new Error("the lobby is not ready to start");
       button.click();
 
       if (webhookMessageId && webhookUrl && !messageUpdated) {

@@ -166,8 +166,30 @@ function show(open: boolean): void {
 function dismiss(): void {
   dismissed = true;
   show(false);
+  resetBoard();
+}
 
+/**
+ * Tell the board to stop waiting.
+ *
+ * The match screen binds `R` to the reset of the board whoever is throwing is
+ * using — the same call the board's own Reset makes — and a key is the same in
+ * every language, where a button's label is not. The site's handler ignores
+ * keys typed into inputs and buttons, so the event goes to the body, which is
+ * where the click that got us here landed anyway. A Reset button is pressed
+ * instead when one is on screen, since a board that offers one is asking for
+ * it; no capture of the rebuilt match screen has shown one yet.
+ */
+function resetBoard(): void {
   const reset = qsText<HTMLElement>(SELECTORS.match.boardReset, SELECTORS.match.boardResetText);
-  if (reset) reset.click();
-  else console.log("Autodarts Tools: Takeout Notification - no Reset button on screen, dismissed only");
+  if (reset) {
+    reset.click();
+    return;
+  }
+
+  for (const code of SELECTORS.match.boardResetKey) {
+    const key = code.replace(/^Key/, "").toLowerCase();
+    document.body.dispatchEvent(new KeyboardEvent("keydown", { code, key, bubbles: true }));
+  }
+  console.log("Autodarts Tools: Takeout Notification - asked the board to reset");
 }

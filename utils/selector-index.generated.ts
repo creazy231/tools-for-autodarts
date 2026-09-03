@@ -15,18 +15,12 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1787085604913;
+export const GENERATED_AT = 1788439561013;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1787085405653;
+export const NEWEST_SOURCE_AT = 1788439016077;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
-  {
-    "selector": "html",
-    "file": "components/PageConfig.vue",
-    "line": 352,
-    "fn": "querySelector"
-  },
   {
     "selector": "[data-id]",
     "file": "components/Settings/Animations.vue",
@@ -36,13 +30,13 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "#root",
     "file": "entrypoints/content/index.ts",
-    "line": 50,
+    "line": 60,
     "fn": "querySelector"
   },
   {
     "selector": "body",
     "file": "entrypoints/content/index.ts",
-    "line": 54,
+    "line": 64,
     "fn": "querySelector"
   },
   {
@@ -52,33 +46,9 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "fn": "querySelector"
   },
   {
-    "selector": "Invite friends",
-    "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 10,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Nodig vrienden uit",
-    "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 10,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Freunde einladen",
-    "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 10,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": ".ad-ext_qr-code-wrapper",
-    "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 36,
-    "fn": "querySelector"
-  },
-  {
     "selector": "canvas",
     "file": "entrypoints/lobbynew.content/qr-code-tournament.ts",
-    "line": 63,
+    "line": 99,
     "fn": "querySelector"
   },
   {
@@ -96,193 +66,145 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 243,
+    "line": 256,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 248,
+    "line": 261,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 316,
+    "line": 329,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification-close",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 336,
+    "line": 349,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 369,
+    "line": 382,
     "fn": "querySelector"
   },
   {
     "selector": "main",
     "file": "entrypoints/match.content/checkout-guide.ts",
-    "line": 137,
+    "line": 156,
     "fn": "closest"
   },
   {
     "selector": "main",
     "file": "entrypoints/match.content/gotcha.ts",
-    "line": 123,
+    "line": 134,
     "fn": "closest"
-  },
-  {
-    "selector": "Board has no active match",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 146,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Board hat kein aktives Spiel",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 146,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Bord heeft geen actieve wedstrijd",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 146,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Board has no active match",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 338,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Board hat kein aktives Spiel",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 338,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "Bord heeft geen actieve wedstrijd",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 338,
-    "fn": "waitForElementWithTextContent"
-  },
-  {
-    "selector": "#ad-ext-player-display",
-    "file": "entrypoints/match.content/index.ts",
-    "line": 380,
-    "fn": "waitForElement"
-  },
-  {
-    "selector": "#ad-ext-turn",
-    "file": "entrypoints/match.content/InstantReplay.vue",
-    "line": 210,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".showAnimations",
-    "file": "entrypoints/match.content/InstantReplay.vue",
-    "line": 210,
-    "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 389,
+    "line": 380,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 394,
+    "line": 385,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 462,
+    "line": 453,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification-close",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 482,
+    "line": 473,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 515,
+    "line": 506,
     "fn": "querySelector"
   },
   {
-    "selector": "#ad-ext-game-variant",
+    "selector": "svg",
     "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 483,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "span",
-    "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 485,
+    "line": 693,
     "fn": "querySelectorAll"
   },
   {
-    "selector": "Live mode",
+    "selector": "button",
     "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 499,
+    "line": 858,
     "fn": "querySelector"
   },
   {
-    "selector": "Coords mode",
-    "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 500,
+    "selector": "label",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 178,
     "fn": "querySelector"
   },
   {
-    "selector": "#ad-ext-player-display",
-    "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 511,
+    "selector": "label",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 224,
     "fn": "querySelector"
   },
   {
-    "selector": "#adt-stream-mode-button",
-    "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 511,
-    "fn": "querySelector"
+    "selector": "input",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 231,
+    "fn": "querySelectorAll"
   },
   {
-    "selector": "#ad-ext-game-variant",
-    "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 512,
-    "fn": "waitForElement"
+    "selector": "[id]",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 232,
+    "fn": "querySelectorAll"
+  },
+  {
+    "selector": "[aria-labelledby]",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 233,
+    "fn": "querySelectorAll"
+  },
+  {
+    "selector": "label",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 235,
+    "fn": "querySelector"
   },
   {
     "selector": "[data-slot]",
     "file": "utils/selectors.ts",
-    "line": 55,
+    "line": 64,
     "fn": "querySelector"
   },
   {
     "selector": "[class*='chakra-']",
     "file": "utils/selectors.ts",
-    "line": 56,
+    "line": 65,
     "fn": "querySelector"
   },
   {
     "selector": "Lobby",
     "file": "utils/selectors.ts",
-    "line": 202,
+    "line": 254,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "img[src^=\\\"blob:\\\"]",
     "file": "utils/websocket-helpers.ts",
-    "line": 263,
+    "line": 343,
     "fn": "querySelectorAll"
   }
 ];

@@ -2,7 +2,7 @@ import type { IConfig } from "@/utils/storage";
 import type { IGameData } from "@/utils/game-data-storage";
 
 import { addStyles, removeStyles } from "@/utils";
-import { AutodartsToolsGameData, GameMode } from "@/utils/game-data-storage";
+import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { SELECTORS, qs, qsaCount } from "@/utils/selectors";
 
@@ -402,7 +402,11 @@ function message(gameData: IGameData): string {
   // The rebuilt card already carries a "GAME SHOT" banner of the site's own,
   // right under where this sits, so saying it again is noise. What the site
   // does not say is how many darts it took.
-  if (gameData.gameMode !== GameMode.X01 || !darts) return "";
+  //
+  // `match.variant` is the site's own name for the game, from the match data.
+  // `gameData.gameMode` was read off an `h2` on the old site's new-lobby page,
+  // which the rebuilt site does not have, so it never left its default.
+  if (match.variant !== "X01" || !darts) return "";
 
   const settings = match.settings as { baseScore?: number };
   const base = settings?.baseScore;

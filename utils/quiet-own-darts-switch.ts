@@ -28,11 +28,15 @@ import { SELECTORS, qs, qsa } from "@/utils/selectors";
 const ROW_FLAG = "data-adt-quiet-own-darts";
 
 /**
- * The site ships English only — `assets/i18n-*.js` registers `en` and `en-dev`
- * and falls back to them for every other language — so this is the whole list
- * today. Anything it misses lands on {@link rowByStructure} instead.
+ * The site's wording for the row, lower-cased.
+ *
+ * As of September 2026 the site registers `en` and `en-dev` only — its Deutsch
+ * setting is offered but falls back to these strings — so the German entries
+ * are guesses at what it will say, kept because a hit is cheaper than the walk
+ * below. Anything the list misses lands on {@link rowByStructure}, which reads
+ * the layout instead and does not care what the label says.
  */
-const DART_LANDED_LABELS = [ "dart landed" ];
+const DART_LANDED_LABELS = [ "dart landed", "dart gelandet", "dart aufgetroffen" ];
 
 let observer: MutationObserver | null = null;
 let configWatcherUnwatch: (() => void) | undefined;

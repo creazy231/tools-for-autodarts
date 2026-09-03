@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- Nothing finds one of autodarts' controls by its English wording alone any more, ahead of the site shipping the German its settings already offer. Reviewing the 3.0 port with the site set to *Deutsch* — which today still shows English, the site having registered no German strings yet — left five places depending on words: Auto Start and Discord Webhooks looked for a button reading *Start Game*, the tournament QR code waited for a heading reading *Invite friends*, the Takeout Notification pressed a button reading *Reset*, and Sound FX watched the page for *Time to ready up*. Each now goes by something the language switcher does not touch
+  - **Auto Start** and **Discord Webhooks** find the lobby's Start Game button by where it sits — alone in the centred box at the foot of the lobby — with the label kept as a last resort. That also puts Auto Start's toggle up in a lobby that is still filling: the same button reads *Needs at least 2 players* until then, so the toggle used not to appear until somebody else had already joined
+  - **QR Code** draws the code into a tournament's invite dialog, arming itself when the participants card's Invite button is pressed — a button the site marks with its plus glyph — and otherwise going by the dialog's title. It had been waiting three seconds after the page loaded for a heading the rebuilt site only shows inside that dialog, so on the rebuilt site it never drew anything
+  - **Takeout Notification** asks the board to reset with the match screen's own `R` shortcut, which the site binds to the reset of the board being thrown at, rather than looking for a *Reset* button that no capture of the rebuilt match screen has shown
+  - **Sound FX**'s `ambient_tournament_ready` plays on the `tournament:match-ready` notification the site receives over its WebSocket — the same signal behind its *Your match is ready* toast — rather than on wording the rebuilt site does not write at all
+  - **Quiet Own Darts** already fell back to the layout of the sound settings when the *Dart landed* label was in a language it did not know; the labels it does know now include the likely German. **Automatic Next Player** keeps the label first and the filled, glyph-less button as its fallback, checked to be the only such button on the match screen; the registry's fallbacks for the user menu and the notifications bell no longer lean on translated aria-labels either
+- The Gameshot Animation's darts-thrown caption keys on the match's own variant rather than on a game mode read off a heading on the old site's new-lobby page — a page the rebuilt site does not have, so the value never changed from its default
+
 ## [3.0.5] - 2026-09-03
 
 ### Fixed

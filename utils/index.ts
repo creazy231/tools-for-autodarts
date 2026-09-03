@@ -31,8 +31,17 @@ export function waitForElement(selector: string | string[], timeout = 3000): Pro
   });
 }
 
+/**
+ * Wait for an element whose text is one of `textContent`.
+ *
+ * Text is the one anchor the site's language switcher rewrites, so prefer a
+ * structural selector wherever the markup offers one; this is for the
+ * controls that offer nothing else. Comparison trims and ignores case, like
+ * `qsText` in utils/selectors.ts.
+ */
 export function waitForElementWithTextContent(selector: string | string[], textContent: string | string[], timeout = 3000): Promise<HTMLElement> {
-  const texts = Array.isArray(textContent) ? textContent : [textContent];
+  const texts = (Array.isArray(textContent) ? textContent : [ textContent ]).map(text => text.trim().toLowerCase());
+  const matches = (element: Element) => texts.includes((element.textContent ?? "").trim().toLowerCase());
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     const timer = setInterval(() => {
@@ -40,7 +49,7 @@ export function waitForElementWithTextContent(selector: string | string[], textC
         for (const sel of selector) {
           const elements = document.querySelectorAll(sel);
           for (const element of elements) {
-            if (texts.includes(element.textContent ?? "")) {
+            if (matches(element)) {
               clearInterval(timer);
               resolve(element as HTMLElement);
               return;
@@ -50,7 +59,7 @@ export function waitForElementWithTextContent(selector: string | string[], textC
       } else {
         const elements = document.querySelectorAll(selector);
         for (const element of elements) {
-          if (texts.includes(element.textContent ?? "")) {
+          if (matches(element)) {
             clearInterval(timer);
             resolve(element as HTMLElement);
             return;

@@ -62,6 +62,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Auto-Start**: Adds an **Autostart On / Autostart Off** toggle beside the lobby's *Start Game* button. While it is on, the game starts 3 seconds after another player joins
   - Those 3 seconds are a grace period: someone who joins the wrong lobby and leaves again cancels the start instead of triggering it
   - Every lobby opens with it off — it presses a button that starts a real game, so the choice is never carried over from an earlier lobby
+  - The toggle is there from the moment the lobby opens, whatever the button beside it currently says, and in every language the site offers
 - **Discord Webhook Integration**: Sends invitation links for private lobbies to your Discord server
   - **Send manually**: Adds a **Discord** button to the lobby's *Players* header, next to Shuffle, so you choose when to announce. With this off, the webhook fires as soon as the lobby opens
   - **Auto-Start Timer**: Automatically starts the game after a configurable time delay once the webhook is sent
@@ -77,6 +78,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything
   - Autodarts' own QR button occupies the same corner, so it is hidden while the pinned code is up and comes back the moment you close it
   - The ✕ underneath hides the code for the rest of that lobby; from then on the site's own button is there if you want it
+  - On a tournament page the code goes into the **Invite** dialog instead, under its title, so the tournament's link can be scanned rather than sent
 
 ### 🎨 Match Customization
 - **Color Customization**: Change the colors of dart throws, scores, and match background for a personalized gaming environment
@@ -127,7 +129,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Takeout Visualization**: Visual notification while the board is waiting for the darts to be pulled
   - A **Removing Darts…** panel in the middle of the screen, in the site's own warning colour and display face
   - Click it to put it away; it stays away for that takeout and returns on the next one
-  - Clicking it also presses the board's **Reset**, for a takeout the board never sees finish
+  - Clicking it also resets the board, for a takeout the board never sees finish — through the match screen's own `R` shortcut, so it works whatever language the site is shown in
   - Only ever shown for a takeout happening right now, on a board this page is about — the board you are watching when you follow one, otherwise a board playing in this match. A board elsewhere no longer puts it on your screen, and neither does one left mid-takeout by an earlier game
 - **Automatic Next Player**: Presses *Next* for you when a takeout never finishes
   - A countdown appears on the site's own *Next* button as soon as takeout starts — configurable, 10 seconds by default
@@ -338,7 +340,7 @@ Add sound effects for various game events:
   - `ambient_lobby_in`: Plays when a player joins the lobby
   - `ambient_lobby_out`: Plays when a player leaves the lobby
 - **Tournament Sounds**:
-  - `ambient_tournament_ready`: Plays when "Time to ready up" text appears in tournaments
+  - `ambient_tournament_ready`: Plays when a tournament match of yours is ready for you to mark ready — the site's own *match ready* notification, in any language
 - **Board Status Sounds** (only during a game):
   - `ambient_board_started`: Plays when the board has started
   - `ambient_board_stopped`: Plays when the board has stopped or disconnected

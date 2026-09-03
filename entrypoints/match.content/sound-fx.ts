@@ -1,4 +1,5 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
+import { AutodartsToolsNotificationData, type INotification, NOTIFICATION_TOURNAMENT_MATCH_READY } from "@/utils/notification-data-storage";
 import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from "@/utils/storage";
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { LAYERS } from "@/utils/layers";
@@ -6,7 +7,7 @@ import { LAYERS } from "@/utils/layers";
 let gameDataWatcherUnwatch: any;
 let lobbyDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
-let tournamentReadyObserver: MutationObserver | null = null;
+let notificationWatcherUnwatch: (() => void) | null = null;
 let config: IConfig;
 // Cached id of the local user (decoded from the auth token), used to tell own throws from opponent throws
 let localUserId: string | null = null;
@@ -130,29 +131,18 @@ export async function soundFx() {
       });
     }
 
-    if (!tournamentReadyObserver) {
-      tournamentReadyObserver = new MutationObserver((mutations) => {
-        if (!config?.soundFx?.enabled) return;
+    if (!notificationWatcherUnwatch) {
+      // The ready-up call for a tournament match arrives as a notification over
+      // the site's WebSocket, named by `type` whatever language the site is
+      // displayed in. It used to be spotted by reading "Time to ready up" off
+      // the page — words the rebuilt site never writes, and that the language
+      // switcher would rewrite if it did.
+      notificationWatcherUnwatch = AutodartsToolsNotificationData.watch((notification: INotification | undefined) => {
+        if (!config?.soundFx?.enabled || !notification) return;
+        if (notification.type !== NOTIFICATION_TOURNAMENT_MATCH_READY) return;
 
-        // Check if "Time to ready up" text appears in the DOM
-        const bodyText = document.body.textContent || document.body.innerText;
-        if (bodyText.includes("Time to ready up") || bodyText.includes("Zeit zum bereitmachen") || bodyText.includes("Tijd om je klaar te maken")) {
-          console.log("Autodarts Tools: Found 'Time to ready up' text, playing tournament ready sound");
-          playSound("ambient_tournament_ready");
-
-          // Disconnect the observer after playing the sound once
-          if (tournamentReadyObserver) {
-            tournamentReadyObserver.disconnect();
-            tournamentReadyObserver = null;
-          }
-        }
-      });
-
-      // Start observing the body for text changes
-      tournamentReadyObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-        characterData: true,
+        console.log("Autodarts Tools: Tournament match ready, playing tournament ready sound");
+        playSound("ambient_tournament_ready");
       });
     }
   } catch (error) {
@@ -177,9 +167,9 @@ export function soundFxOnRemove() {
     boardDataWatcherUnwatch = null;
   }
 
-  if (tournamentReadyObserver) {
-    tournamentReadyObserver.disconnect();
-    tournamentReadyObserver = null;
+  if (notificationWatcherUnwatch) {
+    notificationWatcherUnwatch();
+    notificationWatcherUnwatch = null;
   }
 
   // Clear any pending debounce timer

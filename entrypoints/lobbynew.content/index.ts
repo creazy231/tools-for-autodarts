@@ -1,13 +1,17 @@
 import { onRemove as onQrCodeTournamentRemove, qrCodeTournament } from "./qr-code-tournament";
 
-import type { GameMode, IGameData } from "@/utils/game-data-storage";
-
 import { AutodartsToolsUrlStatus } from "@/utils/storage";
-import { AutodartsToolsGameData } from "@/utils/game-data-storage";
-import { waitForElement } from "@/utils";
 import { isSafari, isiOS } from "@/utils/helpers";
 import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 
+/**
+ * Tournament pages — the QR code for the invite dialog.
+ *
+ * This entrypoint used to also read the game mode off an `h2` on the old
+ * site's `/lobbies/new/<variant>` page. The rebuilt site collapsed those routes
+ * into the /play picker, so that branch never ran, and the one reader of the
+ * value now takes the variant from the match data instead.
+ */
 export default defineContentScript({
   matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
@@ -15,24 +19,10 @@ export default defineContentScript({
     AutodartsToolsUrlStatus.watch(async (url: string) => {
       if (!url && (isiOS() || isSafari())) url = window.location.href;
 
-      if (/\/lobbies\/*new\//.test(url)) {
-        console.log("Autodarts Tools: Lobby New Ready");
-
-        // Read by Winner Animation, which is not ported yet. v2 collapsed these
-        // per-variant routes into /play, so this only ever runs on the old site.
-        const gameData: IGameData = await AutodartsToolsGameData.getValue();
-        const gameModeTitle = await waitForElement("h2");
-
-        await AutodartsToolsGameData.setValue({
-          ...gameData,
-          gameMode: gameModeTitle.textContent as GameMode,
-        });
-
-        console.log("Autodarts Tools: Game Mode", gameModeTitle.textContent);
-      } else if (/\/tournaments\/[0-9a-f-]+/.test(url)) {
+      if (/\/tournaments\/[0-9a-f-]+/.test(url)) {
         await initScript(qrCodeTournament, url).catch(e => console.error(e));
       } else {
-        await onQrCodeTournamentRemove();
+        onQrCodeTournamentRemove();
       }
     });
   },

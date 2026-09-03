@@ -172,8 +172,13 @@ export const SELECTORS = {
      * the hide-page-content logic hid nothing.
      */
     contentRoot: [ "main", "[role='main']" ],
+    /**
+     * The main navigation. Structure first: the aria-label is a `t()` string
+     * the language switcher rewrites, so it can only ever be a fallback.
+     */
     navigation: [
       "[data-slot='navigation']",
+      "header nav",
       "nav[aria-label='Main navigation']",
       "#root .navigation",
     ],
@@ -188,11 +193,20 @@ export const SELECTORS = {
       "[data-slot='avatar'] ~ * p",
       ".ad-ext-player-name",
     ],
+    /**
+     * The avatar button that opens the user drawer. The data-slot comes first
+     * for the same reason as above: "Open user menu" is translated.
+     */
     userMenuButton: [
+      "header [data-slot='drawer-trigger']",
       "button[aria-label='Open user menu']",
       "button[aria-label='Open menu']",
     ],
-    notificationsButton: [ "button[aria-label='Open notifications']" ],
+    /** The bell. FontAwesome names the glyph it draws, which no translation touches. */
+    notificationsButton: [
+      "header button:has([data-icon='bell'])",
+      "button[aria-label='Open notifications']",
+    ],
   },
 
   /**
@@ -260,13 +274,32 @@ export const SELECTORS = {
     /**
      * The Start Game button at the foot of the lobby.
      *
-     * Text is the only anchor available — it carries no distinguishing
-     * data-slot, id or aria-label — so it has to be matched with
-     * `waitForElementWithTextContent`, which a language switch breaks. Worth
-     * asking autodarts for a hook; see docs/v2-migration-map.md.
+     * It carries no id, aria-label or data-slot beyond the generic `button`,
+     * and its label is the wrong anchor twice over: the language switcher
+     * rewrites it, and it changes with the lobby's state — "Needs at least 2
+     * players", "Waiting for players..." and "Start Game" are all the same
+     * element. What does not change is where it sits: alone in the `max-w-80`
+     * box the site wraps it in to centre it, as the one full-width 48px button
+     * on the page. The site draws a `<p>` there instead for anyone who is not
+     * the host, so no match is the right answer in somebody else's lobby.
+     *
+     * See entrypoints/lobby.content/start-game.ts, which tries these in order
+     * and falls back to {@link startGameText}.
      */
-    startGameButton: [ "button[data-slot='button']" ],
-    startGameText: [ "Start Game" ],
+    startGameButton: [
+      "div.max-w-80 > button[data-slot='button']",
+      "button[data-slot='button'].w-full.h-12",
+    ],
+    /** Any of the site's buttons, for the label fallback below. */
+    anyButton: [ "button[data-slot='button']", "button" ],
+    /**
+     * Last resort, and the one anchor here that a language the list does not
+     * know defeats. As of September 2026 the site registers English only — its
+     * Deutsch setting is offered but falls back to these strings — so the
+     * German entry is a guess at what it will say, kept because it costs
+     * nothing.
+     */
+    startGameText: [ "Start Game", "Spiel starten" ],
 
     /**
      * The player counter chip beside the "Players" title, e.g. "2/6".
@@ -319,6 +352,29 @@ export const SELECTORS = {
     variantCards: [
       "[data-slot='card']",
     ],
+  },
+
+  /**
+   * Tournament detail — entrypoints/lobbynew.content/qr-code-tournament.ts.
+   *
+   * The invite dialog is the site's generic dialog, opened from the
+   * participants card. Nothing inside it says what it is except its title,
+   * which is translated, so the opener is the anchor: FontAwesome stamps
+   * `data-icon` on the glyph it renders, and that button is the only one in
+   * `main` drawn with a plus. In a local tournament the same button reads
+   * "Add" and opens the same dialog with tabs, so it covers both.
+   */
+  tournament: {
+    inviteButton: [ "main button[data-slot='button']:has([data-icon='plus'])" ],
+    /** An open dialog of the site's, wherever Base UI has portalled it. */
+    dialog: [ "[data-slot='dialog-content']", "[role='dialog']" ],
+    dialogHeader: [ "[data-slot='dialog-header']" ],
+    dialogTitle: [ "[data-slot='dialog-title']", "[role='dialog'] h2" ],
+    /**
+     * The invite dialog's title, for one that opened without the button being
+     * seen pressed. English is what the site ships; the rest are guesses.
+     */
+    inviteDialogTitleText: [ "Invite friends", "Freunde einladen", "Nodig vrienden uit" ],
   },
 
   /**
@@ -449,13 +505,20 @@ export const SELECTORS = {
     /**
      * The board's own Reset control, which clears a stuck takeout.
      *
-     * Text is the only anchor: it appears alongside the camera view and only
-     * while a board is attached, so it is absent from every capture taken with
-     * a virtual board. Matched case-insensitively via `qsText`, and treated as
-     * optional by the one caller — see takeout.ts.
+     * Text is the only anchor, and no capture of the rebuilt match screen has
+     * shown the button at all — so takeout.ts treats it as optional and reaches
+     * for the site's keyboard shortcut instead: the match screen binds `R` to
+     * the reset of the board being thrown at, which no translation touches.
+     * See {@link boardResetKey}.
      */
     boardReset: [ "button" ],
     boardResetText: [ "Reset", "Zurücksetzen", "Resetten", "Réinitialiser" ],
+    /**
+     * The `KeyboardEvent.code` the match screen listens for to reset the board
+     * of whoever is throwing. Its handler ignores keys typed into inputs and
+     * buttons, so the event has to be dispatched on the document body.
+     */
+    boardResetKey: [ "KeyR" ],
 
     /** Every button on the match screen, for the text fallbacks below. */
     matchButtons: [ "main button", "button" ],
@@ -491,7 +554,7 @@ export const SELECTORS = {
       "main button[data-slot='button'].bg-blue-60:not(:has(svg))",
       "main button.bg-blue-60:not(:has(svg))",
     ],
-    nextButtonText: [ "Next", "Weiter", "Volgende" ],
+    nextButtonText: [ "Next", "Weiter", "Nächster", "Volgende" ],
 
     /**
      * Advances to the next leg once one is won.
