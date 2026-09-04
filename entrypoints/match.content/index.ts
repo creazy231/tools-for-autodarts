@@ -189,6 +189,14 @@ export default defineContentScript({
     AutodartsToolsUrlStatus.watch(async (url: string) => {
       if (!url && (isiOS() || isSafari())) url = window.location.href;
 
+      // One key, shared by every autodarts tab in this browser. A second tab
+      // loading the settings or a lobby writes its URL here too — and its empty
+      // reset first — and neither says anything about the match on this page.
+      // Acting on them anyway tore every feature down mid-match, and put the
+      // dart-landed sound Quiet Own Darts had taken away straight back, the
+      // moment another tab was opened. Only this page's own URL is news here.
+      if (url.split("#")[0] !== window.location.href.split("#")[0]) return;
+
       if (/\/(matches|boards)\/([0-9a-f-]+)/.test(url) && !url.includes("history")) {
         // The app shell. The old gate here, `#root > div > div:nth-of-type(2)`,
         // resolves on v2 to an empty zero-height trailing div — it settles, so

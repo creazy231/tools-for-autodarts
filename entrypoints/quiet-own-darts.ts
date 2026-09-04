@@ -8,13 +8,23 @@
  * that call says whose dart it was, so the decision is made in the content
  * script, which has the match data, and arrives here as a flag.
  *
+ * The flag is an attribute on `<html>`, raised and lowered by
+ * entrypoints/match.content/quiet-own-darts.ts and read here each time a thud
+ * is asked for. It used to arrive as a CustomEvent carrying `{ quiet }` in its
+ * `detail`, which works in Chrome and never worked in Firefox: there the page
+ * is kept away from a content script's objects, `detail` included, and reading
+ * `detail.quiet` threw "Permission denied to access property" — so the flag
+ * never left false and not one thud was dropped. The DOM is the one thing the
+ * two worlds actually share, and an attribute is there to be read whether or
+ * not this script was listening when it was set.
+ *
  * This has to run in the page's world — `Howl` lives there and a content
  * script cannot reach it — so it is injected the same way the WebSocket
  * capture is.
  */
 
-/** What the content script sends when the flag changes. */
-const FLAG_EVENT = "adt-quiet-own-darts";
+/** Present on <html> while the sound is to be dropped. */
+const FLAG_ATTR = "data-adt-quiet-dart-landed";
 
 /** The sprite names autodarts gives its dart-landed effect. */
 const DART_LANDED = /^thud-\d+$/;
@@ -23,18 +33,12 @@ const DART_LANDED = /^thud-\d+$/;
 const PATCHED = "__adtQuietOwnDarts";
 
 export default defineUnlistedScript(() => {
-  let quiet = false;
-
-  window.addEventListener(FLAG_EVENT, (event) => {
-    quiet = Boolean((event as CustomEvent).detail?.quiet);
-  });
-
   function patch(Howl: any): void {
     if (typeof Howl !== "function" || !Howl.prototype || Howl.prototype[PATCHED]) return;
 
     const play = Howl.prototype.play;
     Howl.prototype.play = function (this: unknown, sprite: unknown) {
-      if (quiet && typeof sprite === "string" && DART_LANDED.test(sprite)) {
+      if (typeof sprite === "string" && DART_LANDED.test(sprite) && document.documentElement.hasAttribute(FLAG_ATTR)) {
         // play() hands back the id of the sound it started. The site keeps that
         // id only for the effects it loops — the timer warning — and throws it
         // away for a dart landing, so there is nothing here to stand in for.
