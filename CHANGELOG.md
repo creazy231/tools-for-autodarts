@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **Darts Zoom**'s close-ups show the picture of their own dart. In the camera modes the tiles had been reading a shared list of the last six board pictures — filled on a timer after every board event, from whichever board sent it, and never emptied — by the dart's position in the visit, which once six pictures had gathered was that list's three oldest. So every tile was a frame from a visit or two back, and with two boards taking turns, as when watching a match, usually the other player's board altogether. Each tile now gets the picture the site swaps onto its board right after that dart is scored, kept against the dart's own id: the tile is drawn from a copy of the board at once and takes its picture over in place the moment it arrives, so nothing runs its entrance twice, and a dart whose picture never comes keeps the copy of the board as the site shows it rather than borrowing another dart's frame. Streaming Mode's board picture, which wants the newest frame and nothing else, still comes from the WebSocket handler as before
+- **Darts Zoom**'s camera close-ups are centred on the dart. The pictures a board sends are normalised with the double ring's outer edge at a third of the width, where the drawn board puts it at 37.8% — the site itself scales a picture up by the ratio of the two, 1.13, before laying it under its drawing. The tiles slid every picture by the drawn board's fraction, so the marker sat past the dart by 13% of its distance from the bull, further out the further from the middle the dart was. A picture now slides by its own fraction and is scaled up by the same ratio, so a camera tile shows as much board as a drawn one at the same level
+
 ## [3.0.6] - 2026-09-03
 
 ### Changed

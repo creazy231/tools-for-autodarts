@@ -1,11 +1,9 @@
 import type { IGameData } from "@/utils/game-data-storage";
 import type { IThrow } from "@/utils/websocket-helpers";
 import type { IConfig } from "@/utils/storage";
-import type { IBoardImages } from "@/utils/board-image-storage";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
-import { AutodartsToolsBoardImages } from "@/utils/board-image-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { keepBoardView } from "./board-view";
@@ -22,12 +20,13 @@ import { LAYERS } from "@/utils/layers";
  * close-up matches the board on screen exactly. A copy costs well under a
  * millisecond, so each dart gets its own.
  *
- * With a board attached the site shows a camera instead, and the picture it is
- * showing as each dart lands is already captured into board-image storage by
- * the WebSocket handler — those are the camera modes, and they are the one part
- * of this that needs real hardware. When a frame is missing, or the mode is
- * "image", the cloned SVG board stands in; if even that is gone, the
- * extension's own board.png does.
+ * With a board attached the site shows a camera instead, and swaps a fresh
+ * picture onto it a moment after each dart is scored. Those pictures are the
+ * camera modes, and they are the one part of this that needs real hardware.
+ * The picture that follows a dart is copied and kept against that dart's id —
+ * see {@link frames} — so a tile can only ever show the frame taken as its own
+ * dart landed. When there is no such frame, or the mode is "image", the cloned
+ * board stands in; if even that is gone, the extension's own board.png does.
  *
  * The mode is the same choice Board View offers — camera 1, 2, 3 or the drawn
  * board — because it decides what the board itself shows: the frames are taken
@@ -59,6 +58,21 @@ const LAYOUT_STYLE_ID = "zoom-layout";
 const RING_FRACTION = 0.37778;
 
 /**
+ * The same edge in a camera frame, which is smaller. The boards normalise the
+ * pictures they send to an older convention that puts the double ring's outer
+ * edge at a third of the width — the site's `OLD_RADIUS`, `SIZE / 3`. The site
+ * draws its board to `RADIUS`, the 37.778% above, and lays a frame under that
+ * drawing by scaling it up by `RADIUS_SCALE`, the ratio of the two (1.1333); see
+ * `liveFeedStyle` in its board component. A tile shows the frame as sent, so it
+ * has to slide the dart by the smaller fraction — sliding by the larger one
+ * carried every dart past the middle by 13% of its distance from the bull — and
+ * is scaled up by the same ratio, so a camera tile shows as much board as a
+ * drawn one at the same level.
+ */
+const FRAME_RING_FRACTION = 1 / 3;
+const FRAME_SCALE = RING_FRACTION / FRAME_RING_FRACTION;
+
+/**
  * How hard to zoom for each position, on top of the configured level.
  *
  * The level alone cannot mean the same thing everywhere: the board copy is as
@@ -73,6 +87,19 @@ const RING_FRACTION = 0.37778;
  * a gap of its own.
  */
 const POSITION_ZOOM = { top: 1, bottom: 0.5, board: 1 } as const;
+
+/**
+ * How long a picture that arrived before its dart is kept waiting for it.
+ *
+ * The site swaps the picture onto its board some 70ms after the match state
+ * that scores the dart, and that state reaches this script through extension
+ * storage, which is a few milliseconds more on a quiet machine and could be
+ * longer on a busy one. Should the picture win that race it is held here until
+ * the dart shows up. The window is deliberately short: a board is reset, and
+ * sends a picture of its empty face, a second or more before the first dart of
+ * the visit is scored, and that picture must not be taken for the dart's.
+ */
+const ORPHAN_TTL = 500;
 
 /**
  * The board position moves the board with the `scale` and `translate`
@@ -296,10 +323,10 @@ const BOARD_STYLES = `
 `;
 
 let gameDataWatcherUnwatch: (() => void) | undefined;
-let boardImagesWatcherUnwatch: (() => void) | undefined;
 let stopKeepingBoardView: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let layoutObserver: MutationObserver | undefined;
+let pictureObserver: MutationObserver | undefined;
 let settle: ReturnType<typeof setTimeout> | undefined;
 let host: HTMLElement | null = null;
 let actionBarTop = 0;
@@ -325,10 +352,43 @@ let resetTimer: ReturnType<typeof setTimeout> | undefined;
  * feature is torn down.
  */
 const zoomed = new Set<string>();
+/**
+ * The camera picture taken as each dart of the visit landed, as a data URL,
+ * keyed on the throw's id.
+ *
+ * The site subscribes to pictures of the board being thrown at and swaps each
+ * one onto its board as it comes — one per dart, some 70ms after the match
+ * state that scores it, plus the odd one when a board is reset. That swap is
+ * the signal: the picture that appears after a dart is the picture of it, and
+ * it is copied here against the dart's id the moment it does. Only the darts of
+ * the visit in progress are kept, and only an id can be looked up, so a tile
+ * shows the frame of its own dart or nothing at all.
+ *
+ * This replaced a shared, positional list of the last six pictures that the
+ * WebSocket handler had been filling on a timer after every board event, from
+ * whichever board the event came. Tile `n` read position `n` of that list, and
+ * once six pictures had gathered — two visits in — those were its three oldest,
+ * so every tile showed a frame from a visit or two back, and with two boards
+ * taking turns usually the other player's board. The site's own blob URL is
+ * copied rather than kept because the site revokes it when the next picture
+ * arrives, and a tile rebuilt after that — for a correction, say — would come
+ * up blank.
+ */
+const frames = new Map<string, string>();
+/**
+ * A picture that arrived with no unclaimed dart to belong to, kept for
+ * {@link ORPHAN_TTL} in case its dart is still on the way — see there.
+ */
+let orphan: { picture: string; at: number } | null = null;
+/** The `src` of the board's picture as last seen, so only a change is copied. */
+let lastPicture: string | null = null;
+/** Copies started so far; a copy overtaken by a newer picture is dropped. */
+let copies = 0;
+/** The match state most recently drawn, which is what a new picture is matched against. */
+let latest: IGameData | null = null;
 let boardInset = 0;
 let config: IConfig["zoom"] | null = null;
 let userId: string | null = null;
-let boardImages: string[] = [];
 
 export async function zoom() {
   console.log("Autodarts Tools: Darts Zoom");
@@ -343,6 +403,9 @@ export async function zoom() {
   actionBarTop = 0;
   boardInset = 0;
   zoomed.clear();
+  frames.clear();
+  orphan = null;
+  latest = null;
   addStyles(config.position === "board" ? `${STYLES}\n${BOARD_STYLES}` : STYLES, STYLE_ID);
   mount();
 
@@ -356,14 +419,14 @@ export async function zoom() {
     stopKeepingBoardView = keepBoardView(config.mode);
   }
 
-  // A fresh visit starts with no frames; the handler fills these as the board
-  // pushes them.
-  boardImages = (await AutodartsToolsBoardImages.getValue()).images ?? [];
-  boardImagesWatcherUnwatch?.();
-  boardImagesWatcherUnwatch = AutodartsToolsBoardImages.watch(async (value: IBoardImages) => {
-    boardImages = value.images ?? [];
-    render(await AutodartsToolsGameData.getValue());
-  });
+  const root = qs(SELECTORS.app.contentRoot);
+
+  // The tiles of a camera mode are the pictures the site swaps onto its board;
+  // the board position zooms that board itself, and the drawn board is cloned,
+  // so neither has any use for them.
+  pictureObserver?.disconnect();
+  pictureObserver = undefined;
+  if (config.mode !== "image" && config.position !== "board") watchPictures(root ?? document.body);
 
   render(await AutodartsToolsGameData.getValue());
 
@@ -386,7 +449,6 @@ export async function zoom() {
       place();
     }, 100);
   });
-  const root = qs(SELECTORS.app.contentRoot);
   if (root) layoutObserver.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: [ "class", "style" ] });
 }
 
@@ -395,8 +457,6 @@ export function zoomOnRemove() {
 
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = undefined;
-  boardImagesWatcherUnwatch?.();
-  boardImagesWatcherUnwatch = undefined;
 
   if (onReposition) {
     window.removeEventListener("resize", onReposition);
@@ -404,6 +464,8 @@ export function zoomOnRemove() {
   }
   layoutObserver?.disconnect();
   layoutObserver = undefined;
+  pictureObserver?.disconnect();
+  pictureObserver = undefined;
   if (settle) clearTimeout(settle);
   settle = undefined;
   stopKeepingBoardView?.();
@@ -413,7 +475,10 @@ export function zoomOnRemove() {
   host?.remove();
   host = null;
   config = null;
-  boardImages = [];
+  frames.clear();
+  orphan = null;
+  lastPicture = null;
+  latest = null;
   zoomed.clear();
   actionBarTop = 0;
   boardInset = 0;
@@ -442,6 +507,7 @@ function mount(): void {
 }
 
 function render(gameData: IGameData): void {
+  latest = gameData;
   if (!host || !config) return;
 
   // The bull-off is one dart each at the bull to decide who throws first. A
@@ -451,6 +517,7 @@ function render(gameData: IGameData): void {
   if (gameData?.match?.variant === "Bull-off") return sleep();
 
   const throws = visitInProgress(gameData) ?? [];
+  reconcileFrames(throws);
   const showing = Boolean(throws.length) && shouldShow(gameData);
 
   if (config.position === "board") return holdBoardOn(showing ? throws[throws.length - 1] : null);
@@ -472,11 +539,21 @@ function render(gameData: IGameData): void {
   // would re-clone a board that has moved on since.
   throws.forEach((thrown, index) => {
     const existing = host!.children[index] as HTMLElement | undefined;
-    const stamp = stampOf(thrown, index);
+    const stamp = stampOf(thrown);
     if (existing?.dataset.adtThrow === stamp) return;
 
-    const fresh = tile(thrown, index, board);
+    // The same dart, handed its picture or moved by a correction: only what the
+    // tile shows changes. The tile itself stays, so a picture landing a tenth
+    // of a second after the dart does not run its entrance a second time.
+    if (existing?.dataset.adtId === thrown.id) {
+      existing.querySelector(".adt-zoom-view")?.replaceWith(view(thrown, board));
+      existing.dataset.adtThrow = stamp;
+      return;
+    }
+
+    const fresh = tile(thrown, board);
     fresh.dataset.adtThrow = stamp;
+    fresh.dataset.adtId = thrown.id;
     if (existing) host!.replaceChild(fresh, existing);
     else host!.appendChild(fresh);
   });
@@ -495,6 +572,8 @@ function render(gameData: IGameData): void {
 function sleep(): void {
   host?.replaceChildren();
   releaseBoard();
+  frames.clear();
+  orphan = null;
   boardInset = -1;
   actionBarTop = -1;
   removeStyles(LAYOUT_STYLE_ID);
@@ -547,8 +626,8 @@ function releaseBoard(): void {
  * What makes a tile out of date: the dart moving, or its camera frame arriving
  * after the tile was already built from the board instead.
  */
-function stampOf(thrown: IThrow, index: number): string {
-  const source = config?.mode !== "image" && boardImages[index] ? "frame" : "board";
+function stampOf(thrown: IThrow): string {
+  const source = config?.mode !== "image" && frames.has(thrown.id) ? "frame" : "board";
   return `${thrown.segment?.name ?? ""}:${thrown.coords?.x ?? 0}:${thrown.coords?.y ?? 0}:${source}`;
 }
 
@@ -560,7 +639,7 @@ function stampOf(thrown: IThrow, index: number): string {
  * `turns[0].throws` keeps the last player's darts on screen through the whole
  * of the next player's approach. The turn names its own player, so ask it.
  */
-function visitInProgress(gameData: IGameData): IThrow[] | null {
+function visitInProgress(gameData: IGameData | null): IThrow[] | null {
   const match = gameData?.match;
   const turn = match?.turns?.[0] as { throws?: IThrow[]; playerId?: string } | undefined;
   if (!turn) return null;
@@ -571,19 +650,120 @@ function visitInProgress(gameData: IGameData): IThrow[] | null {
   return turn.throws ?? null;
 }
 
+/**
+ * The picture the site is showing on its board, when a camera is up. Found
+ * inside the board first; the blob it is drawn from is the fallback, and the
+ * only one on the match screen.
+ */
+function boardPicture(): HTMLImageElement | null {
+  return qs<HTMLElement>(SELECTORS.match.board)?.querySelector("img")
+    ?? document.querySelector<HTMLImageElement>("img[src^='blob:']");
+}
+
+/**
+ * Copy each new picture the site puts on its board, as it does so.
+ *
+ * The site replaces the picture's `src` rather than the element, and does so
+ * inside the app root along with every other redraw, so one observer there
+ * sees it; anything that is not a change of picture costs a `querySelector`.
+ * The picture up when this starts is not copied: nothing has landed since it
+ * was taken, and a dart already on the board gets the clone of that board.
+ */
+function watchPictures(root: Node): void {
+  lastPicture = boardPicture()?.src ?? null;
+  pictureObserver = new MutationObserver(() => {
+    const src = boardPicture()?.src ?? null;
+    if (src === lastPicture) return;
+    lastPicture = src;
+    if (src) void keepPicture(src);
+  });
+  pictureObserver.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: [ "src" ] });
+}
+
+/**
+ * Copy a picture and give it to the dart it followed.
+ *
+ * The dart is the newest of the visit in progress that has no picture yet: the
+ * site swaps the picture in after the match state that scores the dart, so by
+ * the time it does the dart is normally already in {@link latest}. Should the
+ * picture come first — see {@link ORPHAN_TTL} — it waits for the dart there;
+ * and a picture with no dart to claim it, such as a reset board's, is dropped
+ * once that has passed. Copying is asynchronous, so a copy the next picture has
+ * already overtaken is dropped too: the dart is in the newer one.
+ */
+async function keepPicture(src: string): Promise<void> {
+  const copy = ++copies;
+  let picture: string;
+  try {
+    picture = await encode(src);
+  } catch (error) {
+    console.warn("Autodarts Tools: Darts Zoom - could not copy the board's picture", error);
+    return;
+  }
+  if (copy !== copies) return;
+
+  const throws = visitInProgress(latest) ?? [];
+  const newest = throws[throws.length - 1];
+  if (newest && !frames.has(newest.id)) {
+    frames.set(newest.id, picture);
+    orphan = null;
+    if (latest) render(latest);
+  } else {
+    orphan = { picture, at: Date.now() };
+  }
+}
+
+/** The bytes behind a blob URL as a data URL, which nothing can revoke. */
+async function encode(src: string): Promise<string> {
+  const blob = await (await fetch(src)).blob();
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+/**
+ * Keep only the frames of the darts on screen, and give a waiting picture to
+ * the dart that has just arrived for it, if one has and it is still fresh.
+ */
+function reconcileFrames(throws: IThrow[]): void {
+  const ids = new Set(throws.map(thrown => thrown.id));
+  for (const id of frames.keys()) if (!ids.has(id)) frames.delete(id);
+
+  if (!orphan) return;
+  const newest = throws[throws.length - 1];
+  const fresh = Date.now() - orphan.at <= ORPHAN_TTL;
+  if (newest && !frames.has(newest.id) && fresh) frames.set(newest.id, orphan.picture);
+  // Claimed, stale, or beaten to its dart by a picture that came the right way
+  // round — whichever it was, it is nobody's now.
+  if (!fresh || (newest && frames.has(newest.id))) orphan = null;
+}
+
 /** One close-up: a board that has been slid so the dart is dead centre. */
-function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLElement {
+function tile(thrown: IThrow, board: HTMLElement | null): HTMLElement {
   const element = document.createElement("div");
   element.className = "adt-zoom-tile";
+  element.appendChild(view(thrown, board));
+  if (config?.showMarker) {
+    const marker = document.createElement("div");
+    marker.className = "adt-zoom-marker";
+    element.appendChild(marker);
+  }
+  return element;
+}
 
-  const view = document.createElement("div");
-  view.className = "adt-zoom-view";
+/** What a tile shows: the dart's own frame, or a board, moved so the dart is in the middle. */
+function view(thrown: IThrow, board: HTMLElement | null): HTMLElement {
+  const box = document.createElement("div");
+  box.className = "adt-zoom-view";
 
-  const frame = config?.mode !== "image" ? boardImages[index] : undefined;
+  const frame = config?.mode !== "image" ? frames.get(thrown.id) : undefined;
   if (frame) {
     const image = document.createElement("img");
     image.src = frame;
-    view.appendChild(image);
+    box.appendChild(image);
   } else if (board) {
     // The site's own board, hit highlight and all. Its children are absolutely
     // positioned against it, so the copy needs its own size back.
@@ -592,28 +772,25 @@ function tile(thrown: IThrow, index: number, board: HTMLElement | null): HTMLEle
     copy.removeAttribute("aria-label");
     copy.style.width = "100%";
     copy.style.height = "100%";
-    view.appendChild(copy);
+    box.appendChild(copy);
   } else {
     const image = document.createElement("img");
     image.src = browser.runtime.getURL("/images/board.png");
-    view.appendChild(image);
+    box.appendChild(image);
   }
 
   const x = thrown.coords?.x ?? 0;
   const y = thrown.coords?.y ?? 0;
   // Translate first, then scale about the middle: the dart ends up where the
   // marker is, magnified. Percentages are of the copy's own box, so this holds
-  // at any tile size.
-  const scale = Math.max(1, (config?.level ?? 3) * POSITION_ZOOM[config?.position ?? "bottom"]);
-  view.style.transform = `scale(${scale}) translate(${-RING_FRACTION * x * 100}%, ${RING_FRACTION * y * 100}%)`;
+  // at any tile size. A frame is a smaller board in the same box, so it slides
+  // by its own fraction and is scaled up to match — see FRAME_RING_FRACTION.
+  const level = Math.max(1, (config?.level ?? 3) * POSITION_ZOOM[config?.position ?? "bottom"]);
+  const ring = frame ? FRAME_RING_FRACTION : RING_FRACTION;
+  const scale = frame ? level * FRAME_SCALE : level;
+  box.style.transform = `scale(${scale}) translate(${-ring * x * 100}%, ${ring * y * 100}%)`;
 
-  element.appendChild(view);
-  if (config?.showMarker) {
-    const marker = document.createElement("div");
-    marker.className = "adt-zoom-marker";
-    element.appendChild(marker);
-  }
-  return element;
+  return box;
 }
 
 /**
