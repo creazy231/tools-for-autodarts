@@ -323,6 +323,8 @@ const BOARD_STYLES = `
 `;
 
 let gameDataWatcherUnwatch: (() => void) | undefined;
+/** The watch kept while the bull-off runs, and nothing else does — see {@link waitForMatch}. */
+let bullOffWatcherUnwatch: (() => void) | undefined;
 let stopKeepingBoardView: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let layoutObserver: MutationObserver | undefined;
@@ -393,6 +395,49 @@ let userId: string | null = null;
 export async function zoom() {
   console.log("Autodarts Tools: Darts Zoom");
 
+  // Nothing is set up during the bull-off — see waitForMatch.
+  if (isBullOff(await AutodartsToolsGameData.getValue())) return waitForMatch();
+
+  await start();
+}
+
+/**
+ * Stand aside for the bull-off, and start once the match proper does.
+ *
+ * The bull-off is one dart each at the bull to decide who throws first. A
+ * close-up of it says nothing you cannot already see, and the bottom strip
+ * reserves its band across the foot of the match area whether or not a dart has
+ * landed — so on a screen the strip is never going to draw in, that band is
+ * simply missing height. Worse, the two halves of standing down disagreed: the
+ * strip gave the band up on every dart of the bull-off and the layout observer
+ * put it back a tenth of a second later, so the match area jumped 151px twice
+ * per dart. Never starting at all is the whole of the fix — no host, no styles,
+ * no observers, and the board is left on whatever view it came up with.
+ *
+ * Waiting here rather than leaving it to the match being torn down and rebuilt
+ * afterwards, which is what index.ts does when the variant changes: that hangs
+ * off a watcher only the URL route registers, so a board page that was sitting
+ * idle when its match began — the observer's route — would never start Darts
+ * Zoom at all.
+ */
+function waitForMatch(): void {
+  console.log("Autodarts Tools: Darts Zoom - standing down until the bull-off is over");
+
+  bullOffWatcherUnwatch?.();
+  bullOffWatcherUnwatch = AutodartsToolsGameData.watch((gameData: IGameData) => {
+    if (isBullOff(gameData)) return;
+    bullOffWatcherUnwatch?.();
+    bullOffWatcherUnwatch = undefined;
+    void start();
+  });
+}
+
+/** The bull-off, which is a variant of its own rather than a phase of the match. */
+function isBullOff(gameData: IGameData | null): boolean {
+  return gameData?.match?.variant === "Bull-off";
+}
+
+async function start() {
   const stored = await AutodartsToolsConfig.getValue();
   // The migration narrows this too, but a content script can load before it has
   // run in this browser, and an unknown value must not mean "no layout".
@@ -457,6 +502,8 @@ export function zoomOnRemove() {
 
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = undefined;
+  bullOffWatcherUnwatch?.();
+  bullOffWatcherUnwatch = undefined;
 
   if (onReposition) {
     window.removeEventListener("resize", onReposition);
@@ -510,11 +557,11 @@ function render(gameData: IGameData): void {
   latest = gameData;
   if (!host || !config) return;
 
-  // The bull-off is one dart each at the bull to decide who throws first. A
-  // close-up of it says nothing you cannot already see, and the strip would
-  // take room out of a screen that is about to be torn down and rebuilt for the
-  // match proper — so the feature stands down entirely until that happens.
-  if (gameData?.match?.variant === "Bull-off") return sleep();
+  // A bull-off normally means this never started at all — see waitForMatch —
+  // but it can also arrive under a strip that is already up, when what was on
+  // screen at startup turned out not to be the match being played. Standing
+  // down is then the same thing done late.
+  if (isBullOff(gameData)) return sleep();
 
   const throws = visitInProgress(gameData) ?? [];
   reconcileFrames(throws);
@@ -806,6 +853,12 @@ function view(thrown: IThrow, board: HTMLElement | null): HTMLElement {
  */
 function place(): void {
   if (!host || !config) return;
+
+  // The other way into the layout rules, and the one that used to undo standing
+  // down: sleep() gives the strip's room back, and the redraw that follows is a
+  // mutation, so a tenth of a second later this measured the empty strip and
+  // took the room straight back again.
+  if (isBullOff(latest)) return;
 
   host.setAttribute("data-position", config.position);
   if (config.position === "board") return;
