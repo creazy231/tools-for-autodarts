@@ -41,9 +41,26 @@ let notificationElement: HTMLElement | null = null;
 let notificationStyleElement: HTMLStyleElement | null = null;
 
 // Audio element pool for Safari compatibility
-const AUDIO_POOL_SIZE = 3;
+const AUDIO_POOL_SIZE = 6;
 const audioPool: HTMLAudioElement[] = [];
 let currentAudioIndex = 0;
+
+// Calls play strictly one after another, because a score is queued as separate
+// clips ("one hundred" then "eighty") that are unintelligible on top of each
+// other. The catch is that a long clip used to hold that lane for its whole
+// length, so everything behind it went silent and then arrived in a burst. A
+// clip therefore only keeps the lane while it is short enough to be part of a
+// spoken sequence; a longer one plays out on its own pool element while the
+// queue moves on. Generous, so real caller packs stay perfectly sequential.
+const LANE_HOLD_MAX_SECONDS = 5;
+// However long a clip claims to be, it never holds the lane past this — covers
+// unknown durations and stalled loads.
+const LANE_HOLD_TIMEOUT_MS = 6000;
+// The pool element holding the lane, if any. Only this element's "ended"/"error"
+// advances the queue, so a long clip finishing later cannot advance a lane it
+// no longer owns.
+let laneHolder: HTMLAudioElement | null = null;
+let laneTimeout: number | null = null;
 // Tracking URLs that need to be revoked
 const blobUrlsToRevoke: string[] = [];
 
@@ -143,7 +160,7 @@ export function callerOnRemove() {
   // Clean up audio player
   if (audioPlayer) {
     audioPlayer.pause();
-    audioPlayer.removeEventListener("ended", playNextSound);
+    audioPlayer.removeEventListener("ended", startQueueIfIdle);
     audioPlayer = null;
   }
 
@@ -154,6 +171,9 @@ export function callerOnRemove() {
     audio.remove();
   });
   audioPool.length = 0;
+
+  // Drop the lane and its watchdog
+  releaseLane(false);
 
   // Revoke any blob URLs
   blobUrlsToRevoke.forEach((url) => {
@@ -169,6 +189,82 @@ export function callerOnRemove() {
   removeInteractionNotification();
 }
 
+/** True when `play()` was refused because the document has no user gesture yet. */
+function isAutoplayBlocked(error: unknown): boolean {
+  const message = String(error);
+  return message.includes("failed because the user didn't interact with the document first") // chrome
+    || message.includes("The play method is not allowed by the user agent") // firefox
+    || message.includes("The request is not allowed by the user agent") // safari
+    || (error instanceof DOMException && error.name === "NotAllowedError");
+}
+
+/**
+ * Arms the one-shot listeners that unlock audio on the next user gesture.
+ *
+ * They are `{ once: true }`, so a gesture that fires them without actually
+ * unlocking used to consume them for good and leave the caller mute for the
+ * rest of the page's life. Anything that finds audio still locked re-arms them.
+ */
+function armUnlockListeners(): void {
+  document.addEventListener("click", unlockAudio, { once: true });
+  document.addEventListener("pointerdown", unlockAudio, { once: true });
+  document.addEventListener("touchstart", unlockAudio, { once: true });
+  document.addEventListener("keydown", unlockAudio, { once: true });
+}
+
+/**
+ * Starts the queue only if nothing is playing. `isPlaying` covers both a held
+ * lane and an active TTS utterance, which holds no pool element of its own.
+ */
+function startQueueIfIdle(): void {
+  if (!isPlaying) playNextSound();
+}
+
+/** Frees the lane and, unless told otherwise, starts the next call. */
+function releaseLane(advance: boolean = true): void {
+  if (laneTimeout !== null) {
+    clearTimeout(laneTimeout);
+    laneTimeout = null;
+  }
+  laneHolder = null;
+  isPlaying = false;
+  if (advance) playNextSound();
+}
+
+/** Marks `audioElement` as the clip holding the lane. */
+function holdLane(audioElement: HTMLAudioElement): void {
+  if (laneTimeout !== null) clearTimeout(laneTimeout);
+  laneHolder = audioElement;
+  laneTimeout = window.setTimeout(() => releaseLane(), LANE_HOLD_TIMEOUT_MS);
+}
+
+/**
+ * Called once a clip is actually playing. One too long to be part of a spoken
+ * sequence gives the lane back straight away and finishes in the background.
+ */
+function releaseLaneIfLongSound(audioElement: HTMLAudioElement): void {
+  if (laneHolder !== audioElement) return;
+
+  const { duration } = audioElement;
+  if (Number.isFinite(duration) && duration > LANE_HOLD_MAX_SECONDS) {
+    console.log(`Autodarts Tools: ${duration.toFixed(1)}s call left to play out, freeing the queue`);
+    releaseLane();
+  }
+}
+
+/**
+ * A pool element free to take a new clip, i.e. one not mid-playback. Falls back
+ * to round-robin so a saturated pool still plays the clip instead of dropping it.
+ */
+function takeAudioElement(): HTMLAudioElement | undefined {
+  const idle = audioPool.find(audio => audio !== laneHolder && (audio.paused || audio.ended));
+  if (idle) return idle;
+
+  const audio = audioPool[currentAudioIndex];
+  currentAudioIndex = (currentAudioIndex + 1) % AUDIO_POOL_SIZE;
+  return audio;
+}
+
 /**
  * Initialize the audio player with Safari compatibility in mind
  */
@@ -176,14 +272,15 @@ function initAudioPlayer(): void {
   if (!audioPlayer) {
     audioPlayer = new Audio();
 
-    // Add ended event listener to play the next sound in queue
-    audioPlayer.addEventListener("ended", playNextSound);
+    // This element only ever carries the silent unlock clip, so it never holds
+    // the lane — it may start the queue, but only when nothing else is playing.
+    audioPlayer.addEventListener("ended", startQueueIfIdle);
 
     // Handle errors
     audioPlayer.addEventListener("error", (e) => {
       console.error("Autodarts Tools: Audio playback error", e);
       // Move to next sound on error
-      playNextSound();
+      startQueueIfIdle();
     });
 
     // Initialize audio pool
@@ -191,20 +288,20 @@ function initAudioPlayer(): void {
       const audio = new Audio();
       audio.addEventListener("ended", () => {
         console.log("Autodarts Tools: Pool audio ended");
-        playNextSound();
+        // A long clip that already gave the lane back finishes here; it must
+        // not advance a queue it is no longer responsible for.
+        if (audio === laneHolder) releaseLane();
       });
       audio.addEventListener("error", (error) => {
         console.error("Autodarts Tools: Pool audio error", error);
-        document.addEventListener("click", unlockAudio, { once: true });
-        playNextSound();
+        armUnlockListeners();
+        if (audio === laneHolder) releaseLane();
       });
       audioPool.push(audio);
     }
 
     // Unlock audio on first user interaction (required for Safari/iOS)
-    document.addEventListener("click", unlockAudio, { once: true });
-    document.addEventListener("touchstart", unlockAudio, { once: true });
-    document.addEventListener("keydown", unlockAudio, { once: true });
+    armUnlockListeners();
   }
 }
 
@@ -245,6 +342,9 @@ function unlockAudio(): void {
     })
     .catch((error) => {
       console.error("Autodarts Tools: Failed to unlock audio", error);
+      // Still locked: put the one-shot gesture listeners back so the next
+      // interaction gets another go, instead of never trying again.
+      armUnlockListeners();
     });
 }
 
@@ -1002,19 +1102,21 @@ async function playNextSound(): Promise<void> {
         // Use URL source if available
         console.log("Autodarts Tools: Using URL source");
 
-        // Get the next audio element from the pool
-        const audioElement = audioPool[currentAudioIndex];
+        // Take a pool element that is not mid-playback, so a long clip still
+        // playing in the background is never cut off to make room
+        const audioElement = takeAudioElement();
 
         // Make sure the audio element exists
         if (!audioElement) {
           console.error("Autodarts Tools: Audio element not found in pool");
           // Move to next sound
-          playNextSound();
+          releaseLane();
           return;
         }
 
-        // Update index for next use
-        currentAudioIndex = (currentAudioIndex + 1) % AUDIO_POOL_SIZE;
+        // This clip owns the lane until it ends, proves to be a long one, or
+        // outstays LANE_HOLD_TIMEOUT_MS
+        holdLane(audioElement);
 
         // Stop any current playback
         audioElement.pause();
@@ -1026,32 +1128,29 @@ async function playNextSound(): Promise<void> {
         audioElement.play()
           .then(() => {
             console.log("Autodarts Tools: URL sound playing successfully");
+            releaseLaneIfLongSound(audioElement);
           })
           .catch((error) => {
             console.error("Autodarts Tools: Error playing URL sound", error);
 
             // Check if the error is due to user interaction requirement
-            if (
-              error.toString().includes("failed because the user didn't interact with the document first") // chrome
-              || error.toString().includes("The play method is not allowed by the user agent") // firefox
-              || error.toString().includes("The request is not allowed by the user agent") // safari
-            ) {
+            if (isAutoplayBlocked(error)) {
               showInteractionNotification();
               unlockAudio(); // Try to unlock audio again
             }
 
             // Move to next sound
-            playNextSound();
+            releaseLane();
           });
       } else {
         console.error("Autodarts Tools: Sound has neither URL, base64 data, nor soundId");
         // Move to next sound
-        playNextSound();
+        releaseLane();
       }
     } catch (error) {
       console.error("Autodarts Tools: Exception while setting up audio", error);
       // Move to next sound on error
-      playNextSound();
+      releaseLane();
     }
   } else {
     console.error("Autodarts Tools: nextSound is unexpectedly empty even though queue had items");
@@ -1065,7 +1164,7 @@ async function playNextSound(): Promise<void> {
 function playTTSSound(tts: ISoundTTS): void {
   if (!window.speechSynthesis) {
     console.error("Autodarts Tools: speechSynthesis not available");
-    playNextSound();
+    releaseLane();
     return;
   }
 
@@ -1087,18 +1186,18 @@ function playTTSSound(tts: ISoundTTS): void {
   const safetyTimeout = setTimeout(() => {
     console.warn("Autodarts Tools: TTS safety timeout reached");
     speechSynthesis.cancel();
-    playNextSound();
+    releaseLane();
   }, 10000);
 
   utterance.onend = () => {
     clearTimeout(safetyTimeout);
     console.log("Autodarts Tools: TTS playback ended");
-    playNextSound();
+    releaseLane();
   };
   utterance.onerror = (e) => {
     clearTimeout(safetyTimeout);
     console.error("Autodarts Tools: TTS playback error", e);
-    playNextSound();
+    releaseLane();
   };
 
   speechSynthesis.speak(utterance);
@@ -1116,15 +1215,15 @@ function playBase64Sound(base64Data: string): void {
 
     if (!audioUrl) {
       console.error("Autodarts Tools: Failed to create audio blob URL");
-      playNextSound();
+      releaseLane();
       return;
     }
 
     // Add URL to tracking array for later revocation
     blobUrlsToRevoke.push(audioUrl);
 
-    // Get the next audio element from the pool
-    const audioElement = audioPool[currentAudioIndex];
+    // Take a pool element that is not mid-playback
+    const audioElement = takeAudioElement();
 
     // Make sure the audio element exists
     if (!audioElement) {
@@ -1134,12 +1233,11 @@ function playBase64Sound(base64Data: string): void {
       if (index > -1) {
         blobUrlsToRevoke.splice(index, 1);
       }
-      playNextSound();
+      releaseLane();
       return;
     }
 
-    // Update index for next use
-    currentAudioIndex = (currentAudioIndex + 1) % AUDIO_POOL_SIZE;
+    holdLane(audioElement);
 
     // Stop any current playback
     audioElement.pause();
@@ -1151,16 +1249,13 @@ function playBase64Sound(base64Data: string): void {
     audioElement.play()
       .then(() => {
         console.log("Autodarts Tools: Base64 sound playing successfully");
+        releaseLaneIfLongSound(audioElement);
       })
       .catch((error) => {
         console.error("Autodarts Tools: Base64 sound playback failed", error);
 
         // Check if error is due to user interaction requirement
-        if (
-          error.toString().includes("failed because the user didn't interact with the document first") // chrome
-          || error.toString().includes("The play method is not allowed by the user agent") // firefox
-          || error.toString().includes("The request is not allowed by the user agent") // safari
-        ) {
+        if (isAutoplayBlocked(error)) {
           showInteractionNotification();
           unlockAudio(); // Try to unlock audio again
         }
@@ -1170,11 +1265,11 @@ function playBase64Sound(base64Data: string): void {
         if (index > -1) {
           blobUrlsToRevoke.splice(index, 1);
         }
-        playNextSound();
+        releaseLane();
       });
   } catch (error) {
     console.error("Autodarts Tools: Error processing base64 data", error);
-    playNextSound();
+    releaseLane();
   }
 }
 
@@ -1290,6 +1385,6 @@ function stopAllSounds(): void {
     audio.currentTime = 0;
   });
 
-  // Reset playing flag
-  isPlaying = false;
+  // Reset playing flag and hand the lane back
+  releaseLane(false);
 }
