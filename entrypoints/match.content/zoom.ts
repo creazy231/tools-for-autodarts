@@ -116,6 +116,25 @@ const ORPHAN_TTL = 500;
 const BOARD_SCALE = "--adt-zoom-board-scale";
 const BOARD_TRANSLATE = "--adt-zoom-board-translate";
 
+/**
+ * Where the site's action bar sits, for the same reason — see
+ * {@link actionBarStyles}. Pixels from the top left of the window.
+ */
+const BAR_X = "--adt-zoom-bar-x";
+const BAR_Y = "--adt-zoom-bar-y";
+/** Marks the bar mid-drag, which is only worth knowing to change the cursor. */
+const DRAGGING_ATTRIBUTE = "data-adt-zoom-dragging";
+/**
+ * How far the pointer has to travel before a press on the bar is a drag rather
+ * than a click.
+ *
+ * The bar is almost entirely the site's own buttons — undo, Next, the camera —
+ * and they have to keep working, so a press is a click until this is passed and
+ * the site's handler is only cut out once it is. Small enough that dragging
+ * feels immediate, large enough to survive the wobble of a real click.
+ */
+const DRAG_THRESHOLD = 4;
+
 const STYLES = `
   #${HOST_ID} {
     position: fixed;
@@ -288,22 +307,35 @@ function boardRoomStyles(clearance: number): string {
  * it is and every handler on it still works. `w-full` has to go with it, or a
  * fixed element stretches to the viewport instead of to its buttons.
  *
- * The top is measured rather than fixed: the throw display grows with the
- * number of players and can reach most of the way across, at which point a bar
- * pinned near the top of the window would sit on top of it.
+ * The top right is only where it starts. The bar can be dragged anywhere in
+ * the window from there — see {@link watchBarDrag} — because what is free space
+ * on one screen is the scoreboard on another.
+ *
+ * Both corners are written through custom properties rather than into the rule
+ * itself: a drag moves the bar with every pointer event, and rewriting a
+ * `<style>` element that often drops its rules for an instant each time. The
+ * properties go on the root element, where React never looks. See
+ * {@link BOARD_SCALE} for the same reasoning on the board.
  */
-function actionBarStyles(top: number): string {
+function actionBarStyles(): string {
   return `
     ${SELECTORS.match.actionBar[0]} {
       position: fixed !important;
-      top: ${top}px !important;
-      right: 1rem !important;
-      left: auto !important;
+      left: var(${BAR_X}) !important;
+      top: var(${BAR_Y}) !important;
+      right: auto !important;
       bottom: auto !important;
       width: auto !important;
       min-width: 0 !important;
       margin: 0 !important;
       z-index: ${LAYERS.zoomTile};
+      cursor: grab;
+      touch-action: none;
+    }
+
+    ${SELECTORS.match.actionBar[0]}[${DRAGGING_ATTRIBUTE}] {
+      cursor: grabbing;
+      user-select: none;
     }
   `;
 }
@@ -331,7 +363,11 @@ let layoutObserver: MutationObserver | undefined;
 let pictureObserver: MutationObserver | undefined;
 let settle: ReturnType<typeof setTimeout> | undefined;
 let host: HTMLElement | null = null;
-let actionBarTop = 0;
+let stopBarWatchers: (() => void) | undefined;
+/** True while the pointer is moving the bar, so nothing else repositions it. */
+let barDragging = false;
+/** The bar's corner as last written, which is what a finished drag saves. */
+let barPoint: { x: number; y: number } | null = null;
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
 /**
  * Every dart the board has already zoomed in on, so that none of them can be
@@ -445,8 +481,8 @@ async function start() {
   config = { ...stored.zoom, position: position === "top" || position === "board" ? position : "bottom", mode: viewMode(stored.zoom?.mode) };
   userId = await getUserIdFromToken();
 
-  actionBarTop = 0;
   boardInset = 0;
+  barPoint = null;
   zoomed.clear();
   frames.clear();
   orphan = null;
@@ -477,6 +513,19 @@ async function start() {
 
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = AutodartsToolsGameData.watch(render);
+
+  // Only the bottom position moves the bar out of the site's own layout, so it
+  // is the only one with anything to drag or to remember.
+  stopBarWatchers?.();
+  stopBarWatchers = undefined;
+  if (config.position === "bottom") {
+    const drag = watchBarDrag();
+    const setting = watchBarSetting();
+    stopBarWatchers = () => {
+      drag();
+      setting();
+    };
+  }
 
   onReposition = () => place();
   window.addEventListener("resize", onReposition);
@@ -517,6 +566,8 @@ export function zoomOnRemove() {
   settle = undefined;
   stopKeepingBoardView?.();
   stopKeepingBoardView = undefined;
+  stopBarWatchers?.();
+  stopBarWatchers = undefined;
 
   releaseBoard();
   host?.remove();
@@ -527,8 +578,10 @@ export function zoomOnRemove() {
   lastPicture = null;
   latest = null;
   zoomed.clear();
-  actionBarTop = 0;
   boardInset = 0;
+  barPoint = null;
+  document.documentElement.style.removeProperty(BAR_X);
+  document.documentElement.style.removeProperty(BAR_Y);
   removeStyles(STYLE_ID);
   removeStyles(LAYOUT_STYLE_ID);
 }
@@ -612,9 +665,9 @@ function render(gameData: IGameData): void {
  * Everything off, and nothing reserved: no tiles, no board hold, and none of
  * the room the strip normally takes out of the layout.
  *
- * The two measurements are pushed off their real values rather than to zero,
- * because {@link place} skips its work when nothing has changed and would
- * otherwise never put the layout rules back.
+ * The measurement is pushed off its real value rather than to zero, because
+ * {@link place} skips its work when nothing has changed and would otherwise
+ * never put the layout rules back.
  */
 function sleep(): void {
   host?.replaceChildren();
@@ -622,7 +675,6 @@ function sleep(): void {
   frames.clear();
   orphan = null;
   boardInset = -1;
-  actionBarTop = -1;
   removeStyles(LAYOUT_STYLE_ID);
 }
 
@@ -877,17 +929,190 @@ function place(): void {
   const strip = host.getBoundingClientRect();
   const clearance = Math.round(strip.height + 8);
 
-  // Clear of the throw display, and never higher than the window's own header.
-  const top = config.position === "bottom" ? Math.round(Math.max(56, (turnBar?.bottom ?? 0) + 8)) : 0;
+  if (clearance !== boardInset) {
+    boardInset = clearance;
+    const rules = config.position === "top"
+      ? [ boardRoomStyles(clearance) ]
+      : [ matchAreaStyles(clearance), actionBarStyles() ];
+    addStyles(rules.join("\n"), LAYOUT_STYLE_ID);
+  }
 
-  if (clearance === boardInset && top === actionBarTop) return;
-  boardInset = clearance;
-  actionBarTop = top;
+  // After the rules rather than with them: the bar has to be out of the flow
+  // before it measures as its buttons rather than as the width of the screen.
+  // Every pass, because this is also what pulls a corner saved on a wider
+  // window back into a narrower one — place() already runs on a resize.
+  if (config.position === "bottom") placeActionBar(turnBar);
+}
 
-  const rules = config.position === "top"
-    ? [ boardRoomStyles(clearance) ]
-    : [ matchAreaStyles(clearance), actionBarStyles(top) ];
-  addStyles(rules.join("\n"), LAYOUT_STYLE_ID);
+/**
+ * Put the action bar where it belongs: where it was last dragged to, or the
+ * corner the bottom strip moves it to until it has been dragged anywhere.
+ */
+function placeActionBar(turnBar?: DOMRect): void {
+  if (barDragging) return;
+
+  const bar = qs<HTMLElement>(SELECTORS.match.actionBar);
+  if (!bar) return;
+
+  const { width, height } = bar.getBoundingClientRect();
+  // Clear of the throw display, and never higher than the window's own header:
+  // the display grows with the player count and can reach most of the way
+  // across, at which point a bar pinned near the top would sit on top of it.
+  const corner = { x: window.innerWidth - width - 16, y: Math.max(56, (turnBar?.bottom ?? 0) + 8) };
+  moveActionBar(config?.actionBarPosition ?? corner, width, height);
+}
+
+/**
+ * Let the bar be dragged anywhere in the window, and remember where.
+ *
+ * The listeners are on the document, not on the bar: the bar is React's and is
+ * rebuilt on every redraw, so anything attached to the element itself would not
+ * last a turn.
+ *
+ * A press is a click until the pointer has travelled {@link DRAG_THRESHOLD} —
+ * the bar is almost entirely the site's own buttons, and undo and Next have to
+ * go on working. Once it has, the bar follows the pointer, and the click that
+ * ends the press is swallowed so a drag that finishes over Next does not press
+ * it. The pointer is captured on the root element rather than on the bar for
+ * the same reason as the listeners: a redraw mid-drag would drop the capture.
+ */
+function watchBarDrag(): () => void {
+  let bar: HTMLElement | null = null;
+  let pointer = -1;
+  let startX = 0;
+  let startY = 0;
+  let offsetX = 0;
+  let offsetY = 0;
+  let width = 0;
+  let height = 0;
+  let swallowClick = false;
+
+  const finish = () => {
+    bar?.removeAttribute(DRAGGING_ATTRIBUTE);
+    try {
+      document.documentElement.releasePointerCapture(pointer);
+    } catch {}
+    bar = null;
+    pointer = -1;
+    barDragging = false;
+  };
+
+  const onPointerDown = (event: PointerEvent) => {
+    // Whatever the last press left armed, this one is a fresh click.
+    swallowClick = false;
+    if (bar || event.button !== 0 || !config) return;
+    // Only the bottom position moves the bar, and it lets go of it entirely
+    // while it is standing down for a bull-off.
+    if (config.position !== "bottom" || isBullOff(latest)) return;
+
+    const found = qs<HTMLElement>(SELECTORS.match.actionBar);
+    if (!found || !(event.target instanceof Node) || !found.contains(event.target)) return;
+
+    const box = found.getBoundingClientRect();
+    bar = found;
+    pointer = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    offsetX = event.clientX - box.left;
+    offsetY = event.clientY - box.top;
+    width = box.width;
+    height = box.height;
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!bar || event.pointerId !== pointer) return;
+
+    if (!barDragging) {
+      if (Math.abs(event.clientX - startX) < DRAG_THRESHOLD && Math.abs(event.clientY - startY) < DRAG_THRESHOLD) return;
+      barDragging = true;
+      bar.setAttribute(DRAGGING_ATTRIBUTE, "");
+      try {
+        document.documentElement.setPointerCapture(pointer);
+      } catch {}
+    }
+
+    moveActionBar({ x: event.clientX - offsetX, y: event.clientY - offsetY }, width, height);
+    event.preventDefault();
+  };
+
+  const onPointerUp = (event: PointerEvent) => {
+    if (!bar || event.pointerId !== pointer) return;
+    const dragged = barDragging;
+    const point = barPoint;
+    finish();
+    if (!dragged || !point) return;
+
+    swallowClick = true;
+    void saveBarPosition(point);
+  };
+
+  const onClick = (event: MouseEvent) => {
+    if (!swallowClick) return;
+    swallowClick = false;
+    event.stopPropagation();
+    event.preventDefault();
+  };
+
+  document.addEventListener("pointerdown", onPointerDown, true);
+  document.addEventListener("pointermove", onPointerMove, true);
+  document.addEventListener("pointerup", onPointerUp, true);
+  document.addEventListener("pointercancel", onPointerUp, true);
+  document.addEventListener("click", onClick, true);
+
+  return () => {
+    if (bar) finish();
+    document.removeEventListener("pointerdown", onPointerDown, true);
+    document.removeEventListener("pointermove", onPointerMove, true);
+    document.removeEventListener("pointerup", onPointerUp, true);
+    document.removeEventListener("pointercancel", onPointerUp, true);
+    document.removeEventListener("click", onClick, true);
+  };
+}
+
+/**
+ * Follow the one setting that can change under a running match.
+ *
+ * Everything else this feature reads is fixed when it starts, but the settings
+ * panel's *Reset bar position* has to reach a match already in progress —
+ * otherwise the button appears to do nothing until the page is reloaded. A drag
+ * writes the same value, so an unchanged point is ignored rather than replacing
+ * the bar on top of itself.
+ */
+function watchBarSetting(): () => void {
+  return AutodartsToolsConfig.watch((next: IConfig) => {
+    if (!config || config.position !== "bottom") return;
+    const saved = next.zoom?.actionBarPosition ?? null;
+    const mine = config.actionBarPosition ?? null;
+    if (saved?.x === mine?.x && saved?.y === mine?.y) return;
+    config.actionBarPosition = saved;
+    place();
+  });
+}
+
+/**
+ * Keep where the bar was dropped, both in storage and on the copy of the
+ * settings this run is working from — without the second, the next place()
+ * would read the old value and put the bar straight back.
+ */
+async function saveBarPosition(point: { x: number; y: number }): Promise<void> {
+  if (config) config.actionBarPosition = point;
+  try {
+    const stored = await AutodartsToolsConfig.getValue();
+    await AutodartsToolsConfig.setValue({ ...stored, zoom: { ...stored.zoom, actionBarPosition: point } });
+  } catch (error) {
+    console.warn("Autodarts Tools: Darts Zoom - could not save where the action bar was dropped", error);
+  }
+}
+
+/** Write a corner to the properties the rule reads, with the bar kept on screen. */
+function moveActionBar(point: { x: number; y: number }, width: number, height: number): void {
+  const x = Math.min(Math.max(0, point.x), Math.max(0, window.innerWidth - width));
+  const y = Math.min(Math.max(0, point.y), Math.max(0, window.innerHeight - height));
+
+  barPoint = { x, y };
+  const root = document.documentElement.style;
+  root.setProperty(BAR_X, `${Math.round(x)}px`);
+  root.setProperty(BAR_Y, `${Math.round(y)}px`);
 }
 
 /** v1's two filters: whose darts to magnify, and whether to bother off a finish. */

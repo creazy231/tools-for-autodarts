@@ -156,6 +156,16 @@ export interface IConfig {
     zoomOn: "everyone" | "opponents";
     showMarker: boolean;
     onlyOnCheckout: boolean;
+    /**
+     * Where the user has dragged autodarts' own action bar to, in viewport
+     * pixels from the top left; `null` is the corner the bottom position puts
+     * it in on its own.
+     *
+     * Only the bottom position moves the bar at all, so only it reads this.
+     * The point is clamped back into the window whenever the layout changes,
+     * so one saved on a larger screen comes back on a smaller one.
+     */
+    actionBarPosition: { x: number; y: number } | null;
   };
   quickCorrection: {
     enabled: boolean;
@@ -489,6 +499,7 @@ export const defaultConfig: IConfig = {
     zoomOn: "everyone",
     showMarker: true,
     onlyOnCheckout: false,
+    actionBarPosition: null,
   },
   quickCorrection: {
     enabled: false,

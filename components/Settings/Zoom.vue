@@ -27,12 +27,20 @@
               </div>
               <p class="mt-1 text-sm text-white/60">
                 <em>Bottom</em> gives each dart a third of the window along the foot of the screen, and
-                moves autodarts' undo and next buttons up to the free space in the top right so they
-                are not covered. <em>Top</em> keeps them where they are and puts the strip under the
-                throw display instead, as wide as it is. <em>On Board</em> adds nothing to the screen
-                at all — autodarts' own board zooms in on each dart as it lands, and pulls back out
-                again.
+                moves autodarts' undo and next buttons up to the free space in the top right — drag
+                that bar anywhere you like and it stays there. <em>Top</em> keeps them where they are
+                and puts the strip under the throw display instead, as wide as it is. <em>On Board</em>
+                adds nothing to the screen at all — autodarts' own board zooms in on each dart as it
+                lands, and pulls back out again.
               </p>
+              <div v-if="config.zoom.position === 'bottom' && config.zoom.actionBarPosition" class="mt-3">
+                <AppButton @click="resetActionBarPosition" size="sm" auto>
+                  Reset bar position
+                </AppButton>
+                <p class="mt-1 text-sm text-white/60">
+                  Puts autodarts' undo and next buttons back in the top right corner.
+                </p>
+              </div>
             </div>
 
             <div v-if="config.zoom.position === 'board'" class="mt-4">
@@ -184,6 +192,7 @@
 </template>
 
 <script setup lang="ts">
+import AppButton from "../AppButton.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSlider from "../AppSlider.vue";
 import AppToggle from "../AppToggle.vue";
@@ -211,6 +220,10 @@ const zoomLevel = computed({
 function formatZoomLabel(value: number): string {
   const percentage = Math.round(((value - 1) / 5) * 100);
   return `${percentage}%`;
+}
+
+function resetActionBarPosition() {
+  if (config.value?.zoom) config.value.zoom.actionBarPosition = null;
 }
 
 async function toggleFeature() {
