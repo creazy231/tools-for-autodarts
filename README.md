@@ -590,6 +590,45 @@ Animations can be triggered by various game events using these tags:
   - `outside`: When a dart lands outside the scoring area
   - `busted`: When a player busts (scores more than needed)
   - `gameshot`: When a player wins the game or leg
+  - `matchshot`: When a player wins the complete match
+
+#### Player-Specific Animation Triggers
+
+Every supported in-match Animation trigger can optionally target a player.
+
+- **Stable player slot**: append `_player1`, `_player2`, etc.
+- **Player name**: append `_[player name]`
+- Player names are case-insensitive.
+- Spaces in names can be kept or replaced with underscores.
+
+Examples:
+
+```text
+100_player1
+140_player2
+180_playername
+bull_player1
+outside_player2
+busted_playername
+gameshot_player1
+gameshot_playername
+matchshot_player2
+matchshot_playername
+100-140_player1
+t20_t20_t20_playername
+```
+
+Specificity:
+
+```text
+<trigger>_<player name>
+→ <trigger>_playerN
+→ <trigger>
+```
+
+For a complete match win, the `matchshot` chain is tried first. If no matching
+matchshot animation exists, Animations fall back to the corresponding
+`gameshot` chain.
 
 #### Combination Tags
 You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`
