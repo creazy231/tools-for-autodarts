@@ -15,7 +15,6 @@ import { soundFx, soundFxOnRemove } from "./sound-fx";
 import { wledFx, wledFxOnRemove } from "./wled";
 import { caller, callerOnRemove } from "./caller";
 import { gotcha, gotchaOnRemove } from "./gotcha";
-import { checkoutGuide, checkoutGuideOnRemove } from "./checkout-guide";
 import { zoom, zoomOnRemove } from "./zoom";
 import { boardView, boardViewOnRemove } from "./board-view";
 import { instantReplay, instantReplayOnRemove } from "./instant-replay";
@@ -75,7 +74,6 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "enhancedScoringDisplay",
   "quickCorrection",
   "gotcha",
-  "checkoutGuide",
   "takeout",
   "nextPlayerOnTakeOutStuck",
   "automaticNextLeg",
@@ -330,10 +328,6 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initScript(gotcha, url).catch(e => console.error(e));
   }
 
-  if (isOn(config, "checkoutGuide")) {
-    await initScript(checkoutGuide, url).catch(e => console.error(e));
-  }
-
   // Discord's lobby half — the webhook announcements — is ported and enabled in
   // entrypoints/lobby.content. This is the other half, which starts a stream
   // once the match begins, and it is not.
@@ -402,7 +396,6 @@ function clearMatch(fromBullOff: boolean = false) {
   automaticNextLegOnRemove();
   enhancedScoringDisplayOnRemove();
   gotchaOnRemove();
-  checkoutGuideOnRemove();
   takeoutOnRemove();
   zoomOnRemove();
   boardViewOnRemove();

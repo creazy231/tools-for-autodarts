@@ -30,10 +30,6 @@ const STYLE_ID = "gotcha";
  * in the `left-3` column it reserves for them, where the eye already looks for
  * "throw this". The custom properties are the site's, so a palette change
  * carries.
- *
- * The Checkout Guide draws its Gotcha route in the same column, but only ever
- * on the card of whoever is throwing — and that card is the one this leaves
- * alone, since nobody is ahead of themselves. So the two never meet.
  */
 const STYLES = `
   [${HINT_ATTR}]::after {

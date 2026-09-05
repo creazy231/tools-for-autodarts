@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Removed
+
+- **Checkout Guide** is gone. It existed for one gap: autodarts drew the route beside a player's score only while its own *Show checkout guide* switch was on, and turning that off took the whole column away even though the routes kept arriving — so the feature filled it in, and stood aside on any card the site was already drawing on. The site now shows a route for every player itself, which leaves the feature nothing to do. Its switch disappears from the settings page and is dropped from saved settings; nothing else changes on the match screen
+  - The one thing it drew that autodarts still does not is the **Gotcha** route, which no route arrives for at any score. The **Caller** announces that number as before, and the **Gotcha Helper** still marks every player you could knock back — but the darts that land exactly on the target are no longer written beside the score
+
 ## [3.0.7] - 2026-09-04
 
 ### Added

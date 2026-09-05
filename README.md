@@ -149,7 +149,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Paste either the board's ID or a link containing it; the ID is picked out for you
   - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
 - **Features While Following a Board**: Everything that describes a match also works while you watch one at `/boards/<id>/follow`
-  - Colours, smaller inactive scores, larger names, legs/sets and match data, Checkout Guide, Gotcha Helper, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
+  - Colours, smaller inactive scores, larger names, legs/sets and match data, Gotcha Helper, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
   - **Automatic Next Player**, **Automatic Next Leg/Set** and **Quick Correction** stay off: they press the site's own controls, which belong to whoever is throwing rather than to whoever is watching
   - Nothing starts until the board is actually in a match, and it starts by itself when one begins — you can sit on the page and wait
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
@@ -178,11 +178,6 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Marks every player ahead of whoever is throwing with the single dart that lands exactly on their score and resets them — `T20`, `D11`, `BULL`
   - A gap no single dart can cover is shown as the gap itself, e.g. `+37`
   - Sits beside the score, in the spot the site keeps for checkout suggestions
-- **Checkout Guide**: Displays suggested checkout darts in each player's score box
-  - Autodarts shows these itself while *Show checkout guide* is on in the match settings; this keeps them on screen when it is off
-  - Stays out of the way whenever the site is already drawing them, so a route is never shown twice
-  - Every player gets their own route, not a copy of whoever is throwing
-  - **Gotcha** gets a route too, which autodarts works out for no one: the darts that land exactly on the target score, honouring Straight, Double and Master out. It is shown for whoever is throwing, and the Caller announces the number with it
 
 ### 🔊 Audio Features
 - **Caller**: Voice announcements for scores, checkouts, and each dart thrown during gameplay
@@ -220,6 +215,7 @@ The Caller feature provides voice announcements during your darts gameplay, simi
 #### Configuration Options
 - **Call Every Dart**: Announces each dart as it's thrown, rather than waiting for the end of a turn
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
+  - Covers **Gotcha** too, which autodarts works out no route for: the number left to reach the target score is announced the same way
 - **Prefer Combined Throws**: When enabled and a sound for the exact dart combination (e.g. `s20_s5_s1`) exists, the generic points sound (e.g. `26`) is skipped for that throw
 - **Custom Sound Library**: Add, edit, and organize voice clips for different game events
 - **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text using the built-in "Generate TTS" button — no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.

@@ -4,13 +4,12 @@ import type { IGotchaSettings, IMatch } from "@/utils/websocket-helpers";
  * Checkouts for the variants autodarts works none out for.
  *
  * The site computes a route per player for X01 and puts it in the match state,
- * which is where both the Checkout Guide overlay and the caller's "you require"
- * read it from. Gotcha gets nothing: its `state` is empty at every score and in
- * all three out modes, because there you count *up* to a target rather than
- * down to zero and the server keeps no route for that. The numbers are all
- * there though — the target is in the match settings and `gameScores` holds the
- * running totals — so the gap, and the darts that close it, are worked out
- * here instead.
+ * which is where the caller's "you require" reads it from. Gotcha gets nothing:
+ * its `state` is empty at every score and in all three out modes, because there
+ * you count *up* to a target rather than down to zero and the server keeps no
+ * route for that. The numbers are all there though — the target is in the match
+ * settings and `gameScores` holds the running totals — so the gap, and the
+ * darts that close it, are worked out here instead.
  */
 
 /** A finish: how far there is to go, and the darts that get there. */

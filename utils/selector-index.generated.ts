@@ -15,10 +15,10 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1788439561013;
+export const GENERATED_AT = 1788551141529;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1788439016077;
+export const NEWEST_SOURCE_AT = 1788551103594;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
@@ -66,73 +66,67 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 256,
+    "line": 356,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 261,
+    "line": 361,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 329,
+    "line": 429,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification-close",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 349,
+    "line": 449,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 382,
+    "line": 482,
     "fn": "querySelector"
-  },
-  {
-    "selector": "main",
-    "file": "entrypoints/match.content/checkout-guide.ts",
-    "line": 156,
-    "fn": "closest"
   },
   {
     "selector": "main",
     "file": "entrypoints/match.content/gotcha.ts",
-    "line": 134,
+    "line": 130,
     "fn": "closest"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 380,
+    "line": 505,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 385,
+    "line": 510,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 453,
+    "line": 578,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification-close",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 473,
+    "line": 598,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 506,
+    "line": 631,
     "fn": "querySelector"
   },
   {
@@ -145,6 +139,18 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
     "selector": "button",
     "file": "entrypoints/match.content/StreamingMode.vue",
     "line": 858,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-zoom-view",
+    "file": "entrypoints/match.content/zoom.ts",
+    "line": 649,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "img",
+    "file": "entrypoints/match.content/zoom.ts",
+    "line": 758,
     "fn": "querySelector"
   },
   {
@@ -198,7 +204,7 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Lobby",
     "file": "utils/selectors.ts",
-    "line": 254,
+    "line": 266,
     "fn": "waitForElementWithTextContent"
   },
   {

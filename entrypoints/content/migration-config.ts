@@ -186,11 +186,7 @@ async function migrateConfig(currentConfigVersion: number) {
       case 21:
         // Migration from version 21 to version 22
         config.version = 22;
-        if (!config.checkoutGuide) {
-          config.checkoutGuide = {
-            enabled: false,
-          };
-        }
+        // checkoutGuide removed
         break;
     }
 

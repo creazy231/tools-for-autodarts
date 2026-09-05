@@ -543,8 +543,6 @@ export const SELECTORS = {
       "div.w-full.text-center:has(> span > div.flex.gap-2)",
       "div.hidden:has(> div.flex.gap-2)",
     ],
-    /** The site's own checkout route, shown down the side of the card. */
-    checkoutSuggestion: [ ".text-checkout-suggestion" ],
     /** Per-player scoring history, under the score card. */
     chalkboard: [ "div.grid-rows-6" ],
     /**

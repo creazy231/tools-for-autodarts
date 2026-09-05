@@ -250,7 +250,6 @@ import QuickCorrection from "./Settings/QuickCorrection.vue";
 import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
 import Gotcha from "./Settings/Gotcha.vue";
-import CheckoutGuide from "./Settings/CheckoutGuide.vue";
 
 import packageConfig from "../package.json";
 
@@ -338,7 +337,6 @@ const featureGroups: FeatureGroup[] = [
       { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
       { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true, v2Ready: true },
       { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false, v2Ready: true },
-      { id: "checkout-guide", title: "Checkout Guide Settings", component: CheckoutGuide, hasSettings: false, v2Ready: true },
     ],
     settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "board-view", "quick-correction", "instant-replay" ],
   },

@@ -195,9 +195,6 @@ export interface IConfig {
   gotcha: {
     enabled: boolean;
   };
-  checkoutGuide: {
-    enabled: boolean;
-  };
 }
 
 export interface ISoundTTS {
@@ -763,9 +760,6 @@ export const defaultConfig: IConfig = {
   gotcha: {
     enabled: false,
   },
-  checkoutGuide: {
-    enabled: false,
-  },
 };
 
 /**
@@ -777,7 +771,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 10;
+const CONFIG_VERSION = 11;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -791,6 +785,20 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Checkout Guide is gone, and its saved switch with it.
+       *
+       * It existed because turning autodarts' own *Show checkout guide* off
+       * took the whole column away while the routes kept arriving. The site
+       * draws a route for every player now regardless, so the feature has
+       * nothing left to fill in.
+       */
+      11: (config: any) => {
+        const next = { ...config };
+        delete next.checkoutGuide;
+        return next;
+      },
+
       /**
        * Darts Zoom's view mode chooses a camera now, the way Board View does,
        * rather than "live" against "image". "Live" meant whichever camera the
