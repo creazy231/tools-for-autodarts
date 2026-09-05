@@ -165,6 +165,7 @@ async function processGameData(gameData: IGameData): Promise<void> {
       winnerMatch ? matchWinnerPlayer : gameWinnerPlayer,
       combination,
       throwName,
+      currentPlayer,
     );
   }
 
@@ -384,6 +385,7 @@ function playWinner(
   player: IPlayer | undefined,
   winningCombination: string,
   winningThrow: string,
+  boardPlayer: IPlayer | undefined,
 ): void {
   const triggerFamilies: Array<"gameshot" | "matchshot"> = matchWinner
     ? [ "matchshot", "gameshot" ]
@@ -398,7 +400,9 @@ function playWinner(
     ).find(hasExactTrigger);
 
     if (resolvedTrigger) {
-      void play(resolvedTrigger);
+      // The trigger is already fully resolved here. Use the player who threw the
+      // winning dart only for board filtering, while keeping exact-trigger playback.
+      void play(resolvedTrigger, undefined, boardPlayer);
       return;
     }
   }
@@ -447,8 +451,35 @@ async function loadFromOPFS(animationId: string): Promise<string | null> {
   return null;
 }
 
-async function play(trigger: string, player?: IPlayer): Promise<void> {
+function isAnimationBoardAllowed(player: IPlayer | undefined): boolean {
+  const boardIds = (config.value?.animations?.boardIds ?? [])
+    .map(id => id.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!boardIds.length) return true;
+
+  const boardId = player?.boardId?.trim().toLowerCase();
+  return Boolean(boardId && boardIds.includes(boardId));
+}
+
+async function play(
+  trigger: string,
+  player?: IPlayer,
+  boardPlayer?: IPlayer,
+): Promise<void> {
   try {
+    const filterPlayer = boardPlayer ?? player;
+
+    if (!isAnimationBoardAllowed(filterPlayer)) {
+      console.log(
+        "Autodarts Tools: Animations - skipped",
+        trigger,
+        "for board",
+        filterPlayer?.boardId || "unknown",
+      );
+      return;
+    }
+
     const resolved = await resolveAnimation(trigger, player);
     if (!resolved) return;
 

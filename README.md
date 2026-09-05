@@ -682,6 +682,21 @@ For a complete match win, the entire `matchshot` chain is tried first. If no
 matching matchshot animation exists, Animations fall back to the corresponding
 `gameshot` chain. Only one winner animation is selected.
 
+#### Board Filtering
+
+Animations can optionally be restricted to one or more Autodarts board IDs.
+Leave the Board IDs field empty to keep the existing behavior and play
+animations for every board.
+
+When one or more board IDs are configured, an animation is only allowed when
+the player responsible for the throw, gameshot or matchshot is using one of
+those boards. This is especially useful for online matches, where a remote
+opponent should not trigger your local celebration GIFs.
+
+Enter one board ID per line. Board IDs are matched case-insensitively. You can
+find a board ID in Autodarts, for example in the board page URL
+(`/boards/<board-id>`).
+
 #### Combination Tags
 You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`
 
