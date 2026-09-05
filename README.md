@@ -591,6 +591,8 @@ Animations can be triggered by various game events using these tags:
   - `busted`: When a player busts (scores more than needed)
   - `gameshot`: When a player wins the game or leg
   - `matchshot`: When a player wins the complete match
+  - Winner triggers can optionally include the winning dart (for example `gameshot_d10` or `matchshot_bull`)
+  - Winner triggers can also include the complete winning visit (for example `gameshot_s25_bull` or `matchshot_t20_t15_d20`)
 
 #### Player-Specific Animation Triggers
 
@@ -612,8 +614,16 @@ outside_player2
 busted_playername
 gameshot_player1
 gameshot_playername
+gameshot_player1_d10
+gameshot_playername_d10
+gameshot_player1_s25_bull
+gameshot_playername_s25_bull
 matchshot_player2
 matchshot_playername
+matchshot_player2_d1
+matchshot_playername_d1
+matchshot_player2_t20_t15_d20
+matchshot_playername_t20_t15_d20
 100-140_player1
 t20_t20_t20_playername
 ```
@@ -626,9 +636,51 @@ Specificity:
 → <trigger>
 ```
 
-For a complete match win, the `matchshot` chain is tried first. If no matching
-matchshot animation exists, Animations fall back to the corresponding
-`gameshot` chain.
+Winner animations can additionally target the winning dart or the complete
+winning visit. Put the checkout after the optional player suffix.
+
+Examples:
+
+```text
+gameshot_d10
+gameshot_player1_d10
+gameshot_playername_d10
+
+gameshot_s25_bull
+gameshot_player1_s25_bull
+gameshot_playername_s25_bull
+
+matchshot_d1
+matchshot_player2_d1
+matchshot_playername_d1
+
+matchshot_t20_t15_d20
+matchshot_player2_t20_t15_d20
+matchshot_playername_t20_t15_d20
+```
+
+Use the normal dart names for the checkout: `s1`-`s20`, `s25`,
+`d1`-`d20`, `t1`-`t20`, and `bull` for the bullseye. For example,
+a 75 checkout via outer bull followed by bullseye is `s25_bull`, not
+`s25_d25`.
+
+Within each winner family, the most specific enabled trigger wins:
+
+```text
+<gameshot|matchshot>_<player name>_<complete winning visit>
+→ <gameshot|matchshot>_playerN_<complete winning visit>
+→ <gameshot|matchshot>_<complete winning visit>
+→ <gameshot|matchshot>_<player name>_<winning dart>
+→ <gameshot|matchshot>_playerN_<winning dart>
+→ <gameshot|matchshot>_<winning dart>
+→ <gameshot|matchshot>_<player name>
+→ <gameshot|matchshot>_playerN
+→ <gameshot|matchshot>
+```
+
+For a complete match win, the entire `matchshot` chain is tried first. If no
+matching matchshot animation exists, Animations fall back to the corresponding
+`gameshot` chain. Only one winner animation is selected.
 
 #### Combination Tags
 You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`

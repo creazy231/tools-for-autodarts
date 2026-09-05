@@ -160,7 +160,12 @@ async function processGameData(gameData: IGameData): Promise<void> {
   );
 
   if (winner) {
-    playWinner(winnerMatch, winnerMatch ? matchWinnerPlayer : gameWinnerPlayer);
+    playWinner(
+      winnerMatch,
+      winnerMatch ? matchWinnerPlayer : gameWinnerPlayer,
+      combination,
+      throwName,
+    );
   }
 
   if (busted) play("busted", currentPlayer);
@@ -308,13 +313,95 @@ function hasTriggerForPlayer(trigger: string, player: IPlayer | undefined): bool
   return matchingAnimations(trigger, player) !== null;
 }
 
-function playWinner(matchWinner: boolean, player: IPlayer | undefined): void {
-  if (matchWinner && hasTriggerForPlayer("matchshot", player)) {
-    void play("matchshot", player);
-    return;
-  }
+function normalizedPlayerNameSuffixes(player: IPlayer | undefined): string[] {
+  if (!player?.name) return [];
 
-  void play("gameshot", player);
+  const nameWithSpaces = player.name.trim().toLowerCase();
+  const nameWithUnderscores = nameWithSpaces.replace(/\s+/g, "_");
+  return [ ...new Set([ nameWithUnderscores, nameWithSpaces ].filter(Boolean)) ];
+}
+
+function hasExactTrigger(trigger: string): boolean {
+  const animations = config.value?.animations?.data;
+  if (!animations?.length) return false;
+
+  return animations.some(
+    animation => animation.enabled
+      && Array.isArray(animation.triggers)
+      && animation.triggers.some(
+        rawTrigger => rawTrigger.trim().toLowerCase() === trigger,
+      ),
+  );
+}
+
+/**
+ * Winner-trigger priority inside one family:
+ * 1. player name + complete winning visit
+ * 2. stable player slot + complete winning visit
+ * 3. generic complete winning visit
+ * 4. player name + winning dart
+ * 5. stable player slot + winning dart
+ * 6. generic winning dart
+ * 7. player name
+ * 8. stable player slot
+ * 9. generic
+ */
+function winnerTriggerCandidates(
+  baseTrigger: "gameshot" | "matchshot",
+  player: IPlayer | undefined,
+  winningCombination: string,
+  winningThrow: string,
+): string[] {
+  const candidates: string[] = [];
+  const names = normalizedPlayerNameSuffixes(player);
+  const slot = player && Number.isInteger(player.index) && player.index >= 0
+    ? "player" + (player.index + 1)
+    : null;
+
+  const addScope = (eventSuffix?: string): void => {
+    const tail = eventSuffix ? "_" + eventSuffix : "";
+
+    for (const name of names) {
+      candidates.push(baseTrigger + "_" + name + tail);
+    }
+
+    if (slot) {
+      candidates.push(baseTrigger + "_" + slot + tail);
+    }
+
+    candidates.push(baseTrigger + tail);
+  };
+
+  if (winningCombination) addScope(winningCombination);
+  if (winningThrow && winningThrow !== winningCombination) addScope(winningThrow);
+  addScope();
+
+  return [ ...new Set(candidates) ];
+}
+
+function playWinner(
+  matchWinner: boolean,
+  player: IPlayer | undefined,
+  winningCombination: string,
+  winningThrow: string,
+): void {
+  const triggerFamilies: Array<"gameshot" | "matchshot"> = matchWinner
+    ? [ "matchshot", "gameshot" ]
+    : [ "gameshot" ];
+
+  for (const baseTrigger of triggerFamilies) {
+    const resolvedTrigger = winnerTriggerCandidates(
+      baseTrigger,
+      player,
+      winningCombination,
+      winningThrow,
+    ).find(hasExactTrigger);
+
+    if (resolvedTrigger) {
+      void play(resolvedTrigger);
+      return;
+    }
+  }
 }
 
 /** Pick an animation for a trigger, at random when several match. */
