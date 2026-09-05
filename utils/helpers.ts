@@ -978,12 +978,51 @@ export const triggerPatterns = {
   triples: /^t(1[0-9]|20|[1-9])$/,
 
   // Special events
-  specialEvents: /^(bull|outside|busted|gameshot)$/,
+  specialEvents: /^(bull|outside|busted|gameshot|matchshot)$/,
 
   // Combination tags: Format: [first dart]_[second dart]_[third dart]
   // Each dart can be a single, double, triple, or bull
   dartPattern: /^(s(1[0-9]|20|[0-9]|25)|d(1[0-9]|20|[1-9])|t(1[0-9]|20|[1-9])|bull)$/,
 };
+
+/** Whether a trigger is one of the existing supported Animation formats. */
+function isValidAnimationBaseTrigger(trigger: string): boolean {
+  if (
+    triggerPatterns.points.test(trigger)
+    || triggerPatterns.singles.test(trigger)
+    || triggerPatterns.doubles.test(trigger)
+    || triggerPatterns.triples.test(trigger)
+    || triggerPatterns.specialEvents.test(trigger)
+    || triggerPatterns.ranges.test(trigger)
+  ) {
+    return true;
+  }
+
+  const parts = trigger.split("_");
+  return parts.length >= 2
+    && parts.length <= 3
+    && parts.every(part => triggerPatterns.dartPattern.test(part));
+}
+
+/**
+ * A player-specific Animation trigger is an existing valid trigger plus a
+ * non-empty suffix. Search from right to left so underscore-based ranges,
+ * combinations and player names can coexist.
+ */
+function isValidAnimationTrigger(trigger: string): boolean {
+  if (isValidAnimationBaseTrigger(trigger)) return true;
+
+  let splitAt = trigger.lastIndexOf("_");
+  while (splitAt > 0) {
+    const baseTrigger = trigger.slice(0, splitAt);
+    const playerSuffix = trigger.slice(splitAt + 1);
+
+    if (playerSuffix && isValidAnimationBaseTrigger(baseTrigger)) return true;
+    splitAt = trigger.lastIndexOf("_", splitAt - 1);
+  }
+
+  return false;
+}
 
 /**
  * Validates animation triggers according to the supported formats
@@ -1003,47 +1042,11 @@ export function validateAnimationTriggers(triggers: string[]): {
     return { validTriggers: [], invalidTriggers: [] };
   }
 
-  // Combination pattern builder
-  const isValidCombination = (combo: string): boolean => {
-    const parts = combo.split("_");
-
-    // Must have 2 or 3 parts
-    if (parts.length < 2 || parts.length > 3) {
-      return false;
-    }
-
-    // Each part must be a valid dart
-    return parts.every(part => triggerPatterns.dartPattern.test(part));
-  };
-
-  // Process each trigger
   for (const trigger of triggers) {
     const trimmedTrigger = trigger.trim().toLowerCase();
+    if (!trimmedTrigger) continue;
 
-    // Skip empty triggers
-    if (!trimmedTrigger) {
-      continue;
-    }
-
-    // Check if it's a valid combination
-    if (trimmedTrigger.includes("_")) {
-      if (isValidCombination(trimmedTrigger)) {
-        validTriggers.push(trimmedTrigger);
-      } else {
-        invalidTriggers.push(trimmedTrigger);
-      }
-      continue;
-    }
-
-    // Check against all single-dart patterns
-    if (
-      triggerPatterns.points.test(trimmedTrigger)
-      || triggerPatterns.singles.test(trimmedTrigger)
-      || triggerPatterns.doubles.test(trimmedTrigger)
-      || triggerPatterns.triples.test(trimmedTrigger)
-      || triggerPatterns.specialEvents.test(trimmedTrigger)
-      || triggerPatterns.ranges.test(trimmedTrigger)
-    ) {
+    if (isValidAnimationTrigger(trimmedTrigger)) {
       validTriggers.push(trimmedTrigger);
     } else {
       invalidTriggers.push(trimmedTrigger);

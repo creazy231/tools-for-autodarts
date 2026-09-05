@@ -107,6 +107,8 @@ export interface IConfig {
 
   animations: {
     enabled: boolean;
+    /** Optional allowlist. Empty/undefined means animations may play for every board. */
+    boardIds?: string[];
     duration?: number;
     delayStart?: number;
     objectFit?: "cover" | "contain";
@@ -520,6 +522,7 @@ export const defaultConfig: IConfig = {
   },
   animations: {
     enabled: false,
+    boardIds: [],
     duration: 5,
     delayStart: 1,
     objectFit: "cover",
