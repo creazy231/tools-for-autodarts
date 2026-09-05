@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - **Checkout Guide** is gone. It existed for one gap: autodarts drew the route beside a player's score only while its own *Show checkout guide* switch was on, and turning that off took the whole column away even though the routes kept arriving — so the feature filled it in, and stood aside on any card the site was already drawing on. The site now shows a route for every player itself, which leaves the feature nothing to do. Its switch disappears from the settings page and is dropped from saved settings; nothing else changes on the match screen
   - The one thing it drew that autodarts still does not is the **Gotcha** route, which no route arrives for at any score. The **Caller** announces that number as before, and the **Gotcha Helper** still marks every player you could knock back — but the darts that land exactly on the target are no longer written beside the score
 
+### Fixed
+
+- **WLED**'s `outside` effect goes off when a dart misses, which it had never done since the feature shipped. Autodarts names a missed dart after the number it landed beside — `M17` for one just wide of the 17 — and never *outside*, so the trigger the lights looked up was one nobody has an effect for; the miss then counted as nothing having happened and they fell back to `gameon`. That is why every other trigger in a setup worked and this one alone stayed dark. A miss now falls back to `outside` after its own segment, so an effect set up on `m17` still wins, and the turn total and the three-dart combination keep the priority they have for every other dart. The **Caller**, **Sound FX** and **Animations** have always read a miss this way; only WLED did not. Thanks to [@msbreton](https://github.com/msbreton) for the report ([#240](https://github.com/creazy231/tools-for-autodarts/issues/240))
+
 ## [3.0.7] - 2026-09-04
 
 ### Added
