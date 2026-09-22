@@ -7,6 +7,7 @@ import { AutodartsToolsTournamentData, type ITournament } from "@/utils/tourname
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
 import { triggerPatterns } from "@/utils/helpers";
 import { gameDataProcessor } from "@/utils/wled";
+import { winId } from "@/utils/win";
 import { WledType } from "#imports";
 
 let gameDataWatcherUnwatch: any;
@@ -29,6 +30,14 @@ let currentBoardId: string | undefined;
 
 let debounceTimer: number | null = null;
 const DEBOUNCE_DELAY = 200;
+
+/**
+ * The win the gameshot/matchshot effect was last set for — see {@link winId}.
+ *
+ * A won leg goes on being reported after the dart that won it, and Finish sends
+ * it once more, so going by the winner alone set the effect again each time.
+ */
+let announcedWin: string | undefined;
 
 /** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
 function isOnALobbyPage(): boolean {
@@ -196,6 +205,15 @@ export function wledFxOnRemove() {
     tournamentDataWatcherUnwatch = null;
   }
 
+  // An update still waiting out its debounce would otherwise run after the
+  // teardown and set its effect over the idle one below — which is how the
+  // lights stayed on the matchshot once Finish had left the match.
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+    debounceTimer = null;
+  }
+  announcedWin = undefined;
+
   setEffectByTrigger("idle");
 }
 
@@ -214,6 +232,14 @@ async function processGameData(
   if (gameData.match.variant === "Bull-off" && isTriggerPresent("bulloff")) {
     setEffectByTrigger("bulloff");
     return;
+  }
+
+  // The same win reported again leaves the lights as they are — not even the
+  // `gameon` fallback, which would take the matchshot off them.
+  const win = winId(gameData.match);
+  if (win) {
+    if (win === announcedWin) return;
+    announcedWin = win;
   }
 
   // gameon is the default effect to play when no other event happened

@@ -3,6 +3,7 @@ import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/stor
 import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { gotchaCheckout } from "@/utils/checkout";
 import { LAYERS } from "@/utils/layers";
+import { winId } from "@/utils/win";
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
@@ -20,9 +21,15 @@ let audioUnlocked = false;
 let debounceTimer: number | null = null;
 // Debounce delay in milliseconds
 const DEBOUNCE_DELAY = 200;
-// Cooldown tracking for gameshot/matchshot sounds (to prevent multiple triggers from AI referee)
-let lastGameshotTimestamp: number = 0;
-const GAMESHOT_COOLDOWN_MS = 10000; // 10 seconds cooldown
+/**
+ * The win the gameshot/matchshot was last called for — see {@link winId}.
+ *
+ * A won leg is reported again and again after the dart that won it: by the AI
+ * referee, and on Finish, which sends the whole match once more. A ten-second
+ * cooldown stood here, and it let through every repeat that came later than
+ * that — Finish, pressed once the celebration is over, called it all again.
+ */
+let announcedWin: string | undefined;
 /**
  * The bull-off is announced once, when it begins.
  *
@@ -148,8 +155,7 @@ export function callerOnRemove() {
     debounceTimer = null;
   }
 
-  // Reset gameshot cooldown timestamp
-  lastGameshotTimestamp = 0;
+  announcedWin = undefined;
   bullOffAnnounced = false;
 
   // Cancel any ongoing TTS
@@ -667,13 +673,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
   // For non-Cricket variants, use normal sound logic
   if (gameData.match.variant !== "Cricket") {
     if (winner) {
-      // Check cooldown to prevent multiple gameshot/matchshot sounds (e.g., from AI referee)
-      const now = Date.now();
-      if (now - lastGameshotTimestamp < GAMESHOT_COOLDOWN_MS) {
-        console.log("Autodarts Tools: Skipping gameshot/matchshot sound due to cooldown");
+      const win = winId(gameData.match);
+      if (win === announcedWin) {
+        console.log("Autodarts Tools: Skipping gameshot/matchshot sound, this win was already called");
         return;
       }
-      lastGameshotTimestamp = now;
+      announcedWin = win;
 
       if (winnerMatch) {
         playSound("matchshot");
@@ -735,13 +740,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
   } else {
     // For Cricket, handle only winner and busted sounds (not the individual throws)
     if (winner) {
-      // Check cooldown to prevent multiple gameshot/matchshot sounds (e.g., from AI referee)
-      const now = Date.now();
-      if (now - lastGameshotTimestamp < GAMESHOT_COOLDOWN_MS) {
-        console.log("Autodarts Tools: Skipping gameshot/matchshot sound due to cooldown (Cricket)");
+      const win = winId(gameData.match);
+      if (win === announcedWin) {
+        console.log("Autodarts Tools: Skipping gameshot/matchshot sound, this win was already called (Cricket)");
         return;
       }
-      lastGameshotTimestamp = now;
+      announcedWin = win;
 
       if (winnerMatch) {
         playSound("matchshot");

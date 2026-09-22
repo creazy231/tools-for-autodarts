@@ -33,6 +33,7 @@ import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, type IAnimation, type IConfig } from "@/utils/storage";
 import { LAYERS } from "@/utils/layers";
+import { winId } from "@/utils/win";
 
 /** Matches the `duration-300` on the image. */
 const FADE_MS = 300;
@@ -53,6 +54,8 @@ const boardRect = ref({ top: 0, left: 0, width: 0, height: 0 });
 
 let hideTimer: number | null = null;
 let unwatchGameData: (() => void) | undefined;
+/** The win the gameshot last played for — see {@link winId}. */
+let announcedWin: string | undefined;
 
 /** Object URLs handed out by OPFS, revoked on unmount. */
 const opfsUrls = new Map<string, string>();
@@ -137,6 +140,14 @@ async function processGameData(gameData: IGameData): Promise<void> {
   const turn = gameData.match.turns[0];
   const currentThrow = turn.throws[turn.throws.length - 1];
   if (!currentThrow) return;
+
+  // A won leg goes on being reported after the dart that won it — Finish sends
+  // it once more — and each report played that dart and the gameshot again.
+  const win = winId(gameData.match);
+  if (win) {
+    if (win === announcedWin) return;
+    announcedWin = win;
+  }
 
   const throwName: string = dartName(currentThrow); // s1
   const isLastThrow: boolean = turn.throws.length >= 3;
