@@ -466,7 +466,8 @@ Effects can be triggered by various game events using these triggers:
 - **Singles**: `s1` to `s20`, `s25` (single segments, s25 for single bull)
 - **Doubles**: `d1` to `d20`, `bull` (double segments, bull for bullseye)
 - **Triples**: `t1` to `t20` (triple segments)
-- **`outside`**: When a dart lands outside the scoring area
+- **Misses**: `m1` to `m20` for a dart that lands outside the double ring beside that number, `miss` for one entered with the keypad's Miss button or corrected to a bouncer
+- **`outside`**: When a dart misses, whichever way autodarts records it — unless an effect is set up on the miss itself (`m17`, `miss`), which takes precedence
 
 ##### Combination Throws
 - **Format**: `[dart1]_[dart2]_[dart3]` (e.g., `t20_t20_t20` for three triple 20s)

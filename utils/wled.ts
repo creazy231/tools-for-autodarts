@@ -74,11 +74,13 @@ async function processX01Data(
 
   if (throwName === "25" && currentThrow.segment.bed.startsWith("Single")) throwName = "s25";
 
-  // Autodarts names a missed dart after the number it landed beside — "M17" —
-  // and never "Outside", so nothing here ever matched the documented `outside`
-  // trigger and every miss fell through to `gameon`. The Caller, Sound FX and
-  // Animations have always mapped the "m" beds onto `outside`; WLED had not.
-  const missed: boolean = /^m\d{1,2}$/.test(throwName);
+  // Autodarts never names a dart "Outside". One that lands beside a number is
+  // named after it — "M17" — and one entered with the keypad's Miss button or
+  // corrected to a bouncer is plain "Miss"; the site's own stats count both.
+  // Nothing here matched the documented `outside` trigger, so every miss fell
+  // through to `gameon`. The Caller, Sound FX and Animations already map both
+  // onto `outside`.
+  const missed: boolean = throwName === "miss" || /^m\d{1,2}$/.test(throwName);
 
   if (winnerMatch && triggerPresentCB("matchshot+" + throwName)) return "matchshot+" + throwName;
   if (winner && triggerPresentCB("gameshot+" + throwName)) return "gameshot+" + throwName;
@@ -86,7 +88,7 @@ async function processX01Data(
   if (isLastThrow && triggerPresentCB(combinedThrows)) return combinedThrows;
   if (!busted && isLastThrow && triggerPresentCB(points)) return points;
   if (triggerPresentCB(throwName)) return throwName;
-  // After the exact segment, so somebody who has set up an `m17` effect keeps it.
+  // After the exact segment, so an effect set up on `m17` or `miss` keeps it.
   if (missed && triggerPresentCB("outside")) return "outside";
 
   return null;
