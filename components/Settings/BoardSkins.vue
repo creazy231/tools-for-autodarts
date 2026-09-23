@@ -15,7 +15,8 @@
               <h4 class="mb-2 font-semibold">
                 Board
               </h4>
-              <div class="grid max-w-2xl grid-cols-2 gap-4 sm:grid-cols-3" role="group">
+              <!-- Three to a row across the dialog, two on a phone. -->
+              <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4" role="group">
                 <button
                   @click="config.boardSkins.skin = skin.id"
                   v-for="skin in BOARD_SKINS"
@@ -26,7 +27,7 @@
                   type="button"
                 >
                   <!-- Round, as the match screen clips it: a picture's corners are not part of the board. -->
-                  <span class="block p-5">
+                  <span class="block p-3 sm:p-5">
                     <img
                       :src="skin.preview"
                       :alt="`${skin.label} board`"
@@ -77,7 +78,7 @@
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play on autodarts' board in another design — the classic one from before the rebuild, or the qwellcode board.
+            Play on autodarts' board in another design — the classic one, qwellcode, Opal or Marble.
           </p>
         </div>
         <div class="flex">

@@ -1,3 +1,4 @@
+import type { PublicPath } from "wxt/browser";
 import type { IConfig } from "@/utils/storage";
 
 import boardV1 from "@/assets/autodarts_board_v1.svg?raw";
@@ -22,10 +23,14 @@ import boardV2 from "@/assets/autodarts_board_v2.svg?raw";
  * page itself can load. How a skin gets one depends on its size:
  *
  * - An SVG is a few dozen KB of text, and goes in as a data URL: nothing to load.
- * - A photo or a rendered picture is hundreds of KB, and a data URL is a third
- *   bigger again, bundled twice and written into every copy Darts Zoom makes. So
- *   those ship as files in `public/images/`, which the manifest lets autodarts'
- *   pages load, and are read from the extension.
+ * - A photo or a rendered picture is hundreds of KB or more, and a data URL is a
+ *   third bigger again, bundled twice and written into every copy Darts Zoom
+ *   makes. So those ship as files: every `assets/<name>_board.<png|jpg|webp>`
+ *   is copied to `images/` in the build by a hook in wxt.config.ts, where the
+ *   manifest lets autodarts' pages load it, and is read from the extension.
+ *   A PNG can leave everything outside the board transparent, which is worth
+ *   doing when the board does not reach the picture's edge: the site clips the
+ *   board to a circle as wide as the square, so a backdrop would show as a ring.
  */
 export type BoardSkinId = IConfig["boardSkins"]["skin"];
 
@@ -50,13 +55,20 @@ function dataUrl(svg: string): string {
 }
 
 /**
- * The qwellcode board, from the extension.
+ * A skin drawn from a picture that ships with the extension.
  *
- * Looked up when it is read rather than when this module loads: WXT evaluates
- * entrypoints in Node while it builds, and there is no `browser` to ask there.
+ * Its address is looked up when it is read rather than when this module loads:
+ * WXT evaluates entrypoints in Node while it builds, and there is no `browser`
+ * to ask there.
  */
-function qwellcode(): string {
-  return browser.runtime.getURL("/images/board-skin-qwellcode.jpg");
+function pictureSkin(id: BoardSkinId, label: string, description: string, path: PublicPath): BoardSkin {
+  return {
+    id,
+    label,
+    description,
+    get preview() { return browser.runtime.getURL(path); },
+    get art() { return browser.runtime.getURL(path); },
+  };
 }
 
 const CLASSIC = dataUrl(boardV1);
@@ -76,13 +88,9 @@ export const BOARD_SKINS: readonly BoardSkin[] = [
     preview: CLASSIC,
     art: CLASSIC,
   },
-  {
-    id: "qwellcode",
-    label: "qwellcode",
-    description: "The qwellcode board, with its lime-green rings.",
-    get preview() { return qwellcode(); },
-    get art() { return qwellcode(); },
-  },
+  pictureSkin("qwellcode", "qwellcode", "The qwellcode board, with its lime-green rings.", "/images/qwellcode_board.jpg"),
+  pictureSkin("opal", "Opal", "Mother-of-pearl segments on plum, ringed in copper.", "/images/opal_board.png"),
+  pictureSkin("marble", "Marble", "Black and white marble veined with gold, in a gilded rim.", "/images/marble_board.png"),
 ];
 
 /** The skin saved as `id`, or Default for anything this build does not know. */

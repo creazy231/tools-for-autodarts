@@ -150,7 +150,7 @@ export interface IConfig {
    */
   boardSkins: {
     enabled: boolean;
-    skin: "default" | "v1" | "qwellcode";
+    skin: "default" | "v1" | "qwellcode" | "opal" | "marble";
   };
   zoom: {
     enabled: boolean;

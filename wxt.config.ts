@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, rmSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { URL, fileURLToPath } from "node:url";
 
@@ -41,6 +41,20 @@ const DEVTOOLS = process.env.ADT_DEVTOOLS === "1";
  * Off by default, and dev only — `yarn build` never sees it.
  */
 const FAKE_CAMERA = process.env.ADT_FAKE_CAMERA === "1";
+
+/**
+ * Board Skins' pictures: every `assets/<name>_board.<png|jpg|jpeg|webp>`.
+ *
+ * They sit in assets/ with the rest of the board art, but a content script
+ * inlines whatever it imports, and a picture is far too big for that — it would
+ * be bundled into two scripts and copied into every Darts Zoom tile. So they ship
+ * as files in `images/`, which the manifest already lets autodarts' pages load;
+ * see utils/board-skins.ts. Read afresh each time, so a picture added while
+ * `yarn dev` runs is picked up by the next build.
+ */
+function boardPictures(root: string): string[] {
+  return readdirSync(join(root, "assets")).filter(file => /_board\.(png|jpe?g|webp)$/i.test(file));
+}
 
 /** Builds that ship the picker. */
 const WITH_PICKER = DEVTOOLS;
@@ -142,6 +156,16 @@ export default defineConfig({
     reloadCommand: "Alt+T",
   },
   hooks: {
+    // Board Skins' pictures — see boardPictures above. The second hook lists
+    // them among the paths `browser.runtime.getURL` accepts.
+    "build:publicAssets": (wxt, files) => {
+      for (const file of boardPictures(wxt.config.root)) {
+        files.push({ absoluteSrc: join(wxt.config.root, "assets", file), relativeDest: `images/${file}` });
+      }
+    },
+    "prepare:publicPaths": (wxt, paths) => {
+      for (const file of boardPictures(wxt.config.root)) paths.push(`images/${file}`);
+    },
     /**
      * Removes the picker from store builds. Its body is already stripped by
      * Vite, but WXT still emits and registers the entrypoint — ~14KB of inert
