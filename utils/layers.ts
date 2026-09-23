@@ -32,12 +32,20 @@ const FEATURE_LAYERS = {
   callerStatus: 50,
   /** Sound FX status readout. */
   soundStatus: 50,
-  /** Animations, over the match but under anything that wants an answer. */
-  animations: 180,
   /** Darts Zoom's tile strip. */
   zoom: 190,
   /** The site's own buttons, moved out from under that strip. */
   zoomTile: 191,
+  /**
+   * Animations, over the match but under anything that wants an answer.
+   *
+   * Darts Zoom counts as the match here. Its tiles only show darts that are
+   * already on the board, and they stay up for the whole visit, so a GIF under
+   * them had a strip cut out of it for as long as it played. The action bar Zoom
+   * moves goes under the GIF with them, as the bar already does where the site
+   * draws it, and a click on the GIF puts it away.
+   */
+  animations: 195,
   /** The takeout notice and its scrim. */
   takeout: 200,
   /** Instant Replay's clip, over the takeout notice it usually follows. */
