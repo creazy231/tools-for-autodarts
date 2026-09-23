@@ -17,7 +17,6 @@ let observer = new MutationObserver(() => {});
 let teardownMenu: (() => void) | undefined;
 const currentUrl = ref();
 const configVisible = ref(false);
-const isConfigPage = ref(true);
 const lastVisitedUrl = useStorage("adt:last-visited-url", "");
 
 watch(currentUrl, async (newURL, oldURL) => {
@@ -83,16 +82,23 @@ onMounted(async () => {
 
   currentUrl.value = "";
   await nextTick();
-  currentUrl.value = window.location.href;
-  isConfigPage.value = url.includes("/tools") || wasLastInTools;
 
-  if (isConfigPage.value) {
+  /**
+   * Reopen the overlay after a reload of /tools.
+   *
+   * The site has no /tools page, so index.ts sends that load to /settings and
+   * the URL is put back here. Open and push before reading the URL, the same as
+   * openTools(): pushState fires no popstate and mutates no DOM, so nothing
+   * else tells currentUrl about it. Reading it first recorded the
+   * /settings/general underneath as the last visited URL, left the overlay shut
+   * unless some unrelated DOM change came along, and the next reload stayed on
+   * /settings/general.
+   */
+  if (url.includes("/tools") || wasLastInTools) {
+    configVisible.value = true;
     window.history.pushState(null, "", "/tools");
-
-    await nextTick();
-
-    isConfigPage.value = false;
   }
+  currentUrl.value = window.location.href;
 
   startObserver();
 
