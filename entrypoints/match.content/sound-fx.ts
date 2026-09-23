@@ -3,6 +3,7 @@ import { AutodartsToolsNotificationData, type INotification, NOTIFICATION_TOURNA
 import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from "@/utils/storage";
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { LAYERS } from "@/utils/layers";
+import { settleGameData } from "@/utils/settle-game-data";
 import { winId } from "@/utils/win";
 
 let gameDataWatcherUnwatch: any;
@@ -25,10 +26,9 @@ let isPlaying2 = false;
 // Flag to track if audio has been unlocked
 let audioUnlocked = false;
 let audioUnlocked2 = false;
-// Debounce timer for processing game data
-let debounceTimer: number | null = null;
-// Debounce delay in milliseconds
-const DEBOUNCE_DELAY = 200;
+// Each game-data update settles before it plays, without a finished visit ever
+// being lost to the next one — see utils/settle-game-data.ts.
+const settled = settleGameData((gameData, oldGameData) => processGameData(gameData, oldGameData, true));
 // The win the gameshot/matchshot sound last played for. A won leg is reported
 // again long after the dart that won it — Finish sends the whole match once
 // more — and the ten-second cooldown that stood here let every later repeat
@@ -110,16 +110,7 @@ export async function soundFx() {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch((gameData: IGameData, oldGameData: IGameData) => {
         if (!config?.soundFx?.enabled) return;
         console.log("Autodarts Tools: soundFx game data updated");
-
-        // Debounce the processGameData call
-        if (debounceTimer) {
-          clearTimeout(debounceTimer);
-        }
-
-        debounceTimer = window.setTimeout(() => {
-          processGameData(gameData, oldGameData, true);
-          debounceTimer = null;
-        }, DEBOUNCE_DELAY);
+        settled.push(gameData, oldGameData);
       });
 
       const url = window.location.href;
@@ -195,11 +186,8 @@ export function soundFxOnRemove() {
     notificationWatcherUnwatch = null;
   }
 
-  // Clear any pending debounce timer
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-    debounceTimer = null;
-  }
+  // Drop any update still settling
+  settled.cancel();
 
   announcedWin = undefined;
 

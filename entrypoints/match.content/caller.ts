@@ -3,6 +3,7 @@ import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/stor
 import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { gotchaCheckout } from "@/utils/checkout";
 import { LAYERS } from "@/utils/layers";
+import { settleGameData } from "@/utils/settle-game-data";
 import { winId } from "@/utils/win";
 
 let gameDataWatcherUnwatch: any;
@@ -17,10 +18,9 @@ const soundQueue: { url?: string; base64?: string; name?: string; soundId?: stri
 let isPlaying = false;
 // Flag to track if audio has been unlocked
 let audioUnlocked = false;
-// Debounce timer for processing game data
-let debounceTimer: number | null = null;
-// Debounce delay in milliseconds
-const DEBOUNCE_DELAY = 200;
+// Each game-data update settles before it is called, without a finished visit
+// ever being lost to the next one — see utils/settle-game-data.ts.
+const settled = settleGameData((gameData, oldGameData) => processGameData(gameData, oldGameData, true));
 /**
  * The win the gameshot/matchshot was last called for — see {@link winId}.
  *
@@ -106,16 +106,7 @@ export async function caller() {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch((gameData: IGameData, oldGameData: IGameData) => {
         if (!config?.caller?.enabled) return;
         console.log("Autodarts Tools: caller game data updated");
-
-        // Debounce the processGameData call
-        if (debounceTimer) {
-          clearTimeout(debounceTimer);
-        }
-
-        debounceTimer = window.setTimeout(() => {
-          processGameData(gameData, oldGameData, true);
-          debounceTimer = null;
-        }, DEBOUNCE_DELAY);
+        settled.push(gameData, oldGameData);
       });
 
       const url = window.location.href;
@@ -149,11 +140,8 @@ export function callerOnRemove() {
     boardDataWatcherUnwatch = null;
   }
 
-  // Clear any pending debounce timer
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-    debounceTimer = null;
-  }
+  // Drop any update still settling
+  settled.cancel();
 
   announcedWin = undefined;
   bullOffAnnounced = false;

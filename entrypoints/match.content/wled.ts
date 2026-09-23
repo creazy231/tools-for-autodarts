@@ -6,6 +6,7 @@ import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage
 import { AutodartsToolsTournamentData, type ITournament } from "@/utils/tournament-data-storage";
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
 import { triggerPatterns } from "@/utils/helpers";
+import { settleGameData } from "@/utils/settle-game-data";
 import { gameDataProcessor } from "@/utils/wled";
 import { winId } from "@/utils/win";
 import { WledType } from "#imports";
@@ -28,8 +29,9 @@ let config: IConfig;
  */
 let currentBoardId: string | undefined;
 
-let debounceTimer: number | null = null;
-const DEBOUNCE_DELAY = 200;
+// Each game-data update settles before its effect is set, without a finished
+// visit ever being lost to the next one — see utils/settle-game-data.ts.
+const settled = settleGameData((gameData, oldGameData) => processGameData(gameData, oldGameData, true));
 
 /**
  * The win the gameshot/matchshot effect was last set for — see {@link winId}.
@@ -111,16 +113,7 @@ export async function wledFx() {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch(
         (gameData: IGameData, oldGameData: IGameData) => {
           if (!config.wledFx?.enabled) return;
-
-          // Debounce the processGameData call
-          if (debounceTimer) {
-            clearTimeout(debounceTimer);
-          }
-
-          debounceTimer = window.setTimeout(() => {
-            processGameData(gameData, oldGameData, true);
-            debounceTimer = null;
-          }, DEBOUNCE_DELAY);
+          settled.push(gameData, oldGameData);
         },
       );
 
@@ -205,13 +198,10 @@ export function wledFxOnRemove() {
     tournamentDataWatcherUnwatch = null;
   }
 
-  // An update still waiting out its debounce would otherwise run after the
-  // teardown and set its effect over the idle one below — which is how the
-  // lights stayed on the matchshot once Finish had left the match.
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-    debounceTimer = null;
-  }
+  // An update still settling would otherwise run after the teardown and set its
+  // effect over the idle one below — which is how the lights stayed on the
+  // matchshot once Finish had left the match.
+  settled.cancel();
   announcedWin = undefined;
 
   setEffectByTrigger("idle");
