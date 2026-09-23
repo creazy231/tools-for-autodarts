@@ -1,4 +1,5 @@
 import { addStyles, removeStyles } from "@/utils";
+import { SELECTORS, qs } from "@/utils/selectors";
 
 /**
  * A countdown drawn on one of the site's own buttons, which clicks it at zero.
@@ -77,7 +78,7 @@ export function createButtonCountdown(attribute: string, styleId: string): Butto
   function watchDom(): void {
     if (observer) return;
 
-    const host = document.querySelector("main");
+    const host = qs(SELECTORS.app.contentRoot);
     if (!host) return;
 
     observer = new MutationObserver(() => {

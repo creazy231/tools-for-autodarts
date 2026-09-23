@@ -178,12 +178,20 @@ export const SELECTORS = {
     /**
      * The scrolling content area, where the settings overlay mounts.
      *
-     * `main` is semantic HTML and there is exactly one. The previous anchor,
-     * `#root > div > div:nth-of-type(2)`, resolves on v2 to an empty
-     * zero-height trailing div — so the overlay mounted in the wrong place and
-     * the hide-page-content logic hid nothing.
+     * The site draws one `main`, but it is not the only one on the page.
+     * Userscripts hang their own windows off `body`, and FankiDarts keeps a
+     * hidden settings dialog there with a `main` inside, in place from the
+     * moment the body exists. A bare `main` found that one whenever the site
+     * had not drawn its shell yet — a slow load was enough — and the overlay
+     * then mounted inside FankiDarts' dialog: the page went blank and the
+     * settings turned up in the other script's window. `#root` is the site's
+     * React root, so this names the site's own and waits for it.
+     *
+     * The previous anchor, `#root > div > div:nth-of-type(2)`, resolves on v2
+     * to an empty zero-height trailing div — so the overlay mounted in the
+     * wrong place and the hide-page-content logic hid nothing.
      */
-    contentRoot: [ "main", "[role='main']" ],
+    contentRoot: [ "#root main", "#root [role='main']" ],
     /**
      * The main navigation. Structure first: the aria-label is a `t()` string
      * the language switcher rewrites, so it can only ever be a fallback.
