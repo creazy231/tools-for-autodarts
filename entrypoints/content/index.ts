@@ -12,6 +12,7 @@ import { isiOS } from "@/utils/helpers";
 import Migration from "@/components/Migration.vue";
 import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 import { quietOwnDartsSwitch, quietOwnDartsSwitchOnRemove } from "@/utils/quiet-own-darts-switch";
+import { keepKeystrokesInFields } from "@/utils/keep-keystrokes-in-fields";
 
 let migrationModalUI: any;
 
@@ -19,6 +20,13 @@ export default defineContentScript({
   matches: AUTODARTS_MATCHES,
   cssInjectionMode: "ui",
   async main(ctx) {
+    // Letters typed into our fields must not reach the page's shortcut
+    // handlers, which cannot see into a shadow root and take them for
+    // shortcuts — FankiDarts opened its settings on every "s". One listener
+    // serves every entrypoint's UI on the page. See
+    // utils/keep-keystrokes-in-fields.ts.
+    ctx.onInvalidated(keepKeystrokesInFields());
+
     await waitForElement(SELECTORS.app.root, 15000);
     AutodartsToolsUrlStatus.setValue(window.location.href.split("#")[0] || "undefined");
 
