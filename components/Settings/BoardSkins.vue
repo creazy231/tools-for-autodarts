@@ -78,7 +78,7 @@
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play on autodarts' board in another design — the classic one, qwellcode, Opal or Marble.
+            Play on autodarts' board in another design — the classic one, qwellcode, Opal, Marble or Sorbet.
           </p>
         </div>
         <div class="flex">

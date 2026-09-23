@@ -91,6 +91,7 @@ export const BOARD_SKINS: readonly BoardSkin[] = [
   pictureSkin("qwellcode", "qwellcode", "The qwellcode board, with its lime-green rings.", "/images/qwellcode_board.jpg"),
   pictureSkin("opal", "Opal", "Mother-of-pearl segments on plum, ringed in copper.", "/images/opal_board.png"),
   pictureSkin("marble", "Marble", "Black and white marble veined with gold, in a gilded rim.", "/images/marble_board.png"),
+  pictureSkin("sorbet", "Sorbet", "Lemon, coral and mint pastels on a lavender ring.", "/images/sorbet_board.png"),
 ];
 
 /** The skin saved as `id`, or Default for anything this build does not know. */
