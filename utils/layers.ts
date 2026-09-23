@@ -15,6 +15,12 @@
  * purpose is to cover everything. Worse than untidy: its scrim darkened the
  * chroma key along with it, which is enough to stop the key working downstream.
  *
+ * The site's own layers are in that context too, and the lowest entries here
+ * are placed against them. On the match screen autodarts draws the match itself
+ * at 10 and the game-info pills at 20. Its header and the match chat's messages
+ * sit at 40, and its sheets and dialogs — the chat, the in-game settings, every
+ * confirmation — at 50, portaled to `body`.
+ *
  * Not every `z-index` in the extension belongs here. Winner Animation's is
  * measured against the site's own end-of-leg panel and lives *inside* the site's
  * card, a nested stacking context — a number in this scale would mean nothing
@@ -28,14 +34,28 @@
  * — they leave room to slot something in without renumbering its neighbours.
  */
 const FEATURE_LAYERS = {
+  /**
+   * Darts Zoom's tile strip: over the match, under everything the site lays
+   * over it.
+   *
+   * It was 190, above all of those, and the bottom strip is where the site
+   * opens its sheets from. The match chat came up with its message field and
+   * quick replies behind the tiles, and the messages it shows at the bottom
+   * right arrived behind the third one.
+   */
+  zoom: 30,
+  /**
+   * The site's own buttons, moved out from under that strip — so one above it,
+   * and under the site's sheets with the rest of the match. That holds in the
+   * sidebar and top-bar layouts, where the bar is a layer of its own. In the
+   * widest one it stays inside the match area's own `z-10` context, so there it
+   * is at 10 against everything here.
+   */
+  zoomTile: 31,
   /** Caller status readout. */
   callerStatus: 50,
   /** Sound FX status readout. */
   soundStatus: 50,
-  /** Darts Zoom's tile strip. */
-  zoom: 190,
-  /** The site's own buttons, moved out from under that strip. */
-  zoomTile: 191,
   /**
    * Animations, over the match but under anything that wants an answer.
    *

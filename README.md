@@ -113,6 +113,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Adjustable zoom level, scaled to the position: the bottom strip is a third of the window wide, so the same level there magnifies far more than a narrower tile would, and it is eased off to suit; the top strip, a third of the throw display wide, takes the level as it is
   - New darts fade in as they land (rising from the foot of the screen in the bottom strip); darts already on screen are left alone
   - The board shrinks to make room, so the close-ups never cover it — at any window size, including tablets
+  - Autodarts' own sheets, dialogs and chat messages open in front of the close-ups, as they do over the rest of the match, so the match chat's message field is never hidden behind the bottom strip
   - An optional centre dot marks the exact point
   - Can be limited to your opponents' darts, or to visits where a checkout is on
   - Clears when the visit is handed over; a busted visit stays up, since the darts are still in the board
