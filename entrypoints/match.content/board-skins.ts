@@ -60,6 +60,12 @@ type Layers = readonly string[];
 /** The skin being drawn, for {@link dressBoardCopy}. Null while none is. */
 let art: string | null = null;
 let stopKeeping: (() => void) | null = null;
+/**
+ * Bumped by every start and every stop, so that a start still waiting for its
+ * picture can tell it has been overtaken — by the match being left, say — and
+ * does not put a skin up after the stop that should have taken it down.
+ */
+let generation = 0;
 
 /**
  * Where the skin goes, and what gives way to it, relative to one board. Later
@@ -112,11 +118,35 @@ export function dressBoardCopy(copy: HTMLElement): void {
   }
 }
 
+/**
+ * Whether a picture loads, once it has.
+ *
+ * The segments turn transparent the moment the stylesheet is in, so a picture
+ * still on its way would leave the board empty for as long as it takes — and
+ * for good, should it never arrive. Decoding it first means the site's board
+ * only ever gives way to a skin that is ready, and stays up in place of one that
+ * is missing.
+ */
+async function decodes(picture: string): Promise<boolean> {
+  const image = new Image();
+  image.src = picture;
+  try {
+    await image.decode();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function boardSkins() {
+  const run = ++generation;
   const config: IConfig = await AutodartsToolsConfig.getValue();
   const skin = boardSkin(config.boardSkins?.skin);
+  const ready = !!skin.art && await decodes(skin.art);
+  if (run !== generation) return;
 
-  art = skin.art;
+  if (skin.art && !ready) console.warn(`Autodarts Tools: Board Skins - ${skin.label} did not load, leaving autodarts' own board`);
+  art = ready ? skin.art : null;
   if (art) addStyles(stylesheet(art), STYLE_ID);
   else removeStyles(STYLE_ID);
 
@@ -134,6 +164,7 @@ export async function boardSkins() {
  * Starting again replaces the stylesheet whatever it finds.
  */
 export function boardSkinsOnRemove(fromBullOff = false) {
+  generation++;
   stopKeeping?.();
   stopKeeping = null;
   if (fromBullOff) return;

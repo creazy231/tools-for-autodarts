@@ -15,7 +15,7 @@
               <h4 class="mb-2 font-semibold">
                 Board
               </h4>
-              <div class="grid max-w-lg grid-cols-2 gap-4" role="group">
+              <div class="grid max-w-2xl grid-cols-2 gap-4 sm:grid-cols-3" role="group">
                 <button
                   @click="config.boardSkins.skin = skin.id"
                   v-for="skin in BOARD_SKINS"
@@ -25,11 +25,12 @@
                   :class="{ 'ring-1 ring-inset ring-[var(--ad-border-strong)]': config.boardSkins.skin === skin.id }"
                   type="button"
                 >
+                  <!-- Round, as the match screen clips it: a picture's corners are not part of the board. -->
                   <span class="block p-5">
                     <img
                       :src="skin.preview"
                       :alt="`${skin.label} board`"
-                      class="aspect-square w-full"
+                      class="aspect-square w-full rounded-full"
                       draggable="false"
                     >
                   </span>
@@ -76,7 +77,7 @@
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play on autodarts' board in another design — the classic one from before the rebuild, to start with.
+            Play on autodarts' board in another design — the classic one from before the rebuild, or the qwellcode board.
           </p>
         </div>
         <div class="flex">
@@ -86,7 +87,7 @@
       </div>
       <!-- The whole board, not the crop the other cards show: cropped to a card, a board is only a pattern of segments. -->
       <div class="gradient-mask-left absolute inset-y-0 right-0 flex w-2/3 items-center justify-end p-5">
-        <img :src="selected.preview" alt="" class="h-full w-auto opacity-70" draggable="false">
+        <img :src="selected.preview" alt="" class="h-full w-auto rounded-full opacity-70" draggable="false">
       </div>
     </div>
   </template>

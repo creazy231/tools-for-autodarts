@@ -127,7 +127,8 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - While it is on, it is the one in charge: Darts Zoom's *View Mode* stops switching the board and only decides where its close-ups come from
   - **Board Skins** outranks it: while that is on, the board is kept on the drawn one and Board View stands aside
 - **Board Skins**: Play on autodarts' drawn dartboard in another design
-  - Two to choose from, each previewed in the settings: **Default**, the board autodarts draws today, left exactly as it is, and **Classic**, the board autodarts drew before its rebuild
+  - Three to choose from, each previewed in the settings: **Default**, the board autodarts draws today, left exactly as it is; **Classic**, the board autodarts drew before its rebuild; and **qwellcode**, a board with lime-green rings
+  - A skin can be a drawing (SVG) or a picture (JPEG, PNG). A picture is put up only once it has loaded, so the board is never shown empty, and if it cannot be loaded autodarts' own board stays
   - Every board the match draws wears it — for your own visits, guests' and bots', the bull-off included — and so does the magnified board autodarts opens while you aim by touch
   - The darts and the yellow of a hit stay on top of it, and aiming by hand lands exactly where it would on autodarts' own board: the skin is drawn to the same grid
   - Games played at particular numbers, such as Around the Clock, dim every segment but the target; they dim on the skin too, with the numbers kept bright as autodarts keeps its own
