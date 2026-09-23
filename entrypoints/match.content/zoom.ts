@@ -6,8 +6,9 @@ import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { keepBoardView } from "./board-view";
+import { keepBoardView, viewOwner } from "./board-view";
 import type { BoardView } from "./board-view";
+import { dressBoardCopy } from "./board-skins";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { LAYERS } from "@/utils/layers";
 
@@ -492,10 +493,10 @@ async function start() {
 
   // The close-ups come from whatever the board is showing, so put it on the
   // right thing — and keep it there, since the site forgets the view on its
-  // own — unless Board View is switched on, in which case that has already
-  // chosen and the two must not press the same button in turn.
+  // own — unless Board Skins or Board View is switched on, in which case that
+  // one has already chosen and the two must not press the same button in turn.
   stopKeepingBoardView?.();
-  if (!stored.boardView?.enabled) {
+  if (!viewOwner(stored)) {
     console.log(`Autodarts Tools: Darts Zoom - keeping the board on ${config.mode}`);
     stopKeepingBoardView = keepBoardView(config.mode);
   }
@@ -865,12 +866,15 @@ function view(thrown: IThrow, board: HTMLElement | null): HTMLElement {
     box.appendChild(image);
   } else if (board) {
     // The site's own board, hit highlight and all. Its children are absolutely
-    // positioned against it, so the copy needs its own size back.
+    // positioned against it, so the copy needs its own size back — and the
+    // skin, if Board Skins is drawing one, as it is not a board to the
+    // stylesheet any more.
     const copy = board.cloneNode(true) as HTMLElement;
     copy.removeAttribute("role");
     copy.removeAttribute("aria-label");
     copy.style.width = "100%";
     copy.style.height = "100%";
+    dressBoardCopy(copy);
     box.appendChild(copy);
   } else {
     const image = document.createElement("img");

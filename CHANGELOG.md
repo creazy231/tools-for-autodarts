@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Board Skins** plays the match on autodarts' drawn dartboard in another design. There are two to start with, each previewed in the settings: *Default*, the board autodarts draws today, and *Classic*, the board it drew before the rebuild. The skin takes the place of the board's segments and printed artwork, drawn to the site's own grid, and leaves autodarts' darts and the yellow of a hit on top, so aiming by hand lands exactly where it did. It is on every board the match draws: your own visits, guests' and bots', the bull-off, and the magnified board autodarts opens while you aim by touch; Darts Zoom's close-ups and Streaming Mode's board wear it too. Games played at particular numbers, such as Around the Clock, dim every segment but the target, and they dim on the skin as well, with the numbers kept bright as autodarts keeps its own
+  - A camera's picture has no board to redraw, so while it is on it also keeps the drawn board up, pressing autodarts' camera button until it shows, the way **Board View** does. Cycling the view yourself hands it over to you until the next leg begins
+  - It is then the one in charge of the view: Board View stands aside, and Darts Zoom and Streaming Mode no longer switch the board, so no two of them press the same button in turn
+
 ### Removed
 
 - **Checkout Guide** is gone. It existed for one gap: autodarts drew the route beside a player's score only while its own *Show checkout guide* switch was on, and turning that off took the whole column away even though the routes kept arriving — so the feature filled it in, and stood aside on any card the site was already drawing on. The site now shows a route for every player itself, which leaves the feature nothing to do. Its switch disappears from the settings page and is dropped from saved settings; nothing else changes on the match screen

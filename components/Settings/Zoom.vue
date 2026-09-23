@@ -82,8 +82,9 @@
                 What autodarts' board shows while a game is on, and so where the close-ups come
                 from: a camera's tiles are that camera's own picture, the drawn board's are a copy
                 of the board. The board is put on your choice when a game starts, and put back
-                whenever the site changes it on its own. Switch <em>Board View</em> on and that
-                feature decides instead — it is the one in charge, and this stops touching it.
+                whenever the site changes it on its own. Switch <em>Board Skins</em> or
+                <em>Board View</em> on and that feature decides instead — it is the one in charge,
+                and this stops touching it.
               </p>
             </div>
 

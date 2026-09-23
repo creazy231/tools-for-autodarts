@@ -17,6 +17,7 @@ import { caller, callerOnRemove } from "./caller";
 import { gotcha, gotchaOnRemove } from "./gotcha";
 import { zoom, zoomOnRemove } from "./zoom";
 import { boardView, boardViewOnRemove } from "./board-view";
+import { boardSkins, boardSkinsOnRemove } from "./board-skins";
 import { instantReplay, instantReplayOnRemove } from "./instant-replay";
 import Animations from "./Animations.vue";
 import StreamingMode from "./StreamingMode.vue";
@@ -79,6 +80,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "automaticNextLeg",
   "zoom",
   "boardView",
+  "boardSkins",
   "instantReplay",
   "streamingMode",
 ]);
@@ -268,6 +270,13 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initScript(automaticFullscreen, url).catch(e => console.error(e));
   }
 
+  // Early, for two reasons: the site's own board is on screen until the skin
+  // goes on, and Streaming Mode and Darts Zoom copy the board as they start —
+  // a copy taken before this has run has no skin to be given.
+  if (isOn(config, "boardSkins")) {
+    await initScript(boardSkins, url).catch(e => console.error(e));
+  }
+
   if (isOn(config, "streamingMode")) {
     await initStreamingMode(ctx).catch(e => console.error(e));
   }
@@ -399,6 +408,7 @@ function clearMatch(fromBullOff: boolean = false) {
   takeoutOnRemove();
   zoomOnRemove();
   boardViewOnRemove();
+  boardSkinsOnRemove(fromBullOff);
   instantReplayOnRemove();
   quietOwnDartsOnRemove();
   matchInitialized = false;

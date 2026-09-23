@@ -91,7 +91,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
     - **Autodarts**: follows autodarts' own design language — flat surfaces with no borders or shadows, condensed uppercase names, and one blue for the player at the oche. A bust shows as a red badge rather than a word in the score cell
   - **Background**: either a chroma key colour of your choice (green by default) or an image you upload
   - **Board**: your choice of the live camera picture, or autodarts' own drawn board — the drawn one is a live copy, hit highlight and all, so it stays sharp at any size and works with no board attached. The camera option falls back to the drawn board whenever no camera is running
-    - While **Board View** is on, that feature chooses what the board shows and Streaming Mode leaves it alone
+    - While **Board Skins** or **Board View** is on, that feature chooses what the board shows and Streaming Mode leaves it alone. The drawn board wears the skin Board Skins is drawing
   - **Scoreboard**: one row per player with legs, sets and remaining score, the player at the oche marked with a dart in the Classic design and a blue bar in the Autodarts one
     - Rows stay in seating order for the whole match. Autodarts re-orders its player list every leg so whoever throws first comes first, which used to make the rows swap places mid-match
     - It scales itself down to fit the window — narrow or short, and whichever design and however many players — on top of whatever the *Score Scale* slider asks for
@@ -109,7 +109,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - **On Board** adds nothing to the screen at all: autodarts' own board — the camera view, or the vector board when no camera is running — zooms in on each dart as it lands and pulls back out again
     - Configurable hold time in milliseconds, 1000 by default; it also pulls back out the moment the visit ends or passes to another player
     - Only a dart that has just been thrown moves the board. Correcting one, or taking one back, leaves it where it is — a zoom is how you know a dart landed, so it should not go off while you are fixing the score
-  - View mode: camera 1, 2, 3, or autodarts' own dartboard — the same choice **Board View** offers. A camera's close-ups are that camera's own picture; the drawn board's are a copy of the board, which is vector art, so they stay sharp at any zoom and show the site's hit highlight. It puts the board itself on your choice when a game starts and back again whenever the site changes it on its own, unless **Board View** is on — then that feature decides
+  - View mode: camera 1, 2, 3, or autodarts' own dartboard — the same choice **Board View** offers. A camera's close-ups are that camera's own picture; the drawn board's are a copy of the board, which is vector art, so they stay sharp at any zoom and show the site's hit highlight. It puts the board itself on your choice when a game starts and back again whenever the site changes it on its own, unless **Board Skins** or **Board View** is on — then that feature decides. The drawn board's close-ups wear the skin Board Skins is drawing
   - Adjustable zoom level, scaled to the position: the bottom strip is a third of the window wide, so the same level there magnifies far more than a narrower tile would, and it is eased off to suit; the top strip, a third of the throw display wide, takes the level as it is
   - New darts fade in as they land (rising from the foot of the screen in the bottom strip); darts already on screen are left alone
   - The board shrinks to make room, so the close-ups never cover it — at any window size, including tablets
@@ -125,6 +125,15 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Cycling the view yourself — the button, or autodarts' own `1` / `2` / `3` keys — hands it over to you until the next leg begins
   - Boards with fewer cameras have a shorter cycle, so asking for one that is not there leaves the view alone rather than pressing forever
   - While it is on, it is the one in charge: Darts Zoom's *View Mode* stops switching the board and only decides where its close-ups come from
+  - **Board Skins** outranks it: while that is on, the board is kept on the drawn one and Board View stands aside
+- **Board Skins**: Play on autodarts' drawn dartboard in another design
+  - Two to choose from, each previewed in the settings: **Default**, the board autodarts draws today, left exactly as it is, and **Classic**, the board autodarts drew before its rebuild
+  - Every board the match draws wears it — for your own visits, guests' and bots', the bull-off included — and so does the magnified board autodarts opens while you aim by touch
+  - The darts and the yellow of a hit stay on top of it, and aiming by hand lands exactly where it would on autodarts' own board: the skin is drawn to the same grid
+  - Games played at particular numbers, such as Around the Clock, dim every segment but the target; they dim on the skin too, with the numbers kept bright as autodarts keeps its own
+  - Darts Zoom's close-ups and Streaming Mode's board wear it as well
+  - A camera's picture has no board to redraw, so it also keeps the drawn board up while a game is on, pressing autodarts' camera button until it shows, the way Board View does. Cycling the view yourself — the button, or autodarts' own `1` / `2` / `3` keys — hands it over to you until the next leg begins
+  - While it is on, it is the one in charge of the view: Board View stands aside, and Darts Zoom and Streaming Mode no longer switch the board
 - **Automatic Fullscreen**: Adds a fullscreen toggle to the match header, alongside the site's own icons
   - It also goes fullscreen by itself on entering a match, but only when the browser allows it. Fullscreen may only be entered straight off a click, and arriving from the lobby's *Start Game* is usually too long ago to count — so most of the time the header button is the way in
 - **Adjustable UI Elements**: Modify the size of legs, sets, and match information — the "Leg / Match" averages row wraps onto a second line rather than being cut short when it no longer fits the card
@@ -150,7 +159,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Paste either the board's ID or a link containing it; the ID is picked out for you
   - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
 - **Features While Following a Board**: Everything that describes a match also works while you watch one at `/boards/<id>/follow`
-  - Colours, smaller inactive scores, larger names, legs/sets and match data, Gotcha Helper, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
+  - Colours, smaller inactive scores, larger names, legs/sets and match data, Gotcha Helper, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Board Skins, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
   - **Automatic Next Player**, **Automatic Next Leg/Set** and **Quick Correction** stay off: they press the site's own controls, which belong to whoever is throwing rather than to whoever is watching
   - Nothing starts until the board is actually in a match, and it starts by itself when one begins — you can sit on the page and wait
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins

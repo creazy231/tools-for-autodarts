@@ -216,14 +216,36 @@ export function keepBoardView(target: BoardView): () => void {
   };
 }
 
+/**
+ * The feature that decides what the board shows, when one is switched on.
+ *
+ * Only one may keep the view at a time: two pressing the same button in turn
+ * take the cycle round twice for every change, and stop wherever they happen to
+ * collide. Board Skins comes first — a skin is drawn on the drawn board and
+ * nowhere else, so while it is on nothing may put a camera up. Board View is
+ * next, that choice being all it is for. Darts Zoom and Streaming Mode each
+ * want a view for their own ends, and take the board as these two leave it.
+ */
+export function viewOwner(config: IConfig): "boardSkins" | "boardView" | null {
+  if (config.boardSkins?.enabled) return "boardSkins";
+  if (config.boardView?.enabled) return "boardView";
+  return null;
+}
+
 let stopKeeping: (() => void) | null = null;
 
 export async function boardView() {
   const config: IConfig = await AutodartsToolsConfig.getValue();
   const target = config.boardView.view;
 
-  console.log(`Autodarts Tools: Board View - keeping the board on ${target}`);
   stopKeeping?.();
+  stopKeeping = null;
+  if (viewOwner(config) !== "boardView") {
+    console.log("Autodarts Tools: Board View - Board Skins keeps the drawn board up, standing down");
+    return;
+  }
+
+  console.log(`Autodarts Tools: Board View - keeping the board on ${target}`);
   // Not awaited: the first press can wait several seconds for a button that can
   // be pressed, and nothing after this in the match start-up depends on it.
   stopKeeping = keepBoardView(target);

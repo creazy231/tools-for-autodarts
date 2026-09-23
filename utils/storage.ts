@@ -141,6 +141,17 @@ export interface IConfig {
     enabled: boolean;
     view: "image" | "camera-1" | "camera-2" | "camera-3";
   };
+  /**
+   * Which design autodarts' drawn dartboard wears — see utils/board-skins.ts.
+   *
+   * "default" leaves the site's own board alone. The feature still keeps the
+   * board on the drawn one while it is on, since that is the only view a skin
+   * can be seen in.
+   */
+  boardSkins: {
+    enabled: boolean;
+    skin: "default" | "v1";
+  };
   zoom: {
     enabled: boolean;
     position: "top" | "bottom" | "board";
@@ -487,6 +498,10 @@ export const defaultConfig: IConfig = {
     enabled: false,
     view: "camera-1",
   },
+  boardSkins: {
+    enabled: false,
+    skin: "default",
+  },
   zoom: {
     enabled: false,
     position: "bottom",
@@ -771,7 +786,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 11;
+const CONFIG_VERSION = 12;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -785,6 +800,12 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /** Board Skins is new, and a saved config has nothing for it. */
+      12: (config: any) => ({
+        ...config,
+        boardSkins: config.boardSkins ?? defaultConfig.boardSkins,
+      }),
+
       /**
        * Checkout Guide is gone, and its saved switch with it.
        *

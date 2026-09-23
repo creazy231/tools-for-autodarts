@@ -31,6 +31,10 @@
                 Boards with fewer cameras have a shorter cycle — asking for a camera that is not
                 there leaves the view alone rather than pressing forever.
               </p>
+              <p class="mt-1 text-sm text-white/60">
+                While <em>Board Skins</em> is on, that feature keeps the drawn board up instead, and
+                this one stands aside.
+              </p>
             </div>
           </div>
         </div>

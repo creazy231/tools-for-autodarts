@@ -428,6 +428,37 @@ export const SELECTORS = {
      * takes a copy per dart rather than trying to be clever about layers.
      */
     board: [ "main [role='img'][aria-label='Dartboard']" ],
+    /**
+     * Every board the match screen draws, not just the first: the one in the
+     * middle, and the magnified copy the site opens beside it while a dart is
+     * aimed by touch on a screen narrower than its wide layout. One component
+     * draws both, so Board Skins dresses both the same way.
+     */
+    anyBoard: [ "[role='img'][aria-label='Dartboard']" ],
+    /**
+     * A board's segments — a child of {@link anyBoard}, not a descendant.
+     *
+     * The only layer whose paths carry a `fill-opacity`: that is how the site
+     * dims every segment but the ones a game is aiming at, down to 0.2 — the
+     * games played at particular numbers do it, X01 never does. Missing while a
+     * camera is showing, which draws a picture in its place.
+     */
+    boardSegments: [ "svg:has(> g > path[fill-opacity])" ],
+    /**
+     * A board's printed artwork: the maker's branding and the number ring,
+     * again children of {@link anyBoard}. The number ring sits in a clipped
+     * wrapper of its own when a game hides some of the numbers.
+     *
+     * `aria-hidden` is the anchor because it is what the site sets on exactly
+     * these two and on nothing else — their viewBox differs from one board
+     * design to the next. Anything drawing a `filter` is left out on purpose:
+     * that is the layer holding the darts, and should the site ever mark it
+     * aria-hidden too, the darts must stay.
+     */
+    boardArtwork: [
+      "svg[aria-hidden='true']:not(:has(filter))",
+      "div > svg[aria-hidden='true']:not(:has(filter))",
+    ],
 
     /**
      * A flanking column beside the board — NOT one per player.

@@ -190,7 +190,8 @@ import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsBoardImages } from "@/utils/board-image-storage";
 import { SELECTORS, qs } from "@/utils/selectors";
-import { setBoardView } from "./board-view";
+import { setBoardView, viewOwner } from "./board-view";
+import { dressBoardCopy } from "./board-skins";
 import StreamingBoardClassic from "./StreamingBoardClassic.vue";
 import StreamingBoardV2 from "./StreamingBoardV2.vue";
 import { metricsFor } from "./streaming-board";
@@ -634,12 +635,13 @@ onMounted(async () => {
  * delay between presses, and running that on each update would leave the board
  * permanently mid-cycle.
  *
- * Board View itself is left alone when it is switched on — it has already
- * chosen, and two features pressing the same button in turn would fight.
+ * The board is left alone while Board Skins or Board View is switched on —
+ * that one has already chosen, and two features pressing the same button in
+ * turn would fight.
  */
 async function syncBoardView() {
   if (!enabled.value || !config.value?.streamingMode.board) return;
-  if (config.value.boardView?.enabled) return;
+  if (viewOwner(config.value)) return;
 
   await setBoardView(config.value.streamingMode.boardImage ? "live" : "image")
     .catch(e => console.error("Autodarts Tools: Streaming Mode - board view", e));
@@ -696,6 +698,8 @@ function paintBoard(): void {
     layer.style.width = "100%";
     layer.style.height = "100%";
   });
+  // Nor does a stylesheet on the page reach in here, Board Skins' included.
+  dressBoardCopy(copy);
 
   mount.replaceChildren(copy);
 }
