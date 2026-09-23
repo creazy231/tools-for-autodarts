@@ -88,7 +88,7 @@
       </div>
       <!-- The whole board, not the crop the other cards show: cropped to a card, a board is only a pattern of segments. -->
       <div class="gradient-mask-left absolute inset-y-0 right-0 flex w-2/3 items-center justify-end p-5">
-        <img :src="selected.preview" alt="" class="h-full w-auto rounded-full opacity-70" draggable="false">
+        <img :src="imageUrl" alt="" class="h-full w-auto rounded-full opacity-70" draggable="false">
       </div>
     </div>
   </template>
@@ -101,6 +101,8 @@ import { BOARD_SKINS, boardSkin } from "@/utils/board-skins";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();
+/** The card always shows the qwellcode board, whichever skin is chosen. */
+const imageUrl = boardSkin("qwellcode").preview;
 
 const selected = computed(() => boardSkin(config.value?.boardSkins?.skin));
 
