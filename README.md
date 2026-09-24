@@ -82,7 +82,7 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 
 ### 🎨 Match Customization
 - **Colors**: Recolours the match screen. Everything starts at autodarts' own colours, so switching it on changes nothing until you pick something
-  - **Player card**: the card of the player whose turn it is, in autodarts' own raspberry, one of eight colour pairs (*Blueberry*, *Ocean*, *Lime*, *Petrol*, *Orange*, *Crimson*, *Gold* and *Graphite*), or two colours of your own. It follows that player in every layout the match screen has, the 3+ player top bar included. A bust and a won leg keep autodarts' own colours, and so does the winner's pattern
+  - **Player card**: the card of the player whose turn it is, in autodarts' own raspberry, one of eight colour pairs (*Blueberry*, *Ocean*, *Lime*, *Petrol*, *Orange*, *Crimson*, *Gold* and *Slate*), or two colours of your own. It follows that player in every layout the match screen has, the 3+ player top bar included. A bust and a won leg keep autodarts' own colours, and so does the winner's pattern
   - **Background**: the page behind the match, in autodarts' own midnight, one of seven dark pairs (*Royal*, *Forest*, *Petrol*, *Wine*, *Plum*, *Ember* and *Graphite*), or two colours of your own. autodarts' mark stays on it, tinted to go with the colours
     - **On every autodarts page**: puts the background on every page, the lobby, the home page and the settings included, rather than on the match screen alone. The settings page shows a change at once
   - **More colours**: the other players' cards and the throw bar, the text on the cards and in the throw bar, and the bottom bar that holds undo and Next, each with a button back to autodarts' own

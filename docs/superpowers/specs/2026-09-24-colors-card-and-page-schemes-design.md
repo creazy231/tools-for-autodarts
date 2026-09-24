@@ -72,7 +72,10 @@ So both halves of the request are possible.
    card presets are the site's palettes and FankiDarts-style muted pairs, kept to
    autodarts' own contrast bar: at least 4:1 against the card's text at both ends
    (raspberry's bright end is 4.2:1), and at least 2.5:1 between the bright end and
-   the idle card, so it is never mistaken for one.
+   the idle card, so it is never mistaken for one. The bright end is also a
+   colour, never a grey (saturation 0.3 or more): with 3+ players the small
+   layouts' resting cells are black-60, a mid grey that nothing carrying white type
+   can out-contrast, so hue is what separates the active one there.
    The page presets are "black-90 to a deep colour", like the site's midnight.
 4. **The texture stays and follows the colour.** The page rule reads the site's
    own `body` rule from the CSSOM (never the computed style, which can be ours),

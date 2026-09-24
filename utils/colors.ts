@@ -42,7 +42,10 @@ export const SITE_ACTION_BAR = "#042963";
  * The card carries white type and has to stand apart from the resting cards
  * beside it, so every pair keeps to the bar autodarts sets for itself: 4:1 or
  * more against the text at both ends (raspberry's bright end is 4.2:1), and
- * 2.5:1 or more between the bright end and a resting card. The site's own
+ * 2.5:1 or more between the bright end and a resting card. That bright end is
+ * a colour, never a grey: the small layouts draw resting cells in black-60, a
+ * mid grey nothing carrying white type can out-contrast, and there the hue is
+ * what tells the active one apart, as it is for raspberry. The site's own
  * palettes come first, under their own names (`player-colors-*.js`). Lime is
  * darkened at its teal end, which is 2.2:1 as the site has it. The rest are
  * muted pairs in the manner of FankiDarts' Playerbox presets.
@@ -55,7 +58,7 @@ export const CARD_PRESETS: readonly ColorPreset[] = [
   { id: "orange", label: "Orange", from: "#6f3f20", to: "#c5561c" },
   { id: "crimson", label: "Crimson", from: "#6a1624", to: "#b8323f" },
   { id: "gold", label: "Gold", from: "#5c4a12", to: "#8e7328" },
-  { id: "graphite", label: "Graphite", from: "#424242", to: "#616161" },
+  { id: "slate", label: "Slate", from: "#253247", to: "#497097" },
 ];
 
 /**
