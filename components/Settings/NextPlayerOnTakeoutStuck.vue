@@ -55,6 +55,9 @@
           />
         </div>
       </div>
+      <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
+        <img :src="imageUrl" alt="Auto Next Player on Takeout" class="size-full object-cover">
+      </div>
     </div>
   </template>
 </template>
@@ -65,6 +68,7 @@ import AppInput from "../AppInput.vue";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();
+const imageUrl = browser.runtime.getURL("/images/next-player-on-takeout-stuck.png");
 
 async function toggleFeature() {
   if (!config.value) return;

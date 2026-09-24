@@ -55,6 +55,9 @@
           />
         </div>
       </div>
+      <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
+        <img :src="imageUrl" alt="Larger Player Names" class="size-full object-cover">
+      </div>
     </div>
   </template>
 </template>
@@ -66,6 +69,7 @@ import AppInput from "../AppInput.vue";
 const emit = defineEmits([ "toggle" ]);
 const { config, ready } = useConfig();
 const sizeValue = ref("");
+const imageUrl = browser.runtime.getURL("/images/larger-player-names.png");
 
 onMounted(async () => {
   await ready();

@@ -13,6 +13,10 @@ All notable changes to this project will be documented in this file.
   - The other colours stay: the other players' cards and the throw bar, the text on them, and the bottom bar, each now starting at autodarts' own and with a button back to it, so switching Colors on changes nothing until something is picked
   - Settings from before carry over as they looked. With Colors on, the one colour every card had becomes the active card's pair as well as the other cards' colour, and the page colour becomes the background's pair; with it off, only a colour moved off its default is kept, and the rest start at autodarts' own. A settings file exported before this change is read the same way when it is imported or pasted
 
+### Changed
+
+- **The settings page**'s feature cards show the rebuilt site. Every picture on them was taken on the old one, so most showed a match screen autodarts no longer draws. Each is now a screenshot of the feature at work on the rebuilt site, one feature per picture, cropped so that what it changes sits on the card's right, beside the description. *Larger Player Names*, *Automatic Next Leg* and *Auto Next Player on Takeout* have a picture for the first time, and *Board Skins* shows a match on the qwellcode board instead of the board on its own. The pictures take a fifth of the space they did, about 5 MB instead of 25 MB
+
 ### Removed
 
 - **Checkout Guide** is gone. It existed for one gap: autodarts drew the route beside a player's score only while its own *Show checkout guide* switch was on, and turning that off took the whole column away even though the routes kept arriving — so the feature filled it in, and stood aside on any card the site was already drawing on. The site now shows a route for every player itself, which leaves the feature nothing to do. Its switch disappears from the settings page and is dropped from saved settings; nothing else changes on the match screen

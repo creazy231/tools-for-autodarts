@@ -86,9 +86,8 @@
           <AppToggle @update:model-value="toggleFeature" v-model="config.boardSkins.enabled" />
         </div>
       </div>
-      <!-- The whole board, not the crop the other cards show: cropped to a card, a board is only a pattern of segments. -->
-      <div class="gradient-mask-left absolute inset-y-0 right-0 flex w-2/3 items-center justify-end p-5">
-        <img :src="imageUrl" alt="" class="h-full w-auto rounded-full opacity-70" draggable="false">
+      <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
+        <img :src="imageUrl" alt="Board Skins" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -101,8 +100,8 @@ import { BOARD_SKINS, boardSkin } from "@/utils/board-skins";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();
-/** The card always shows the qwellcode board, whichever skin is chosen. */
-const imageUrl = boardSkin("qwellcode").preview;
+/** The card always shows a match on the qwellcode board, whichever skin is chosen. */
+const imageUrl = browser.runtime.getURL("/images/board-skins.png");
 
 const selected = computed(() => boardSkin(config.value?.boardSkins?.skin));
 
