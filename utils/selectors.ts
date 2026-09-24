@@ -375,7 +375,8 @@ export const SELECTORS = {
   },
 
   /**
-   * Tournament detail — entrypoints/lobbynew.content/qr-code-tournament.ts.
+   * Tournament detail — entrypoints/lobbynew.content/qr-code-tournament.ts,
+   * and the ready-up that Sound FX and WLED go off on (utils/tournament-ready.ts).
    *
    * The invite dialog is the site's generic dialog, opened from the
    * participants card. Nothing inside it says what it is except its title,
@@ -395,6 +396,23 @@ export const SELECTORS = {
      * seen pressed. English is what the site ships; the rest are guesses.
      */
     inviteDialogTitleText: [ "Invite friends", "Freunde einladen", "Nodig vrienden uit" ],
+    /**
+     * The Match Ready card's ready-up button — utils/tournament-ready.ts.
+     * Nothing marks it but its label and the ready-up countdown it carries, so
+     * these only narrow the search: the card first, then anywhere in `main`
+     * for a redesign that stops drawing it as one. Both also match the card's
+     * scoring device picker, which comes first, so every match has to be
+     * looked at. Matchmaking has a Mark Ready button of its own, in a dialog
+     * portalled outside `main`, and neither candidate reaches it.
+     */
+    readyUpButton: [ "#root main [data-slot='card'] button[data-slot='button']", "#root main button" ],
+    /**
+     * What that button says before it is pressed and after, in each language
+     * the site ships: `tournaments.markReady.markReady` and `.cancelReady`, read
+     * off its i18n chunk (en, de, nl) on 2026-09-24.
+     */
+    markReadyText: [ "Mark Ready", "Als bereit markieren", "Gereed melden" ],
+    markUnreadyText: [ "Mark Unready", "Als nicht bereit markieren", "Gereedmelding intrekken" ],
   },
 
   /**

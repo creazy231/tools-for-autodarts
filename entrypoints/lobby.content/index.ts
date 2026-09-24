@@ -55,6 +55,15 @@ export default defineContentScript({
     lobbyReadyUnwatch = AutodartsToolsUrlStatus.watch(async (url: string) => {
       if (!url && (isiOS() || isSafari())) url = window.location.href;
 
+      // One key, shared by every autodarts tab in this browser — see the same
+      // guard in entrypoints/match.content/index.ts. Another tab loading or
+      // moving on writes its own URL here, and its empty reset first, and this
+      // page took either for having left itself: everything below was torn
+      // down and nothing brought it back until this page moved. A tournament
+      // tab waiting for its ready-up lost Sound FX and WLED to a second tab
+      // opened on the board. Only this page's own URL is news here.
+      if (url.split("#")[0] !== window.location.href.split("#")[0]) return;
+
       const config: IConfig = await AutodartsToolsConfig.getValue();
       const lobbyIdMatch = url.match(LOBBY_ROUTE);
       if (lobbyIdMatch) {

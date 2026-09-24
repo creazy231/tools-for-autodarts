@@ -1,15 +1,15 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
-import { AutodartsToolsNotificationData, type INotification, NOTIFICATION_TOURNAMENT_MATCH_READY } from "@/utils/notification-data-storage";
 import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from "@/utils/storage";
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
+import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
 import { winId } from "@/utils/win";
 
 let gameDataWatcherUnwatch: any;
 let lobbyDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
-let notificationWatcherUnwatch: (() => void) | null = null;
+let tournamentReadyUnwatch: (() => void) | null = null;
 let config: IConfig;
 // Cached id of the local user (decoded from the auth token), used to tell own throws from opponent throws
 let localUserId: string | null = null;
@@ -145,19 +145,21 @@ export async function soundFx() {
       });
     }
 
-    if (!notificationWatcherUnwatch) {
-      // The ready-up call for a tournament match arrives as a notification over
-      // the site's WebSocket, named by `type` whatever language the site is
-      // displayed in. It used to be spotted by reading "Time to ready up" off
-      // the page — words the rebuilt site never writes, and that the language
-      // switcher would rewrite if it did.
-      notificationWatcherUnwatch = AutodartsToolsNotificationData.watch((notification: INotification | undefined) => {
-        if (!config?.soundFx?.enabled || !notification) return;
-        if (notification.type !== NOTIFICATION_TOURNAMENT_MATCH_READY) return;
-
-        console.log("Autodarts Tools: Tournament match ready, playing tournament ready sound");
-        playSound("ambient_tournament_ready");
-      });
+    // A tournament match of yours waiting for you to mark ready — see
+    // utils/tournament-ready.ts. Only a tournament's page draws the card, and
+    // the lobby entrypoint starts this on lobbies as well, without a teardown
+    // in between, so the watch follows the page it is on.
+    if (isTournamentPage()) {
+      if (!tournamentReadyUnwatch) {
+        tournamentReadyUnwatch = watchTournamentReady(() => {
+          if (!config?.soundFx?.enabled) return;
+          console.log("Autodarts Tools: Tournament match ready, playing tournament ready sound");
+          playSound("ambient_tournament_ready");
+        });
+      }
+    } else if (tournamentReadyUnwatch) {
+      tournamentReadyUnwatch();
+      tournamentReadyUnwatch = null;
     }
   } catch (error) {
     console.error("Autodarts Tools: soundFx initialization error", error);
@@ -181,9 +183,9 @@ export function soundFxOnRemove() {
     boardDataWatcherUnwatch = null;
   }
 
-  if (notificationWatcherUnwatch) {
-    notificationWatcherUnwatch();
-    notificationWatcherUnwatch = null;
+  if (tournamentReadyUnwatch) {
+    tournamentReadyUnwatch();
+    tournamentReadyUnwatch = null;
   }
 
   // Drop any update still settling

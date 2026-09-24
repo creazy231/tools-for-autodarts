@@ -3,10 +3,10 @@ import type { ILobbies } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage";
-import { AutodartsToolsTournamentData, type ITournament } from "@/utils/tournament-data-storage";
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
 import { triggerPatterns } from "@/utils/helpers";
 import { settleGameData } from "@/utils/settle-game-data";
+import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
 import { gameDataProcessor } from "@/utils/wled";
 import { winId } from "@/utils/win";
 import { WledType } from "#imports";
@@ -14,7 +14,7 @@ import { WledType } from "#imports";
 let gameDataWatcherUnwatch: any;
 let lobbyDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
-let tournamentDataWatcherUnwatch: any;
+let tournamentReadyUnwatch: (() => void) | null = null;
 let config: IConfig;
 
 /**
@@ -158,18 +158,24 @@ export async function wledFx() {
       });
     }
 
-    if (!tournamentDataWatcherUnwatch) {
-      tournamentDataWatcherUnwatch = AutodartsToolsTournamentData.watch(
-        async (tournamentData: ITournament | undefined, oldTournamentData: ITournament | undefined) => {
-          if (!tournamentData || !config.wledFx?.enabled) return;
-
-          // Check if tournament event is "start" and trigger the tournament_ready effect
-          if (tournamentData.event === "start") {
-            console.log("Autodarts Tools: WLED: Tournament start event detected, triggering tournament_ready effect");
-            setEffectByTrigger("tournament_ready");
-          }
-        },
-      );
+    // A tournament match of yours waiting for you to mark ready, the same
+    // moment Sound FX plays `ambient_tournament_ready` on — see
+    // utils/tournament-ready.ts. This used to be the tournament's `start`
+    // event, which comes once, before the first round, and never for the
+    // matches after it. Only a tournament's page draws the card, and the lobby
+    // entrypoint starts this on lobbies as well, without a teardown in between,
+    // so the watch follows the page it is on.
+    if (isTournamentPage()) {
+      if (!tournamentReadyUnwatch) {
+        tournamentReadyUnwatch = watchTournamentReady(() => {
+          if (!config.wledFx?.enabled) return;
+          console.log("Autodarts Tools: WLED: Tournament match ready, triggering tournament_ready effect");
+          setEffectByTrigger("tournament_ready");
+        });
+      }
+    } else if (tournamentReadyUnwatch) {
+      tournamentReadyUnwatch();
+      tournamentReadyUnwatch = null;
     }
   } catch (error) {
     console.error("Autodarts Tools: WLED: wledFx initialization error", error);
@@ -193,9 +199,9 @@ export function wledFxOnRemove() {
     boardDataWatcherUnwatch = null;
   }
 
-  if (tournamentDataWatcherUnwatch) {
-    tournamentDataWatcherUnwatch();
-    tournamentDataWatcherUnwatch = null;
+  if (tournamentReadyUnwatch) {
+    tournamentReadyUnwatch();
+    tournamentReadyUnwatch = null;
   }
 
   // An update still settling would otherwise run after the teardown and set its

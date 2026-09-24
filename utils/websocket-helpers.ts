@@ -2,8 +2,6 @@ import { AutodartsToolsBoardData, type IBoard } from "./board-data-storage";
 import { AutodartsToolsBoardImages } from "./board-image-storage";
 import { AutodartsToolsGameData } from "./game-data-storage";
 import { AutodartsToolsLobbyData } from "./lobby-data-storage";
-import { AutodartsToolsTournamentData, type ITournament } from "./tournament-data-storage";
-import { AutodartsToolsNotificationData, type INotification } from "./notification-data-storage";
 
 interface IUserSettings {
   callCheckouts: boolean;
@@ -270,7 +268,7 @@ async function isWatchedBoard(id: string | undefined): Promise<boolean> {
   return known.size ? known.has(id) : true;
 }
 
-export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | ITournament | INotification | string) {
+export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string) {
   // do a switch on the channel
   switch (channel) {
     case "autodarts.lobbies": {
@@ -387,32 +385,6 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
         }
         AutodartsToolsBoardImages.setValue(boardImages);
       }
-
-      break;
-    }
-    case "autodarts.tournaments": {
-      data = data as ITournament;
-
-      AutodartsToolsTournamentData.setValue(data);
-
-      break;
-    }
-    case "autodarts.notifications": {
-      // One notification per frame, named by `type` in every language the
-      // site is displayed in. Sound FX listens for the tournament ready-up
-      // call; the rest are kept the same way and read by nothing yet.
-      const notification = data as Partial<INotification>;
-      if (!notification || typeof notification.type !== "string") break;
-
-      AutodartsToolsNotificationData.setValue({
-        id: notification.id,
-        type: notification.type,
-        level: notification.level,
-        createdAt: notification.createdAt,
-        expiresAt: notification.expiresAt,
-        body: notification.body,
-        receivedAt: Date.now(),
-      });
 
       break;
     }

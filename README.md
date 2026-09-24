@@ -352,7 +352,7 @@ Add sound effects for various game events:
   - `ambient_lobby_in`: Plays when a player joins the lobby
   - `ambient_lobby_out`: Plays when a player leaves the lobby
 - **Tournament Sounds**:
-  - `ambient_tournament_ready`: Plays when a tournament match of yours is ready for you to mark ready — the site's own *match ready* notification, in any language
+  - `ambient_tournament_ready`: Plays when a tournament match of yours is ready and autodarts asks you to *Mark Ready*. Keep the tournament's page open while you wait, whichever of *Information*, *Bracket* or *Rankings* is showing, since that is where autodarts puts its *Match Ready* card. It plays once each time you are called, not again as the countdown runs or when you mark ready and change your mind, and works in English, German and Dutch as well as any language autodarts adds later
 - **Board Status Sounds** (only during a game):
   - `ambient_board_started`: Plays when the board has started
   - `ambient_board_stopped`: Plays when the board has stopped or disconnected
@@ -493,7 +493,7 @@ Effects can be triggered by various game events using these triggers:
 - **`lobby_out`**: When a player leaves the lobby, as long as somebody is still in it
 
 ##### Tournament Events
-- **`tournament_ready`**: Triggered when tournament start event is received via websocket
+- **`tournament_ready`**: When a tournament match of yours is ready and autodarts asks you to *Mark Ready*, the same moment Sound FX plays `ambient_tournament_ready` on: once for each of your matches, while the tournament's page is open
 
 ##### Player-Specific Effects
 - **Player Names**: Use the exact player name as it appears in Autodarts. This is triggered instead of the generic `gameon` effect.
