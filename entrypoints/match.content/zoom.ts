@@ -6,6 +6,7 @@ import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
+import { wasThrown } from "@/utils/thrown";
 import { keepBoardView, viewOwner } from "./board-view";
 import type { BoardView } from "./board-view";
 import { dressBoardCopy } from "./board-skins";
@@ -371,8 +372,8 @@ let barDragging = false;
 let barPoint: { x: number; y: number } | null = null;
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
 /**
- * Every dart the board has already zoomed in on, so that none of them can be
- * zoomed in on twice.
+ * Every dart the board has already been handed — zoomed in on, or passed over
+ * as entered by hand — so that none of them can be zoomed in on twice.
  *
  * Keyed on the throw's own id, which is the one thing a correction leaves
  * alone: editing a dart rewrites its `segment` and its `coords`, and hands
@@ -691,11 +692,19 @@ function sleep(): void {
  * left to run its timer out rather than snatched back early — the hold is a
  * second at its default, and the board pulling out from under a correction
  * would read as the feature reacting to it.
+ *
+ * A dart entered by hand is new to the board too, with an id of its own, but
+ * it is no throw: it is clicked onto the board or typed in on the keypad when
+ * the board missed a dart, or after taking a wrong one back. Zooming in on
+ * where it was clicked — or on the bull, for a keypad dart, which has no
+ * coordinates — was the board reacting to a correction after all, so
+ * {@link wasThrown} keeps those off it.
  */
 function holdBoardOn(thrown: IThrow | null): void {
   if (!thrown) return releaseBoard();
   if (zoomed.has(thrown.id)) return;
   zoomed.add(thrown.id);
+  if (!wasThrown(thrown)) return;
 
   clearTimeout(resetTimer);
   resetTimer = undefined;
