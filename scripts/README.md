@@ -242,6 +242,32 @@ qsa(SELECTORS.lobby.playerRows)           // querySelectorAll with fallback
 detectSiteVersion()                       // "v1" | "v2"
 ```
 
+## Firefox for Android XPI
+
+`scripts/android-xpi.ts` turns the Firefox store zip into
+`.output/autodarts-tools-<version>-android.xpi`, which Firefox for Android can
+install from a file. Run it after `yarn zip:firefox`:
+
+```bash
+yarn zip:firefox && bun run scripts/android-xpi.ts
+```
+
+The store build has no add-on ID — AMO assigned one — and Firefox will not
+permanently install an unsigned add-on without one, so the script writes the
+listing's ID into the XPI's manifest and copies every other file byte for byte.
+Because it is the listing's own ID, the XPI upgrades a copy installed from AMO in
+place.
+
+To install it on the device:
+
+1. Use Firefox **Nightly** — Beta and Release only take signed add-ons.
+2. Set `xpinstall.signatures.required` to `false` in `about:config`.
+3. Enable the debug menu: Settings → About Firefox Nightly → tap the logo five times.
+4. Settings → Advanced → **Install add-on from file**.
+
+`adb push .output/autodarts-tools-<version>-android.xpi /sdcard/Download/` puts
+the file on a device connected over USB.
+
 ## AltStore Source Update Automation
 
 ### Overview

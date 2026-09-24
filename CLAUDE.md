@@ -86,7 +86,7 @@ Do **not** import these manually — they are globally available.
 
 - **`socket/`** — Socket.io server (Bun) deployed at `adt-socket.tobias-thiele.de`; tracks online friends/presence data shared between extension users
 - **`proxy/`** — Express server (Docker) that forwards Discord webhook requests via an `x-target-url` header
-- **`scripts/`** — Release automation (Safari/Xcode builds, App Store submission, AltStore source updates — see `scripts/README.md`)
+- **`scripts/`** — Release automation (Safari/Xcode builds, the Firefox for Android XPI, App Store submission, AltStore source updates — see `scripts/README.md`)
 
 ## Code Conventions
 
