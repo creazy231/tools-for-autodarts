@@ -2,6 +2,7 @@ import { ref, toRaw, watch } from "vue";
 
 import type { IConfig } from "@/utils/storage";
 
+import { normalizeColors } from "@/utils/colors";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 
 /**
@@ -43,8 +44,9 @@ function adopt(value: IConfig): void {
  *
  * Storage migrations cover the shapes that changed; these are the ones that were
  * simply added, where the default is the whole answer. Most are a missing
- * top-level section, which the merge covers on its own — only the two nested
- * ones need saying out loud.
+ * top-level section, which the merge covers on its own — only the nested ones
+ * need saying out loud. Colors goes through its own normaliser, which also
+ * brings an imported config of the old shape up to date.
  *
  * Applied before the ref is filled, so backfilling does not itself count as an
  * edit. It reaches storage with the first real change, exactly as it did when
@@ -52,8 +54,7 @@ function adopt(value: IConfig): void {
  */
 function withDefaults(stored: IConfig): IConfig {
   const merged: IConfig = { ...JSON.parse(JSON.stringify(defaultConfig)), ...stored };
-  merged.colors = { ...merged.colors };
-  merged.colors.actionBar ||= defaultConfig.colors.actionBar;
+  merged.colors = normalizeColors(merged.colors);
   merged.discord = { ...merged.discord };
   merged.discord.autoStartAfterTimer ??= { ...defaultConfig.discord.autoStartAfterTimer! };
   return merged;

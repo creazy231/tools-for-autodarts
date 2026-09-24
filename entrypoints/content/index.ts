@@ -13,6 +13,7 @@ import Migration from "@/components/Migration.vue";
 import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 import { quietOwnDartsSwitch, quietOwnDartsSwitchOnRemove } from "@/utils/quiet-own-darts-switch";
 import { keepKeystrokesInFields } from "@/utils/keep-keystrokes-in-fields";
+import { pageBackground } from "@/utils/page-background";
 
 let migrationModalUI: any;
 
@@ -26,6 +27,14 @@ export default defineContentScript({
     // serves every entrypoint's UI on the page. See
     // utils/keep-keystrokes-in-fields.ts.
     ctx.onInvalidated(keepKeystrokesInFields());
+
+    // Colors' page, where it is set to cover every page and not only the match
+    // screen. See utils/page-background.ts.
+    try {
+      ctx.onInvalidated(await pageBackground());
+    } catch (e) {
+      console.error(e);
+    }
 
     await waitForElement(SELECTORS.app.root, 15000);
     AutodartsToolsUrlStatus.setValue(window.location.href.split("#")[0] || "undefined");

@@ -81,9 +81,13 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - On a tournament page the code goes into the **Invite** dialog instead, under its title, so the tournament's link can be scanned rather than sent
 
 ### 🎨 Match Customization
-- **Color Customization**: Change the colors of dart throws, scores, and match background for a personalized gaming environment
-  - Four pickers: score card background, text, match background, and the bottom bar that holds the undo and next buttons
-  - The bottom bar starts at the color autodarts uses, so nothing changes there until you pick one
+- **Colors**: Recolours the match screen. Everything starts at autodarts' own colours, so switching it on changes nothing until you pick something
+  - **Player card**: the card of the player whose turn it is, in autodarts' own raspberry, one of eight colour pairs (*Blueberry*, *Ocean*, *Lime*, *Petrol*, *Orange*, *Crimson*, *Gold* and *Graphite*), or two colours of your own. It follows that player in every layout the match screen has, the 3+ player top bar included. A bust and a won leg keep autodarts' own colours, and so does the winner's pattern
+  - **Background**: the page behind the match, in autodarts' own midnight, one of seven dark pairs (*Royal*, *Forest*, *Petrol*, *Wine*, *Plum*, *Ember* and *Graphite*), or two colours of your own. autodarts' mark stays on it, tinted to go with the colours
+    - **On every autodarts page**: puts the background on every page, the lobby, the home page and the settings included, rather than on the match screen alone. The settings page shows a change at once
+  - **More colours**: the other players' cards and the throw bar, the text on the cards and in the throw bar, and the bottom bar that holds undo and Next, each with a button back to autodarts' own
+  - A preview of the match screen in the settings, drawn from autodarts' own card, shows every change as you make it, on your **Board Skins** board when that is on
+  - Editing either colour of a preset turns it into a pair of your own, starting from the preset's colours
 - **Streaming Mode**: Replaces the whole match screen with a broadcast overlay — a chroma key background, the dartboard, and a scoreboard you place where you want it
   - Switched on and off from the **stream icon in the match header**, next to the site's own icons. While the overlay is up it covers that header, so the overlay itself carries the way back out: the **✕** in its footer, or a click anywhere on the background
   - **Design**: two scoreboards to choose from, switchable mid-match

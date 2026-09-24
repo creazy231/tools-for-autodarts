@@ -426,6 +426,38 @@ body {
   background: var(--ad-action-disabled);
 }
 
+/* --------------------------------------------------------- colour inputs ---
+ * A native colour picker as nothing but its swatch. Every browser draws its own
+ * bordered button round the swatch, which reads as a second control. Sized by
+ * utilities where it is used, since a size here would outrank them.
+ */
+.adt-color-input {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-xs);
+}
+
+.adt-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.adt-color-input::-webkit-color-swatch {
+  border: 0;
+  border-radius: var(--ad-radius-xs);
+}
+
+.adt-color-input::-moz-color-swatch {
+  border: 0;
+  border-radius: var(--ad-radius-xs);
+}
+
+.adt-color-input:focus-visible {
+  outline: none;
+  box-shadow: var(--ad-focus-ring);
+}
+
 /* -------------------------------------------------------------- popover ---*/
 .adt-popover {
   color: var(--ad-text-primary);

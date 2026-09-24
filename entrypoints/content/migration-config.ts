@@ -76,11 +76,10 @@ async function migrateConfig(currentConfigVersion: number) {
         }
         break;
       case 9:
-        // Migration from version 9 to version 10
+        // Migration from version 9 to version 10. It gave Colors its page
+        // colour; storage's own migration (v13) has reshaped Colors by the time
+        // this runs, and reads a missing page colour as autodarts' own.
         config.version = 10;
-        if (config.colors && !config.colors.matchBackground) {
-          config.colors.matchBackground = defaultConfig.colors.matchBackground;
-        }
         break;
       case 10:
         // Migration from version 10 to version 11

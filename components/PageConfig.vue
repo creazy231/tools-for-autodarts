@@ -257,6 +257,7 @@ import packageConfig from "../package.json";
 import type { IConfig, ISound } from "@/utils/storage";
 
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
+import { normalizeColors } from "@/utils/colors";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
 import AppAlert from "@/components/AppAlert.vue";
@@ -321,7 +322,7 @@ const featureGroups: FeatureGroup[] = [
     id: "matches",
     tab: 1,
     features: [
-      { id: "colors", title: "Colors Settings", component: Colors, hasSettings: true, v2Ready: true },
+      { id: "colors", title: "Colors Settings", component: Colors, hasSettings: true, v2Ready: true, wideSettings: true },
       { id: "takeout-notification", title: "Takeout Notification Settings", component: TakeoutNotification, hasSettings: false, v2Ready: true },
       { id: "next-player-on-takeout-stuck", title: "Next Player On Takeout Stuck Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
       { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true, v2Ready: true },
@@ -555,6 +556,9 @@ function importSettings() {
             ...JSON.parse(JSON.stringify(defaultConfig)),
             ...JSON.parse(JSON.stringify(importedData.config)),
           };
+          // An export from before a change of shape is merged as it is, so
+          // Colors is brought up to date here; see normalizeColors.
+          newConfig.colors = normalizeColors(newConfig.colors);
 
           // Set the local ref
           config.value = newConfig;
@@ -805,6 +809,9 @@ function pasteFromClipboard() {
           ...JSON.parse(JSON.stringify(defaultConfig)),
           ...JSON.parse(JSON.stringify(importedData.config)),
         };
+        // An export from before a change of shape is merged as it is, so
+        // Colors is brought up to date here; see normalizeColors.
+        newConfig.colors = normalizeColors(newConfig.colors);
 
         // Set the local ref
         config.value = newConfig;

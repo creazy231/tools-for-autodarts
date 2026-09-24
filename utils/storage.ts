@@ -1,5 +1,7 @@
 import type { BoardStatus } from "@/utils/types";
 
+import { defaultColors, normalizeColors } from "@/utils/colors";
+
 export interface IConfig {
   version: number;
   discord: {
@@ -49,9 +51,14 @@ export interface IConfig {
   };
   colors: {
     enabled: boolean;
-    background: string;
+    /** The card of the player whose turn it is. */
+    card: ColorScheme;
+    /** The page behind the match, or behind every page with `everywhere`. */
+    page: ColorScheme;
+    everywhere: boolean;
+    /** Every other card, and the throw bar. "" is autodarts' own, here and in the two below. */
+    cards: string;
     text: string;
-    matchBackground: string;
     actionBar: string;
   };
   recentLocalPlayers: {
@@ -206,6 +213,18 @@ export interface IConfig {
   gotcha: {
     enabled: boolean;
   };
+}
+
+/**
+ * A gradient Colors paints: autodarts' own ("default", which draws nothing),
+ * one of the presets in utils/colors.ts, or a pair picked by hand ("custom").
+ * `from` and `to` always hold the colours it shows, so nothing that draws it
+ * needs the preset list.
+ */
+export interface ColorScheme {
+  preset: string;
+  from: string;
+  to: string;
 }
 
 export interface ISoundTTS {
@@ -430,15 +449,9 @@ export const defaultConfig: IConfig = {
       y: 0,
     },
   },
-  colors: {
-    enabled: false,
-    background: "#3182CE",
-    text: "#FFFFFF",
-    matchBackground: "#3c3c3c",
-    // the site's own fill for that bar, so switching Colors on does not change
-    // it until a colour is actually picked
-    actionBar: "#042963",
-  },
+  // autodarts' own colours throughout, so switching Colors on changes nothing
+  // until something is picked
+  colors: defaultColors(),
   recentLocalPlayers: {
     enabled: false,
     cap: 10,
@@ -786,7 +799,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 12;
+const CONFIG_VERSION = 13;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -800,6 +813,14 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Colors has a colour scheme for the active player's card and one for
+       * the page, where it had one flat colour for every card and one for a
+       * page stripped of its texture. What was on screen stays on screen; see
+       * normalizeColors in utils/colors.ts for how each setting carries over.
+       */
+      13: (config: any) => ({ ...config, colors: normalizeColors(config.colors) }),
+
       /** Board Skins is new, and a saved config has nothing for it. */
       12: (config: any) => ({
         ...config,

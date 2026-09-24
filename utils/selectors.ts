@@ -575,6 +575,28 @@ export const SELECTORS = {
     ],
     /** Whose turn it is: the site paints that one card with its gradient. */
     activePlayerCard: [ "main div[class*='bg-raspberry']" ],
+    /**
+     * Whatever marks whose turn it is. That is the card in every layout, the
+     * cell of a 3+ player top bar, cricket's player cells, and the
+     * active-player chip and status pill. The site paints all of them with
+     * this one gradient and uses it for nothing else on the match screen, so
+     * Colors recolours exactly these.
+     *
+     * The fallback is for a renamed gradient. It skips the site's variant
+     * classes: `aria-pressed:bg-raspberry-…` sits on buttons that show it only
+     * while pressed, and a bare substring match would paint them all the time.
+     */
+    activeHighlight: [
+      ".bg-raspberry-slush-diagonal",
+      "[class*='bg-raspberry']:not([class*=':bg-raspberry'])",
+    ],
+    /**
+     * A score card at rest, as a class on its face. The site puts a gradient on
+     * the active, busted and winning card, and tailwind-merge takes the resting
+     * colour off whenever it does, so these two mean idle and nothing else.
+     * black-60 is the sidebar and top-bar layouts'.
+     */
+    idleCard: [ ".bg-black-80", ".bg-black-60" ],
     /** Player name, relative to a card. */
     playerName: [ "span.font-display" ],
     /**
@@ -673,16 +695,27 @@ export const SELECTORS = {
     /**
      * The bar above the board: three dart slots then the turn total.
      * v1's equivalent was `#ad-ext-turn` and its `.ad-ext-turn-throw` children.
+     *
+     * `max-w-25` is the slot's size in the widest layout only; the sidebar and
+     * top-bar layouts draw it `max-w-20`. The second candidate is the slot in
+     * every layout: the site's Throw component is the one thing on the match
+     * screen that is both a size container and set in the number face.
      */
-    turnBar: [ "main div.max-w-25" ],
+    turnBar: [ "main div.max-w-25", "main div.\\@container.font-number" ],
     /**
      * The rounded panel the dart slots sit in.
      *
      * Worth recolouring alongside the slots: it shows in the gaps between them,
      * and the site turns it red on a bust, which reads as broken next to a
      * colour scheme of the user's choosing.
+     *
+     * The second candidate is for the layouts the first misses, as with
+     * {@link turnBar}: the turn total is a direct child of the panel.
      */
-    turnBarPanel: [ "main div.rounded-2xl:has(> div > div.max-w-25)" ],
+    turnBarPanel: [
+      "main div.rounded-2xl:has(> div > div.max-w-25)",
+      "main div.rounded-2xl:has(> div.\\@container.font-number)",
+    ],
     /**
      * The three dart slots, in throw order — the ones grouped together to the
      * left of the turn total. Scoping to that group is what separates them

@@ -55,6 +55,7 @@ import AppButton from "@/components/AppButton.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import AppNotification from "@/components/AppNotification.vue";
 import { AutodartsToolsConfig } from "@/utils/storage";
+import { normalizeColors } from "@/utils/colors";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, isIndexedDBAvailable } from "@/utils/helpers";
 
 interface OldConfig {
@@ -249,7 +250,7 @@ async function migrateSettings() {
     config.discord = oldConfig.discord;
     config.autoStart = oldConfig.autoStart;
     config.streamingMode = oldConfig.streamingMode;
-    config.colors = oldConfig.colors;
+    config.colors = normalizeColors(oldConfig.colors);
     config.recentLocalPlayers = oldConfig.recentLocalPlayers;
     config.takeout = oldConfig.takeout;
     config.smallerScores = oldConfig.inactiveSmall;

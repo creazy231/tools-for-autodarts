@@ -75,7 +75,8 @@ export function waitForElementWithTextContent(selector: string | string[], textC
   });
 }
 
-const STYLE_ID_PREFIX = "ad-ext_style_";
+/** Every stylesheet {@link addStyles} installs has an id starting with this. */
+export const STYLE_ID_PREFIX = "ad-ext_style_";
 
 /**
  * Install a feature's stylesheet, replacing any previous version of it.
