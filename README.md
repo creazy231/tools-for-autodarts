@@ -228,6 +228,7 @@ Everyone else — a remote opponent, a bot — keeps the sound. When you are onl
 The Caller feature provides voice announcements during your darts gameplay, similar to professional darts tournaments:
 
 #### Configuration Options
+- **Game Modes**: Choose which game modes the Caller speaks in (X01, Cricket, the training modes, the party modes, and the bull-off). All modes are selected by default
 - **Call Every Dart**: Announces each dart as it's thrown, rather than waiting for the end of a turn
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
   - Covers **Gotcha** too, which autodarts works out no route for: the number left to reach the target score is announced the same way
@@ -339,6 +340,9 @@ The caller has a sophisticated fallback system to provide complete coverage even
 ### 🔊 Sound FX Feature
 The Sound FX feature adds ambient sound effects to your gameplay experience:
 
+#### Game Modes
+Choose which game modes Sound FX plays in — for example X01 only, or everything but the party modes. All modes are selected by default. Lobby and tournament sounds are not tied to a game mode.
+
 #### Game Event Sounds
 Add sound effects for various game events:
 - **Point Triggers**: Sounds can be triggered for any score from `ambient_0` to `ambient_180`
@@ -443,6 +447,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 #### Configuration Options
 - **Effect Management**: Add, edit, enable/disable, and reorder lighting effects
 - **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
+- **Game Modes**: Choose which game modes trigger effects. All modes are selected by default. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) are not tied to a game mode and fire whenever WLED is enabled
 - **CSV Import**: Bulk import effects using CSV format: `[name];[url];[trigger1];[trigger2]...`
 - **Drag & Drop**: Reorder effects by dragging them in the settings interface
 - **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
@@ -581,6 +586,7 @@ Takeout;http://wled-device.local/win/PL=3;takeout;busted
 The Animations feature allows you to display custom GIF animations for special events during gameplay:
 
 #### Configuration
+- **Game Modes**: Choose which game modes show animations. All modes are selected by default
 - **Delay**: Set how long to wait before showing the animation (in seconds)
 - **Duration**: Set how long the animation should display (in seconds)
 - **Object Fit**: Choose between 'cover' (fill screen) or 'contain' (maintain aspect ratio)

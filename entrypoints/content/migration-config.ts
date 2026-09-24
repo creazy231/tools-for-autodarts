@@ -187,6 +187,14 @@ async function migrateConfig(currentConfigVersion: number) {
         config.version = 22;
         // checkoutGuide removed
         break;
+      case 22:
+        // Migration from version 22 to version 23
+        config.version = 23;
+        config.animations.disabledGameModes = [];
+        config.caller.disabledGameModes = [];
+        config.soundFx.disabledGameModes = [];
+        config.wledFx.disabledGameModes = [];
+        break;
     }
 
     await AutodartsToolsConfig.setValue(config);
