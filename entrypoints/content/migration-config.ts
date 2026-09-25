@@ -187,6 +187,13 @@ async function migrateConfig(currentConfigVersion: number) {
         config.version = 22;
         // checkoutGuide removed
         break;
+      case 22:
+        // Migration from version 22 to version 23
+        config.version = 23;
+        config.animations.data.forEach((animation) => {
+          animation.duration = 0;
+        });
+        break;
     }
 
     await AutodartsToolsConfig.setValue(config);

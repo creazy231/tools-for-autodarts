@@ -193,7 +193,7 @@ function hasTrigger(trigger: string): boolean {
 }
 
 /** Pick an animation for a trigger, at random when several match. */
-async function resolveAnimation(trigger: string): Promise<string | null> {
+async function resolveAnimation(trigger: string): Promise<{ url: string; duration: number } | null> {
   const animations = config.value?.animations?.data;
   if (!animations?.length) return null;
 
@@ -203,13 +203,12 @@ async function resolveAnimation(trigger: string): Promise<string | null> {
   const picked = matched[Math.floor(Math.random() * matched.length)];
 
   // Uploaded GIFs live in OPFS and are addressed by id; the rest are plain URLs.
-  if (picked.animationId && !picked.url) {
-    const cached = opfsUrls.get(picked.animationId);
-    if (cached) return cached;
-    return await loadFromOPFS(picked.animationId);
-  }
+  const url = picked.animationId && !picked.url
+    ? opfsUrls.get(picked.animationId) ?? await loadFromOPFS(picked.animationId)
+    : picked.url;
+  if (!url) return null;
 
-  return picked.url;
+  return { url, duration: picked.duration };
 }
 
 function matchesTrigger(animation: IAnimation, trigger: string): boolean {
@@ -249,8 +248,8 @@ async function loadFromOPFS(animationId: string): Promise<string | null> {
 
 async function play(trigger: string): Promise<void> {
   try {
-    const url = await resolveAnimation(trigger);
-    if (!url) return;
+    const animation = await resolveAnimation(trigger);
+    if (!animation) return;
 
     console.log("Autodarts Tools: Animations - playing", trigger);
 
@@ -264,9 +263,10 @@ async function play(trigger: string): Promise<void> {
     }
 
     const delay = (config.value?.animations?.delayStart ?? 1) * 1000;
-    const duration = (config.value?.animations?.duration ?? 5) * 1000;
+    // A duration of 0 on the animation means "use the global one".
+    const duration = (animation.duration || (config.value?.animations?.duration ?? 5)) * 1000;
 
-    currentUrl.value = url;
+    currentUrl.value = animation.url;
 
     setTimeout(() => {
       visible.value = true;
