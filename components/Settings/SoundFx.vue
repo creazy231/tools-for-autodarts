@@ -30,6 +30,18 @@
           <div class="space-y-3 text-white/70">
             <p>Configure sound effects that play during the game for special events.</p>
 
+            <div>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex items-center gap-2">
+                  <span>enable in selected Game Modes</span>
+                </div>
+                <AppMultiSelect id="soundfx-gamemode-select" class="w-full"
+                  :options="Object.values(GameMode).map(mode => ({ value: mode, label: `${mode}` }))"
+                  :model-value="toEnabledGameModes(config.soundFx.disabledGameModes)"
+                  @update:model-value="config.soundFx.disabledGameModes = toDisabledGameModes($event)" />
+              </div>
+            </div>
+
             <div class="mt-2 flex items-center gap-2 text-sm">
               <span class="icon-[pixelarticons--drag-and-drop] text-white/60" />
               <p>Drag and drop sounds to change their order</p>
@@ -472,6 +484,7 @@ import AppInput from "../AppInput.vue";
 import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppSlider from "../AppSlider.vue";
+import AppMultiSelect from "../AppMultiSelect.vue";
 import { type ISound } from "@/utils/storage";
 import { useNotification } from "@/composables/useNotification";
 import { useTTS } from "@/composables/useTTS";

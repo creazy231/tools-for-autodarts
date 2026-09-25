@@ -42,11 +42,9 @@
             </div>
           </div>
           <div class="space-y-3 text-white/70">
-            <p>
-              Configure WLED effects that are played during the game. If board IDs are defined, the
-              effects are only played for throws on these boards. The 'other' effect is triggered
-              for throws on other boards.
-            </p>
+            <p>Configure WLED effects that are played during the game.</p>
+            <p>If board IDs are defined, the effects are only played for throws on these boards. The
+              'other' effect is triggered for throws on other boards.</p>
             <div class="mt-4 space-y-4">
               <div class="grid grid-cols-[auto_1fr] gap-4">
                 <p>Board IDs:<br><span class="text-xs text-white/60">(one per line)</span></p>
@@ -68,6 +66,18 @@
                 </div>
                 <AppToggle @update:model-value="config.wledFx.onlyOnce = !config.wledFx.onlyOnce"
                   v-model="config.wledFx.onlyOnce" />
+              </div>
+            </div>
+
+            <div>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex items-center gap-2">
+                  <span>enable in selected Game Modes</span>
+                </div>
+                <AppMultiSelect id="wled-gamemode-select" class="w-full"
+                  :options="Object.values(GameMode).map(mode => ({ value: mode, label: `${mode}` }))"
+                  :model-value="toEnabledGameModes(config.wledFx.disabledGameModes)"
+                  @update:model-value="config.wledFx.disabledGameModes = toDisabledGameModes($event)" />
               </div>
             </div>
 
@@ -409,6 +419,7 @@ import AppInput from "../AppInput.vue";
 import AppNotification from "../AppNotification.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 import AppDropdown from "../AppDropDown.vue";
+import AppMultiSelect from "../AppMultiSelect.vue";
 
 import { useNotification } from "@/composables/useNotification";
 import { type IWled } from "@/utils/storage";

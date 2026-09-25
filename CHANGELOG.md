@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **The Caller**, **Sound FX**, **WLED** and **Animations** can each be limited to the game modes you choose — X01, Cricket, the training modes (CountUp, ATC, Random Checkout, RTW, Segment Training, Bob's 27, 121), the party modes (Shanghai, Gotcha, Bermuda, Killer) and the bull-off. A new *enable in selected Game Modes* dropdown in each feature's settings picks them, with an *All* entry to select or clear the whole list at once. The mode is taken from the match's own variant, so it is right on the rebuilt site. Every mode is selected by default, and an existing configuration is migrated with every mode on, so nothing changes until you narrow it down. Lobby and tournament triggers do not belong to a game mode and keep firing whenever the feature is enabled
+
 ## [3.0.9] - 2026-09-25
 
 ### Changed

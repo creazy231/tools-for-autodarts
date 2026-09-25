@@ -78,6 +78,18 @@
               </div>
             </div>
 
+            <div>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex items-center gap-2">
+                  <span>enable in selected Game Modes</span>
+                </div>
+                <AppMultiSelect id="animation-gamemode-select" class="w-full"
+                  :options="Object.values(GameMode).map(mode => ({ value: mode, label: `${mode}` }))"
+                  :model-value="toEnabledGameModes(config.animations.disabledGameModes)"
+                  @update:model-value="config.animations.disabledGameModes = toDisabledGameModes($event)" />
+              </div>
+            </div>
+
             <div class="mt-2 flex items-center gap-2 text-sm">
               <span class="icon-[pixelarticons--drag-and-drop] text-white/60" />
               <p>Drag and drop animations to change their order</p>
@@ -418,6 +430,7 @@ import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppTextarea from "../AppTextarea.vue";
 import AppToggle from "../AppToggle.vue";
+import AppMultiSelect from "../AppMultiSelect.vue";
 
 import { useNotification } from "@/composables/useNotification";
 import { deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
@@ -528,7 +541,7 @@ async function loadAnimationSource(animation: IAnimation) {
         return;
       }
     } catch (error) {
-      console.error("Error loading animation from OPFS:", error);
+      console.error("Autodarts Tools: Animation: Error loading animation from OPFS:", error);
     }
   }
   // Fallback to URL if animation is not stored in OPFS
@@ -914,7 +927,7 @@ async function processGifFiles() {
           throw new Error("Failed to save animation to browser storage");
         }
       } catch (error) {
-        console.error(`Error processing file ${file.name}:`, error);
+        console.error(`Autodarts Tools: Animation: Error processing file ${file.name}:`, error);
         showNotification(`Failed to process ${file.name}`, "error");
       }
     }
@@ -927,7 +940,7 @@ async function processGifFiles() {
     // Update intersection observer to detect newly added animations
     updateIntersectionObserverForNewAnimations();
   } catch (error) {
-    console.error("Error processing files:", error);
+    console.error("Autodarts Tools: Animation: Error processing files:", error);
     showNotification("Error processing files", "error");
   } finally {
     isGifProcessing.value = false;

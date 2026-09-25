@@ -65,6 +65,10 @@ Features are organized into four tabs in `components/PageConfig.vue`: Lobbies, M
 - **Cross-component** — Event bus via `mitt` (see `composables/useEventBus.ts`)
 - **WebSocket capture** — Script injection into page context to intercept autodarts game events, which drive sounds, animations, and WLED effects
 
+### Game Modes
+
+Read the current game mode from `gameData.match?.variant` (the site's own name, e.g. `"X01"`, `"Cricket"`, `"Bull-off"`). The `GameMode` enum in `utils/game-data-storage.ts` uses the variant names. Caller, Sound FX, WLED and Animations each store a `disabledGameModes` list (empty by default) and check it through a local `_is_enabled()` helper. Only game-data events are gated this way: lobby and tournament triggers ignore the game mode. Because the config stores the disabled modes, a variant added to the enum is enabled everywhere without a migration. The settings dropdown shows the enabled modes and converts with `toEnabledGameModes()` / `toDisabledGameModes()`.
+
 ### Auto-imports
 
 WXT + Vite plugins auto-import:
@@ -107,7 +111,7 @@ Template-first SFCs (`<template>`, `<script setup lang="ts">`, `<style>`). Insid
 - Container class: `adt-container` (`relative overflow-hidden rounded-md bg-black/50 p-6 shadow-lg`)
 - Feature card images use `gradient-mask-left` CSS mask
 - Icons: Iconify CSS mode — `<span class="icon-[pixelarticons--name]" />` or `icon-[material-symbols--name]`
-- Reusable UI components use `App` prefix: `AppButton`, `AppInput`, `AppToggle`, `AppModal`, `AppSelect`, `AppRadioGroup`, `AppSlider`, `AppTabs`, `AppNotification`
+- Reusable UI components use `App` prefix: `AppButton`, `AppInput`, `AppToggle`, `AppModal`, `AppSelect`, `AppMultiSelect`, `AppRadioGroup`, `AppSlider`, `AppTabs`, `AppNotification`
 
 ### Config Persistence Pattern
 
