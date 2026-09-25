@@ -26,6 +26,29 @@
           <div class="space-y-3 text-white/70">
             <p>Configure the animations for the game. Click the plus button to add a new animation.</p>
 
+            <!-- Board Filtering -->
+            <div class="mt-4 space-y-2">
+              <div class="grid grid-cols-[auto_1fr] gap-4">
+                <p>
+                  Board IDs:<br>
+                  <span class="text-xs text-white/60">(optional, one per line)</span>
+                </p>
+                <AppTextarea
+                  id="animation-boards"
+                  v-model="animationBoardIds"
+                  :placeholder="boardIdsPlaceholder"
+                  monospace
+                  :rows="3"
+                  :autosize="false"
+                />
+              </div>
+              <p class="text-xs text-white/60">
+                Leave empty to play animations for every board. When board IDs are configured,
+                animations only play for throws and wins by players on those boards. This is useful
+                in online matches so an opponent's board does not trigger your local GIFs.
+              </p>
+            </div>
+
             <!-- Animation Settings -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
@@ -468,6 +491,20 @@ const lowercaseText = computed({
   get: () => newAnimation.value.text,
   set: (val: string) => {
     newAnimation.value.text = val.toLowerCase();
+  },
+});
+
+const boardIdsPlaceholder = "6a501a61-53a5-468a-a56a-17134ace3099\n6128583a-66d8-46a7-87be-97f045ce7456\n...";
+
+const animationBoardIds = computed({
+  get: () => (config.value?.animations.boardIds ?? []).join("\n"),
+  set: (val: string) => {
+    if (!config.value) return;
+
+    config.value.animations.boardIds = val
+      .split(/\r?\n/)
+      .map(id => id.trim().toLowerCase())
+      .filter(Boolean);
   },
 });
 
