@@ -56,7 +56,8 @@
                 Background
               </h4>
               <p class="mb-3 text-sm text-white/60">
-                The page behind the match. autodarts' mark stays on it, tinted to go with the colours you pick.
+                The page behind the match, and the bottom bar and its buttons with it. autodarts' mark stays on the
+                page, tinted to go with the colours you pick.
               </p>
               <SchemePicker
                 v-model="config.colors.page"
@@ -83,7 +84,7 @@
                 >
                   <input
                     @input="setFlat(flat.key, $event)"
-                    :value="config.colors[flat.key] || flat.site"
+                    :value="shown(flat.key)"
                     :aria-label="flat.label"
                     class="adt-color-input size-9 shrink-0"
                     type="color"
@@ -93,13 +94,13 @@
                       {{ flat.label }}
                     </p>
                     <p class="text-xs text-white/60">
-                      {{ config.colors[flat.key] ? flat.hint : "autodarts' own" }}
+                      {{ hint(flat) }}
                     </p>
                   </div>
                   <AppButton
                     @click="config.colors[flat.key] = ''"
                     v-if="config.colors[flat.key]"
-                    :title="`${flat.label}: back to autodarts' own`"
+                    :title="resetTitle(flat)"
                     auto
                     class="aspect-square size-8 shrink-0 p-0"
                     type="ghost"
@@ -154,7 +155,7 @@ import ColorsPreview from "./Colors/ColorsPreview.vue";
 import SchemePicker from "./Colors/SchemePicker.vue";
 
 import { boardSkin } from "@/utils/board-skins";
-import { CARD_PRESETS, PAGE_PRESETS, SITE_ACTION_BAR, SITE_CARD, SITE_CARDS, SITE_PAGE, SITE_TEXT } from "@/utils/colors";
+import { CARD_PRESETS, PAGE_PRESETS, SITE_ACTION_BAR, SITE_CARD, SITE_CARDS, SITE_PAGE, SITE_TEXT, barPalette } from "@/utils/colors";
 import { siteTexture } from "@/utils/page-background";
 
 const emit = defineEmits([ "toggle" ]);
@@ -163,7 +164,7 @@ const emit = defineEmits([ "toggle" ]);
 const FLAT = [
   { key: "cards", label: "Other cards", hint: "Every card but the active one, and the throw bar", site: SITE_CARDS },
   { key: "text", label: "Text", hint: "On the cards and in the throw bar", site: SITE_TEXT },
-  { key: "actionBar", label: "Bottom bar", hint: "The bar that holds undo and Next", site: SITE_ACTION_BAR },
+  { key: "actionBar", label: "Bottom bar", hint: "The bar that holds undo and Next, and its buttons with it", site: SITE_ACTION_BAR },
 ] as const;
 
 const { config } = useConfig();
@@ -178,6 +179,28 @@ const board = computed(() => boardSkin(config.value?.boardSkins?.enabled ? confi
 onMounted(() => {
   texture.value = siteTexture();
 });
+
+/**
+ * The colour a flat picker shows. The bottom bar follows the background until
+ * a colour of its own is picked, so it shows the one the match screen draws.
+ */
+function shown(key: typeof FLAT[number]["key"]): string {
+  const colors = config.value!.colors;
+  if (key === "actionBar" && !colors.actionBar) return barPalette(colors)?.bar ?? SITE_ACTION_BAR;
+  return colors[key] || FLAT.find(flat => flat.key === key)!.site;
+}
+
+function hint(flat: typeof FLAT[number]): string {
+  const colors = config.value!.colors;
+  if (colors[flat.key]) return flat.hint;
+  if (flat.key === "actionBar" && barPalette(colors)) return "Follows the background";
+  return "autodarts' own";
+}
+
+function resetTitle(flat: typeof FLAT[number]): string {
+  const following = flat.key === "actionBar" && config.value!.colors.page.preset !== "default";
+  return following ? `${flat.label}: follow the background again` : `${flat.label}: back to autodarts' own`;
+}
 
 function setFlat(key: typeof FLAT[number]["key"], event: Event) {
   if (!config.value) return;

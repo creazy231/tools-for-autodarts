@@ -35,6 +35,8 @@ export const SITE_CARDS = "#16181c";
 export const SITE_TEXT = "#f7f8fa";
 /** The one-off `bg-[#042963]` of the bar holding undo and Next. */
 export const SITE_ACTION_BAR = "#042963";
+/** blue-60, what the bar's buttons are filled with, and outlined in. */
+export const SITE_BUTTON = "#0b55df";
 
 /**
  * Pairs for the card of the player whose turn it is.
@@ -195,6 +197,102 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${channel(0)}${channel(8)}${channel(4)}`;
 }
 
+/** WCAG relative luminance. */
+function luminance(color: string): number {
+  const n = Number.parseInt(color.slice(1), 16);
+  const [ r, g, b ] = [ n >> 16 & 255, n >> 8 & 255, n & 255 ].map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrast(a: string, b: string): number {
+  const [ light, dark ] = [ luminance(a), luminance(b) ].sort((x, y) => y - x);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+/** `text-blue-05`, the label on the bar's filled buttons. */
+const BUTTON_LABEL = "#f0f5fd";
+/** blue-70, a button held down. */
+const SITE_PRESSED = "#003eb3";
+
+/*
+ * How autodarts' own bar is put together, as contrast ratios so they carry to
+ * any hue: a colour's lightness says little about how light it looks, and a
+ * green as light as blue-60 would be nearly as light as its label. The bar
+ * stands 1.2:1 off the page, the buttons 2.2:1 off the bar, which leaves their
+ * label at 5.9:1, and a pressed button 1.4:1 under a resting one.
+ */
+const BAR_STEP = contrast(SITE_ACTION_BAR, SITE_PAGE.to);
+const BUTTON_STEP = contrast(SITE_BUTTON, SITE_ACTION_BAR);
+const PRESSED_STEP = contrast(SITE_BUTTON, SITE_PRESSED);
+/** The lightest a button may be and keep its label readable, at 4.5:1. */
+const READABLE = (luminance(BUTTON_LABEL) + 0.05) / 4.5 - 0.05;
+
+/**
+ * The colour of this hue and saturation with the given luminance. Luminance
+ * rises with lightness, so halving the range finds it.
+ */
+function shade(h: number, s: number, target: number): string {
+  let [ low, high ] = [ 0, 1 ];
+  for (let i = 0; i < 24; i++) {
+    const mid = (low + high) / 2;
+    if (luminance(hslToHex(h, s, mid)) < target) low = mid;
+    else high = mid;
+  }
+  return hslToHex(h, s, low);
+}
+
+/** The luminance `ratio`:1 above (or below, for a negative ratio) one of `from`. */
+function step(from: number, ratio: number): number {
+  const next = ratio > 0 ? ratio * (from + 0.05) - 0.05 : (from + 0.05) / -ratio - 0.05;
+  return Math.min(1, Math.max(0, next));
+}
+
+/** The bottom bar's colours: its fill, its buttons, and the border a won leg spins round it. */
+export interface BarPalette {
+  bar: string;
+  /** The buttons' fill and outline (the site's blue-60). */
+  button: string;
+  /** A button held down (blue-70). */
+  pressed: string;
+  /** The won leg's border: the button's colour, then two lighter steps of it. */
+  glow: [ string, string, string ];
+}
+
+/**
+ * The bottom bar and its buttons in the colours around them, or `undefined`
+ * while those are autodarts' own.
+ *
+ * A bottom bar colour picked by hand is the bar; otherwise the background's end
+ * colour is where it all comes from, the way autodarts derives its own from
+ * blue-90: the bar a step lighter than the page, the buttons a further step
+ * lighter than the bar, and a pressed one a step darker, all in the page's hue
+ * and a touch less saturated (0.91 of it, as #042963 and blue-60 are). A
+ * button is never so light that its label stops reading, so on a light bar
+ * it comes out darker than the bar instead. Either way the buttons take the
+ * bar's hue, so bar and buttons stay one piece.
+ */
+export function barPalette(colors: ColorsConfig): BarPalette | undefined {
+  const source = colors.actionBar || (colors.page.preset === "default" ? "" : colors.page.to);
+  if (!source) return undefined;
+
+  const [ h, sourceSaturation ] = hexToHsl(source);
+  const s = sourceSaturation * 0.91;
+  const bar = colors.actionBar || shade(h, s, step(luminance(source), BAR_STEP));
+  const light = Math.min(step(luminance(bar), BUTTON_STEP), READABLE);
+  const button = shade(h, s, light);
+  const [ bh, bs, bl ] = hexToHsl(button);
+  const toward = (share: number) => hslToHex(bh, bs, bl + (1 - bl) * share);
+  return {
+    bar,
+    button,
+    pressed: shade(h, s, step(light, -PRESSED_STEP)),
+    glow: [ button, toward(0.35), toward(0.6) ],
+  };
+}
+
 /**
  * The shade autodarts' mark is drawn in on a page that ends in `color`.
  *
@@ -306,15 +404,34 @@ export function matchStyles(colors: ColorsConfig): string {
       }`);
   }
 
-  if (colors.actionBar) {
+  const bar = barPalette(colors);
+  if (bar) {
+    const actionBar = SELECTORS.match.actionBar[0];
+    const [ glow, lighter, lightest ] = bar.glow;
     rules.push(`
+      /* the bar's buttons, and the camera button beside the board, which is
+         the same outlined button: the site fills and outlines them from these
+         variables. --outline-high is resolved on the root, so it would keep
+         the old blue if it were left to follow --color-blue-60 */
+      ${actionBar}, ${SELECTORS.match.cameraButton[0]} {
+        --color-blue-60: ${bar.button};
+        --color-blue-70: ${bar.pressed};
+        --outline-high: ${bar.button};
+      }
       /* the bar along the bottom, which holds undo and Next. Once a leg is won
          the site draws its fill as a gradient layer, over any colour, inside a
          spinning border; a shadow inside the border covers the fill and
          leaves the border as it is */
-      ${SELECTORS.match.actionBar[0]} {
-        background-color: ${colors.actionBar} !important;
-        box-shadow: inset 0 0 0 100vmax ${colors.actionBar} !important;
+      ${actionBar} {
+        background-color: ${bar.bar} !important;
+        box-shadow: inset 0 0 0 100vmax ${bar.bar} !important;
+      }
+      /* and that border spins through lighter shades of the buttons rather
+         than autodarts' blue and green */
+      ${actionBar}${anyOf(SELECTORS.match.actionBarHighlight)} {
+        background-image:
+          linear-gradient(${bar.bar}, ${bar.bar}),
+          conic-gradient(from var(--control-bar-border-angle), ${glow} 0%, ${lighter} 20%, ${lightest} 40%, ${lighter} 60%, ${glow} 80%, ${glow} 100%) !important;
       }`);
   }
 

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **Colors**' background colours the bottom bar and its buttons as well, rather than leaving autodarts' blue under a page of another colour. The bar takes a shade a step lighter than the page, and undo, *Next*, the input picker and the camera button beside the board take the page's colour, a step lighter again, pressed a step darker, with their labels as readable as they are on autodarts' own blue. Once a leg is won, the border that spins round the bar turns in lighter shades of it instead of autodarts' blue and green. The steps are the ones between autodarts' own midnight page, bar and buttons, taken as contrast rather than lightness so that a green or a gold looks as strong as the blue does, so the background's own colours give back autodarts' own. A *Bottom bar* colour picked under *More colours* still wins over the background, and the buttons then follow that instead
+
 ## [3.0.8] - 2026-09-24
 
 ### Added

@@ -659,6 +659,12 @@ export const SELECTORS = {
       "main div.rounded-2xl:has(button[data-slot='button'])",
       "main div[class*='bg-[#042963]']",
     ],
+    /**
+     * The action bar once a leg is won, as a class on the bar itself: the site
+     * then draws the fill as a gradient layer of its own, inside a border that
+     * spins through its brand gradient (`--control-bar-border-angle`).
+     */
+    actionBarHighlight: [ ".control-bar-gradient-border" ],
 
     /**
      * The primary action in the turn bar — "Next", which ends the current visit.

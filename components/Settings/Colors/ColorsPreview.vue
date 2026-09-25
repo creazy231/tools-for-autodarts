@@ -42,6 +42,14 @@
       draggable="false"
     >
 
+    <!-- the camera button at the board's corner, outlined like undo -->
+    <span
+      :style="{ borderColor: bar.button }"
+      class="absolute left-[30%] top-[15.11%] flex h-[2.375cqw] w-[3.25cqw] items-center justify-center rounded-[0.75cqw] border-[0.125cqw] text-white"
+    >
+      <span class="icon-[material-symbols--photo-camera] size-[1.125cqw]" />
+    </span>
+
     <div
       v-for="player in PLAYERS"
       :key="player.name"
@@ -114,15 +122,24 @@
       </div>
     </div>
 
-    <!-- the bottom bar: the input method, undo and Next -->
+    <!-- the bottom bar: the input method, undo and Next, in the bar's own colours -->
     <div
-      :style="{ backgroundColor: colors.actionBar || SITE_ACTION_BAR }"
+      :style="{ backgroundColor: bar.bar }"
       class="absolute left-[31.5%] top-[88.89%] flex h-[7.56%] w-[37%] items-center gap-[0.5cqw] rounded-[1.125cqw] px-[1.625cqw]"
     >
-      <span class="size-[2.5cqw] rounded-[0.75cqw] bg-[#0b55df]" />
+      <span
+        :style="{ backgroundColor: bar.button }"
+        class="size-[2.5cqw] rounded-[0.75cqw]"
+      />
       <span class="flex-1" />
-      <span class="h-[2.5cqw] w-[3.375cqw] rounded-[0.75cqw] border-[0.125cqw] border-[#0b55df]" />
-      <span class="flex h-[2.5cqw] w-[4cqw] items-center justify-center rounded-[0.75cqw] bg-[#0b55df] font-[family-name:var(--ad-font-body)] text-[length:1cqw] font-bold leading-none text-white">Next</span>
+      <span
+        :style="{ borderColor: bar.button }"
+        class="h-[2.5cqw] w-[3.375cqw] rounded-[0.75cqw] border-[0.125cqw]"
+      />
+      <span
+        :style="{ backgroundColor: bar.button }"
+        class="flex h-[2.5cqw] w-[4cqw] items-center justify-center rounded-[0.75cqw] font-[family-name:var(--ad-font-body)] text-[length:1cqw] font-bold leading-none text-[#f0f5fd]"
+      >Next</span>
     </div>
   </div>
 </template>
@@ -130,7 +147,7 @@
 <script setup lang="ts">
 import type { ColorsConfig } from "@/utils/colors";
 
-import { SITE_ACTION_BAR, SITE_CARDS, SITE_TEXT, gradient, pageLayers } from "@/utils/colors";
+import { SITE_ACTION_BAR, SITE_BUTTON, SITE_CARDS, SITE_TEXT, barPalette, gradient, pageLayers } from "@/utils/colors";
 
 const props = defineProps<{
   colors: ColorsConfig;
@@ -151,6 +168,9 @@ const PLAYERS = [
   { name: "You", avatar: "icon-[material-symbols--person]", score: 406, legs: 1, leg: "95.0", match: "71.4", darts: 3, active: true },
   { name: "Bot Level 3", avatar: "icon-[material-symbols--smart-toy-outline]", score: 441, legs: 0, leg: "60.0", match: "64.2", darts: 3, active: false },
 ];
+
+/** The bottom bar and its buttons, as the match screen draws them: autodarts' own until something is picked. */
+const bar = computed(() => barPalette(props.colors) ?? { bar: SITE_ACTION_BAR, button: SITE_BUTTON });
 
 const page = computed(() => ({
   backgroundColor: props.colors.page.from,
