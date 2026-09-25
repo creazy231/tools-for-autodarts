@@ -196,6 +196,37 @@
           </p>
         </div>
 
+        <div>
+          <label for="animation-duration" class="mb-1 block text-sm font-medium text-white">
+            Animation Duration in ms
+          </label>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <AppInput
+              id="animation-duration"
+              @update:model-value="val => newAnimation.duration = val ? Number(val) : null"
+              :model-value="newAnimation.duration ? String(newAnimation.duration) : ''"
+              type="number"
+              :placeholder="`${(config!.animations.duration || 0) * 1000}`"
+              >
+                <template #icon>
+                  <span class="icon-[pixelarticons--clock]" />
+                </template>
+              </AppInput>
+            </div>
+            <AppButton
+              @click="fetchGifDuration"
+              :loading="isFetchingDuration"
+              :disabled="!newAnimation.url.trim()"
+              auto
+              class="h-auto"
+              title="Read the duration from the GIF at the URL above"
+            >
+              From GIF
+            </AppButton>
+          </div>
+        </div>
+
         <hr class="border-white/20">
 
         <div>
@@ -420,7 +451,7 @@ import AppTextarea from "../AppTextarea.vue";
 import AppToggle from "../AppToggle.vue";
 
 import { useNotification } from "@/composables/useNotification";
-import { deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
+import { backgroundFetch, deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
 import { type IAnimation } from "@/utils/storage";
 
 const emit = defineEmits([ "toggle" ]);
@@ -430,11 +461,13 @@ const { config, ready } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
-const newAnimation = ref<{ url: string; text: string; animationId: string | null }>({
+const newAnimation = ref<{ url: string; text: string; animationId: string | null; duration: number | null }>({
   url: "",
   text: "",
   animationId: null,
+  duration: null,
 });
+const isFetchingDuration = ref(false);
 const allowAdd = ref(false);
 const editingIndex = ref<number | null>(null);
 const animationsContainer = ref<HTMLElement | null>(null);
@@ -658,6 +691,58 @@ function toggleAnimationEnabled(index: number) {
   config.value.animations.data[index].enabled = !config.value.animations.data[index].enabled;
 }
 
+async function getGifDurationFromUrl(url) {
+  try {
+    const response = await backgroundFetch(url);
+    if (!response.ok || !response.data) {
+      console.error(`fetching ${url} failed`, response);
+      return 0;
+    }
+    let uint8: Uint8Array;
+    
+    if (response.data.startsWith("data:image/gif;base64,")) {
+      const base64String = response.data.slice("data:image/gif;base64,".length);
+      const binaryString = atob(base64String);
+      uint8 = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        uint8[i] = binaryString.charCodeAt(i);
+      }
+    } else {
+      const buffer = new TextEncoder().encode(response.data);
+      uint8 = new Uint8Array(buffer);
+    }
+
+    let duration:number = 0;
+    for (let i = 0; i < uint8.length - 4; i++) {
+      if (uint8[i] === 0x21 && uint8[i + 1] === 0xF9 && uint8[i + 2] === 0x04) {
+        const delay = (uint8[i + 4] + (uint8[i + 5] << 8)) * 10;
+        duration += delay;
+      }
+    }
+    return duration;
+  } catch (error) {
+    console.error("Error calculating GIF duration:", error);
+    return null;
+  }
+}
+
+async function fetchGifDuration() {
+  const url = newAnimation.value.url.trim();
+  if (!url) return;
+
+  isFetchingDuration.value = true;
+  try {
+    const duration = await getGifDurationFromUrl(url);
+    if (duration) {
+      newAnimation.value.duration = duration;
+    } else {
+      showNotification("Could not read the duration from this GIF", "error");
+    }
+  } finally {
+    isFetchingDuration.value = false;
+  }
+}
+
 async function editAnimation(index: number) {
   if (!config.value || !config.value.animations.data[index]) return;
 
@@ -678,6 +763,7 @@ async function editAnimation(index: number) {
       ? animation.triggers.join("\n")
       : "",
     animationId: animation.animationId || null,
+    duration: animation.duration ? animation.duration * 1000 : null,
   };
   isEditMode.value = true;
   editingIndex.value = index;
@@ -734,6 +820,7 @@ function saveAnimation() {
     triggers: validTriggers, // Use the validated triggers
     enabled: true, // New animations are enabled by default
     animationId: newAnimation.value.animationId ?? undefined,
+    duration: (newAnimation.value.duration || 0) / 1000,
   };
 
   if (isEditMode.value && editingIndex.value !== null) {
@@ -747,7 +834,7 @@ function saveAnimation() {
   }
 
   // Reset form and close modal
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", text: "", animationId: null, duration: 0 };
   showAnimationModal.value = false;
   editingIndex.value = null;
 
@@ -756,7 +843,7 @@ function saveAnimation() {
 }
 
 function closeAnimationModal() {
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", text: "", animationId: null, duration: 0 };
   showAnimationModal.value = false;
   editingIndex.value = null;
   isUploadedGif.value = false;
@@ -780,7 +867,7 @@ function removeAnimation(index: number) {
 }
 
 function openAddAnimationModal() {
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", text: "", animationId: null, duration: 0 };
   isEditMode.value = false;
   editingIndex.value = null;
   showAnimationModal.value = true;
@@ -892,6 +979,7 @@ async function processGifFiles() {
           url: "", // Empty URL since we're storing in OPFS
           triggers,
           enabled: true,
+          duration: 0,
         };
 
         // Save to OPFS
