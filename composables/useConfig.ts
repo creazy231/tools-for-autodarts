@@ -2,6 +2,7 @@ import { ref, toRaw, watch } from "vue";
 
 import type { IConfig } from "@/utils/storage";
 
+import { canonicalJson } from "@/utils/canonical-json";
 import { normalizeColors } from "@/utils/colors";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 
@@ -31,11 +32,16 @@ let opened: Promise<void> | undefined;
  * storage watcher, where adopting it would look like a fresh edit and write
  * again; and adopting someone else's write trips the deep watcher below, which
  * would bounce it right back at them.
+ *
+ * Compared as canonical JSON, keys sorted, because storage hands a value back
+ * with its keys in alphabetical order. Plain JSON never matched our own write
+ * read back, so every save was taken for someone else's and adopted: the whole
+ * config replaced after each click, and every list keyed by its items rebuilt.
  */
 let settled = "";
 
 function adopt(value: IConfig): void {
-  settled = JSON.stringify(value);
+  settled = canonicalJson(value);
   config.value = value;
 }
 
@@ -71,7 +77,7 @@ function withDefaults(stored: IConfig): IConfig {
 watch(config, async () => {
   if (!config.value) return;
 
-  const next = JSON.stringify(config.value);
+  const next = canonicalJson(config.value);
   if (next === settled) return; // came from storage, not from the user
 
   settled = next;
@@ -84,7 +90,7 @@ async function open(): Promise<void> {
   // Changes made anywhere else: a second tab with the settings page open, a
   // content script, or a storage migration finishing after this read.
   AutodartsToolsConfig.watch((value?: IConfig) => {
-    if (!value || JSON.stringify(value) === settled) return;
+    if (!value || canonicalJson(value) === settled) return;
     adopt(withDefaults(value));
   });
 }

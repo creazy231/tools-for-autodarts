@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **The settings page** no longer reloads all its settings after every change. Storage hands them back with their keys in alphabetical order, so a change read back never looked like the one just made: each click was taken for a change made somewhere else, and everything was rebuilt from storage behind the scenes
+
 ## [3.0.9] - 2026-09-25
 
 ### Changed
