@@ -1093,6 +1093,9 @@ body {
 .adt-menu {
   position: fixed;
   z-index: 60;
+  /* Its own width rather than whatever is left beside the trigger, so that
+     AppMenu can slide it along to fit. */
+  width: max-content;
   min-width: 248px;
   max-width: calc(100vw - 32px);
   padding: 6px;

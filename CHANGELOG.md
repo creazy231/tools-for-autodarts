@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
   - Uploading shows the trigger each file's name will give before anything is saved. The Caller's and Sound FX's editors can play a sound's link before it is added, and WLED's editor can send an effect to try it
   - The play button shows what is playing and stops it. A new sound stops the last one, and closing the settings stops them all
   - The list's heading, search and pills stay in view while it scrolls, and the dialog keeps its height while a search narrows the list
+- **The settings page** has two menus where it had four buttons for moving settings between installations: **Export** downloads them as a file or copies them to the clipboard, and **Import** loads a file or pastes what was copied. Each choice has a line on what it does, and Import's both say that they replace all your settings. A coffee cup beside the gear opens the Ko-fi page in a new tab. On most phones the buttons fit on one row instead of three, and a menu that is wider than the room beside its button slides along to stay on the screen
 
 ### Fixed
 

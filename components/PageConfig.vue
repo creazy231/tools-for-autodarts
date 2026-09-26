@@ -54,42 +54,47 @@
               Autodarts Tools {{ packageConfig.version }}
             </h1>
           </div>
-          <div class="mt-2 grid grid-cols-2 items-center gap-2 sm:mt-0 sm:grid-cols-[1fr_1fr_1fr_1fr_auto]">
-            <AppButton
-              @click="exportSettings"
-              title="Download settings as file"
-            >
-              <span class="icon-[pixelarticons--calendar-export] mr-2" />
-              <span>Export</span>
-            </AppButton>
-            <AppButton
-              @click="importSettings"
-              title="Import settings from file"
-            >
-              <span class="icon-[pixelarticons--calendar-import] mr-2" />
-              <span>Import</span>
-            </AppButton>
-            <AppButton
-              @click="copyToClipboard"
-              title="Copy settings to clipboard"
-            >
-              <span class="icon-[pixelarticons--copy] mr-2" />
-              <span>Copy</span>
-            </AppButton>
-            <AppButton
-              @click="pasteFromClipboard"
-              title="Paste settings from clipboard"
-            >
-              <span class="icon-[pixelarticons--calendar-import] mr-2" />
-              <span>Paste</span>
-            </AppButton>
-            <AppButton
-              @click="toggleDangerZone"
-              title="Advanced settings"
-              class="aspect-square size-10 p-0"
-            >
-              <span class="icon-[material-symbols--settings-suggest-outline]" />
-            </AppButton>
+          <!--
+            On a phone the two menus share their row with Ko-fi and the gear,
+            so they drop their icons there, and on the narrowest phones the two
+            icon buttons wrap onto a row of their own. Export's menu lines up
+            with its left edge, Import's with its right.
+          -->
+          <div class="mt-2 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+            <AppMenu :items="exportActions" align="start" class="flex-1 sm:flex-none">
+              <template #trigger="{ open, toggle }">
+                <AppButton @click="toggle" :aria-expanded="open" class="max-sm:px-3">
+                  <span class="icon-[pixelarticons--calendar-export] mr-2 max-sm:hidden" />
+                  <span>Export</span>
+                  <span class="icon-[material-symbols--expand-more-rounded] -mr-1 ml-1 text-lg" />
+                </AppButton>
+              </template>
+            </AppMenu>
+            <AppMenu :items="importActions" class="flex-1 sm:flex-none">
+              <template #trigger="{ open, toggle }">
+                <AppButton @click="toggle" :aria-expanded="open" class="max-sm:px-3">
+                  <span class="icon-[pixelarticons--calendar-import] mr-2 max-sm:hidden" />
+                  <span>Import</span>
+                  <span class="icon-[material-symbols--expand-more-rounded] -mr-1 ml-1 text-lg" />
+                </AppButton>
+              </template>
+            </AppMenu>
+            <div class="ml-auto flex gap-2">
+              <AppButton
+                @click="openKofi"
+                title="Support on Ko-fi"
+                class="aspect-square size-10 p-0"
+              >
+                <span class="icon-[material-symbols--coffee-outline-rounded]" />
+              </AppButton>
+              <AppButton
+                @click="toggleDangerZone"
+                title="Advanced settings"
+                class="aspect-square size-10 p-0"
+              >
+                <span class="icon-[material-symbols--settings-suggest-outline]" />
+              </AppButton>
+            </div>
           </div>
         </div>
 
@@ -261,6 +266,7 @@ import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 import { normalizeColors } from "@/utils/colors";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
+import AppMenu from "@/components/AppMenu.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import AppNotification from "@/components/AppNotification.vue";
@@ -370,6 +376,19 @@ const featureGroups: FeatureGroup[] = [
     ],
     settingIds: [ "animations", "caller", "sound-fx", "wled-fx" ],
   },
+];
+
+/**
+ * The header's two menus. Either import replaces every setting and reloads the
+ * page without asking, so their hints say so.
+ */
+const exportActions = [
+  { label: "Download file", hint: "To keep as a backup or import elsewhere", icon: "icon-[material-symbols--download-rounded]", action: exportSettings },
+  { label: "Copy to clipboard", hint: "To share or paste into Import elsewhere", icon: "icon-[material-symbols--content-copy-outline-rounded]", action: copyToClipboard },
+];
+const importActions = [
+  { label: "Upload file", hint: "Replaces your settings with an exported file", icon: "icon-[material-symbols--upload-rounded]", action: importSettings },
+  { label: "Paste from clipboard", hint: "Replaces your settings with copied ones", icon: "icon-[material-symbols--content-paste-rounded]", action: pasteFromClipboard },
 ];
 
 // Tabs component data

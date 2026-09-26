@@ -626,8 +626,8 @@ You can add multiple triggers for the same animation by entering each trigger on
 > If you assign the same trigger to multiple animations, the system will randomly select one of the matching animations to play each time the trigger occurs. This allows for variety in your gameplay experience.
 
 ### 🔄 Utility Features
-- **Settings Import/Export**: Transfer your configuration between devices or create backups
-- **Clipboard Support**: Copy and paste settings for easy sharing
+- **Settings Import/Export**: Transfer your configuration between devices or create backups, as a file or through the clipboard, from the **Export** and **Import** menus at the top of the settings page
+- **Support**: The coffee cup beside the gear opens the project's Ko-fi page in a new tab
 - **What's New**: A summary of what changed, shown once the first time you open the settings page on a new release — what needs your attention, and what is worth switching on. Re-open it any time from **Release Notes** in the advanced panel behind the gear
 
 ## ⚙️ Configuration
@@ -643,12 +643,14 @@ The extension provides a comprehensive settings panel where you can configure al
 
 ### 📤 Settings Import/Export
 
-The extension allows you to easily transfer your settings between devices or create backups:
+The **Export** and **Import** menus at the top of the settings page let you transfer your settings between devices or create backups:
 
-- **Export Settings**: Download your current configuration as a file
-- **Import Settings**: Load settings from a previously exported file
-- **Copy to Clipboard**: Copy your settings to the clipboard for easy sharing
-- **Paste from Clipboard**: Apply settings that were copied from another installation
+- **Export**
+  - **Download file**: Save your current configuration as a file
+  - **Copy to clipboard**: Copy your settings to the clipboard for easy sharing
+- **Import** (either one replaces all your current settings and reloads the page)
+  - **Upload file**: Load settings from a previously exported file
+  - **Paste from clipboard**: Apply settings that were copied from another installation
 - **Reset Settings**: Restore all settings to their default values through the Danger Zone section
 
 This makes it simple to:
