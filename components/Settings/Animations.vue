@@ -1,378 +1,206 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end">
-            <div class="flex w-full flex-wrap gap-2 sm:w-auto">
-              <AppButton @click="sortAnimationsByTriggers" size="sm" class="!py-1 text-xs sm:text-sm" auto title="Sort animations by their triggers">
-                <span class="icon-[pixelarticons--sort-alphabetic] mr-1" />
-                <span class="whitespace-nowrap">Sort</span>
-              </AppButton>
-              <AppButton @click="openDeleteAllModal" size="sm" class="!py-1 text-xs sm:text-sm" auto type="danger" title="Delete all animations">
-                <span class="icon-[pixelarticons--trash] mr-1" />
-                <span class="whitespace-nowrap">Delete All</span>
-              </AppButton>
-              <AppButton @click="openGifUploadModal" size="sm" class="!py-1 text-xs sm:text-sm" auto type="success">
-                <span class="icon-[pixelarticons--upload] mr-1" />
-                <span class="whitespace-nowrap">Upload GIFs</span>
-              </AppButton>
-            </div>
-          </div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure the animations for the game. Click the plus button to add a new animation.</p>
+    <!-- Visible overflow so the list's heading can stick; see Wled.vue. -->
+    <div v-if="config" class="adt-container !overflow-visible">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Shows a GIF over the board at the moments you pick: a 180, a bull, a bust, a won leg. A click puts it away early.
+        </p>
 
-            <!-- Animation Settings -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <label class="mb-1 block text-sm font-medium text-white">Delay (seconds)</label>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow description="Seconds between the dart and the animation." title="Start delay">
+            <div class="flex items-center gap-2">
+              <div class="w-24">
                 <AppInput
-                  @update:model-value="val => config!.animations.delayStart = Number(val)"
-                  v-if="config"
-                  :model-value="String(config.animations.delayStart || 1)"
-                  type="number"
+                  @update:model-value="setSeconds('delayStart', $event, 0)"
+                  :model-value="String(config.animations.delayStart ?? 1)"
+                  class="text-right"
+                  dense
                   min="0"
                   step="0.1"
-                  placeholder="1"
+                  type="number"
                 />
               </div>
-              <div>
-                <label class="mb-1 block text-sm font-medium text-white">Duration (seconds)</label>
+              <span class="text-sm">s</span>
+            </div>
+          </OptionRow>
+          <OptionRow description="Seconds an animation stays up." title="Show for">
+            <div class="flex items-center gap-2">
+              <div class="w-24">
                 <AppInput
-                  @update:model-value="val => config!.animations.duration = Number(val)"
-                  v-if="config"
-                  :model-value="String(config.animations.duration || 5)"
-                  type="number"
+                  @update:model-value="setSeconds('duration', $event, 0.5)"
+                  :model-value="String(config.animations.duration ?? 5)"
+                  class="text-right"
+                  dense
                   min="0.5"
                   step="0.5"
-                  placeholder="5"
+                  type="number"
                 />
               </div>
-              <div>
-                <label class="mb-1 block text-sm font-medium text-white">Object Fit</label>
-                <AppSelect
-                  @update:model-value="val => config!.animations.objectFit = val as 'cover' | 'contain'"
-                  v-if="config"
-                  :model-value="config.animations.objectFit || 'cover'"
-                  :options="[
-                    { value: 'cover', label: 'Cover' },
-                    { value: 'contain', label: 'Contain' },
-                  ]"
-                />
-              </div>
-              <div>
-                <label class="mb-1 block text-sm font-medium text-white">View Mode</label>
-                <AppSelect
-                  @update:model-value="val => config!.animations.viewMode = val as 'full-page' | 'board-only'"
-                  v-if="config"
-                  :model-value="config.animations.viewMode || 'board-only'"
-                  :options="[
-                    { value: 'full-page', label: 'Full Page' },
-                    { value: 'board-only', label: 'Board Only' },
-                  ]"
-                />
-              </div>
+              <span class="text-sm">s</span>
             </div>
+          </OptionRow>
+          <OptionRow description="Cover fills the space and may crop the GIF. Contain shows all of it." title="Fit">
+            <AppRadioGroup v-model="objectFit" :options="FITS" button-size="sm" />
+          </OptionRow>
+          <OptionRow description="Just the board, or the whole page over a blurred background." title="Covers">
+            <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" button-size="sm" />
+          </OptionRow>
+        </section>
 
-            <div class="mt-2 flex items-center gap-2 text-sm">
-              <span class="icon-[pixelarticons--drag-and-drop] text-white/60" />
-              <p>Drag and drop animations to change their order</p>
-            </div>
+        <LibrarySection
+          @reorder="moveAnimation"
+          :category-labels="{ players: 'Other' }"
+          :entries="entries"
+          empty-icon="icon-[material-symbols--animated-images-outline-rounded]"
+          empty-text="Upload GIFs from your computer, or add one from a link. Links from Tenor and Giphy work."
+          empty-title="No animations yet"
+          list-class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          search-placeholder="Search animations by trigger or link"
+          title="Animations"
+        >
+          <template #actions>
+            <AppMenu :items="moreActions">
+              <template #trigger="{ open, toggle }">
+                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                  <span class="icon-[material-symbols--more-horiz]" />
+                </button>
+              </template>
+            </AppMenu>
+            <AppMenu :items="addActions">
+              <template #trigger="{ open, toggle }">
+                <AppButton @click="toggle" :aria-expanded="open" auto size="sm" type="primary">
+                  <span class="flex items-center gap-1">
+                    <span class="icon-[material-symbols--add-rounded] text-lg" />
+                    Add
+                    <span class="icon-[material-symbols--expand-more-rounded] -mr-1 text-lg" />
+                  </span>
+                </AppButton>
+              </template>
+            </AppMenu>
+          </template>
 
+          <template #default="{ entries: shown, filtering, query }">
             <div
-              ref="animationsContainer"
-              :key="containerKey"
-              class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              v-for="entry in shown"
+              :key="stableKey(config.animations.data[entry.index])"
+              :ref="observeTile"
+              :data-index="entry.index"
+              class="flex flex-col overflow-hidden rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)] ring-1 ring-inset ring-[var(--ad-border-subtle)]"
             >
-              <div
-                @click="openAddAnimationModal"
-                v-if="allowAdd"
-                class="add-animation-button flex aspect-video cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-white/30 bg-transparent p-4 transition-colors hover:bg-white/10"
-              >
-                <div class="flex flex-col items-center">
-                  <span class="icon-[pixelarticons--plus] mb-1 text-xl" />
-                  <span>Add Animation</span>
-                </div>
-              </div>
-
-              <!-- Display existing animations -->
-              <div
-                v-for="(animation, index) in config.animations.data"
-                :key="index"
-                :data-id="index"
-                class="group relative aspect-video overflow-hidden rounded-md border border-white/30 bg-black/30"
-                :class="{
-                  'opacity-50': !animation.enabled,
-                }"
-              >
-                <!-- Main content -->
+              <div class="relative aspect-video overflow-hidden bg-black/40">
                 <img
-                  :src="getAnimationSource(animation)"
-                  class="size-full object-cover"
+                  :alt="`Animation on ${entry.triggers.join(', ') || 'no trigger'}`"
+                  class="size-full object-cover transition"
+                  :class="[{ 'opacity-30 grayscale': !entry.enabled }]"
+                  :src="getAnimationSource(config.animations.data[entry.index])"
                   loading="lazy"
-                  :alt="`Animation ${index + 1}: ${animation.triggers.join(', ')}`"
                 >
-
-                <!-- Drag handle overlay -->
-                <div class="absolute inset-0 flex h-12 cursor-move items-center justify-center bg-gradient-to-b from-black/100 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
-                  <span class="icon-[pixelarticons--drag-and-drop] text-lg text-white/70" />
-                </div>
-
-                <!-- Disabled overlay -->
-                <div v-if="!animation.enabled" class="absolute inset-0 flex items-center justify-center bg-black/40">
-                  <span class="icon-[pixelarticons--close-circle] text-2xl text-white/70" />
-                </div>
-
-                <!-- Toggle button -->
-                <div class="absolute left-2 top-2 z-20">
-                  <AppToggle
-                    @update:model-value="toggleAnimationEnabled(index)"
-                    :model-value="animation.enabled"
-                    size="sm"
-                  />
-                </div>
-
-                <!-- Edit button -->
-                <div class="absolute right-2 top-2 z-20">
-                  <button
-                    @click.stop="editAnimation(index)"
-                    class="flex size-8 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20"
-                  >
-                    <span class="icon-[pixelarticons--edit] text-sm" />
+                <span v-if="!filtering" class="adt-drag-handle is-glass absolute left-2 top-2" title="Drag to reorder">
+                  <span class="icon-[material-symbols--drag-indicator]" />
+                </span>
+                <div class="absolute right-2 top-2 flex gap-1">
+                  <button @click="editAnimation(entry.index)" aria-label="Edit animation" class="adt-glass-btn" title="Edit" type="button">
+                    <span class="icon-[material-symbols--edit-outline-rounded]" />
                   </button>
+                  <ConfirmDeleteButton @confirm="removeAnimation(entry.index)" glass label="animation" />
                 </div>
-
-                <!--
-                  Info section. Label and delete share one row: the tile is
-                  aspect-video, so in a narrow column it is only ~80px tall and
-                  a two-row footer grows up into the toggle above it.
-                -->
-                <div class="absolute inset-x-0 bottom-0 flex cursor-move items-center gap-2 bg-black/70 px-2 py-1.5 text-xs">
-                  <div class="min-w-0 flex-1 truncate font-mono uppercase">
-                    {{ Array.isArray(animation.triggers) ? animation.triggers.join(', ') : '' }}
-                  </div>
-                  <button
-                    @click.stop="removeAnimation(index)"
-                    class="shrink-0 text-red-500 hover:text-red-400"
-                  >
-                    <span class="icon-[pixelarticons--trash] text-sm" />
-                  </button>
-                </div>
+                <span v-if="!entry.enabled" class="adt-chip absolute bottom-2 left-2 !bg-black/70">Off</span>
+              </div>
+              <div class="flex items-center gap-2 p-2.5">
+                <TriggerChips :max="2" :query="query" :triggers="entry.triggers" :wrap="false" class="flex-1" />
+                <AppSwitch
+                  @update:model-value="config.animations.data[entry.index].enabled = $event"
+                  :label="`Animation on ${entry.name}: ${entry.enabled ? 'on' : 'off'}`"
+                  :model-value="entry.enabled"
+                />
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+
+          <template #empty>
+            <AppButton @click="openGifUploadModal" auto type="primary">
+              Upload GIFs
+            </AppButton>
+            <AppButton @click="openAddAnimationModal" auto>
+              Add from a link
+            </AppButton>
+          </template>
+        </LibrarySection>
       </div>
     </div>
 
-    <!-- Animation Modal (Add/Edit) -->
-    <AppModal
-      @close="closeAnimationModal"
-      :show="showAnimationModal"
-      :title="isEditMode ? 'Edit Animation' : 'Add Animation'"
-    >
-      <div class="space-y-4">
+    <!-- Animation (add / edit) -->
+    <AppModal @close="closeAnimationModal" :show="showAnimationModal" :title="isEditMode ? 'Edit animation' : 'Add an animation from a link'" ghost-close>
+      <div class="space-y-5">
+        <div v-if="previewSrc" class="overflow-hidden rounded-[var(--ad-radius-lg)] bg-black/40">
+          <img :src="previewSrc" alt="Preview" class="mx-auto max-h-48 object-contain">
+        </div>
         <div>
-          <label for="animation-url" class="mb-1 block text-sm font-medium text-white">
-            {{ isUploadedGif ? "Uploaded GIF" : "Animation URL (GIF)" }}
-          </label>
           <AppInput
             id="animation-url"
             v-model="newAnimation.url"
-            type="url"
-            :placeholder="isUploadedGif ? `Uploaded GIF: ${uploadedGifFilename}` : 'https://example.com/animation.gif'"
             :disabled="isUploadedGif"
+            :label="isUploadedGif ? 'Uploaded GIF' : 'Link to a GIF'"
+            :placeholder="isUploadedGif ? uploadedGifFilename : 'https://example.com/animation.gif'"
+            type="url"
           >
             <template #icon>
-              <span :class="isUploadedGif ? 'icon-[pixelarticons--image]' : 'icon-[pixelarticons--link]'" />
+              <span :class="isUploadedGif ? 'icon-[material-symbols--gif-box-outline-rounded]' : 'icon-[material-symbols--link-rounded]'" />
             </template>
           </AppInput>
-          <p v-if="isUploadedGif" class="mt-1 text-xs text-white/60">
-            This GIF was uploaded to your browser's storage and cannot be edited directly.
+          <p v-if="isUploadedGif" class="adt-field-hint">
+            Kept in this browser as {{ uploadedGifFilename }}. Only its triggers can be changed.
           </p>
         </div>
-
-        <hr class="border-white/20">
-
-        <div>
-          <label for="animation-text" class="mb-1 flex items-center justify-between text-sm font-medium text-white">
-            <span>Triggers <span class="text-xs text-white/60">(one per line)</span></span>
-            <a
-              href="https://github.com/creazy231/tools-for-autodarts?tab=readme-ov-file#-animations"
-              target="_blank"
-              class="text-blue-400 hover:text-blue-300"
-            >
-              View supported triggers
-            </a>
-          </label>
-          <AppTextarea
-            id="animation-text"
-            v-model="lowercaseText"
-            :placeholder="textareaPlaceholder"
-            monospace
-            :rows="6"
-            :max-rows="10"
-          />
-        </div>
+        <TriggerField id="animation-triggers" v-model="animationTriggers" :validate="validateAnimationTrigger" feature="animations" />
       </div>
-
       <template #footer>
-        <AppButton @click="closeAnimationModal">
+        <AppButton @click="closeAnimationModal" auto>
           Cancel
         </AppButton>
-        <AppButton @click="saveAnimation" type="success">
-          Save
+        <AppButton @click="saveAnimation" auto type="primary">
+          {{ isEditMode ? "Save" : "Add animation" }}
         </AppButton>
       </template>
-
-      <AppNotification
-        @close="hideNotification"
-        :show="notification.show"
-        :message="notification.message"
-        :type="notification.type"
-      />
+      <AppNotification @close="hideNotification" :message="notification.message" :show="notification.show" :type="notification.type" />
     </AppModal>
 
-    <!-- File Upload Modal -->
-    <AppModal
+    <UploadDialog
       @close="closeGifUploadModal"
+      @save="processGifFiles"
+      :noun="{ one: 'GIF', other: 'GIFs' }"
+      :processing="isGifProcessing"
       :show="showGifUploadModal"
-      title="Upload Animation GIFs"
-    >
-      <div class="space-y-4">
-        <div
-          @dragover.prevent="onGifDragOver"
-          @dragleave.prevent="onGifDragLeave"
-          @drop.prevent="onGifDrop"
-          @click="triggerGifFileInput"
-          :class="{ 'border-white/50 bg-white/10': isGifDragging }"
-          class="flex h-40 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-white/30 transition-colors hover:bg-white/5"
-        >
-          <span class="icon-[pixelarticons--upload] mb-2 text-3xl text-white/70" />
-          <p class="text-white/70">
-            Drag and drop GIF files here or click to browse
-          </p>
-          <p class="mt-1 text-xs text-white/50">
-            Supported format: GIF
-          </p>
-          <input
-            @change="onGifFileSelect"
-            ref="gifFileInput"
-            type="file"
-            accept="image/gif"
-            multiple
-            class="hidden"
-          >
-        </div>
-        <div v-if="selectedGifFiles.length > 0" class="mt-4">
-          <h4 class="mb-2 text-sm font-medium">
-            Selected Files ({{ selectedGifFiles.length }})
-          </h4>
-          <div class="max-h-60 overflow-y-auto rounded-md border border-white/20">
-            <div
-              v-for="(file, index) in selectedGifFiles"
-              :key="index"
-              class="flex items-center justify-between border-b border-white/10 p-2 last:border-b-0"
-            >
-              <div class="flex items-center">
-                <span class="icon-[pixelarticons--image] mr-2 text-white/70" />
-                <span class="max-w-[calc(100%-2rem)] truncate">{{ file.name }}</span>
-              </div>
-              <button
-                @click.stop="removeGifFile(index)"
-                class="flex items-center justify-center text-red-500 hover:text-red-400"
-              >
-                <span class="icon-[pixelarticons--close]" />
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-center">
-            <label class="flex cursor-pointer items-center">
-              <input
-                v-model="generateTriggersFromFilenamesGif"
-                type="checkbox"
-                class="form-checkbox size-4 rounded text-blue-600 focus:ring-blue-500"
-              >
-              <span class="ml-2 text-sm">Generate triggers from filenames</span>
-            </label>
-            <span
-              class="icon-[pixelarticons--info-box] ml-2 cursor-help text-white/50"
-              title="If enabled, triggers will be automatically generated from filenames. For example, a file named '180.gif' will trigger on '180' scores."
-            />
-          </div>
-          <div v-if="!generateTriggersFromFilenamesGif">
-            <label for="bulk-trigger-gif" class="mb-1 block text-sm font-medium text-white">
-              Assign same trigger to all files (optional)
-            </label>
-            <AppInput
-              id="bulk-trigger-gif"
-              v-model="bulkTriggerGif"
-              type="text"
-              placeholder="e.g., t20, 180, gameshot"
-            >
-              <template #icon>
-                <span class="icon-[pixelarticons--edit]" />
-              </template>
-            </AppInput>
-            <p class="mt-1 text-xs text-white/60">
-              If provided, all uploaded files will be assigned this trigger.
-            </p>
-          </div>
-        </div>
-      </div>
-      <template #footer>
-        <AppButton @click="closeGifUploadModal">
-          Cancel
-        </AppButton>
-        <AppButton
-          @click="processGifFiles"
-          type="success"
-          :disabled="selectedGifFiles.length === 0 || isGifProcessing"
-          :loading="isGifProcessing"
-        >
-          Save {{ selectedGifFiles.length }} GIFs
-        </AppButton>
-      </template>
-    </AppModal>
-
-    <!-- Delete All Confirmation Modal -->
-    <AppModal
-      @close="closeDeleteAllModal"
-      :show="showDeleteAllModal"
-      title="Delete All Animations"
-    >
-      <div class="space-y-4">
-        <p>Are you sure you want to delete all animations? This action cannot be undone.</p>
-        <p class="text-sm text-white/60">
-          This will remove all {{ config?.animations.data.length || 0 }} animations.
-        </p>
-      </div>
-
-      <template #footer>
-        <AppButton @click="closeDeleteAllModal">
-          Cancel
-        </AppButton>
-        <AppButton
-          @click="deleteAllAnimations"
-          type="danger"
-        >
-          Delete All
-        </AppButton>
-      </template>
-    </AppModal>
-
-    <AppNotification
-      @close="hideNotification"
-      :show="notification.show"
-      :message="notification.message"
-      :type="notification.type"
+      :triggers-from-name="file => extractTriggersFromGifFilename(file.name)"
+      :validate="validateAnimationTrigger"
+      accept="image/gif"
+      feature="animations"
+      file-icon="icon-[material-symbols--gif-box-outline-rounded]"
+      formats="GIF"
+      names-hint="A file named 180.gif plays on 180. Join several with a +, as in 180+t20.gif. A name that isn't a trigger gives none."
+      title="Upload GIFs"
     />
+
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="`Delete all ${config?.animations.data.length ?? 0} animations?`" ghost-close size="sm">
+      <p class="text-sm text-[var(--ad-text-muted)]">
+        They're removed for good, uploaded GIFs included. This can't be undone.
+      </p>
+      <template #footer>
+        <AppButton @click="closeDeleteAllModal" auto>
+          Cancel
+        </AppButton>
+        <AppButton @click="deleteAllAnimations" auto type="danger">
+          Delete all
+        </AppButton>
+      </template>
+    </AppModal>
+
+    <AppNotification @close="hideNotification" :message="notification.message" :show="notification.show" :type="notification.type" />
   </template>
 
   <template v-else>
@@ -383,7 +211,7 @@
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex items-center adt-card-title">
+          <h3 class="adt-card-title mb-1 flex items-center">
             Animations
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
@@ -408,16 +236,26 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
-import Sortable from "sortablejs";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 import AppButton from "../AppButton.vue";
 import AppInput from "../AppInput.vue";
+import AppMenu from "../AppMenu.vue";
 import AppModal from "../AppModal.vue";
 import AppNotification from "../AppNotification.vue";
-import AppSelect from "../AppSelect.vue";
-import AppTextarea from "../AppTextarea.vue";
+import AppRadioGroup from "../AppRadioGroup.vue";
+import AppSwitch from "../AppSwitch.vue";
 import AppToggle from "../AppToggle.vue";
+
+import ConfirmDeleteButton from "./Library/ConfirmDeleteButton.vue";
+import LibrarySection from "./Library/LibrarySection.vue";
+import OptionRow from "./Library/OptionRow.vue";
+import TriggerChips from "./Library/TriggerChips.vue";
+import TriggerField from "./Library/TriggerField.vue";
+import UploadDialog from "./Library/UploadDialog.vue";
+import { stableKey } from "./Library/stable-key";
+
+import type { ComponentPublicInstance } from "vue";
+import type { LibraryEntry } from "@/utils/library-search";
 
 import { useNotification } from "@/composables/useNotification";
 import { deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
@@ -426,175 +264,114 @@ import { type IAnimation } from "@/utils/storage";
 const emit = defineEmits([ "toggle" ]);
 const { notification, showNotification, hideNotification } = useNotification();
 useStorage("adt:active-settings", "animations");
-const { config, ready } = useConfig();
+
+const FITS = [ { label: "Cover", value: "cover" }, { label: "Contain", value: "contain" } ];
+const VIEW_MODES = [ { label: "Board only", value: "board-only" }, { label: "Full page", value: "full-page" } ];
+/** Drawn until a GIF comes near the view. */
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
-const newAnimation = ref<{ url: string; text: string; animationId: string | null }>({
+const newAnimation = ref<{ url: string; animationId: string | null }>({
   url: "",
-  text: "",
   animationId: null,
 });
-const allowAdd = ref(false);
+const animationTriggers = ref<string[]>([]);
 const editingIndex = ref<number | null>(null);
-const animationsContainer = ref<HTMLElement | null>(null);
-const isDragging = ref(false);
-const currentDragIndex = ref<number | null>(null);
-const containerKey = ref(0);
-let sortableInstance: Sortable | null = null;
 
-// Track which animations are visible
+// Which animations have come near the view
 const visibleAnimations = ref<Set<string>>(new Set());
-let intersectionObserver: IntersectionObserver | null = null;
 
 // GIF upload modal state
 const showGifUploadModal = ref(false);
-const gifFileInput = ref<HTMLInputElement | null>(null);
-const selectedGifFiles = ref<File[]>([]);
-const isGifDragging = ref(false);
 const isGifProcessing = ref(false);
-const generateTriggersFromFilenamesGif = ref(true);
-const bulkTriggerGif = ref("");
 
 // Delete All Modal state
 const showDeleteAllModal = ref(false);
 
-// In the script section with other refs
 const isUploadedGif = ref(false);
 const uploadedGifFilename = ref("");
 
-// Computed property for lowercase text handling
-const lowercaseText = computed({
-  get: () => newAnimation.value.text,
-  set: (val: string) => {
-    newAnimation.value.text = val.toLowerCase();
+/** Object URLs of uploaded GIFs, by animationId. */
+const animationSources = ref<Record<string, string>>({});
+/** Uploaded GIFs being read from OPFS, so a render does not start a second read. */
+const loadingSources = new Set<string>();
+
+/**
+ * GIFs load once they come near the view, and stay loaded: twenty remote GIFs
+ * fetched and decoded at once is what this is for. Tiles register themselves
+ * through a function ref, so a search that re-renders the grid needs no
+ * container query to be observed again.
+ */
+const intersectionObserver = typeof IntersectionObserver === "undefined"
+  ? null
+  : new IntersectionObserver((observed) => {
+    for (const entry of observed) {
+      if (!entry.isIntersecting) continue;
+      const animation = config.value?.animations.data[Number((entry.target as HTMLElement).dataset.index)];
+      if (animation) visibleAnimations.value.add(visibilityKey(animation));
+    }
+  }, { rootMargin: "200px", threshold: 0.1 });
+
+const objectFit = computed({
+  get: () => config.value?.animations.objectFit ?? "cover",
+  set: (value: string) => {
+    if (config.value) config.value.animations.objectFit = value as "cover" | "contain";
   },
 });
 
-const textareaPlaceholder = `0
-180
-100-180
-t20
-25
-bull
-gameshot
-busted
-outside
-`;
-
-// Display animations - modified to retrieve from OPFS
-// Change from index-based to id-based storage
-const animationSources = ref<Record<string, string>>({});
-
-// Helper to get the proper URL source for an animation
-function getAnimationSource(animation: IAnimation): string {
-  // Create a unique identifier for this animation
-  const animId = animation.animationId || `url_${animation.url}`;
-
-  // If it's not in the visible set, don't load it yet
-  const uniqueId = `${animId}_${animation.triggers.join("_")}`;
-  if (!visibleAnimations.value.has(uniqueId)) {
-    // Return an empty placeholder for animations not yet visible
-    return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
-  }
-
-  // If we already have the source cached, return it
-  if (animationSources.value[animId]) {
-    return animationSources.value[animId];
-  }
-
-  // If it's a regular URL, return it directly
-  if (animation.url && !animation.animationId) {
-    animationSources.value[animId] = animation.url;
-    return animation.url;
-  }
-
-  // Otherwise, try to load from OPFS
-  loadAnimationSource(animation);
-
-  // Return placeholder or URL while loading
-  return animation.url || "";
-}
-
-// Load animation sources from OPFS
-async function loadAnimationSource(animation: IAnimation) {
-  // Create a unique identifier for this animation
-  const animId = animation.animationId || `url_${animation.url}`;
-  if (animation.animationId && isOPFSAvailable()) {
-    try {
-      const objectURL = await getAnimationFromOPFS(animation.animationId);
-      if (objectURL) {
-        animationSources.value[animId] = objectURL;
-        return;
-      }
-    } catch (error) {
-      console.error("Error loading animation from OPFS:", error);
-    }
-  }
-  // Fallback to URL if animation is not stored in OPFS
-  animationSources.value[animId] = animation.url;
-}
-
-// Setup the intersection observer to detect which animations are visible
-function setupIntersectionObserver() {
-  if (!intersectionObserver) {
-    intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const target = entry.target as HTMLElement;
-          const index = target.dataset.id;
-          if (!index || !config.value) continue;
-
-          const animation = config.value.animations.data[Number.parseInt(index, 10)];
-          if (!animation) continue;
-
-          const animId = animation.animationId || `url_${animation.url}`;
-          const uniqueId = `${animId}_${animation.triggers.join("_")}`;
-
-          if (entry.isIntersecting) {
-            // Add to visible set when intersecting
-            visibleAnimations.value.add(uniqueId);
-          } else if (!isDragging.value) {
-            // Only remove from visible set if not dragging
-            visibleAnimations.value.delete(uniqueId);
-          }
-        }
-      },
-      {
-        root: null, // viewport
-        rootMargin: "200px", // Load images 200px before they enter viewport
-        threshold: 0.1, // Trigger when at least 10% is visible
-      },
-    );
-  }
-
-  // Observe all animation items
-  if (animationsContainer.value) {
-    const items = animationsContainer.value.querySelectorAll("[data-id]");
-    for (const item of items) {
-      intersectionObserver?.observe(item);
-    }
-  }
-}
-
-onMounted(async () => {
-  await ready();
-  await nextTick();
-  initSortable();
-  await nextTick();
-  allowAdd.value = true;
-
-  // Setup intersection observer for lazy gif loading after the DOM is updated
-  await nextTick();
-  setupIntersectionObserver();
+const viewMode = computed({
+  get: () => config.value?.animations.viewMode ?? "board-only",
+  set: (value: string) => {
+    if (config.value) config.value.animations.viewMode = value as "full-page" | "board-only";
+  },
 });
 
+const entries = computed<LibraryEntry[]>(() => (config.value?.animations.data ?? []).map((animation, index) => {
+  const triggers = Array.isArray(animation.triggers) ? animation.triggers : [];
+  return {
+    index,
+    name: triggers.join(", ") || "animation",
+    triggers,
+    source: animation.animationId ? "uploaded" : animation.url,
+    enabled: animation.enabled,
+  };
+}));
+
+/** The GIF the add/edit dialog holds: its link, or the uploaded file's picture. */
+const previewSrc = computed(() => {
+  const { url, animationId } = newAnimation.value;
+  if (isUploadedGif.value && animationId) return animationSources.value[animationId] ?? "";
+  return /^https?:\/\/\S+$/.test(url.trim()) ? url.trim() : "";
+});
+
+const addActions = [
+  { label: "Upload GIFs", hint: "From your computer, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openGifUploadModal },
+  { label: "Add from a link", hint: "A GIF on the web, e.g. from Tenor or Giphy", icon: "icon-[material-symbols--link-rounded]", action: openAddAnimationModal },
+];
+
+const moreActions = computed(() => [
+  {
+    label: "Sort by trigger",
+    hint: "Puts the grid in trigger order",
+    icon: "icon-[material-symbols--sort-by-alpha-rounded]",
+    disabled: (config.value?.animations.data.length ?? 0) < 2,
+    action: sortAnimationsByTriggers,
+  },
+  {
+    label: "Delete all…",
+    icon: "icon-[material-symbols--delete-outline-rounded]",
+    danger: true,
+    separated: true,
+    disabled: !config.value?.animations.data.length,
+    action: openDeleteAllModal,
+  },
+]);
+
 onUnmounted(() => {
-  // Disconnect the observer
-  if (intersectionObserver) {
-    intersectionObserver.disconnect();
-    intersectionObserver = null;
-  }
+  intersectionObserver?.disconnect();
 
   // Revoke all object URLs
   for (const url of Object.values(animationSources.value)) {
@@ -603,59 +380,59 @@ onUnmounted(() => {
   animationSources.value = {};
 });
 
-function initSortable() {
-  if (!animationsContainer.value) return;
-
-  // Clean up any existing instance
-  if (sortableInstance) {
-    sortableInstance.destroy();
-    sortableInstance = null;
-  }
-
-  // Create a new Sortable instance
-  sortableInstance = Sortable.create(animationsContainer.value, {
-    animation: 150,
-    draggable: "[data-id]",
-    filter: ".flex.h-32", // Don't make the "Add Animation" button draggable
-    ghostClass: "bg-gray-700",
-    handle: ".cursor-move", // Use the info section as the drag handle
-    onEnd(evt) {
-      isDragging.value = false;
-      currentDragIndex.value = null;
-
-      // Only update if the position actually changed
-      if (evt.oldIndex !== evt.newIndex && config.value?.animations.data) {
-        // Get the moved item
-        const oldIndex = evt.oldIndex;
-        const newIndex = evt.newIndex;
-
-        // Update the data array to match the DOM
-        if (oldIndex !== undefined && newIndex !== undefined) {
-          const movedItem = config.value.animations.data.splice(oldIndex - 1, 1)[0];
-
-          config.value.animations.data.splice(newIndex - 1, 0, movedItem);
-
-          // Update the container key to force re-render
-          containerKey.value++;
-
-          // Show notification
-          showNotification("Animation order updated");
-
-          // Re-initialize sortable after a short delay to ensure DOM is updated
-          setTimeout(() => {
-            initSortable();
-          }, 50);
-        }
-      }
-    },
-  });
+function visibilityKey(animation: IAnimation): string {
+  return `${animation.animationId || `url_${animation.url}`}_${animation.triggers.join("_")}`;
 }
 
-function toggleAnimationEnabled(index: number) {
-  if (!config.value || !config.value.animations.data[index]) return;
+function observeTile(element: Element | ComponentPublicInstance | null) {
+  if (element instanceof Element) intersectionObserver?.observe(element);
+}
 
-  // Toggle the enabled state
-  config.value.animations.data[index].enabled = !config.value.animations.data[index].enabled;
+/** A number of seconds from a field; ignores a field left empty while it is being retyped. */
+function setSeconds(key: "delayStart" | "duration", value: string, min: number) {
+  const seconds = Number(value);
+  if (!config.value || value === "" || Number.isNaN(seconds)) return;
+  config.value.animations[key] = Math.max(min, seconds);
+}
+
+function validateAnimationTrigger(trigger: string): string {
+  return validateAnimationTriggers([ trigger ]).invalidTriggers.length ? "Animations don't know this trigger." : "";
+}
+
+function moveAnimation(from: number, to: number) {
+  const data = config.value?.animations.data;
+  if (!data) return;
+  const [ moved ] = data.splice(from, 1);
+  data.splice(to, 0, moved);
+}
+
+// Helper to get the proper URL source for an animation
+function getAnimationSource(animation: IAnimation): string {
+  // Not near the view yet: don't load it
+  if (!visibleAnimations.value.has(visibilityKey(animation))) return PLACEHOLDER;
+
+  // A GIF on the web is its own source
+  if (!animation.animationId) return animation.url || PLACEHOLDER;
+
+  // An uploaded one comes from OPFS, once read
+  if (animationSources.value[animation.animationId]) return animationSources.value[animation.animationId];
+  loadAnimationSource(animation);
+  return animation.url || PLACEHOLDER;
+}
+
+// Load animation sources from OPFS
+async function loadAnimationSource(animation: IAnimation) {
+  const id = animation.animationId;
+  if (!id || loadingSources.has(id) || !isOPFSAvailable()) return;
+  loadingSources.add(id);
+  try {
+    const objectURL = await getAnimationFromOPFS(id);
+    if (objectURL) animationSources.value[id] = objectURL;
+  } catch (error) {
+    console.error("Error loading animation from OPFS:", error);
+  } finally {
+    loadingSources.delete(id);
+  }
 }
 
 async function editAnimation(index: number) {
@@ -670,59 +447,39 @@ async function editAnimation(index: number) {
   if (animation.animationId) {
     const name = await getAnimationNameFromOPFS(animation.animationId);
     uploadedGifFilename.value = name || "unknown";
+    // The dialog previews it; tiles out of view have not read it yet.
+    loadAnimationSource(animation);
   }
 
   newAnimation.value = {
     url: animation.url || "",
-    text: Array.isArray(animation.triggers)
-      ? animation.triggers.join("\n")
-      : "",
     animationId: animation.animationId || null,
   };
+  animationTriggers.value = Array.isArray(animation.triggers) ? [ ...animation.triggers ] : [];
   isEditMode.value = true;
   editingIndex.value = index;
   showAnimationModal.value = true;
 }
 
-// After a new animation is added or animations are rearranged, re-initialize the observer
-async function updateIntersectionObserverForNewAnimations() {
-  // Disconnect existing observer to prevent memory leaks
-  if (intersectionObserver) {
-    intersectionObserver.disconnect();
-  }
-
-  // Short delay to ensure DOM is updated
-  await nextTick();
-  setupIntersectionObserver();
-}
-
 function saveAnimation() {
-  if (!config.value || !newAnimation.value.text) {
-    return;
-  }
+  if (!config.value) return;
 
   // Either url (remote gif) or animationId (uploaded gif) is required
   if (!newAnimation.value.url && !newAnimation.value.animationId) {
+    showNotification("Add a link to a GIF first.", "error");
     return;
   }
 
-  // Convert text to array of triggers (split by newline and filter empty lines)
-  const rawTriggers = newAnimation.value.text
-    .split("\n")
-    .map(line => line.trim().toLowerCase())
-    .filter(line => line.length > 0);
-
   // Validate triggers
-  const { validTriggers, invalidTriggers } = validateAnimationTriggers(rawTriggers);
+  const { validTriggers, invalidTriggers } = validateAnimationTriggers(animationTriggers.value);
 
-  // If there are invalid triggers, show a warning
+  // If there are invalid triggers, drop them and say which
   if (invalidTriggers.length > 0) {
-    newAnimation.value.text = validTriggers.join("\n");
+    animationTriggers.value = validTriggers;
     showNotification(`Some triggers were invalid and removed: ${invalidTriggers.join(", ")}`, "error");
     return;
   }
 
-  // If no valid triggers remain, show an error but still save
   if (validTriggers.length === 0) {
     showNotification("No valid triggers found. Please check the documentation for supported trigger formats.", "error");
     return;
@@ -731,7 +488,7 @@ function saveAnimation() {
   // Create animation object
   const animation: IAnimation = {
     url: newAnimation.value.url.trim(),
-    triggers: validTriggers, // Use the validated triggers
+    triggers: validTriggers,
     enabled: true, // New animations are enabled by default
     animationId: newAnimation.value.animationId ?? undefined,
   };
@@ -746,17 +503,12 @@ function saveAnimation() {
     config.value.animations.data.unshift(animation);
   }
 
-  // Reset form and close modal
-  newAnimation.value = { url: "", text: "", animationId: null };
-  showAnimationModal.value = false;
-  editingIndex.value = null;
-
-  // Update intersection observer to detect the newly added animation
-  updateIntersectionObserverForNewAnimations();
+  closeAnimationModal();
 }
 
 function closeAnimationModal() {
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", animationId: null };
+  animationTriggers.value = [];
   showAnimationModal.value = false;
   editingIndex.value = null;
   isUploadedGif.value = false;
@@ -770,17 +522,18 @@ function removeAnimation(index: number) {
     if (animation.animationId && isOPFSAvailable()) {
       deleteAnimationFromOPFS(animation.animationId).catch(e => console.error(e));
       // Also remove from sources cache
+      if (animationSources.value[animation.animationId]) URL.revokeObjectURL(animationSources.value[animation.animationId]);
       delete animationSources.value[animation.animationId];
     }
-    // Also remove URL-based entry if exists
-    delete animationSources.value[`url_${animation.url}`];
     config.value.animations.data.splice(index, 1);
-    containerKey.value++; // Force re-render of the list
   }
 }
 
 function openAddAnimationModal() {
-  newAnimation.value = { url: "", text: "", animationId: null };
+  newAnimation.value = { url: "", animationId: null };
+  animationTriggers.value = [];
+  isUploadedGif.value = false;
+  uploadedGifFilename.value = "";
   isEditMode.value = false;
   editingIndex.value = null;
   showAnimationModal.value = true;
@@ -802,49 +555,10 @@ async function toggleFeature() {
 
 function openGifUploadModal() {
   showGifUploadModal.value = true;
-  selectedGifFiles.value = [];
-  bulkTriggerGif.value = "";
 }
 
 function closeGifUploadModal() {
   showGifUploadModal.value = false;
-  selectedGifFiles.value = [];
-  isGifDragging.value = false;
-}
-
-function triggerGifFileInput() {
-  gifFileInput.value?.click();
-}
-
-function onGifDragOver(event: DragEvent) {
-  isGifDragging.value = true;
-}
-
-function onGifDragLeave(event: DragEvent) {
-  isGifDragging.value = false;
-}
-
-function onGifDrop(event: DragEvent) {
-  isGifDragging.value = false;
-  if (!event.dataTransfer) return;
-  const files = Array.from(event.dataTransfer.files).filter(file => file.type === "image/gif");
-  if (files.length > 0) {
-    selectedGifFiles.value = [ ...selectedGifFiles.value, ...files ];
-  }
-}
-
-function onGifFileSelect(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files) return;
-  const files = Array.from(input.files).filter(file => file.type === "image/gif");
-  if (files.length > 0) {
-    selectedGifFiles.value = [ ...selectedGifFiles.value, ...files ];
-  }
-  input.value = "";
-}
-
-function removeGifFile(index: number) {
-  selectedGifFiles.value.splice(index, 1);
 }
 
 function extractTriggersFromGifFilename(filename: string): string[] {
@@ -858,8 +572,8 @@ function fileToBlob(file: File): Blob {
   return new Blob([ file ], { type: file.type });
 }
 
-async function processGifFiles() {
-  if (!config.value || selectedGifFiles.value.length === 0) return;
+async function processGifFiles({ files, fromNames, triggers: shared }: { files: File[]; fromNames: boolean; triggers: string[] }) {
+  if (!config.value || !files.length) return;
   isGifProcessing.value = true;
 
   if (!isOPFSAvailable()) {
@@ -870,49 +584,31 @@ async function processGifFiles() {
 
   try {
     let successCount = 0;
+    const sharedTriggers = validateAnimationTriggers(shared).validTriggers;
 
-    for (const file of selectedGifFiles.value) {
+    for (const file of files) {
       try {
         const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf("."));
-        
-        // Generate triggers - bulk trigger takes precedence
-        let triggers: string[] = [];
-        if (bulkTriggerGif.value.trim()) {
-          // Use bulk trigger if provided, validate it
-          const bulkTriggerLower = bulkTriggerGif.value.trim().toLowerCase();
-          const { validTriggers } = validateAnimationTriggers([ bulkTriggerLower ]);
-          triggers = validTriggers;
-        } else if (generateTriggersFromFilenamesGif.value) {
-          // Otherwise use filename-based triggers if enabled
-          triggers = extractTriggersFromGifFilename(file.name);
-        }
 
         // Create the animation object
         const animation: IAnimation = {
           url: "", // Empty URL since we're storing in OPFS
-          triggers,
+          triggers: fromNames ? extractTriggersFromGifFilename(file.name) : [ ...sharedTriggers ],
           enabled: true,
         };
 
         // Save to OPFS
-        const blob = fileToBlob(file);
-        const animationId = await saveAnimationToOPFS(nameWithoutExt, blob);
+        const animationId = await saveAnimationToOPFS(nameWithoutExt, fileToBlob(file));
+        if (!animationId) throw new Error("Failed to save animation to browser storage");
 
-        if (animationId) {
-          // If successful, store the ID reference
-          animation.animationId = animationId;
-          // Get object URL for display
-          const objectURL = await getAnimationFromOPFS(animationId);
-          if (objectURL) {
-            animationSources.value[animationId] = objectURL;
-          }
+        // If successful, store the ID reference and the object URL for display
+        animation.animationId = animationId;
+        const objectURL = await getAnimationFromOPFS(animationId);
+        if (objectURL) animationSources.value[animationId] = objectURL;
 
-          // Add to animations list
-          config.value.animations.data.unshift(animation);
-          successCount++;
-        } else {
-          throw new Error("Failed to save animation to browser storage");
-        }
+        // Add to animations list
+        config.value.animations.data.unshift(animation);
+        successCount++;
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
         showNotification(`Failed to process ${file.name}`, "error");
@@ -922,10 +618,6 @@ async function processGifFiles() {
     // Close modal and update UI
     closeGifUploadModal();
     showNotification(`Added ${successCount} GIFs`, "success");
-    containerKey.value++; // Force re-render
-
-    // Update intersection observer to detect newly added animations
-    updateIntersectionObserverForNewAnimations();
   } catch (error) {
     console.error("Error processing files:", error);
     showNotification("Error processing files", "error");
@@ -963,10 +655,10 @@ async function deleteAllAnimations() {
   showNotification("All animations have been deleted", "error");
 
   // Reset animations cache
+  for (const url of Object.values(animationSources.value)) {
+    URL.revokeObjectURL(url);
+  }
   animationSources.value = {};
-
-  // Force re-render of the list
-  containerKey.value++;
 }
 
 function sortAnimationsByTriggers() {
@@ -991,23 +683,5 @@ function sortAnimationsByTriggers() {
 
   // Show notification
   showNotification("Animations have been sorted by their triggers");
-
-  // Force re-render of the list
-  containerKey.value++;
 }
-
-// Need to update containerKey when things change
-
-// Also need to add a watch to reinit observer
-watch(containerKey, () => {
-  // Disconnect existing observer
-  if (intersectionObserver) {
-    intersectionObserver.disconnect();
-  }
-
-  // Wait for DOM update then reinitialize
-  nextTick(() => {
-    setupIntersectionObserver();
-  });
-});
 </script>

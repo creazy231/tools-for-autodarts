@@ -35,6 +35,7 @@
       :show="showSettingsModal"
       :title="getSettingTitle(activeSettings)"
       :width="getSettingWidth(activeSettings)"
+      :fill="getSettingFill(activeSettings)"
     >
       <component :is="getComponentForSetting(activeSettings)" />
     </SettingsModal>
@@ -283,6 +284,11 @@ interface Feature {
    * one.
    */
   wideSettings?: boolean;
+  /**
+   * Give its dialog the full height at all times. For the panels with a
+   * searchable list, whose dialog would otherwise resize as the search narrows it.
+   */
+  fillSettings?: boolean;
 }
 
 interface FeatureGroup {
@@ -357,10 +363,10 @@ const featureGroups: FeatureGroup[] = [
     id: "sounds-animations",
     tab: 3,
     features: [
-      { id: "animations", title: "Animations Settings", component: Animations, hasSettings: true, v2Ready: true },
-      { id: "caller", title: "Caller Settings", component: Caller, hasSettings: true, v2Ready: true, wideSettings: true },
-      { id: "sound-fx", title: "Sound FX Settings", component: SoundFx, hasSettings: true, v2Ready: true, wideSettings: true },
-      { id: "wled-fx", title: "WLED Settings", component: Wled, hasSettings: true, v2Ready: true, wideSettings: true },
+      { id: "animations", title: "Animations Settings", component: Animations, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "caller", title: "Caller Settings", component: Caller, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "sound-fx", title: "Sound FX Settings", component: SoundFx, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "wled-fx", title: "WLED Settings", component: Wled, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
     ],
     settingIds: [ "animations", "caller", "sound-fx", "wled-fx" ],
   },
@@ -423,6 +429,14 @@ function getSettingWidth(settingId) {
     if (feature) return feature.wideSettings ? "widest" : "wide";
   }
   return "wide";
+}
+
+function getSettingFill(settingId) {
+  for (const group of featureGroups) {
+    const feature = group.features.find(f => f.id === settingId);
+    if (feature) return !!feature.fillSettings;
+  }
+  return false;
 }
 
 function getComponentForSetting(settingId) {

@@ -4,9 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Animations**, the **Caller**, **Sound FX** and **WLED** can be searched. A field above each list finds sounds, GIFs and effects by name, by trigger, or by where they come from, whether a link, the words a voice speaks or a WLED address. The exact trigger comes first, so `26` finds the sound on 26 before the one on 126, and a number also finds the ranges that take it in, so `150` answers "what plays on 150?" with the sound on `100-180`. Pills under the field narrow the list to scores, single darts and combinations, game events, board status, player names or what is switched off, each with a count of what the search has left. A trigger that is none of the built-in ones counts as a player's name, since that is how the Caller, Sound FX and WLED read it, so a misspelt trigger turns up there too
+
+### Changed
+
+- **Animations**, the **Caller**, **Sound FX** and **WLED** have new settings. Each is a list under the feature's options, built from the rebuilt site's own parts: its search field, its pill tabs, its switches and its popovers. Sounds and lighting effects are rows, one line each, with a play button, the name over where it comes from, the triggers as chips, a switch, edit and delete; animations stay a grid of GIFs, each with its triggers and a switch under the picture. The row of four or five coloured buttons is gone: everything that adds something is under one blue **Add**, and sorting and deleting everything are under **⋯**. The options are settings rows with a line on what each does. WLED's *trigger Effects only once* is now *Don't restart a running effect*, and Animations' fit and cover are two-way switches instead of drop-downs
+  - Deleting takes a second click, on the red **Delete** the bin turns into, so a stray click no longer throws away a sound and its file
+  - Triggers are typed as chips rather than one per line. Enter adds one, a pasted list becomes one per line, the named triggers are suggested with what they do as they are typed, and Animations marks a trigger it does not know as soon as it is added instead of when saving. WLED's board IDs are entered the same way, and one that is not a board ID is marked
+  - Uploading shows the trigger each file's name will give before anything is saved. The Caller's and Sound FX's editors can play a sound's link before it is added, and WLED's editor can send an effect to try it
+  - The play button shows what is playing and stops it. A new sound stops the last one, and closing the settings stops them all
+  - The list's heading, search and pills stay in view while it scrolls, and the dialog keeps its height while a search narrows the list
+
 ### Fixed
 
 - **The settings page** no longer reloads all its settings after every change. Storage hands them back with their keys in alphabetical order, so a change read back never looked like the one just made: each click was taken for a change made somewhere else, and everything was rebuilt from storage behind the scenes
+- **The Caller** keeps an uploaded sound's recording when its name or triggers are saved before the recording has finished loading into the editor. It used to be saved without it, which left the sound silent
+- **Sound FX** and the **Caller** say "TTS sound updated" when an existing text-to-speech sound is saved; they always said "added"
 
 ## [3.0.9] - 2026-09-25
 

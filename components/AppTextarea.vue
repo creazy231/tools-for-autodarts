@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label v-if="label" :for="id" class="mb-1 block text-sm font-medium text-white">{{ label }}</label>
+    <label v-if="label" :for="id" class="adt-field-label">{{ label }}</label>
     <textarea
       :id="id"
       ref="textareaRef"
@@ -10,14 +10,14 @@
       :disabled="disabled"
       :style="maxRows ? { maxHeight: `${maxRows * 1.5}rem` } : {}"
       :class="twMerge(
-        'transition-height w-full rounded-md border border-white/20 bg-white/10 p-2 text-white duration-100 placeholder:text-white/50 focus:border-white/40 focus:outline-none',
-        monospace && 'font-mono',
-        disabled && 'cursor-not-allowed opacity-60',
+        // Design system › Forms › TextField, over several lines.
+        'adt-textarea transition-height',
+        monospace && 'is-mono',
         autosize && 'resize-none',
         $attrs.class?.toString(),
       )"
     />
-    <p v-if="helperText" class="mt-1 text-xs text-white/60">
+    <p v-if="helperText" class="adt-field-hint">
       {{ helperText }}
     </p>
   </div>

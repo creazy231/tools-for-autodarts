@@ -11,8 +11,15 @@
       <span v-if="$slots.icon" class="adt-input-icon">
         <slot name="icon" />
       </span>
+      <!--
+        Everything but the class reaches the field itself: `min`, `step` and
+        listeners were dropped on the floor while inheritAttrs was off. `size`
+        stays behind too: several callers pass `size="sm"`, which never did
+        anything here, and the field's own size attribute takes a number.
+      -->
       <input
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+        v-bind="_.omit($attrs, 'class', 'size')"
         :id="id"
         :value="modelValue"
         :type="type"
@@ -21,6 +28,7 @@
         :class="twMerge(
           // Design system › Forms › TextField
           'adt-input placeholder:text-[var(--ad-text-muted)]',
+          dense && 'adt-input-sm',
           $slots.icon && 'adt-input-has-icon',
           disabled && 'cursor-not-allowed',
           $attrs.class?.toString(),
@@ -35,6 +43,7 @@
 
 <script setup lang="ts">
 import { twMerge } from "tailwind-merge";
+import _ from "lodash";
 
 defineOptions({
   inheritAttrs: false,
@@ -48,11 +57,14 @@ const props = withDefaults(defineProps<{
   id?: string;
   type?: string;
   disabled?: boolean;
+  /** A denser field, for a number in a settings row, instead of the spec's 52px. */
+  dense?: boolean;
 }>(), {
   placeholder: "",
   id: `input-${Math.random().toString(36).substring(2, 9)}`,
   type: "text",
   disabled: false,
+  dense: false,
 });
 
 defineEmits([ "update:modelValue" ]);

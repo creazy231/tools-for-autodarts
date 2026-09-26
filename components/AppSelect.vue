@@ -1,27 +1,28 @@
 <template>
   <div>
-    <label v-if="label" :for="id" class="mb-1 block text-sm font-medium text-white">{{ label }}</label>
+    <label v-if="label" :for="id" class="adt-field-label">{{ label }}</label>
     <div class="relative">
       <select
         @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
         :id="id"
-        :value="modelValue"
-        :disabled="disabled"
         :class="twMerge(
-          'w-full appearance-none rounded-md border border-white/20 bg-white/10 px-3 py-2 text-white focus:border-white/40 focus:outline-none',
-          disabled && 'cursor-not-allowed opacity-60',
+          // Design system › Forms › TextField, as a select.
+          'adt-input adt-select',
+          disabled && 'cursor-not-allowed',
           $attrs.class?.toString(),
         )"
+        :disabled="disabled"
+        :value="modelValue"
       >
-        <option v-for="option in options" :key="option.value" :value="option.value" class="bg-white text-gray-800">
+        <option v-for="option in options" :key="option.value" :value="option.value">
           {{ option.label }}
         </option>
       </select>
-      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/60">
-        <span class="icon-[pixelarticons--arrow-down]" />
-      </div>
+      <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-xl text-[var(--ad-text-muted)]">
+        <span class="icon-[material-symbols--expand-more-rounded]" />
+      </span>
     </div>
-    <p v-if="helperText" class="mt-1 text-xs text-white/60">
+    <p v-if="helperText" class="adt-field-hint">
       {{ helperText }}
     </p>
   </div>

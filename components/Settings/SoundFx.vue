@@ -1,422 +1,138 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-end">
-            <div class="flex w-full flex-wrap gap-2 sm:w-auto">
-              <AppButton @click="sortSoundsByTriggers" size="sm" class="!py-1 text-xs sm:text-sm" auto title="Sort sounds by their triggers">
-                <span class="icon-[pixelarticons--sort-alphabetic] mr-1" />
-                <span class="whitespace-nowrap">Sort</span>
-              </AppButton>
-              <AppButton @click="openDeleteAllModal" size="sm" class="!py-1 text-xs sm:text-sm" auto type="danger" title="Delete all sounds">
-                <span class="icon-[pixelarticons--trash] mr-1" />
-                <span class="whitespace-nowrap">Delete All</span>
-              </AppButton>
-              <AppButton @click="openTTSModal()" size="sm" class="!py-1 text-xs sm:text-sm" auto type="warning" :disabled="!isTTSAvailable" title="Generate sound from text-to-speech">
-                <span class="icon-[pixelarticons--chat] mr-1" />
-                <span class="whitespace-nowrap">Generate TTS</span>
-              </AppButton>
-              <AppButton @click="openUploadModal" size="sm" class="!py-1 text-xs sm:text-sm" auto type="success">
-                <span class="icon-[pixelarticons--upload] mr-1" />
-                <span class="whitespace-nowrap">Upload Files</span>
-              </AppButton>
-            </div>
-          </div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure sound effects that play during the game for special events.</p>
+    <!-- Visible overflow so the list's heading can stick; see Wled.vue. -->
+    <div v-if="config" class="adt-container !overflow-visible">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Plays sound effects on game events, such as a crowd on a 180 or a groan on a bust. Each sound plays on the
+          triggers you give it. Start them with <code class="adt-code">ambient_</code> to keep them apart from the Caller's.
+        </p>
 
-            <div class="mt-2 flex items-center gap-2 text-sm">
-              <span class="icon-[pixelarticons--drag-and-drop] text-white/60" />
-              <p>Drag and drop sounds to change their order</p>
-            </div>
+        <LibrarySection
+          @reorder="moveSound"
+          :entries="entries"
+          empty-icon="icon-[material-symbols--graphic-eq-rounded]"
+          empty-text="Upload sounds of your own, add one from a link, or generate one from text."
+          empty-title="No sounds yet"
+          search-placeholder="Search sounds by name or trigger"
+          title="Sounds"
+        >
+          <template #actions>
+            <AppMenu :items="moreActions">
+              <template #trigger="{ open, toggle }">
+                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                  <span class="icon-[material-symbols--more-horiz]" />
+                </button>
+              </template>
+            </AppMenu>
+            <AppMenu :items="addActions">
+              <template #trigger="{ open, toggle }">
+                <AppButton @click="toggle" :aria-expanded="open" auto size="sm" type="primary">
+                  <span class="flex items-center gap-1">
+                    <span class="icon-[material-symbols--add-rounded] text-lg" />
+                    Add
+                    <span class="icon-[material-symbols--expand-more-rounded] -mr-1 text-lg" />
+                  </span>
+                </AppButton>
+              </template>
+            </AppMenu>
+          </template>
 
-            <div
-              ref="soundsContainer"
-              :key="containerKey"
-              class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          <template #default="{ entries: shown, filtering, query }">
+            <LibraryItem
+              @delete="removeSound(entry.index)"
+              @edit="editAny(entry.index)"
+              @toggle="config.soundFx.sounds[entry.index].enabled = $event"
+              v-for="entry in shown"
+              :key="stableKey(config.soundFx.sounds[entry.index])"
+              :data-index="entry.index"
+              :draggable="!filtering"
+              :enabled="entry.enabled"
+              :query="query"
+              :title="entry.name"
+              :triggers="entry.triggers"
             >
-              <div
-                @click="openAddSoundModal"
-                v-if="allowAdd"
-                class="flex h-32 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-white/30 bg-transparent p-4 transition-colors hover:bg-white/10"
-              >
-                <div class="flex flex-col items-center">
-                  <span class="icon-[pixelarticons--plus] mb-1 text-xl" />
-                  <span>Add Sound</span>
-                </div>
-              </div>
+              <template #lead>
+                <PlayButton @click="togglePlay(entry.index)" :label="entry.name" :playing="playingKey === stableKey(config.soundFx.sounds[entry.index])" />
+              </template>
+              <template #meta>
+                <SoundSource :sound="config.soundFx.sounds[entry.index]" :voices="voices" />
+              </template>
+            </LibraryItem>
+          </template>
 
-              <div
-                v-for="(sound, index) in config.soundFx.sounds"
-                :key="index"
-                :data-id="index"
-                class="group relative h-32 overflow-hidden rounded-md border border-white/30 bg-black/30"
-                :class="{
-                  'opacity-50': !sound.enabled,
-                }"
-              >
-                <!-- Disabled overlay -->
-                <div v-if="!sound.enabled" class="absolute inset-0 flex items-center justify-center bg-black/40">
-                  <span class="icon-[pixelarticons--close-circle] text-2xl text-white/70" />
-                </div>
-
-                <!-- Toggle button -->
-                <div class="absolute left-2 top-2 z-20">
-                  <AppToggle
-                    @update:model-value="toggleSound(index)"
-                    v-model="sound.enabled"
-                    size="sm"
-                  />
-                </div>
-
-                <!-- Sound name (centered) -->
-                <div v-if="sound.name" class="absolute left-[7.5rem] top-3.5 z-20 max-w-28 truncate">
-                  <div class="truncate rounded bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
-                    {{ sound.name }}
-                  </div>
-                </div>
-
-                <!-- Edit button -->
-                <div class="absolute right-2 top-2 z-20">
-                  <button
-                    @click.stop="sound.tts ? openTTSModal(sound, index) : editSound(index)"
-                    class="flex size-8 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20"
-                  >
-                    <span class="icon-[pixelarticons--edit] text-sm" />
-                  </button>
-                </div>
-
-                <!-- Info section - used as drag handle -->
-                <div
-                  class="absolute inset-x-0 bottom-0 cursor-move bg-black/70 p-2 text-xs"
-                >
-                  <div class="truncate border-b border-white/30 pb-1 font-mono text-xxs" :title="sound.tts ? `TTS: ${sound.tts.text}` : sound.url">
-                    {{ sound.tts ? `TTS: "${sound.tts.text}"` : (sound.url || "Uploaded") }}
-                  </div>
-                  <div class="mt-1 truncate font-mono uppercase">
-                    {{ Array.isArray(sound.triggers) ? sound.triggers.join(', ') : 'No triggers' }}
-                  </div>
-                  <div class="mt-1 flex justify-between">
-                    <button
-                      @click.stop="playSound(sound)"
-                      class="text-[var(--adt-success-border)] hover:text-[var(--adt-success-surface)]"
-                      title="Play sound"
-                    >
-                      <span class="icon-[pixelarticons--play] text-sm" />
-                    </button>
-                    <button
-                      @click.stop="removeSound(index)"
-                      class="text-[var(--adt-error-border)] hover:text-[var(--adt-error-surface)]"
-                    >
-                      <span class="icon-[pixelarticons--trash] text-sm" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          <template #empty>
+            <AppButton @click="openUploadModal" auto type="primary">
+              Upload files
+            </AppButton>
+            <AppButton @click="openTTSModal()" :disabled="!isTTSAvailable" auto>
+              Generate a sound
+            </AppButton>
+            <AppButton @click="openAddSoundModal" auto>
+              Add from a link
+            </AppButton>
+          </template>
+        </LibrarySection>
       </div>
     </div>
 
-    <!-- Sound Modal (Add/Edit) -->
-    <AppModal
+    <SoundDialog
       @close="closeSoundModal"
+      @play="previewDraft"
+      @save="saveSound"
+      v-model:name="newSound.name"
+      v-model:triggers="newSound.triggers"
+      v-model:url="newSound.url"
+      :editing="isEditMode"
+      :has-file="draftHasFile"
+      :playing="playingKey === DRAFT_KEY"
       :show="showSoundModal"
-      :title="isEditMode ? 'Edit Sound' : 'Add Sound'"
-    >
-      <div class="space-y-4">
-        <div>
-          <label for="sound-name" class="mb-1 block text-sm font-medium text-white">Sound Name (optional)</label>
-          <AppInput
-            id="sound-name"
-            v-model="newSound.name"
-            type="text"
-            placeholder="Enter a name for this sound"
-          >
-            <template #icon>
-              <span class="icon-[pixelarticons--contact-multiple]" />
-            </template>
-          </AppInput>
-        </div>
+      :url-error="urlError"
+      feature="soundFx"
+    />
 
-        <div v-if="!newSound.base64">
-          <label for="sound-url" class="mb-1 block text-sm font-medium text-white">Sound URL (MP3, WAV, etc.)</label>
-          <AppInput
-            id="sound-url"
-            v-model="newSound.url"
-            type="url"
-            placeholder="https://example.com/sound.mp3"
-          >
-            <template #icon>
-              <span class="icon-[pixelarticons--link]" />
-            </template>
-          </AppInput>
-          <div v-if="urlError" class="mt-1 text-sm text-red-500">
-            {{ urlError }}
-          </div>
-        </div>
-
-        <hr class="border-white/20">
-
-        <div>
-          <label for="sound-text" class="mb-1 flex items-center justify-between text-sm font-medium text-white">
-            <span>Triggers <span class="text-xs text-white/60">(one per line)</span></span>
-            <a
-              href="https://github.com/creazy231/tools-for-autodarts?tab=readme-ov-file#-sound-fx-feature"
-              target="_blank"
-              class="text-blue-400 hover:text-blue-300"
-            >
-              View supported triggers
-            </a>
-          </label>
-          <AppTextarea
-            id="sound-text"
-            v-model="lowercaseText"
-            :placeholder="textareaPlaceholder"
-            monospace
-            :rows="6"
-            :max-rows="10"
-          />
-        </div>
-      </div>
-
-      <template #footer>
-        <AppButton @click="closeSoundModal">
-          Cancel
-        </AppButton>
-        <AppButton @click="saveSound" type="success">
-          Save
-        </AppButton>
-      </template>
-    </AppModal>
-
-    <!-- File Upload Modal -->
-    <AppModal
+    <UploadDialog
       @close="closeUploadModal"
+      @save="processFiles"
+      :noun="{ one: 'sound', other: 'sounds' }"
+      :processing="isProcessing"
       :show="showUploadModal"
-      title="Upload Sound Files"
-    >
-      <div class="space-y-4">
-        <div
-          @dragover.prevent="onFileDragOver"
-          @dragleave.prevent="onFileDragLeave"
-          @drop.prevent="onFileDrop"
-          @click="triggerFileInput"
-          :class="{ 'border-white/50 bg-white/10': isDragging }"
-          class="flex h-40 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-white/30 transition-colors hover:bg-white/5"
-        >
-          <span class="icon-[pixelarticons--upload] mb-2 text-3xl text-white/70" />
-          <p class="text-white/70">
-            Drag and drop sound files here or click to browse
-          </p>
-          <p class="mt-1 text-xs text-white/50">
-            Supported formats: MP3, WAV, OGG
-          </p>
-          <input
-            @change="onFileSelect"
-            ref="fileInput"
-            type="file"
-            accept="audio/*"
-            multiple
-            class="hidden"
-          >
-        </div>
+      :triggers-from-name="file => extractTriggerFromFilename(file.name)"
+      accept="audio/*"
+      feature="soundFx"
+      file-icon="icon-[material-symbols--audio-file-outline-rounded]"
+      formats="MP3, WAV or OGG"
+      names-hint="A file named 180.mp3 plays on 180. Anything after a + is left out, so 180+crowd.mp3 does too."
+      title="Upload sounds"
+    />
 
-        <!-- Selected files list -->
-        <div v-if="selectedFiles.length > 0" class="mt-4">
-          <h4 class="mb-2 text-sm font-medium">
-            Selected Files ({{ selectedFiles.length }})
-          </h4>
-          <div class="max-h-60 overflow-y-auto rounded-md border border-white/20">
-            <div
-              v-for="(file, index) in selectedFiles"
-              :key="index"
-              class="flex items-center justify-between border-b border-white/10 p-2 last:border-b-0"
-            >
-              <div class="flex items-center">
-                <span class="icon-[pixelarticons--volume-2] mr-2 text-white/70" />
-                <span class="max-w-[calc(100%-2rem)] truncate">{{ file.name }}</span>
-              </div>
-              <button
-                @click.stop="removeFile(index)"
-                class="flex items-center justify-center text-red-500 hover:text-red-400"
-              >
-                <span class="icon-[pixelarticons--close]" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-3">
-          <div class="flex items-center">
-            <label class="flex cursor-pointer items-center">
-              <input
-                v-model="generateTriggersFromFilenames"
-                type="checkbox"
-                class="form-checkbox size-4 rounded text-blue-600 focus:ring-blue-500"
-              >
-              <span class="ml-2 text-sm">Generate triggers from filenames</span>
-            </label>
-            <span
-              class="icon-[pixelarticons--info-box] ml-2 cursor-help text-white/50"
-              title="If enabled, triggers will be automatically generated from filenames. For example, a file named '180.mp3' will trigger on '180' scores."
-            />
-          </div>
-          <div v-if="!generateTriggersFromFilenames">
-            <label for="bulk-trigger" class="mb-1 block text-sm font-medium text-white">
-              Assign same trigger to all files (optional)
-            </label>
-            <AppInput
-              id="bulk-trigger"
-              v-model="bulkTrigger"
-              type="text"
-              placeholder="e.g., t20, 180, gameshot"
-            >
-              <template #icon>
-                <span class="icon-[pixelarticons--edit]" />
-              </template>
-            </AppInput>
-            <p class="mt-1 text-xs text-white/60">
-              If provided, all uploaded files will be assigned this trigger.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <AppButton @click="closeUploadModal">
-          Cancel
-        </AppButton>
-        <AppButton
-          @click="processFiles"
-          type="success"
-          :disabled="selectedFiles.length === 0 || isProcessing"
-          :loading="isProcessing"
-        >
-          Save {{ selectedFiles.length }} Files
-        </AppButton>
-      </template>
-    </AppModal>
-
-    <!-- Delete All Confirmation Modal -->
-    <AppModal
-      @close="closeDeleteAllModal"
-      :show="showDeleteAllModal"
-      title="Delete All Sounds"
-    >
-      <div class="space-y-4">
-        <p>Are you sure you want to delete all sounds? This action cannot be undone.</p>
-        <p class="text-sm text-white/60">
-          This will remove all {{ config?.soundFx.sounds.length || 0 }} sounds from the sound effects.
-        </p>
-      </div>
-
-      <template #footer>
-        <AppButton @click="closeDeleteAllModal">
-          Cancel
-        </AppButton>
-        <AppButton
-          @click="deleteAllSounds"
-          type="danger"
-        >
-          Delete All
-        </AppButton>
-      </template>
-    </AppModal>
-
-    <!-- TTS Generate Modal -->
-    <AppModal
+    <TtsDialog
       @close="closeTTSModal"
+      @prelisten="prelistenTTS"
+      @save="saveTTSSound"
+      v-model:pitch="ttsForm.pitch"
+      v-model:rate="ttsForm.rate"
+      v-model:text="ttsForm.text"
+      v-model:triggers="ttsForm.triggers"
+      v-model:voice="ttsForm.voiceURI"
+      :editing="ttsEditingIndex !== null"
       :show="showTTSModal"
-      title="Generate TTS Sound"
-    >
-      <div class="space-y-4">
-        <div>
-          <label for="tts-text" class="mb-1 block text-sm font-medium text-white">Text to speak</label>
-          <AppInput
-            id="tts-text"
-            v-model="ttsForm.text"
-            type="text"
-            placeholder="e.g., One hundred and eighty!"
-          >
-            <template #icon>
-              <span class="icon-[pixelarticons--chat]" />
-            </template>
-          </AppInput>
-        </div>
+      :speaking="isSpeaking"
+      :voices="voices"
+      feature="soundFx"
+    />
 
-        <div>
-          <label class="mb-1 block text-sm font-medium text-white">Voice</label>
-          <AppSelect
-            v-model="ttsForm.voiceURI"
-            :options="ttsVoiceOptions"
-          />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-white">
-            Speed <span class="text-xs text-white/60">({{ ttsForm.rate.toFixed(1) }}x)</span>
-          </label>
-          <AppSlider
-            v-model="ttsForm.rate"
-            :min="0.5"
-            :max="2"
-            :step="0.1"
-          />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-white">
-            Pitch <span class="text-xs text-white/60">({{ ttsForm.pitch.toFixed(1) }})</span>
-          </label>
-          <AppSlider
-            v-model="ttsForm.pitch"
-            :min="0"
-            :max="2"
-            :step="0.1"
-          />
-        </div>
-
-        <hr class="border-white/20">
-
-        <div>
-          <label for="tts-triggers" class="mb-1 flex items-center justify-between text-sm font-medium text-white">
-            <span>Triggers <span class="text-xs text-white/60">(one per line)</span></span>
-            <a
-              href="https://github.com/creazy231/tools-for-autodarts?tab=readme-ov-file#-sound-fx-feature"
-              target="_blank"
-              class="text-blue-400 hover:text-blue-300"
-            >
-              View supported triggers
-            </a>
-          </label>
-          <AppTextarea
-            id="tts-triggers"
-            v-model="ttsLowercaseTriggers"
-            :placeholder="textareaPlaceholder"
-            monospace
-            :rows="4"
-            :max-rows="8"
-          />
-        </div>
-      </div>
-
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="`Delete all ${config?.soundFx.sounds.length ?? 0} sounds?`" ghost-close size="sm">
+      <p class="text-sm text-[var(--ad-text-muted)]">
+        They're removed for good, stored files included. This can't be undone.
+      </p>
       <template #footer>
-        <AppButton @click="closeTTSModal">
+        <AppButton @click="closeDeleteAllModal" auto>
           Cancel
         </AppButton>
-        <AppButton @click="prelistenTTS" :disabled="!ttsForm.text" :loading="isSpeaking">
-          <span class="icon-[pixelarticons--play] mr-1" />
-          Prelisten
-        </AppButton>
-        <AppButton @click="saveTTSSound" type="success" :disabled="!ttsForm.text || !ttsForm.triggers">
-          Save
+        <AppButton @click="deleteAllSounds" auto type="danger">
+          Delete all
         </AppButton>
       </template>
     </AppModal>
@@ -437,7 +153,7 @@
     >
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 flex items-center adt-card-title">
+          <h3 class="adt-card-title mb-1 flex items-center">
             Sound FX
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
@@ -461,20 +177,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from "vue";
-import Sortable from "sortablejs";
 import { useStorage } from "@vueuse/core";
-import AppToggle from "../AppToggle.vue";
+
 import AppButton from "../AppButton.vue";
+import AppMenu from "../AppMenu.vue";
 import AppModal from "../AppModal.vue";
-import AppTextarea from "../AppTextarea.vue";
-import AppInput from "../AppInput.vue";
 import AppNotification from "../AppNotification.vue";
-import AppSelect from "../AppSelect.vue";
-import AppSlider from "../AppSlider.vue";
-import { type ISound } from "@/utils/storage";
+import AppToggle from "../AppToggle.vue";
+
+import LibraryItem from "./Library/LibraryItem.vue";
+import LibrarySection from "./Library/LibrarySection.vue";
+import PlayButton from "./Library/PlayButton.vue";
+import SoundDialog from "./Library/SoundDialog.vue";
+import SoundSource from "./Library/SoundSource.vue";
+import TtsDialog from "./Library/TtsDialog.vue";
+import UploadDialog from "./Library/UploadDialog.vue";
+import { stableKey } from "./Library/stable-key";
+
+import type { LibraryEntry } from "@/utils/library-search";
+
 import { useNotification } from "@/composables/useNotification";
 import { useTTS } from "@/composables/useTTS";
+import { type ISound } from "@/utils/storage";
 import {
   base64toBlob,
   deleteSoundFxFromIndexedDB,
@@ -487,46 +211,32 @@ import {
 const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "sound-fx");
 
-const textareaPlaceholder = `180
-s60
-s50
-s25
-...
-`;
+/** The playing key of a sound tried out in the add/edit dialog, before it is in the list. */
+const DRAFT_KEY = -1;
 
-const { config, ready } = useConfig();
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/sound-fx.png");
 const showSoundModal = ref(false);
 const isEditMode = ref(false);
-const newSound = ref({
-  url: "",
-  text: "",
-  name: "",
-  base64: "",
-});
+const newSound = ref({ url: "", name: "", base64: "", triggers: [] as string[] });
 const editingIndex = ref<number | null>(null);
 const urlError = ref("");
-const allowAdd = ref(false);
 
-// Sortable related refs
-const soundsContainer = ref<HTMLElement | null>(null);
-const containerKey = ref(0);
-let sortableInstance: Sortable | null = null;
-
-// File upload related refs
+// File upload
 const showUploadModal = ref(false);
-const fileInput = ref<HTMLInputElement | null>(null);
-const selectedFiles = ref<File[]>([]);
-const isDragging = ref(false);
-const generateTriggersFromFilenames = ref(true);
-const bulkTrigger = ref("");
 const isProcessing = ref(false);
 
 // Delete all modal
 const showDeleteAllModal = ref(false);
 
-// Audio player reference for stopping previous sounds
+/**
+ * What is playing: the stable key of its item, or DRAFT_KEY for the dialog's.
+ * One sound at a time, so a new one stops the last.
+ */
+const playingKey = ref<number | null>(null);
 let currentPlayer: HTMLAudioElement | null = null;
+/** Stopping a voice ends its speech, which is not the end of the one we start next. */
+let ignoreSpeechEnd = false;
 
 const { notification, showNotification, hideNotification } = useNotification();
 
@@ -541,91 +251,122 @@ const ttsForm = ref({
   lang: "",
   rate: 1,
   pitch: 1,
-  triggers: "",
+  triggers: [] as string[],
 });
 
-const ttsVoiceOptions = computed(() => {
-  return [
-    { value: "", label: "Default voice" },
-    ...voices.value,
-  ];
+const entries = computed<LibraryEntry[]>(() => (config.value?.soundFx.sounds ?? []).map((sound, index) => {
+  const triggers = Array.isArray(sound.triggers) ? sound.triggers : [];
+  return {
+    index,
+    name: sound.name || sound.tts?.text || triggers[0] || "Untitled sound",
+    triggers,
+    source: sound.tts ? `tts ${sound.tts.text}` : sound.url || "uploaded",
+    enabled: sound.enabled,
+  };
+}));
+
+/** An uploaded sound being edited: its file loads a moment after the dialog opens. */
+const draftHasFile = computed(() => {
+  if (newSound.value.base64) return true;
+  if (!isEditMode.value || editingIndex.value === null) return false;
+  return !!config.value?.soundFx.sounds[editingIndex.value]?.soundId;
 });
 
-const ttsLowercaseTriggers = computed({
-  get: () => ttsForm.value.triggers,
-  set: (val: string) => {
-    ttsForm.value.triggers = val.toLowerCase();
+const addActions = computed(() => [
+  { label: "Upload files", hint: "MP3, WAV or OGG, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openUploadModal },
+  {
+    label: "Generate a sound",
+    hint: isTTSAvailable.value ? "Text to speech, in a voice on this device" : "This device has no text-to-speech voices",
+    icon: "icon-[material-symbols--record-voice-over-outline-rounded]",
+    disabled: !isTTSAvailable.value,
+    action: () => openTTSModal(),
   },
-});
+  { label: "Add from a link", hint: "A sound file on the web", icon: "icon-[material-symbols--link-rounded]", action: openAddSoundModal },
+]);
 
-// Computed property for trigger text handling
-const lowercaseText = computed({
-  get: () => newSound.value.text,
-  set: (val: string) => {
-    newSound.value.text = val.toLowerCase();
+const moreActions = computed(() => [
+  {
+    label: "Sort by trigger",
+    hint: "Puts the list in trigger order",
+    icon: "icon-[material-symbols--sort-by-alpha-rounded]",
+    disabled: (config.value?.soundFx.sounds.length ?? 0) < 2,
+    action: sortSoundsByTriggers,
   },
-});
+  {
+    label: "Delete all…",
+    icon: "icon-[material-symbols--delete-outline-rounded]",
+    danger: true,
+    separated: true,
+    disabled: !config.value?.soundFx.sounds.length,
+    action: openDeleteAllModal,
+  },
+]);
 
-onMounted(async () => {
-  await ready();
-  await nextTick();
-  initSortable();
-  await nextTick();
-  allowAdd.value = true;
-});
-
-// Initialize Sortable.js
-function initSortable() {
-  if (!soundsContainer.value) return;
-
-  // Clean up any existing instance
-  if (sortableInstance) {
-    sortableInstance.destroy();
-    sortableInstance = null;
+// Text to speech has no ended event of ours to hook, so follow useTTS.
+watch(isSpeaking, (speaking) => {
+  if (speaking) return;
+  if (ignoreSpeechEnd) {
+    ignoreSpeechEnd = false;
+    return;
   }
+  if (!currentPlayer) playingKey.value = null;
+});
 
-  // Create a new Sortable instance
-  sortableInstance = Sortable.create(soundsContainer.value, {
-    animation: 150,
-    draggable: "[data-id]",
-    filter: ".flex.h-32", // Don't make the "Add Sound" button draggable
-    ghostClass: "bg-gray-700",
-    handle: ".cursor-move", // Use the info section as the drag handle
-    onEnd(evt) {
-      // Only update if the position actually changed
-      if (evt.oldIndex !== evt.newIndex && config.value?.soundFx.sounds) {
-        // Get the moved item
-        const oldIndex = evt.oldIndex;
-        const newIndex = evt.newIndex;
+onBeforeUnmount(stopPlayback);
 
-        // Update the data array to match the DOM
-        if (oldIndex !== undefined && newIndex !== undefined) {
-          const movedItem = config.value.soundFx.sounds.splice(oldIndex - 1, 1)[0];
-          config.value.soundFx.sounds.splice(newIndex - 1, 0, movedItem);
+function moveSound(from: number, to: number) {
+  const sounds = config.value?.soundFx.sounds;
+  if (!sounds) return;
+  const [ moved ] = sounds.splice(from, 1);
+  sounds.splice(to, 0, moved);
+}
 
-          // Update the container key to force re-render
-          containerKey.value++;
+function editAny(index: number) {
+  const sound = config.value!.soundFx.sounds[index];
+  if (sound.tts) openTTSModal(sound, index);
+  else editSound(index);
+}
 
-          // Re-initialize sortable after a short delay to ensure DOM is updated
-          setTimeout(() => {
-            initSortable();
-          }, 50);
-        }
-      }
-    },
-  });
+function togglePlay(index: number) {
+  const sound = config.value!.soundFx.sounds[index];
+  if (playingKey.value === stableKey(sound)) stopPlayback();
+  else playSound(sound, stableKey(sound));
+}
+
+/** Plays what the add/edit dialog holds: its link, or the uploaded file being edited. */
+function previewDraft() {
+  if (playingKey.value === DRAFT_KEY) {
+    stopPlayback();
+    return;
+  }
+  const { url, base64, name } = newSound.value;
+  const stored = isEditMode.value && editingIndex.value !== null ? config.value?.soundFx.sounds[editingIndex.value] : undefined;
+  playSound({ name, url: url.trim(), base64, soundId: base64 ? undefined : stored?.soundId, enabled: true, triggers: [] }, DRAFT_KEY);
+}
+
+function stopPlayback() {
+  if (currentPlayer) {
+    currentPlayer.pause();
+    currentPlayer.currentTime = 0;
+    currentPlayer = null;
+  }
+  if (isSpeaking.value) ignoreSpeechEnd = true;
+  stopPreview();
+  playingKey.value = null;
 }
 
 // Modal handling
 function openAddSoundModal() {
-  newSound.value = { name: "", text: "", base64: "", url: "" };
+  newSound.value = { name: "", url: "", base64: "", triggers: [] };
   isEditMode.value = false;
   editingIndex.value = null;
+  urlError.value = "";
   showSoundModal.value = true;
 }
 
 function closeSoundModal() {
-  newSound.value = { name: "", text: "", base64: "", url: "" };
+  if (playingKey.value === DRAFT_KEY) stopPlayback();
+  newSound.value = { name: "", url: "", base64: "", triggers: [] };
   showSoundModal.value = false;
   editingIndex.value = null;
   urlError.value = "";
@@ -637,9 +378,9 @@ function editSound(index: number) {
   // Set up base form values
   newSound.value = {
     name: sound.name || "",
-    text: Array.isArray(sound.triggers) ? sound.triggers.join("\n") : "",
-    base64: "", // We'll load this below if needed
     url: sound.url || "",
+    base64: "", // loaded below if needed
+    triggers: Array.isArray(sound.triggers) ? [ ...sound.triggers ] : [],
   };
 
   // If we have a soundId, load from IndexedDB
@@ -667,6 +408,7 @@ function editSound(index: number) {
 
   isEditMode.value = true;
   editingIndex.value = index;
+  urlError.value = "";
   showSoundModal.value = true;
 }
 
@@ -683,30 +425,21 @@ async function saveSound() {
   }
 
   // Check if we have triggers
-  if (!newSound.value.text) {
+  if (!newSound.value.triggers.length) {
     showNotification("Please provide at least one trigger", "error");
     return;
   }
 
   // Check if URL starts with https://
   if (newSound.value.url && !newSound.value.url.startsWith("https://")) {
-    urlError.value = "URL must start with https:// for security reasons";
+    urlError.value = "The link has to start with https://, for security.";
     return;
   }
 
   // Reset error message
   urlError.value = "";
 
-  // Convert text to array of triggers (split by newline and filter empty lines)
-  let triggers = newSound.value.text
-    .split("\n")
-    .map(line => line.trim().toLowerCase())
-    .filter(line => line.length > 0);
-
-  // Ensure triggers is an array
-  if (!Array.isArray(triggers)) {
-    triggers = [];
-  }
+  const triggers = [ ...newSound.value.triggers ];
 
   // Store base64 data in IndexedDB if available
   let soundId: string | null = null;
@@ -752,41 +485,42 @@ async function saveSound() {
 }
 
 async function removeSound(index: number) {
-  if (config.value && config.value.soundFx.sounds) {
-    const sound = config.value.soundFx.sounds[index];
+  const sounds = config.value?.soundFx.sounds;
+  if (!sounds) return;
 
-    // If sound is stored in IndexedDB, delete it
-    if (sound.soundId && isIndexedDBAvailable()) {
-      await deleteSoundFxFromIndexedDB(sound.soundId);
-    }
+  const sound = sounds[index];
+  if (playingKey.value === stableKey(sound)) stopPlayback();
 
-    config.value.soundFx.sounds.splice(index, 1);
+  // If sound is stored in IndexedDB, delete it
+  if (sound.soundId && isIndexedDBAvailable()) {
+    await deleteSoundFxFromIndexedDB(sound.soundId);
   }
+
+  // Found again after the wait, in case another delete moved it.
+  const at = sounds.indexOf(sound);
+  if (at !== -1) sounds.splice(at, 1);
 }
 
-function toggleSound(index: number) {
-  if (config.value && config.value.soundFx.sounds) {
-    config.value.soundFx.sounds[index].enabled = !config.value.soundFx.sounds[index].enabled;
-  }
-}
+async function playSound(sound: ISound, key: number) {
+  stopPlayback();
+  playingKey.value = key;
 
-async function playSound(sound: ISound) {
-  // Handle TTS sounds
+  // Handle TTS sounds; the isSpeaking watcher clears the key when it is done.
   if (sound.tts) {
     preview(sound.tts.text, sound.tts.voiceURI, sound.tts.rate, sound.tts.pitch);
     return;
-  }
-
-  // Stop current audio if it exists
-  if (currentPlayer) {
-    currentPlayer.pause();
-    currentPlayer.currentTime = 0;
   }
 
   // Create an audio element with preload enabled
   const audio = new Audio();
   audio.preload = "auto";
   currentPlayer = audio;
+
+  const finish = () => {
+    if (currentPlayer !== audio) return;
+    currentPlayer = null;
+    playingKey.value = null;
+  };
 
   // Try to get base64 from IndexedDB first if sound has a soundId
   let source = "";
@@ -834,20 +568,27 @@ async function playSound(sound: ISound) {
     } else {
       // No audio source available
       showNotification("No audio source available for this sound", "error");
+      finish();
       return;
     }
+  }
+
+  // Stopped, or another sound started, while the file was read.
+  if (currentPlayer !== audio) {
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    return;
   }
 
   // Set the source
   audio.src = source;
 
-  // Set up event handlers for cleanup
-  if (blobUrl) {
-    audio.addEventListener("ended", () => {
-      URL.revokeObjectURL(blobUrl);
-    });
+  audio.addEventListener("ended", () => {
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    finish();
+  });
 
-    audio.addEventListener("error", () => {
+  audio.addEventListener("error", () => {
+    if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
       console.error("Error playing audio");
       showNotification("Failed to play sound", "error");
@@ -860,8 +601,9 @@ async function playSound(sound: ISound) {
           console.error("Fallback playback also failed:", err);
         });
       }
-    });
-  }
+    }
+    finish();
+  });
 
   // Play the audio
   audio.play().catch((error) => {
@@ -872,6 +614,7 @@ async function playSound(sound: ISound) {
     if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
     }
+    finish();
   });
 }
 
@@ -892,59 +635,10 @@ async function toggleFeature() {
 // File upload related functions
 function openUploadModal() {
   showUploadModal.value = true;
-  selectedFiles.value = [];
-  bulkTrigger.value = "";
 }
 
 function closeUploadModal() {
   showUploadModal.value = false;
-  selectedFiles.value = [];
-  isDragging.value = false;
-}
-
-function triggerFileInput() {
-  fileInput.value?.click();
-}
-
-function onFileDragOver(event: DragEvent) {
-  isDragging.value = true;
-}
-
-function onFileDragLeave(event: DragEvent) {
-  isDragging.value = false;
-}
-
-function onFileDrop(event: DragEvent) {
-  isDragging.value = false;
-  if (!event.dataTransfer) return;
-
-  const files = Array.from(event.dataTransfer.files).filter(file =>
-    file.type.startsWith("audio/"),
-  );
-
-  if (files.length > 0) {
-    selectedFiles.value = [ ...selectedFiles.value, ...files ];
-  }
-}
-
-function onFileSelect(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files) return;
-
-  const files = Array.from(input.files).filter(file =>
-    file.type.startsWith("audio/"),
-  );
-
-  if (files.length > 0) {
-    selectedFiles.value = [ ...selectedFiles.value, ...files ];
-  }
-
-  // Reset the input so the same file can be selected again
-  input.value = "";
-}
-
-function removeFile(index: number) {
-  selectedFiles.value.splice(index, 1);
 }
 
 function extractTriggerFromFilename(filename: string): string[] {
@@ -971,29 +665,18 @@ async function fileToBase64(file: File): Promise<string> {
   });
 }
 
-async function processFiles() {
-  if (!config.value || selectedFiles.value.length === 0) return;
+async function processFiles({ files, fromNames, triggers: shared }: { files: File[]; fromNames: boolean; triggers: string[] }) {
+  if (!config.value || !files.length) return;
 
   isProcessing.value = true;
+  let added = 0;
 
   try {
-    for (const file of selectedFiles.value) {
+    for (const file of files) {
       try {
-        // Convert file to base64
         const base64Data = await fileToBase64(file);
-
-        // Get filename without extension
         const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf("."));
-
-        // Generate triggers - bulk trigger takes precedence
-        let triggers: string[] = [];
-        if (bulkTrigger.value.trim()) {
-          // Use bulk trigger if provided
-          triggers = [ bulkTrigger.value.trim().toLowerCase() ];
-        } else if (generateTriggersFromFilenames.value) {
-          // Otherwise use filename-based triggers if enabled
-          triggers = extractTriggerFromFilename(file.name);
-        }
+        const triggers = fromNames ? extractTriggerFromFilename(file.name) : [ ...shared ];
 
         // Store file in IndexedDB if available
         let soundId: string | null = null;
@@ -1001,32 +684,26 @@ async function processFiles() {
           soundId = await saveSoundFxToIndexedDB(nameWithoutExt, base64Data);
         }
 
-        // Create sound object
-        const sound: ISound = {
+        config.value.soundFx.sounds.unshift({
           name: nameWithoutExt,
           url: "",
           base64: soundId ? "" : base64Data, // Only store in config if not in IndexedDB
           soundId: soundId || "", // Store the IndexedDB ID if available
           enabled: true,
           triggers,
-        };
-
-        // Add to the beginning of sounds array
-        config.value.soundFx.sounds.unshift(sound);
+        });
+        added++;
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
       }
     }
 
-    // Show notification
-    showNotification(`Successfully added ${selectedFiles.value.length} sounds`);
+    showNotification(`Added ${added} ${added === 1 ? "sound" : "sounds"}`);
   } catch (error) {
     console.error("Error processing files:", error);
     showNotification("Error processing files", "error");
   } finally {
     isProcessing.value = false;
-
-    // Close modal
     closeUploadModal();
   }
 }
@@ -1065,6 +742,7 @@ function closeDeleteAllModal() {
 
 async function deleteAllSounds() {
   if (!config.value) return;
+  stopPlayback();
 
   // Delete all sounds from IndexedDB
   if (isIndexedDBAvailable()) {
@@ -1086,7 +764,7 @@ async function deleteAllSounds() {
 
 // TTS functions
 function openTTSModal(sound?: ISound, index?: number) {
-  stopPreview();
+  stopPlayback();
   if (sound?.tts && index !== undefined) {
     // Edit mode
     ttsEditingIndex.value = index;
@@ -1097,7 +775,7 @@ function openTTSModal(sound?: ISound, index?: number) {
       lang: sound.tts.lang || "",
       rate: sound.tts.rate ?? 1,
       pitch: sound.tts.pitch ?? 1,
-      triggers: Array.isArray(sound.triggers) ? sound.triggers.join("\n") : "",
+      triggers: Array.isArray(sound.triggers) ? [ ...sound.triggers ] : [],
     };
   } else {
     // New mode — use last-used settings from localStorage
@@ -1109,34 +787,31 @@ function openTTSModal(sound?: ISound, index?: number) {
       lang: "",
       rate: lastRate.value,
       pitch: lastPitch.value,
-      triggers: "",
+      triggers: [],
     };
   }
   showTTSModal.value = true;
 }
 
 function closeTTSModal() {
-  stopPreview();
+  stopPlayback();
   showTTSModal.value = false;
   ttsEditingIndex.value = null;
 }
 
 function prelistenTTS() {
   if (!ttsForm.value.text) return;
+  stopPlayback();
   preview(ttsForm.value.text, ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
 }
 
 function saveTTSSound() {
-  if (!config.value || !ttsForm.value.text || !ttsForm.value.triggers) return;
+  if (!config.value || !ttsForm.value.text || !ttsForm.value.triggers.length) return;
 
-  stopPreview();
+  stopPlayback();
   saveDefaults(ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
 
-  const triggers = ttsForm.value.triggers
-    .split("\n")
-    .map(l => l.trim().toLowerCase())
-    .filter(Boolean);
-
+  const triggers = [ ...ttsForm.value.triggers ];
   const selectedVoice = voices.value.find(v => v.value === ttsForm.value.voiceURI);
 
   const sound: ISound = {
@@ -1154,17 +829,19 @@ function saveTTSSound() {
     },
   };
 
-  if (ttsEditingIndex.value !== null) {
+  // Read before closing, which resets it.
+  const editing = ttsEditingIndex.value;
+  if (editing !== null) {
     // Update existing
-    const existing = config.value.soundFx.sounds[ttsEditingIndex.value];
+    const existing = config.value.soundFx.sounds[editing];
     sound.enabled = existing.enabled;
-    config.value.soundFx.sounds[ttsEditingIndex.value] = sound;
+    config.value.soundFx.sounds[editing] = sound;
   } else {
     // Add new
     config.value.soundFx.sounds.unshift(sound);
   }
 
   closeTTSModal();
-  showNotification(ttsEditingIndex.value !== null ? "TTS sound updated" : "TTS sound added");
+  showNotification(editing !== null ? "TTS sound updated" : "TTS sound added");
 }
 </script>

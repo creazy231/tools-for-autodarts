@@ -259,6 +259,9 @@ body {
 .adt-modal-lg { max-width: 56rem; }
 .adt-modal-xl { max-width: 72rem; }
 
+/* As tall as it may be, so a list a search narrows does not resize, and so re-centre, the dialog. */
+.adt-modal.adt-modal-fill { height: 85vh; }
+
 .adt-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -426,6 +429,63 @@ body {
   background: var(--ad-action-disabled);
 }
 
+/* A denser field, for a number in a settings row. */
+.adt-input.adt-input-sm {
+  height: 40px;
+  padding: 0 12px;
+  font-size: var(--ad-text-base);
+  border-radius: var(--ad-radius-lg);
+}
+
+/* Forms/Select: the TextField, with room for its chevron. */
+.adt-select {
+  display: block;
+  padding-right: 44px;
+  cursor: pointer;
+  appearance: none;
+}
+
+.adt-select option {
+  color: var(--ad-text-primary);
+  background: var(--ad-ink-750);
+}
+
+/* Forms/TextArea: the TextField's fill, radius and focus ring, over several lines. */
+.adt-textarea {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-md);
+  font-weight: var(--ad-weight-medium);
+  line-height: var(--ad-leading-normal);
+  color: var(--ad-text-primary);
+  background: var(--ad-surface-input);
+  border: 0;
+  border-radius: var(--ad-radius-xl);
+  outline: none;
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-textarea::placeholder {
+  color: var(--ad-text-muted);
+}
+
+.adt-textarea:focus {
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-textarea:disabled {
+  color: var(--ad-text-disabled);
+  cursor: not-allowed;
+  background: var(--ad-action-disabled);
+}
+
+.adt-textarea.is-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--ad-text-sm);
+}
+
 /* --------------------------------------------------------- colour inputs ---
  * A native colour picker as nothing but its swatch. Every browser draws its own
  * bordered button round the swatch, which reads as a second control. Sized by
@@ -588,6 +648,691 @@ body {
   flex: none;
   gap: 8px;
   align-items: center;
+}
+
+/* ------------------------------------------------------------- libraries ---
+ * The lists in the Animations, Caller, Sound FX and WLED settings, and their
+ * controls. Built from parts measured on the rebuilt site so they read as its
+ * own: the friends drawer's search field and group headings, the Stats page's
+ * pill tabs, the switch in its lists, its popovers. See
+ * docs/superpowers/specs/2026-09-25-sound-and-light-libraries-redesign-design.md.
+ */
+
+/* Section heading with a count, as the friends drawer's "OFFLINE · 2". */
+.adt-section-title {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-family: var(--ad-font-display);
+  font-size: var(--ad-text-xl);
+  font-weight: var(--ad-weight-bold);
+  line-height: 1;
+  color: var(--ad-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.adt-section-count {
+  color: var(--ad-text-muted);
+}
+
+/*
+ * One item in a library list, by named areas. On a phone: the name with its
+ * switch, the source under it, then the triggers with edit and delete, so the
+ * name keeps its width. From 768px, one line: the triggers get a column of
+ * their own and the switch and actions sit at the end.
+ */
+.adt-row {
+  display: grid;
+  grid-template-areas:
+    "handle lead title switch"
+    "handle lead meta meta"
+    "handle lead chips actions";
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  row-gap: 4px;
+  column-gap: 12px;
+  align-items: center;
+  padding: 10px 6px 10px 4px;
+  border-bottom: 1px solid var(--ad-border-subtle);
+  transition: background-color var(--ad-duration-fast) var(--ad-ease-standard);
+}
+
+.adt-row:hover {
+  background: rgb(255 255 255 / 3%);
+}
+
+/* An item that is off, dimmed but for its switch and actions. */
+.adt-row.is-off .adt-row-dim {
+  opacity: 0.45;
+}
+
+@media (min-width: 768px) {
+  .adt-row {
+    grid-template-areas:
+      "handle lead title chips switch actions"
+      "handle lead meta chips switch actions";
+    grid-template-columns: auto auto minmax(0, 1fr) minmax(0, 1fr) auto auto;
+    row-gap: 2px;
+    column-gap: 16px;
+  }
+}
+
+/* The friends drawer's search field: a light pill on the dark surface. */
+.adt-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.adt-search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 48px 0 46px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-base);
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-text-on-light);
+  background: var(--ad-surface-input-light);
+  border: 0;
+  border-radius: var(--ad-radius-xl);
+  outline: none;
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-search-input::placeholder {
+  color: var(--ad-ink-500);
+}
+
+.adt-search-input:focus-visible {
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.adt-search-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 20px;
+  color: var(--ad-ink-500);
+  pointer-events: none;
+}
+
+.adt-search-clear {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  color: var(--ad-ink-500);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-md);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-search-clear:hover {
+  color: var(--ad-text-on-light);
+  background: rgb(22 24 28 / 8%);
+}
+
+/* The Stats page's pill tabs, for filtering within one view. */
+.adt-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adt-pill {
+  display: inline-flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-sm);
+  font-weight: var(--ad-weight-bold);
+  line-height: 1;
+  color: var(--ad-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  background: rgb(255 255 255 / 10%);
+  border: 0;
+  border-radius: var(--ad-radius-full);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-pill:hover:not(.is-active) {
+  background: rgb(255 255 255 / 15%);
+}
+
+.adt-pill:focus-visible {
+  outline: none;
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-pill.is-active {
+  color: var(--ad-text-on-light);
+  background: var(--ad-white);
+}
+
+/* A pill the search has left nothing under. */
+.adt-pill.is-empty:not(.is-active) {
+  opacity: 0.45;
+}
+
+.adt-pill-count {
+  font-weight: var(--ad-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
+
+/* A trigger, as the tournament cards' small pills. */
+.adt-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  max-width: 100%;
+  height: 22px;
+  padding: 0 8px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-xs);
+  font-weight: var(--ad-weight-semibold);
+  line-height: 1;
+  color: var(--ad-text-secondary);
+  white-space: nowrap;
+  background: rgb(255 255 255 / 8%);
+  border-radius: var(--ad-radius-full);
+}
+
+.adt-chip.is-match {
+  color: var(--ad-white);
+  background: color-mix(in srgb, var(--ad-blue-400) 32%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ad-blue-400) 60%, transparent);
+}
+
+.adt-chip.is-more {
+  color: var(--ad-text-muted);
+}
+
+.adt-chip.is-warning {
+  color: var(--ad-warning);
+  background: color-mix(in srgb, var(--ad-warning) 16%, transparent);
+}
+
+/* The part of a title the search found. */
+.adt-mark {
+  color: var(--ad-white);
+  background: color-mix(in srgb, var(--ad-blue-400) 38%, transparent);
+  border-radius: 3px;
+}
+
+/*
+ * Forms/Switch as the site draws it in its lists (data-slot="switch", size
+ * sm): blue when on, the sunken fill with a navy ring when off. The ring is a
+ * site value with no token. The border stays, transparent, when on, so the
+ * thumb travels the same box either way.
+ */
+.adt-switch {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  width: 43px;
+  height: 20px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--ad-surface-chrome);
+  border: 1px solid rgb(55 76 152 / 60%);
+  border-radius: var(--ad-radius-full);
+  box-shadow: 0 2px 2px rgb(13 13 13 / 50%), inset 0 -0.5px 0 rgb(255 255 255 / 8%);
+  transition:
+    background-color var(--ad-duration-fast) var(--ad-ease-standard),
+    border-color var(--ad-duration-fast) var(--ad-ease-standard);
+}
+
+.adt-switch.is-on {
+  background: var(--ad-action-primary);
+  border-color: transparent;
+}
+
+.adt-switch:focus-visible {
+  outline: none;
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.adt-switch-thumb {
+  display: block;
+  width: 20px;
+  height: 14px;
+  background: var(--ad-white);
+  border-radius: var(--ad-radius-full);
+  box-shadow: 0 2px 2px rgb(13 13 13 / 50%);
+  transform: translateX(2px);
+  transition: transform var(--ad-duration-fast) var(--ad-ease-standard);
+}
+
+.adt-switch.is-on .adt-switch-thumb {
+  transform: translateX(19px);
+}
+
+/* Core/IconButton, ghost: the dialog's close button, for actions in a row. */
+.adt-icon-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 18px;
+  color: var(--ad-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-md);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-icon-btn:hover:enabled,
+.adt-icon-btn[aria-expanded="true"] {
+  color: var(--ad-text-primary);
+  background: rgb(255 255 255 / 7%);
+}
+
+.adt-icon-btn.is-danger:hover:enabled {
+  color: var(--ad-rose-500);
+  background: color-mix(in srgb, var(--ad-rose-500) 14%, transparent);
+}
+
+.adt-icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* The same over a picture: dark glass, so it reads on any GIF. */
+.adt-glass-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 16px;
+  color: var(--ad-white);
+  cursor: pointer;
+  background: rgb(1 4 11 / 60%);
+  border: 0;
+  border-radius: var(--ad-radius-sm);
+  backdrop-filter: blur(6px);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-glass-btn:hover {
+  background: rgb(1 4 11 / 82%);
+}
+
+/* The second click of a delete: the bin turns into this, laid over its neighbours. */
+.adt-confirm-delete {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 10;
+  height: 32px;
+  padding: 0 12px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-sm);
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-white);
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--ad-danger);
+  border: 0;
+  border-radius: var(--ad-radius-md);
+  box-shadow: var(--ad-shadow-popover);
+  transform: translateY(-50%);
+}
+
+/*
+ * Play or test: the square button beside each voice on the site's caller
+ * settings. Neutral at rest, since a list has one per row, and blue while its
+ * item plays, as colour marks what is on.
+ */
+.adt-play {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 22px;
+  color: var(--ad-text-primary);
+  cursor: pointer;
+  background: rgb(255 255 255 / 8%);
+  border: 0;
+  border-radius: var(--ad-radius-md);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-play.is-lg {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--ad-radius-xl);
+}
+
+.adt-play:hover:enabled,
+.adt-play.is-playing {
+  background: var(--ad-action-primary);
+}
+
+.adt-play:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.adt-icon-btn:focus-visible,
+.adt-glass-btn:focus-visible,
+.adt-confirm-delete:focus-visible,
+.adt-play:focus-visible {
+  outline: none;
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-drag-handle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 32px;
+  font-size: 18px;
+  color: var(--ad-text-disabled);
+  cursor: grab;
+  border-radius: 6px;
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-drag-handle:hover {
+  color: var(--ad-text-secondary);
+}
+
+.adt-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* A handle over a picture takes the glass button's look. */
+.adt-drag-handle.is-glass {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  color: var(--ad-white);
+  background: rgb(1 4 11 / 60%);
+  border-radius: var(--ad-radius-sm);
+  backdrop-filter: blur(6px);
+}
+
+/* Where a dragged item will land. */
+.adt-sortable-ghost {
+  opacity: 0.35;
+}
+
+/* The Filters popover's surface (#292c33 on the site), for menus. */
+.adt-menu {
+  position: fixed;
+  z-index: 60;
+  min-width: 248px;
+  max-width: calc(100vw - 32px);
+  padding: 6px;
+  background: var(--ad-ink-750);
+  border-radius: var(--ad-radius-lg);
+  outline: 1px solid rgb(255 255 255 / 10%);
+  outline-offset: -1px;
+  box-shadow: 0 0 12px 2px rgb(1 4 11 / 30%), var(--ad-shadow-popover);
+}
+
+.adt-menu-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-base);
+  font-weight: var(--ad-weight-semibold);
+  line-height: var(--ad-leading-snug);
+  color: var(--ad-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-md);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-menu-item:hover:enabled,
+.adt-menu-item:focus-visible {
+  background: rgb(255 255 255 / 7%);
+  outline: none;
+}
+
+.adt-menu-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.adt-menu-item.is-danger {
+  color: var(--ad-rose-500);
+}
+
+.adt-menu-item-icon {
+  flex: none;
+  margin-top: 1px;
+  font-size: 18px;
+  color: var(--ad-text-muted);
+}
+
+.adt-menu-item.is-danger .adt-menu-item-icon {
+  color: inherit;
+}
+
+.adt-menu-item-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--ad-text-xs);
+  font-weight: var(--ad-weight-medium);
+  color: var(--ad-text-muted);
+}
+
+.adt-menu-divider {
+  height: 1px;
+  margin: 6px 8px;
+  background: var(--ad-border-subtle);
+}
+
+/* A file drop target. */
+.adt-dropzone {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 168px;
+  padding: 24px;
+  color: var(--ad-text-secondary);
+  text-align: center;
+  cursor: pointer;
+  background: rgb(255 255 255 / 3%);
+  border: 1.5px dashed var(--ad-border-strong);
+  border-radius: var(--ad-radius-xl);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-dropzone:hover {
+  background: rgb(255 255 255 / 5%);
+  border-color: rgb(255 255 255 / 28%);
+}
+
+.adt-dropzone.is-over {
+  background: color-mix(in srgb, var(--ad-action-primary) 14%, transparent);
+  border-color: var(--ad-action-primary);
+}
+
+.adt-dropzone:focus-visible {
+  outline: none;
+  box-shadow: var(--ad-focus-ring);
+}
+
+/* Chips in a field: the trigger and board-ID inputs. */
+.adt-token-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 52px;
+  padding: 10px 12px;
+  cursor: text;
+  background: var(--ad-surface-input);
+  border-radius: var(--ad-radius-xl);
+  transition: var(--ad-transition-interactive);
+}
+
+.adt-token-input:focus-within {
+  box-shadow: var(--ad-focus-ring);
+}
+
+.adt-token-input > input {
+  flex: 1 0 140px;
+  min-width: 0;
+  height: 30px;
+  padding: 0 4px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-md);
+  font-weight: var(--ad-weight-medium);
+  color: var(--ad-text-primary);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+
+.adt-token-input > input::placeholder {
+  color: var(--ad-text-muted);
+}
+
+.adt-token {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  max-width: 100%;
+  height: 30px;
+  padding: 0 4px 0 12px;
+  font-family: var(--ad-font-body);
+  font-size: var(--ad-text-sm);
+  font-weight: var(--ad-weight-semibold);
+  color: var(--ad-text-primary);
+  background: rgb(255 255 255 / 10%);
+  border-radius: var(--ad-radius-full);
+}
+
+.adt-token.is-invalid {
+  color: var(--ad-white);
+  background: color-mix(in srgb, var(--ad-rose-500) 30%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ad-rose-500) 60%, transparent);
+}
+
+.adt-token-remove {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 15px;
+  color: var(--ad-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-full);
+}
+
+.adt-token-remove:hover {
+  color: var(--ad-white);
+  background: rgb(255 255 255 / 12%);
+}
+
+/* Suggestions under a trigger field, in the flow so a dialog never clips them. */
+.adt-suggestions {
+  margin-top: 6px;
+  padding: 4px;
+  background: rgb(255 255 255 / 4%);
+  border-radius: var(--ad-radius-lg);
+}
+
+.adt-suggestion {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  width: 100%;
+  padding: 8px 10px;
+  font-family: var(--ad-font-body);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ad-radius-md);
+}
+
+.adt-suggestion:hover,
+.adt-suggestion.is-active {
+  background: rgb(255 255 255 / 8%);
+}
+
+.adt-suggestion-trigger {
+  flex: none;
+  font-size: var(--ad-text-sm);
+  font-weight: var(--ad-weight-bold);
+  color: var(--ad-text-primary);
+}
+
+.adt-suggestion-text {
+  min-width: 0;
+  font-size: var(--ad-text-xs);
+  color: var(--ad-text-muted);
+}
+
+/* Code in hints and descriptions. */
+.adt-code {
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  color: var(--ad-text-secondary);
+  background: rgb(255 255 255 / 8%);
+  border-radius: var(--ad-radius-xs);
+}
+
+.adt-code-block {
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--ad-text-xs);
+  line-height: var(--ad-leading-normal);
+  color: var(--ad-text-secondary);
+  white-space: pre;
+  background: rgb(255 255 255 / 4%);
+  border-radius: var(--ad-radius-lg);
 }
 
 /* --------------------------------------------------------- disabled tile ---

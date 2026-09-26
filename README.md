@@ -232,9 +232,11 @@ The Caller feature provides voice announcements during your darts gameplay, simi
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
   - Covers **Gotcha** too, which autodarts works out no route for: the number left to reach the target score is announced the same way
 - **Prefer Combined Throws**: When enabled and a sound for the exact dart combination (e.g. `s20_s5_s1`) exists, the generic points sound (e.g. `26`) is skipped for that throw
-- **Custom Sound Library**: Add, edit, and organize voice clips for different game events
-- **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text using the built-in "Generate TTS" button — no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.
-- **Bulk Upload with Trigger Assignment**: When uploading multiple files, you can assign the same trigger to all files at once, making it easy to set up larger sound sets without manually assigning triggers to each file individually
+- **Custom Sound Library**: Add, edit, and organize voice clips for different game events. Everything that adds sounds is under **Add**: a predefined caller set, uploaded files, text-to-speech, or a link. Sorting by trigger and deleting everything are under **⋯**
+- **Search and Filters**: Find a sound by its name or trigger with the search above the list. A number also finds the ranges that cover it, so `150` finds a sound on `100-180`. The pills narrow the list to scores, throws, events, board status, player names, or the sounds you have switched off. Drag a sound by its handle to reorder the list, while no search or filter narrows it
+- **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text under **Add › Generate a sound**, with no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.
+- **Bulk Upload with Trigger Assignment**: When uploading multiple files, each file shows the trigger its name gives before anything is saved, or choose **The same for all** to give every file the same triggers. That makes it easy to set up larger sound sets without assigning triggers to each file individually
+- **Triggers as chips**: Type a trigger and press Enter; the named ones are suggested as you type, with what each does. A pasted list becomes one trigger per line
 
 #### Supported Triggers
 You can assign sounds to be played based on these triggers:
@@ -411,10 +413,10 @@ The Sound FX feature includes a sophisticated multi-level fallback system:
 
 #### Text-to-Speech (TTS) Generation
 Generate sound effects directly from text without needing external audio files:
-- **Generate TTS Button**: Available in the Sound FX settings toolbar alongside Upload and Delete buttons
+- **Add › Generate a sound**: In the Sound FX settings, beside uploading files and adding a sound from a link
 - **Voice Selection**: Choose from any voice installed on your operating system (varies by platform)
 - **Speed & Pitch Control**: Adjust speech rate (0.5x–2x) and pitch (0–2) with sliders
-- **Prelisten**: Preview the generated speech before saving
+- **Listen**: Hear the generated speech before saving it
 - **Persistent Settings**: Your last-used voice, speed, and pitch are remembered across sessions
 - **Cross-Platform**: Works on Desktop (Chrome, Firefox, Edge, Safari), iOS Safari, and Android Chrome using the Web Speech API
 - **Trigger Assignment**: Assign triggers to TTS sounds just like any other sound
@@ -424,8 +426,13 @@ Generate sound effects directly from text without needing external audio files:
 
 #### Bulk Upload with Trigger Assignment
 - **Multi-File Upload**: Upload multiple sound files at once for faster setup
-- **Bulk Trigger Assignment**: When "Generate triggers from filenames" is disabled, you can assign the same trigger to all uploaded files at once
+- **Bulk Trigger Assignment**: Each file shows the trigger its name gives before it is added; choose **The same for all** instead of **From file names** to give every uploaded file the same triggers
 - **Efficient Setup**: Makes it easy to set up larger sound sets without manually assigning triggers to each file individually
+
+#### Search and Filters
+- **Search**: Find a sound by its name or trigger. The `ambient_` prefix counts as part of the trigger, so `ambient` lists every ambient sound, and a number also finds the ranges that cover it
+- **Filters**: The pills narrow the list to scores, throws, events, board status, player names, or the sounds you have switched off
+- **Reorder**: Drag a sound by its handle, while no search or filter narrows the list
 
 #### Technical Features
 - **Queue Management**: Enhanced sound queue management to prevent overlapping and ensure proper playback order (improved in v2.0.3)
@@ -441,10 +448,11 @@ The WLED feature allows you to trigger lighting effects and other HTTP requests 
 WLED is a popular open-source firmware for controlling addressable LED strips (WS2812B, SK6812, etc.) with ESP8266/ESP32 microcontrollers. It provides a web interface and HTTP API for controlling lighting effects, making it perfect for integrating with Tools for Autodarts.
 
 #### Configuration Options
-- **Effect Management**: Add, edit, enable/disable, and reorder lighting effects
+- **Effect Management**: Add, edit, enable/disable, and reorder lighting effects. **Add** holds a new effect and the CSV import, **⋯** sorting by trigger and deleting everything, and each effect has a play button to send it, as its editor has **Test**
+- **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
 - **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
-- **CSV Import**: Bulk import effects using CSV format: `[name];[url];[trigger1];[trigger2]...`
-- **Drag & Drop**: Reorder effects by dragging them in the settings interface
+- **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
+- **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
 - **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
 
 #### Supported Triggers
@@ -545,15 +553,16 @@ https://kno.wled.ge/interfaces/json-api/ for further informations about the json
 
 
 #### CSV Import Format
-Import multiple effects at once using this format:
+Import multiple effects at once, one per line. The second field is the effect's type: `URL`, `PRESET` (followed by the preset's number) or `API` (followed by the JSON to send). The address always starts with `http://` or `https://`:
 ```csv
-Effect Name;http://wled-device.local/win/PL=1;gameon
-180 Effect;http://wled-device.local/win/PL=2;180
-Takeout;http://wled-device.local/win/PL=3;takeout;busted
+Effect Name;URL;http://wled-device.local/win/PL=1;gameon
+180 Effect;URL;http://wled-device.local/win/PL=2;180
+Takeout;URL;http://wled-device.local/win/PL=3;takeout;busted
+Bust preset;PRESET;http://wled-device.local;7;busted
 ```
 
 #### Board Filtering
-- **Enable Filtering**: Add board IDs (one per line) to restrict effects to specific boards
+- **Enable Filtering**: Paste each board ID under **Boards** and press Enter to restrict effects to those boards; an entry that isn't a board ID is marked
 - **Other Effect**: Create an effect with trigger `other` for throws on non-matching boards
 - **Use Cases**: Different effects for different dart boards in multi-board setups
 
@@ -581,11 +590,14 @@ Takeout;http://wled-device.local/win/PL=3;takeout;busted
 The Animations feature allows you to display custom GIF animations for special events during gameplay:
 
 #### Configuration
-- **Delay**: Set how long to wait before showing the animation (in seconds)
-- **Duration**: Set how long the animation should display (in seconds)
-- **Object Fit**: Choose between 'cover' (fill screen) or 'contain' (maintain aspect ratio)
-- **View Mode**: Choose between 'Board Only' (the animation covers the dartboard) or 'Full Page' (it covers the whole page, over a blurred background)
-- **Bulk Upload with Trigger Assignment**: When uploading multiple GIF files, you can assign the same trigger to all files at once when "Generate triggers from filenames" is disabled, making it easy to set up larger animation sets
+- **Start delay**: Set how long to wait before showing the animation (in seconds)
+- **Show for**: Set how long the animation should display (in seconds)
+- **Fit**: Choose between **Cover** (fill the space, cropping the GIF if needed) or **Contain** (show all of it)
+- **Covers**: Choose between **Board only** (the animation covers the dartboard) or **Full page** (it covers the whole page, over a blurred background)
+- **Add**: Upload GIFs, or add one from a link, whose editor previews it. Sorting by trigger and deleting everything are under **⋯**
+- **Search and Filters**: Find an animation by its trigger or link, and narrow the grid with the pills to scores, throws, events, other triggers, or the animations you have switched off. Drag an animation by its handle to reorder the grid, while no search or filter narrows it
+- **Bulk Upload with Trigger Assignment**: When uploading multiple GIF files, each file shows the triggers its name gives before anything is saved, or choose **The same for all** to give every file the same triggers, making it easy to set up larger animation sets
+- **Trigger checking**: A trigger animations don't know is marked as soon as it is added, rather than when saving
 
 Clicking an animation dismisses it early, so a long GIF never has to be waited out mid-leg.
 

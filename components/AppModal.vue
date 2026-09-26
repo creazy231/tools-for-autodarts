@@ -47,7 +47,8 @@
         >
           <span class="icon-[pixelarticons--close]" />
         </AppButton>
-        <h2 v-if="title" class="adt-modal-title mb-4">
+        <!-- Room on the right for the close button, which is laid over the corner. -->
+        <h2 v-if="title" class="adt-modal-title mb-4 pr-10">
           {{ title }}
         </h2>
 
