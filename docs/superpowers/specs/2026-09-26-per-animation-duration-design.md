@@ -101,12 +101,11 @@ So a length of one run covers the whole GIF on every play, as long as the GIF ha
 
 6. **The grid shows a length of its own.** An animation with its own length has a small chip at the bottom right of its picture: a timer icon and "2.37 s", titled "Stays up for 2.37 s". The number drops trailing zeros ("4 s", "4.5 s"). It is the same `adt-chip` on black as the *Off* chip at the bottom left. The chip is neutral: colour means on or playing, nothing else. Animations without a length of their own show nothing, as the sound rows show no volume at 100%.
 
-7. **The player waits for the GIF during the start delay.** `play()` starts loading the picked GIF into a detached `Image` as soon as the trigger fires, and mounts the overlay once *Start delay* has passed and the GIF has loaded, so the clock runs while the whole GIF is on screen:
-   - A GIF that is still loading 3 s after the start delay is shown anyway, as today.
-   - A GIF that fails to load is not shown at all. Today a dead link puts up an empty overlay for the whole duration, and in *Full page* that blurs the page for nothing.
+7. **The player loads the GIF during the start delay, and starts the clock once it has loaded.** When and which GIF appears stays as it is, since a later trigger replacing an earlier one before it shows (a 180, then its three-dart combination 500 ms later) depends on that schedule. Only these change:
+   - `play()` starts loading the picked GIF into a detached `Image` as soon as the trigger fires. With the defaults (1 s delay, GIFs loading in 0.3–0.5 s) the GIF is ready when the overlay appears, and runs from its first frame.
+   - The hide timer starts when the overlay's picture has loaded (its `load` event, or at once when it already has), not when the overlay is mounted. A download slower than the start delay then no longer cuts the end off. The wait is capped: a GIF that never loads is hidden 3 s after its duration would have ended.
+   - A GIF whose preload failed is not shown, and one that fails while on screen is hidden. Today a dead link puts up an empty overlay for the whole duration, and in *Full page* that blurs the page for nothing.
    - Uploaded GIFs are blob: URLs and load at once.
-
-   With the defaults (1 s delay, GIFs loading in 0.3–0.5 s) nothing appears later than it does now.
 
 ## Rulings
 
@@ -118,7 +117,7 @@ These are the calls made without the user, for review:
 4. Seconds, not milliseconds, in the editor, to match *Start delay* and *Show for*. The minimum is 0.1 s, not the option's 0.5 s, because some GIFs run shorter than half a second.
 5. The button is named for what it does: **Use the GIF's length** rather than **From GIF**.
 6. A length chip on the grid, which the pull request did not have.
-7. The player waits up to 3 s past the start delay for the GIF to load, and skips a GIF that fails to load. This goes beyond the pull request. Without it, "the GIF's length" cuts the end off every first play.
+7. The player preloads the GIF during the start delay, starts the clock once it has loaded (waiting at most 3 s), and skips a GIF that fails to load. This goes beyond the pull request. Without it, "the GIF's length" cuts the end off the first play of a GIF that isn't cached yet, and Tenor lets its links be cached for an hour or a day.
 8. Commits stay local on `main`. Nothing is pushed, and #254 gets no comment until the user has looked.
 
 ## Not doing
