@@ -1,32 +1,27 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure the size of player names display on the match page.</p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Draws the player names on the match screen larger, in every layout, the sidebar of a narrower window included.
+        </p>
 
-            <div class="mt-4 space-y-4">
-              <div class="grid grid-cols-[auto_1fr] items-center gap-4">
-                <p>Font Size:</p>
-                <AppInput
-                  v-model="sizeValue"
-                  type="text"
-                  placeholder="Enter a size in rem (e.g., 2.5)"
-                  class="w-full"
-                />
-              </div>
-              <p class="text-sm text-white/50">
-                The size in rem — 1 is the browser's base size, 16 pixels by default. Autodarts draws the
-                names at about 1.1, so 2.5 is more than twice as large.
-              </p>
-            </div>
-          </div>
-        </div>
+        <section>
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow description="In rem: 1 is the browser's base size, 16 pixels by default. autodarts draws names at about 1.1." title="Size">
+            <AppNumberInput
+              v-model="config.largerPlayerNames.value"
+              :max="10"
+              :min="0.5"
+              :step="0.1"
+              label="Size"
+              unit="rem"
+            />
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -63,29 +58,14 @@
 </template>
 
 <script setup lang="ts">
+import AppNumberInput from "../AppNumberInput.vue";
 import AppToggle from "../AppToggle.vue";
-import AppInput from "../AppInput.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
-const { config, ready } = useConfig();
-const sizeValue = ref("");
+const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/larger-player-names.png");
-
-onMounted(async () => {
-  await ready();
-  // Initialize the size value from config
-  if (config.value?.largerPlayerNames?.value) {
-    sizeValue.value = config.value.largerPlayerNames.value.toString();
-  }
-});
-
-watch(sizeValue, (newValue) => {
-  if (config.value) {
-    // Convert string to number
-    const numValue = Number.parseFloat(newValue) || 1; // Default to 1 if parsing fails
-    config.value.largerPlayerNames.value = numValue;
-  }
-});
 
 async function toggleFeature() {
   if (!config.value) return;

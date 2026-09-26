@@ -16,11 +16,23 @@ All notable changes to this project will be documented in this file.
   - Uploading shows the trigger each file's name will give before anything is saved. The Caller's and Sound FX's editors can play a sound's link before it is added, and WLED's editor can send an effect to try it
   - The play button shows what is playing and stops it. A new sound stops the last one, and closing the settings stops them all
   - The list's heading, search and pills stay in view while it scrolls, and the dialog keeps its height while a search narrows the list
+- **The settings of fourteen more features** are laid out like the sound and light libraries: Discord Webhooks, Recent Local Players, Colors, Auto Next Player on Takeout, Automatic Next Leg, Streaming Mode, Larger Legs/Sets, Larger Player Names, Larger Player Match Data, Darts Zoom, Board View, Board Skins, Quick Correction and Instant Replay. Each opens on a line about what the feature does, then settings rows grouped under headings, each with the setting's name, a line on what it does and its control on the right. Buttons that only put something back are grey rather than red, and colour is left for what is switched on
+  - **Recent Local Players** shows the saved players as a list you can search. A player goes with a second click, on the red **Delete** the bin turns into, and deleting them all, now under **⋯**, asks first
+  - **Streaming Mode**'s settings are grouped into the scoreboard, the board, the background and the layout. An uploaded background shows as a thumbnail with **Replace** beside it, removing it takes a second click, and the board's choice reads *Camera* or *Drawn board*
+  - **Darts Zoom**'s *On board* hold time is set in seconds
+  - **Instant Replay** shows the camera's picture beside its settings, kept in view while they scroll, and says when no camera is free
+  - **Discord Webhooks** says under the webhook field when there is none, or when it is not a Discord webhook. *Post live scores* shows as unavailable, since that half of the feature does not run on the rebuilt site yet
+  - **Quick Correction**'s note that it does not work in Safari is a warning rather than yellow text
 - **The settings page** has two menus where it had four buttons for moving settings between installations: **Export** downloads them as a file or copies them to the clipboard, and **Import** loads a file or pastes what was copied. Each choice has a line on what it does, and Import's both say that they replace all your settings. A coffee cup beside the gear opens the Ko-fi page in a new tab. On most phones the buttons fit on one row instead of three, and a menu that is wider than the room beside its button slides along to stay on the screen
 
 ### Fixed
 
 - **The settings page** no longer reloads all its settings after every change. Storage hands them back with their keys in alphabetical order, so a change read back never looked like the one just made: each click was taken for a change made somewhere else, and everything was rebuilt from storage behind the scenes
+- **Recent Local Players** forgets a player deleted in the settings, a lobby open under them included. The name came back the next time a lobby opened, because autodarts' own list of players still held it
+- Numbers in the settings keep what is typed until you leave the field. **Instant Replay**'s duration jumped to 5 on the first digit of a 15, and emptying a field set it to 0, to its minimum, or in **Discord Webhooks**' countdown to no number at all
+- The settings of **Darts Zoom** and **Quick Correction** open at the top instead of scrolled down to their slider
+- **Darts Zoom**'s and **Board View**'s choice of camera fits a phone, where it ran off the edge of the dialog, and so does Darts Zoom's *Checkout only* switch, which was squeezed to half its width
+- The settings of **Auto Next Player on Takeout** and **Larger Legs/Sets** carry their cards' names
 - **The Caller** keeps an uploaded sound's recording when its name or triggers are saved before the recording has finished loading into the editor. It used to be saved without it, which left the sound silent
 - **Sound FX** and the **Caller** say "TTS sound updated" when an existing text-to-speech sound is saved; they always said "added"
 

@@ -1,42 +1,36 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure how the quick correction is displayed during matches.</p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Fixes a dart the board read wrong: open it on a throw and pick the right segment from a grid of the whole board,
+          with the mouse or the number pad.
+        </p>
 
-            <div class="mt-4 space-y-4">
-              <p>This feature allows you to quickly correct darts during matches.</p>
-              <p class="text-yellow-400">
-                <strong>Note:</strong> This feature will not work in Safari due to security restrictions.
-              </p>
+        <AppAlert class="mb-6" compact variant="warning">
+          Not available in Safari yet: its security rules block the correction window.
+        </AppAlert>
 
-              <div class="mt-6">
-                <h4 class="mb-2 font-semibold">
-                  Window Scale
-                </h4>
-                <div class="max-w-sm">
-                  <AppSlider
-                    v-model="scale"
-                    :min="0.5"
-                    :max="2"
-                    :step="0.1"
-                    :show-labels="true"
-                    :format-label="formatScaleLabel"
-                  />
-                </div>
-                <p class="mt-1 text-sm text-white/60">
-                  Adjust the size of the correction window.
-                </p>
-              </div>
+        <section>
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow description="How large the correction window opens." title="Window size">
+            <div class="flex w-full items-center gap-3 sm:w-64">
+              <AppSlider
+                v-model="scale"
+                :autofocus="false"
+                :max="2"
+                :min="0.5"
+                :show-value="false"
+                :step="0.1"
+                class="flex-1"
+              />
+              <span class="w-11 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ formatScaleLabel(scale) }}</span>
             </div>
-          </div>
-        </div>
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -76,8 +70,11 @@
 </template>
 
 <script setup lang="ts">
-import AppToggle from "../AppToggle.vue";
+import AppAlert from "../AppAlert.vue";
 import AppSlider from "../AppSlider.vue";
+import AppToggle from "../AppToggle.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();

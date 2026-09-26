@@ -1,43 +1,25 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div v-if="config" class="adt-container min-h-56">
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>
-              Autodarts has one button for what the board shows, and it only cycles: camera 1, 2, 3,
-              the drawn board, and round again. This presses it for you when a game starts, until the
-              view you picked comes up.
-            </p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Autodarts has one button for what the board shows, and it only cycles: camera 1, 2, 3, the drawn board, and round
+          again. This presses it for you when a game starts, until the view you picked comes up.
+        </p>
 
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Start every game showing
-              </h4>
-              <div class="flex">
-                <AppRadioGroup
-                  v-model="config.boardView.view"
-                  class="grid max-w-md grid-cols-4"
-                  :options="[
-                    { label: 'Camera 1', value: 'camera-1' },
-                    { label: 'Camera 2', value: 'camera-2' },
-                    { label: 'Camera 3', value: 'camera-3' },
-                    { label: 'Board', value: 'image' },
-                  ]"
-                />
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                Boards with fewer cameras have a shorter cycle — asking for a camera that is not
-                there leaves the view alone rather than pressing forever.
-              </p>
-              <p class="mt-1 text-sm text-white/60">
-                While <em>Board Skins</em> is on, that feature keeps the drawn board up instead, and
-                this one stands aside.
-              </p>
-            </div>
-          </div>
-        </div>
+        <section>
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow title="Start every game showing">
+            <template #description>
+              A board with fewer cameras has a shorter cycle, so asking for one it lacks leaves the view alone. While Board
+              Skins is on, it keeps the drawn board up instead, and this stands aside.
+            </template>
+            <AppRadioGroup v-model="config.boardView.view" :options="VIEWS" aria-label="Start every game showing" button-size="sm" class-name="is-grid" />
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -65,10 +47,20 @@
 </template>
 
 <script setup lang="ts">
-import AppToggle from "../AppToggle.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
+import AppToggle from "../AppToggle.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+
+const VIEWS = [
+  { label: "Camera 1", value: "camera-1" },
+  { label: "Camera 2", value: "camera-2" },
+  { label: "Camera 3", value: "camera-3" },
+  { label: "Board", value: "image" },
+];
+
 const { config } = useConfig();
 
 async function toggleFeature() {

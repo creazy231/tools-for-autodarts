@@ -107,6 +107,15 @@ body {
   flex-direction: column;
 }
 
+/* Two to a row on a phone, for four options that do not fit its width in one: the camera choices. */
+@media (max-width: 639px) {
+  .adt-segment.is-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+}
+
 .adt-segment-item {
   display: inline-flex;
   flex: none;
@@ -715,6 +724,13 @@ body {
     row-gap: 2px;
     column-gap: 16px;
   }
+}
+
+/* A name and its delete, nothing else (the saved players): one line at every width. */
+.adt-row.is-plain {
+  grid-template-areas: "lead title actions";
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding-left: 8px;
 }
 
 /* The friends drawer's search field: a light pill on the dark surface. */

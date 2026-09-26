@@ -10,8 +10,8 @@
       v-if="config"
       class="adt-container !overflow-visible"
     >
-      <div class="relative z-10 text-white/70">
-        <p class="mb-6">
+      <div class="relative z-10 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
           Recolours the match screen: the card of the player whose turn it is, the page behind it, and the
           colours around them. Everything starts at autodarts' own, so nothing changes until you pick something.
         </p>
@@ -34,12 +34,12 @@
             />
           </div>
 
-          <div class="space-y-6 pt-2 lg:pt-0">
+          <div class="space-y-8 pt-2 lg:pt-0">
             <section>
-              <h4 class="mb-1 font-semibold text-white">
+              <h3 class="adt-section-title">
                 Player card
-              </h4>
-              <p class="mb-3 text-sm text-white/60">
+              </h3>
+              <p class="mb-4 mt-2 text-sm text-[var(--ad-text-muted)]">
                 The card of the player whose turn it is, in every layout. A bust and a won leg keep autodarts' own
                 colours, and so does the winner's pattern.
               </p>
@@ -52,10 +52,10 @@
             </section>
 
             <section>
-              <h4 class="mb-1 font-semibold text-white">
+              <h3 class="adt-section-title">
                 Background
-              </h4>
-              <p class="mb-3 text-sm text-white/60">
+              </h3>
+              <p class="mb-4 mt-2 text-sm text-[var(--ad-text-muted)]">
                 The page behind the match, and the bottom bar and its buttons with it. autodarts' mark stays on the
                 page, tinted to go with the colours you pick.
               </p>
@@ -66,22 +66,35 @@
                 :texture="texture"
                 label="Background"
               />
-              <div class="mt-4 grid grid-cols-[auto_1fr] items-center gap-4">
-                <AppToggle v-model="config.colors.everywhere" />
-                <p>On every autodarts page, not only in matches</p>
+              <div class="mt-2">
+                <OptionRow
+                  description="Puts the background on the lobby, the home page and the settings as well, not only on the match screen."
+                  title="On every autodarts page"
+                >
+                  <AppToggle v-model="config.colors.everywhere" aria-label="On every autodarts page" size="sm" />
+                </OptionRow>
               </div>
             </section>
 
             <section>
-              <h4 class="mb-3 font-semibold text-white">
+              <h3 class="adt-section-title">
                 More colours
-              </h4>
-              <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-                <div
-                  v-for="flat in FLAT"
-                  :key="flat.key"
-                  class="flex items-center gap-3 rounded-[var(--ad-radius-md)] bg-[var(--ad-surface-sunken)] p-3"
-                >
+              </h3>
+              <OptionRow v-for="flat in FLAT" :key="flat.key" :title="flat.label">
+                <template #description>
+                  {{ flat.hint }}. {{ state(flat) }}
+                </template>
+                <div class="flex items-center gap-1">
+                  <button
+                    @click="config.colors[flat.key] = ''"
+                    v-if="config.colors[flat.key]"
+                    :aria-label="resetTitle(flat)"
+                    :title="resetTitle(flat)"
+                    class="adt-icon-btn"
+                    type="button"
+                  >
+                    <span class="icon-[material-symbols--restart-alt-rounded]" />
+                  </button>
                   <input
                     @input="setFlat(flat.key, $event)"
                     :value="shown(flat.key)"
@@ -89,26 +102,8 @@
                     class="adt-color-input size-9 shrink-0"
                     type="color"
                   >
-                  <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-white">
-                      {{ flat.label }}
-                    </p>
-                    <p class="text-xs text-white/60">
-                      {{ hint(flat) }}
-                    </p>
-                  </div>
-                  <AppButton
-                    @click="config.colors[flat.key] = ''"
-                    v-if="config.colors[flat.key]"
-                    :title="resetTitle(flat)"
-                    auto
-                    class="aspect-square size-8 shrink-0 p-0"
-                    type="ghost"
-                  >
-                    <span class="icon-[pixelarticons--reload]" />
-                  </AppButton>
                 </div>
-              </div>
+              </OptionRow>
             </section>
           </div>
         </div>
@@ -148,11 +143,11 @@
 </template>
 
 <script setup lang="ts">
-import AppButton from "../AppButton.vue";
 import AppToggle from "../AppToggle.vue";
 
 import ColorsPreview from "./Colors/ColorsPreview.vue";
 import SchemePicker from "./Colors/SchemePicker.vue";
+import OptionRow from "./Library/OptionRow.vue";
 
 import { boardSkin } from "@/utils/board-skins";
 import { CARD_PRESETS, PAGE_PRESETS, SITE_ACTION_BAR, SITE_CARD, SITE_CARDS, SITE_PAGE, SITE_TEXT, barPalette } from "@/utils/colors";
@@ -190,11 +185,12 @@ function shown(key: typeof FLAT[number]["key"]): string {
   return colors[key] || FLAT.find(flat => flat.key === key)!.site;
 }
 
-function hint(flat: typeof FLAT[number]): string {
+/** What a flat colour is while none is picked: autodarts' own, or for the bottom bar the background's. */
+function state(flat: typeof FLAT[number]): string {
   const colors = config.value!.colors;
-  if (colors[flat.key]) return flat.hint;
-  if (flat.key === "actionBar" && barPalette(colors)) return "Follows the background";
-  return "autodarts' own";
+  if (colors[flat.key]) return "";
+  if (flat.key === "actionBar" && barPalette(colors)) return "Follows the background until you pick one.";
+  return "autodarts' own until you pick one.";
 }
 
 function resetTitle(flat: typeof FLAT[number]): string {

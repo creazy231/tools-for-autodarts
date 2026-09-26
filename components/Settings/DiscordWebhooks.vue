@@ -1,75 +1,72 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Toggles between sending the invitation link automatically or manually.</p>
-            <AppRadioGroup
-              v-model="config.discord.manually"
-              class="grid max-w-sm grid-cols-2"
-              :options="[
-                { label: 'Automatic', value: false },
-                { label: 'Manual', value: true },
-              ]"
-            />
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Posts the invitation link of every private lobby you open to a Discord channel, and marks the post once the game has started.
+        </p>
+
+        <section>
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow stacked title="Webhook URL">
+            <template #description>
+              Where the invitation is posted. Discord makes one under a channel's Edit Channel › Integrations › Webhooks.
+            </template>
             <AppInput
+              id="discord-webhook-url"
               v-model="config.discord.url"
-              placeholder="Enter Discord webhook URL"
-              label="Webhook URL"
-              helper-text="The Discord webhook URL to send lobby invitations to"
-              size="sm"
+              aria-label="Webhook URL"
+              placeholder="https://discord.com/api/webhooks/…"
+              type="url"
             >
               <template #icon>
-                <span class="icon-[pixelarticons--link]" />
+                <span class="icon-[material-symbols--link-rounded]" />
               </template>
             </AppInput>
-
-            <div v-if="config?.discord?.autoStartAfterTimer" class="mt-6 border-t border-white/20 pt-4">
-              <h4 class="mb-3 font-semibold">
-                Auto-Start Timer
-              </h4>
-              <div class="flex items-center gap-4">
-                <AppToggle
-                  v-model="config.discord.autoStartAfterTimer.enabled"
-                  label="Auto-start game after timer"
-                  class="mt-6"
-                />
-                <div class="relative w-24">
-                  <AppInput
-                    v-model="minutes"
-                    type="number"
-                    label="Minutes"
-                    :disabled="!config.discord.autoStartAfterTimer.enabled"
-                    min="1"
-                    max="60"
-                    class="w-full"
-                    size="sm"
-                  />
-                </div>
-              </div>
-              <p class="mt-2 text-sm text-white/60">
-                Automatically starts the game after the specified time once the Discord webhook is sent.
-              </p>
-              <template v-if="config.discord.autoStartAfterTimer.enabled">
-                <div class="mt-4 flex">
-                  <AppToggle
-                    v-model="config.discord.autoStartAfterTimer.stream"
-                    label="Enable streaming mode when timer starts"
-                    :disabled="!config.discord.autoStartAfterTimer.enabled"
-                  />
-                </div>
-                <p class="mt-2 text-sm text-white/60">
-                  Streams the game results to the Discord.
-                </p>
-              </template>
-            </div>
-          </div>
-        </div>
+            <p v-if="urlHint" class="adt-field-hint !text-[var(--ad-warning)]">
+              {{ urlHint }}
+            </p>
+          </OptionRow>
+          <OptionRow
+            description="Automatic posts it as soon as the lobby opens. Manual adds a Discord button beside Shuffle, so you decide when."
+            title="Send the invitation"
+          >
+            <AppRadioGroup v-model="config.discord.manually" :options="SEND_MODES" aria-label="Send the invitation" button-size="sm" />
+          </OptionRow>
+          <template v-if="config.discord.autoStartAfterTimer">
+            <OptionRow
+              description="Starts the game by itself a set time after the post, and the post says when."
+              title="Start after a countdown"
+            >
+              <AppToggle v-model="config.discord.autoStartAfterTimer.enabled" aria-label="Start after a countdown" size="sm" />
+            </OptionRow>
+            <OptionRow v-if="config.discord.autoStartAfterTimer.enabled" description="From the post to the start of the game." title="Countdown">
+              <AppNumberInput
+                v-model="config.discord.autoStartAfterTimer.minutes"
+                :max="60"
+                :min="1"
+                label="Countdown"
+                unit="min"
+              />
+            </OptionRow>
+            <!--
+              Disabled rather than hidden: the match half that would post the
+              scores is not ported to the rebuilt site (match.content's
+              PORTED_TO_V2 has no "discord"), so the switch could only fail
+              silently. Same treatment as an unported feature card, and shown
+              off whatever is stored, since off is what it is.
+            -->
+            <OptionRow
+              description="Keeps a post in the channel updated with the scores while the game is on. Not available on the rebuilt site yet."
+              title="Post live scores"
+            >
+              <AppToggle :model-value="false" aria-label="Post live scores" disabled size="sm" />
+            </OptionRow>
+          </template>
+        </section>
       </div>
     </div>
   </template>
@@ -107,25 +104,32 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
-
-import AppRadioGroup from "../AppRadioGroup.vue";
 import AppInput from "../AppInput.vue";
+import AppNumberInput from "../AppNumberInput.vue";
+import AppRadioGroup from "../AppRadioGroup.vue";
 import AppToggle from "../AppToggle.vue";
 
+import OptionRow from "./Library/OptionRow.vue";
+
 const emit = defineEmits([ "toggle" ]);
-useStorage("adt:active-settings", "discord-webhooks");
+
+const SEND_MODES = [
+  { label: "Automatic", value: false },
+  { label: "Manual", value: true },
+];
+
+/** Discord's own webhook addresses, its test clients' and versioned ones (/api/v10/webhooks/) included. */
+const DISCORD_WEBHOOK = /^https:\/\/(?:(?:ptb|canary)\.)?discord(?:app)?\.com\/api\/(?:v\d+\/)?webhooks\//i;
+
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/discord-webhooks.png");
 
-// Computed property for minutes with type handling
-const minutes = computed({
-  get: () => config.value?.discord?.autoStartAfterTimer?.minutes?.toString() || "5",
-  set: (value: string) => {
-    if (config.value?.discord?.autoStartAfterTimer) {
-      config.value.discord.autoStartAfterTimer.minutes = Number.parseInt(value, 10);
-    }
-  },
+/** Said under the field: nothing is posted without a URL, and anything but a webhook is likely a paste gone wrong. */
+const urlHint = computed(() => {
+  const url = config.value?.discord.url?.trim() ?? "";
+  if (!url) return "Nothing is posted until there is a URL here.";
+  if (!DISCORD_WEBHOOK.test(url)) return "This isn't a Discord webhook URL, so the post may never arrive.";
+  return "";
 });
 
 async function toggleFeature() {

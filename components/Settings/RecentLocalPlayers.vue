@@ -1,67 +1,84 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Saved players appear as a strip under the lobby's player list, and are written back into the site's own Add Player dialog.</p>
+    <!-- Visible overflow so the list's heading can stick; see Wled.vue. -->
+    <div v-if="config" class="adt-container !overflow-visible">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Keeps the local players you enter, not only the six autodarts remembers, and puts them one click away in a strip under the lobby's player list.
+        </p>
 
-            <div class="mt-4 space-y-4">
-              <!-- Maximum Players Cap -->
-              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-                <AppInput
-                  @update:model-value="config.recentLocalPlayers.cap = Number($event)"
-                  :model-value="String(config.recentLocalPlayers.cap)"
-                  placeholder="10"
-                  type="number"
-                  size="sm"
-                  input-class="w-full"
-                />
-                <p>Maximum saved players to keep</p>
-              </div>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <!-- No ceiling, as the lobby has none: one would trim a longer stored list at the next sync. -->
+          <OptionRow description="Once the list is full, the oldest name makes room for a new one." title="Players to keep">
+            <AppNumberInput
+              v-model="config.recentLocalPlayers.cap"
+              :min="1"
+              label="Players to keep"
+            />
+          </OptionRow>
+        </section>
 
-              <!-- Current Players List -->
-              <div v-if="config.recentLocalPlayers.players.length > 0" class="mt-4">
-                <h4 class="mb-2 font-semibold">
-                  Current Players List
-                </h4>
-                <div class="mb-2 flex flex-wrap gap-2">
-                  <div
-                    v-for="(player, index) in config.recentLocalPlayers.players"
-                    :key="index"
-                  >
-                    <AppButton
-                      @click="removePlayer(index)"
-                      class="text-white/70 hover:text-white"
-                      size="sm"
-                    >
-                      {{ player }}
-                      <span class="icon-[pixelarticons--close] ml-2" />
-                    </AppButton>
-                  </div>
-                </div>
-                <AppButton
-                  @click="clearAllPlayers"
-                  size="sm"
-                  auto
-                >
-                  <span class="icon-[pixelarticons--trash] mr-2" />
-                  Clear All Players
-                </AppButton>
-              </div>
+        <!--
+          Not sortable: the lobby rebuilds this order on every visit, newest
+          first, from autodarts' own list and this one.
+        -->
+        <LibrarySection
+          :entries="entries"
+          :sortable="false"
+          empty-icon="icon-[material-symbols--group-outline-rounded]"
+          empty-text="Every local player you add to a lobby is saved here, and offered in a strip under the lobby's player list."
+          empty-title="No saved players yet"
+          no-match-text="No saved player has that in their name."
+          search-placeholder="Search players"
+          title="Saved players"
+        >
+          <template #actions>
+            <AppMenu :items="moreActions">
+              <template #trigger="{ open, toggle }">
+                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                  <span class="icon-[material-symbols--more-horiz]" />
+                </button>
+              </template>
+            </AppMenu>
+          </template>
 
-              <div v-else-if="config.recentLocalPlayers.enabled" class="mt-4 italic text-white/50">
-                No players stored yet. Players will be added automatically when you add them in the lobby.
-              </div>
-            </div>
-          </div>
-        </div>
+          <template #default="{ entries: shown, query }">
+            <LibraryItem
+              @delete="removePlayer(entry.index)"
+              v-for="entry in shown"
+              :key="entry.name"
+              :data-index="entry.index"
+              :query="query"
+              :title="entry.name"
+              plain
+            >
+              <template #lead>
+                <span class="icon-[material-symbols--person-outline-rounded] block text-lg text-[var(--ad-text-muted)]" />
+              </template>
+            </LibraryItem>
+          </template>
+        </LibrarySection>
       </div>
     </div>
+
+    <!-- Delete all -->
+    <AppModal @close="showDeleteAll = false" :show="showDeleteAll" :title="`Delete all ${config?.recentLocalPlayers.players.length ?? 0} saved players?`" ghost-close size="sm">
+      <p class="text-sm text-[var(--ad-text-muted)]">
+        They go from the lobby's strip and from autodarts' own Add Player list. This can't be undone.
+      </p>
+      <template #footer>
+        <AppButton @click="showDeleteAll = false" auto>
+          Cancel
+        </AppButton>
+        <AppButton @click="deleteAllPlayers" auto type="danger">
+          Delete all
+        </AppButton>
+      </template>
+    </AppModal>
   </template>
 
   <template v-else>
@@ -97,26 +114,55 @@
 </template>
 
 <script setup lang="ts">
-import AppToggle from "../AppToggle.vue";
-import AppInput from "../AppInput.vue";
 import AppButton from "../AppButton.vue";
+import AppMenu from "../AppMenu.vue";
+import AppModal from "../AppModal.vue";
+import AppNumberInput from "../AppNumberInput.vue";
+import AppToggle from "../AppToggle.vue";
+
+import LibraryItem from "./Library/LibraryItem.vue";
+import LibrarySection from "./Library/LibrarySection.vue";
+import OptionRow from "./Library/OptionRow.vue";
+
+import type { LibraryEntry } from "@/utils/library-search";
+
+import { forgetGuestPlayers } from "@/utils/guest-players";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/recent-local-players.png");
 
-// Function to remove a player from the list
+const showDeleteAll = ref(false);
+
+/** Names only: nothing to trigger, switch or edit, so the library searches the name. */
+const entries = computed<LibraryEntry[]>(() => (config.value?.recentLocalPlayers.players ?? [])
+  .map((name, index) => ({ index, name, triggers: [], source: "", enabled: true })));
+
+const moreActions = computed(() => [
+  {
+    label: "Delete all…",
+    icon: "icon-[material-symbols--delete-outline-rounded]",
+    danger: true,
+    disabled: !config.value?.recentLocalPlayers.players.length,
+    action: () => {
+      showDeleteAll.value = true;
+    },
+  },
+]);
+
+/** From both lists, or the lobby's next sync brings the name back; see utils/guest-players.ts. */
 function removePlayer(index: number) {
-  if (config.value && config.value.recentLocalPlayers.players) {
-    config.value.recentLocalPlayers.players.splice(index, 1);
-  }
+  const players = config.value?.recentLocalPlayers.players;
+  if (!players?.[index]) return;
+  forgetGuestPlayers([ players[index] ]);
+  players.splice(index, 1);
 }
 
-// Function to clear all players
-function clearAllPlayers() {
-  if (config.value) {
-    config.value.recentLocalPlayers.players = [];
-  }
+function deleteAllPlayers() {
+  if (!config.value) return;
+  forgetGuestPlayers(config.value.recentLocalPlayers.players);
+  config.value.recentLocalPlayers.players = [];
+  showDeleteAll.value = false;
 }
 
 async function toggleFeature() {

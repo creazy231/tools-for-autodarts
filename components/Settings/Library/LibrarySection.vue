@@ -50,14 +50,14 @@
         Nothing matches
       </p>
       <p class="mt-1 max-w-md text-sm text-[var(--ad-text-muted)]">
-        No item has that in its name, triggers or source.
+        {{ noMatchText }}
       </p>
       <AppButton @click="reset" auto class="mt-6" size="sm">
         Clear the search
       </AppButton>
     </div>
 
-    <p v-else-if="filtering && shown.length > 1" class="mt-4 text-center text-xs text-[var(--ad-text-muted)]">
+    <p v-else-if="sortable && filtering && shown.length > 1" class="mt-4 text-center text-xs text-[var(--ad-text-muted)]">
       {{ dragHint }}
     </p>
   </section>
@@ -92,11 +92,17 @@ const props = withDefaults(defineProps<{
   /** Layout of the list: rows by default, a grid for pictures. */
   listClass?: string;
   categoryLabels?: Partial<Record<TriggerCategory, string>>;
+  /** Whether items can be dragged into a new order. Not for a list kept in an order of its own, such as the saved players. */
+  sortable?: boolean;
+  /** Said when a search finds nothing. */
+  noMatchText?: string;
 }>(), {
   emptyIcon: "icon-[material-symbols--library-music-outline-rounded]",
   searchPlaceholder: "Search by name or trigger",
   listClass: "",
   categoryLabels: () => ({}),
+  sortable: true,
+  noMatchText: "No item has that in its name, triggers or source.",
 });
 
 const emit = defineEmits<{ reorder: [ from: number, to: number ] }>();
@@ -104,7 +110,7 @@ const emit = defineEmits<{ reorder: [ from: number, to: number ] }>();
 const query = ref("");
 const filter = ref<LibraryFilter>("all");
 const list = ref<HTMLElement>();
-let sortable: Sortable | undefined;
+let sorter: Sortable | undefined;
 
 const matching = computed(() => searchLibrary(props.entries, query.value));
 const shown = computed(() => matching.value.filter(entry => matchesFilter(entry, filter.value)));
@@ -131,8 +137,8 @@ const pills = computed(() => {
 });
 
 onMounted(() => {
-  if (!list.value) return;
-  sortable = Sortable.create(list.value, {
+  if (!list.value || !props.sortable) return;
+  sorter = Sortable.create(list.value, {
     animation: 150,
     handle: ".adt-drag-handle",
     draggable: "[data-index]",
@@ -149,7 +155,7 @@ onMounted(() => {
 });
 
 watch(filtering, (value) => {
-  sortable?.option("disabled", value);
+  sorter?.option("disabled", value);
 });
 
 // A pill whose last item has gone (the last one off switched back on) goes back
@@ -158,7 +164,7 @@ watch(present, (value) => {
   filter.value = keptFilter(filter.value, value);
 });
 
-onBeforeUnmount(() => sortable?.destroy());
+onBeforeUnmount(() => sorter?.destroy());
 
 function reset() {
   query.value = "";

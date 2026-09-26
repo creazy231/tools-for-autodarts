@@ -1,162 +1,91 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure the zoom feature for dart throws.</p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          A close-up of where each dart of the visit landed, one tile per dart: along the foot of the screen, under the throw
+          display, or on the board itself.
+        </p>
 
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Position
-              </h4>
-              <div class="flex">
-                <AppRadioGroup
-                  v-model="config.zoom.position"
-                  class="grid max-w-sm grid-cols-3"
-                  :options="[
-                    { label: 'Bottom', value: 'bottom' },
-                    { label: 'Top', value: 'top' },
-                    { label: 'On Board', value: 'board' },
-                  ]"
-                />
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                <em>Bottom</em> gives each dart a third of the window along the foot of the screen, and
-                moves autodarts' undo and next buttons up to the free space in the top right — drag
-                that bar anywhere you like and it stays there. <em>Top</em> keeps them where they are
-                and puts the strip under the throw display instead, as wide as it is. <em>On Board</em>
-                adds nothing to the screen at all — autodarts' own board zooms in on each dart as it
-                lands, and pulls back out again.
-              </p>
-              <div v-if="config.zoom.position === 'bottom' && config.zoom.actionBarPosition" class="mt-3">
-                <AppButton @click="resetActionBarPosition" size="sm" auto>
-                  Reset bar position
-                </AppButton>
-                <p class="mt-1 text-sm text-white/60">
-                  Puts autodarts' undo and next buttons back in the top right corner.
-                </p>
-              </div>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Close-ups
+          </h3>
+          <OptionRow title="Position">
+            <template #description>
+              Bottom gives each dart a third of the window and moves undo and Next to the top right, where you can drag
+              them anywhere. Top puts the strip under the throw display. On board zooms autodarts' own board in on each
+              dart instead, and adds nothing to the screen.
+            </template>
+            <AppRadioGroup v-model="config.zoom.position" :options="POSITIONS" aria-label="Position" button-size="sm" />
+          </OptionRow>
+          <OptionRow
+            v-if="config.zoom.position === 'bottom' && config.zoom.actionBarPosition"
+            description="Puts autodarts' undo and Next back in the top right corner."
+            title="Bar position"
+          >
+            <AppButton @click="resetActionBarPosition" auto size="sm">
+              Reset bar position
+            </AppButton>
+          </OptionRow>
+          <OptionRow
+            v-if="config.zoom.position === 'board'"
+            description="How long the board stays on a dart. It pulls back out as soon as the visit ends or passes on."
+            title="Hold for"
+          >
+            <AppNumberInput
+              v-model="holdSeconds"
+              :max="10"
+              :min="0.2"
+              :step="0.1"
+              label="Hold for"
+              unit="s"
+            />
+          </OptionRow>
+          <OptionRow description="How closely each tile zooms in on its dart." title="Zoom level">
+            <div class="flex w-full items-center gap-3 sm:w-64">
+              <AppSlider
+                v-model="zoomLevel"
+                :autofocus="false"
+                :max="6"
+                :min="1"
+                :show-value="false"
+                :step="0.1"
+                class="flex-1"
+              />
+              <span class="w-11 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ formatZoomLabel(zoomLevel) }}</span>
             </div>
+          </OptionRow>
+          <OptionRow description="A dot on the exact point each dart landed." title="Centre dot">
+            <AppToggle v-model="config.zoom.showMarker" aria-label="Centre dot" size="sm" />
+          </OptionRow>
+        </section>
 
-            <div v-if="config.zoom.position === 'board'" class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Hold For
-              </h4>
-              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-                <AppInput
-                  @update:model-value="config.zoom.resetAfterMs = Number($event)"
-                  :model-value="String(config.zoom.resetAfterMs ?? 1000)"
-                  placeholder="1000"
-                  type="number"
-                  size="sm"
-                  input-class="w-full"
-                />
-                <p>Milliseconds the board stays zoomed on a dart before pulling back out — 1000 is
-                  one second. It also pulls back out as soon as the visit ends or passes to another
-                  player.</p>
-              </div>
-            </div>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Which darts
+          </h3>
+          <OptionRow description="Everyone's darts, or only your opponents'." title="Show darts of">
+            <AppRadioGroup v-model="config.zoom.zoomOn" :options="ZOOM_ON" aria-label="Show darts of" button-size="sm" />
+          </OptionRow>
+          <OptionRow description="Close-ups only on visits where a checkout is on." title="Only on a checkout">
+            <AppToggle v-model="config.zoom.onlyOnCheckout" aria-label="Only on a checkout" size="sm" />
+          </OptionRow>
+        </section>
 
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                View Mode
-              </h4>
-              <div class="flex">
-                <AppRadioGroup
-                  v-model="config.zoom.mode"
-                  class="grid max-w-md grid-cols-4"
-                  :options="[
-                    { label: 'Camera 1', value: 'camera-1' },
-                    { label: 'Camera 2', value: 'camera-2' },
-                    { label: 'Camera 3', value: 'camera-3' },
-                    { label: 'Board', value: 'image' },
-                  ]"
-                />
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                What autodarts' board shows while a game is on, and so where the close-ups come
-                from: a camera's tiles are that camera's own picture, the drawn board's are a copy
-                of the board. The board is put on your choice when a game starts, and put back
-                whenever the site changes it on its own. Switch <em>Board Skins</em> or
-                <em>Board View</em> on and that feature decides instead — it is the one in charge,
-                and this stops touching it.
-              </p>
-            </div>
-
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Zoom On
-              </h4>
-              <div class="flex">
-                <AppRadioGroup
-                  v-model="config.zoom.zoomOn"
-                  class="grid max-w-sm grid-cols-2"
-                  :options="[
-                    { label: 'Everyone', value: 'everyone' },
-                    { label: 'Opponents', value: 'opponents' },
-                  ]"
-                />
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                Control which throws to display in the zoom view.
-              </p>
-            </div>
-
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Center Dot Marker
-              </h4>
-              <div class="flex items-center">
-                <AppToggle
-                  v-model="config.zoom.showMarker"
-                />
-                <span class="ml-2">Show center dot marker</span>
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                Toggle visibility of the center dot marker that indicates dart position.
-              </p>
-            </div>
-
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Checkout Only
-              </h4>
-              <div class="flex items-center">
-                <AppToggle
-                  v-model="config.zoom.onlyOnCheckout"
-                />
-                <span class="ml-2">Show zoom only when checkout is available</span>
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                When enabled, the zoom view will only appear when a checkout is possible.
-              </p>
-            </div>
-
-            <div class="mt-6">
-              <h4 class="mb-2 font-semibold">
-                Zoom Level
-              </h4>
-              <div class="max-w-sm">
-                <AppSlider
-                  v-model="zoomLevel"
-                  :min="1"
-                  :max="6"
-                  :step="0.1"
-                  :show-labels="true"
-                  :format-label="formatZoomLabel"
-                />
-              </div>
-              <p class="mt-1 text-sm text-white/60">
-                Adjust the zoom level of the dart throw images.
-              </p>
-            </div>
-          </div>
-        </div>
+        <section>
+          <h3 class="adt-section-title">
+            Board
+          </h3>
+          <OptionRow title="View">
+            <template #description>
+              What autodarts' board shows during a game, and so what the close-ups are cut from: a camera's own picture,
+              or a sharp copy of the drawn board. While Board Skins or Board View is on, that feature decides.
+            </template>
+            <AppRadioGroup v-model="config.zoom.mode" :options="VIEWS" aria-label="Board view" button-size="sm" class-name="is-grid" />
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -194,14 +123,41 @@
 
 <script setup lang="ts">
 import AppButton from "../AppButton.vue";
+import AppNumberInput from "../AppNumberInput.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSlider from "../AppSlider.vue";
 import AppToggle from "../AppToggle.vue";
-import AppInput from "../AppInput.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+
+const POSITIONS = [
+  { label: "Bottom", value: "bottom" },
+  { label: "Top", value: "top" },
+  { label: "On board", value: "board" },
+];
+const ZOOM_ON = [
+  { label: "Everyone", value: "everyone" },
+  { label: "Opponents", value: "opponents" },
+];
+const VIEWS = [
+  { label: "Camera 1", value: "camera-1" },
+  { label: "Camera 2", value: "camera-2" },
+  { label: "Camera 3", value: "camera-3" },
+  { label: "Board", value: "image" },
+];
+
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/zoom.png");
+
+/** Stored in milliseconds; shown in seconds, as every other time in the settings. */
+const holdSeconds = computed({
+  get: () => (config.value?.zoom.resetAfterMs ?? 1000) / 1000,
+  set: (seconds: number) => {
+    if (config.value) config.value.zoom.resetAfterMs = Math.round(seconds * 1000);
+  },
+});
 
 // Computed property for zoom level with mapping between 1-6 and the actual zoom value
 const zoomLevel = computed({

@@ -1,31 +1,27 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure how long to wait before automatically starting the next leg after a takeout.</p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Starts the next leg once the darts are out of the board, after a countdown on the site's own Next Leg button.
+        </p>
 
-            <div class="mt-4 space-y-4">
-              <!-- Seconds Input -->
-              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-                <AppInput
-                  @update:model-value="config.automaticNextLeg.sec = Number($event)"
-                  :model-value="String(config.automaticNextLeg.sec)"
-                  placeholder="5"
-                  type="number"
-                  size="sm"
-                  input-class="w-full"
-                />
-                <p>Seconds to wait before automatically starting the next leg</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <section>
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <!-- At least a second: a countdown of 0 is never started (button-countdown.ts), which would switch this off. -->
+          <OptionRow description="From the end of the takeout to the next leg." title="Countdown">
+            <AppNumberInput
+              v-model="config.automaticNextLeg.sec"
+              :max="120"
+              :min="1"
+              label="Countdown"
+              unit="s"
+            />
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -63,8 +59,10 @@
 </template>
 
 <script setup lang="ts">
+import AppNumberInput from "../AppNumberInput.vue";
 import AppToggle from "../AppToggle.vue";
-import AppInput from "../AppInput.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();

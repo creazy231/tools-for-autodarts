@@ -2,8 +2,10 @@
   <div>
     <label v-if="label" :for="id" class="adt-field-label">{{ label }}</label>
     <div class="relative">
+      <!-- Everything but the class reaches the field, an aria-label included; `size` stays behind, as in AppInput. -->
       <select
         @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        v-bind="_.omit($attrs, 'class', 'size')"
         :id="id"
         :class="twMerge(
           // Design system › Forms › TextField, as a select.
@@ -30,6 +32,7 @@
 
 <script setup lang="ts">
 import { twMerge } from "tailwind-merge";
+import _ from "lodash";
 
 defineOptions({
   inheritAttrs: false,

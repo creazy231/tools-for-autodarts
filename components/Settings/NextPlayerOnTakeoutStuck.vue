@@ -1,31 +1,26 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure how long to wait before automatically switching to the next player when takeout is stuck.</p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Presses Next for you when a takeout never finishes. A countdown starts on the site's own Next button as soon as the takeout does, and a click anywhere calls it off.
+        </p>
 
-            <div class="mt-4 space-y-4">
-              <!-- Seconds Input -->
-              <div class="grid grid-cols-[5rem_auto] items-center gap-4">
-                <AppInput
-                  @update:model-value="config.nextPlayerOnTakeOutStuck.sec = Number($event)"
-                  :model-value="String(config.nextPlayerOnTakeOutStuck.sec)"
-                  placeholder="5"
-                  type="number"
-                  size="sm"
-                  input-class="w-full"
-                />
-                <p>Seconds to wait before automatically switching to the next player</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <section>
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow description="From the start of the takeout to the press, unless the board comes back first." title="Countdown">
+            <AppNumberInput
+              v-model="config.nextPlayerOnTakeOutStuck.sec"
+              :max="120"
+              :min="1"
+              label="Countdown"
+              unit="s"
+            />
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -63,8 +58,10 @@
 </template>
 
 <script setup lang="ts">
+import AppNumberInput from "../AppNumberInput.vue";
 import AppToggle from "../AppToggle.vue";
-import AppInput from "../AppInput.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
 const { config } = useConfig();

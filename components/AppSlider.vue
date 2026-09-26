@@ -51,6 +51,12 @@ const props = withDefaults(defineProps<{
   showLabels?: boolean;
   showValue?: boolean;
   formatLabel?: (value: number) => string;
+  /**
+   * Take focus when mounted, as the TTS editor's sliders always have. A
+   * settings row turns it off: in a dialog that scrolls, the focus scrolled it
+   * down to the slider as it opened.
+   */
+  autofocus?: boolean;
 }>(), {
   min: 0,
   max: 100,
@@ -58,6 +64,7 @@ const props = withDefaults(defineProps<{
   showLabels: false,
   showValue: true,
   formatLabel: (value: number) => value.toString(),
+  autofocus: true,
 });
 
 const emit = defineEmits([ "update:modelValue" ]);
@@ -165,7 +172,7 @@ function handleKeyDown(e: KeyboardEvent) {
 }
 
 onMounted(() => {
-  if (thumb.value) {
+  if (props.autofocus && thumb.value) {
     thumb.value.focus();
   }
 });

@@ -26,9 +26,7 @@ import RecentLocalPlayersStrip from "./RecentLocalPlayers.vue";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { fetchWithAuth, getUserIdFromToken } from "@/utils/helpers";
-
-/** Where the rebuilt site keeps its own (capped) list. */
-const GUEST_KEY = "autodarts-guest-players";
+import { GUEST_KEY } from "@/utils/guest-players";
 
 /**
  * Where the site keeps the board picked for autoscoring: its id, or `manual`

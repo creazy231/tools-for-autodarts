@@ -1,193 +1,173 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>
-              Point a webcam at your board and the last few seconds are replayed over the screen
-              whenever a leg is won. Click the replay to dismiss it early.
-            </p>
-            <p class="text-sm text-white/60">
-              The camera records for as long as you are in a match, and nothing ever leaves your
-              computer. This is your own webcam, not the board's camera — the browser cannot reach
-              that one.
-            </p>
+    <!-- Visible overflow so the preview can stick; see Colors.vue. -->
+    <div v-if="config" class="adt-container !overflow-visible">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="max-w-3xl">
+          Point a webcam at your board, and the last seconds before the winning dart are played back over the screen
+          whenever a leg is won. A click on the replay puts it away early.
+        </p>
+        <p class="mb-6 mt-2 max-w-3xl text-sm text-[var(--ad-text-muted)]">
+          It records only while you are in a match, and nothing leaves your computer. This is your own webcam, not the
+          board's camera, which the browser cannot reach.
+        </p>
 
-            <div v-if="!hasCameraPermission && !cameraError">
-              <p class="mb-2">
-                Camera access is required for this feature.
-              </p>
-              <AppButton @click="requestCameraAccess" class="mb-4">
-                <span class="icon-[pixelarticons--camera] mr-2" />
-                <span>Allow Camera Access</span>
-              </AppButton>
+        <AppAlert v-if="cameraError" class="mb-6" :title="hasCameraPermission ? 'Camera unavailable' : 'No camera access'" variant="error">
+          {{ cameraError }}
+          <template #action>
+            <!-- With access already given, only the cameras need looking at again, not the permission. -->
+            <AppButton @click="hasCameraPermission ? loadCameraDevices() : requestCameraAccess()" auto size="sm">
+              Try again
+            </AppButton>
+          </template>
+        </AppAlert>
+
+        <!-- While the browser asks. Not while an earlier grant lets it answer by itself, which only takes a moment. -->
+        <div
+          v-if="!hasCameraPermission && !cameraError && !answeringItself"
+          class="flex flex-col items-center rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)] px-6 py-12 text-center"
+        >
+          <span class="icon-[material-symbols--videocam-outline-rounded] mb-4 text-5xl text-white/25" />
+          <p class="text-lg font-bold text-white">
+            Camera access needed
+          </p>
+          <p class="mt-1 max-w-md text-sm text-[var(--ad-text-muted)]">
+            The replay is recorded from your webcam, so the browser asks you first. Allow it in the prompt, or ask again.
+          </p>
+          <AppButton @click="requestCameraAccess" auto class="mt-6" type="primary">
+            Allow camera access
+          </AppButton>
+        </div>
+
+        <!-- The preview beside the options where there is room, kept in view while they scroll; above them on a phone. -->
+        <div v-if="hasCameraPermission" class="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] lg:items-start lg:gap-8">
+          <div class="mb-8 lg:sticky lg:top-0 lg:order-2 lg:mb-0">
+            <h3 class="adt-section-title mb-3">
+              Preview
+            </h3>
+            <div class="relative overflow-hidden rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)]">
+              <video
+                ref="videoPreview"
+                class="aspect-video w-full object-cover"
+                autoplay
+                muted
+                playsinline
+                :style="{ transform: `scale(${zoomLevel}) translate(${positionX}%, ${positionY}%)` }"
+              />
+              <span v-if="currentFps && cameraDevices.length" class="adt-chip absolute bottom-2 right-2 !bg-black/70 !text-white">{{ currentFps }} FPS</span>
+              <div v-if="!cameraDevices.length" class="absolute inset-0 flex flex-col items-center justify-center text-sm text-[var(--ad-text-muted)]">
+                <span class="icon-[material-symbols--videocam-off-outline-rounded] mb-2 text-4xl text-white/25" />
+                No camera to show
+              </div>
             </div>
+          </div>
 
-            <div v-if="cameraError" class="mb-4 rounded border border-red-500 bg-red-500/10 p-3 text-sm text-red-300">
-              <p>{{ cameraError }}</p>
-            </div>
-
-            <div v-if="hasCameraPermission" class="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <!-- Left side: Settings -->
-              <div class="space-y-4">
-                <div>
-                  <div class="mb-1 flex items-center justify-between">
-                    <label class="text-sm font-medium">Select Camera</label>
-                    <AppButton
-                      @click="loadCameraDevices"
-                      auto
-                      size="sm"
-                      variant="ghost"
-                      class="text-xs"
-                      :disabled="isLoadingDevices"
-                    >
-                      <span
-                        class="mr-1"
-                        :class="isLoadingDevices ? 'icon-[eos-icons--loading] animate-spin' : 'icon-[material-symbols--refresh]'"
-                      />
-                      {{ isLoadingDevices ? 'Checking...' : 'Refresh' }}
-                    </AppButton>
-                  </div>
-                  <AppSelect
-                    v-model="selectedDeviceId"
-                    class="w-full"
-                    :options="cameraOptions"
-                    :disabled="!cameraDevices.length"
-                  />
-                  <p v-if="!cameraDevices.length && hasCameraPermission" class="mt-1 text-xs text-white/60">
-                    No available cameras found. They may be in use by other applications.
-                  </p>
-                  <p v-else-if="cameraDevices.length && hasCameraPermission" class="mt-1 text-xs text-white/60">
-                    Only showing cameras not currently in use by other applications.
-                  </p>
-                </div>
-
-                <div class="relative w-36">
-                  <AppInput
-                    @update:model-value="config.instantReplay.duration = Math.min(Math.max(Number($event), 5), 30)"
-                    :model-value="String(config.instantReplay.duration)"
-                    type="number"
-                    label="Duration (seconds)"
-                    min="5"
-                    max="30"
-                    class="w-full"
-                    size="sm"
-                  />
-                </div>
-                <p class="text-sm text-white/60">
-                  How many seconds leading up to the winning dart to play back (5-30 seconds).
-                  A little more may be shown, never less.
-                </p>
-
-                <div class="relative w-36">
-                  <AppInput
-                    @update:model-value="config.instantReplay.startDelay = Math.min(Math.max(Number($event), 0), 10)"
-                    :model-value="String(config.instantReplay.startDelay)"
-                    type="number"
-                    label="Start delay (seconds)"
-                    min="0"
-                    max="10"
-                    class="w-full"
-                    size="sm"
-                  />
-                </div>
-                <p class="text-sm text-white/60">
-                  How long to wait after the leg is won before the replay appears (0-10 seconds),
-                  leaving room for the site's own celebration.
-                </p>
-
-                <div>
-                  <label class="mb-1 block text-sm font-medium">View Mode</label>
-                  <AppSelect
-                    v-model="viewMode"
-                    :options="[
-                      { value: 'full-page', label: 'Full Page' },
-                      { value: 'board-only', label: 'Board Only' },
-                    ]"
-                    class="w-full"
-                  />
-                </div>
-                <p class="text-sm text-white/60">
-                  Control how the replay is displayed. Full Page covers the entire screen, Board Only shows just over the dartboard.
-                </p>
-
-                <div>
-                  <label class="mb-1 block text-sm font-medium">Camera Zoom</label>
-                  <div class="flex items-center space-x-4">
-                    <span class="text-sm">1x</span>
-                    <AppSlider
-                      v-model="zoomLevel"
-                      :min="1"
-                      :max="5"
-                      :step="0.1"
-                      class="w-full"
+          <div>
+            <section class="mb-10">
+              <h3 class="adt-section-title">
+                Camera
+              </h3>
+              <OptionRow :description="cameraHint" title="Camera">
+                <div class="flex items-center gap-1">
+                  <!-- The width on a wrapper: .adt-input's own 100% comes after the utilities and beats one on the field. -->
+                  <div class="w-56">
+                    <AppSelect
+                      v-model="selectedDeviceId"
+                      :disabled="!cameraDevices.length"
+                      :options="cameraOptions"
+                      aria-label="Camera"
                     />
-                    <span class="text-sm">5x</span>
                   </div>
-                  <p class="mt-1 text-sm text-white/60">
-                    Zoom level: {{ zoomLevel.toFixed(1) }}x
-                  </p>
+                  <button
+                    @click="loadCameraDevices"
+                    :aria-busy="isLoadingDevices"
+                    :aria-label="isLoadingDevices ? 'Looking for cameras' : 'Look for cameras again'"
+                    :disabled="isLoadingDevices"
+                    class="adt-icon-btn"
+                    :title="isLoadingDevices ? 'Looking…' : 'Look again'"
+                    type="button"
+                  >
+                    <span :class="isLoadingDevices ? 'icon-[material-symbols--progress-activity] animate-spin' : 'icon-[material-symbols--refresh-rounded]'" />
+                  </button>
                 </div>
+              </OptionRow>
+            </section>
 
-                <div v-if="zoomLevel > 1" class="space-y-3">
-                  <div>
-                    <label class="mb-1 block text-sm font-medium">Position X</label>
-                    <div class="flex items-center space-x-4">
-                      <span class="text-sm">Left</span>
-                      <AppSlider
-                        v-model="positionX"
-                        :min="-100"
-                        :max="100"
-                        :step="1"
-                        class="w-full"
-                      />
-                      <span class="text-sm">Right</span>
-                    </div>
-                  </div>
+            <section class="mb-10">
+              <h3 class="adt-section-title">
+                Replay
+              </h3>
+              <OptionRow description="Before the winning dart. A little more may show, never less." title="Duration">
+                <AppNumberInput
+                  v-model="config.instantReplay.duration"
+                  :max="30"
+                  :min="5"
+                  label="Duration"
+                  unit="s"
+                />
+              </OptionRow>
+              <OptionRow description="From the won leg to the replay, leaving room for autodarts' own celebration." title="Start delay">
+                <AppNumberInput
+                  v-model="config.instantReplay.startDelay"
+                  :max="10"
+                  :min="0"
+                  label="Start delay"
+                  unit="s"
+                />
+              </OptionRow>
+              <OptionRow description="Just the board, or the whole page." title="Covers">
+                <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" aria-label="Covers" button-size="sm" />
+              </OptionRow>
+            </section>
 
-                  <div>
-                    <label class="mb-1 block text-sm font-medium">Position Y</label>
-                    <div class="flex items-center space-x-4">
-                      <span class="text-sm">Up</span>
-                      <AppSlider
-                        v-model="positionY"
-                        :min="-100"
-                        :max="100"
-                        :step="1"
-                        class="w-full"
-                      />
-                      <span class="text-sm">Down</span>
-                    </div>
-                  </div>
-                  <p class="mt-1 text-sm text-white/60">
-                    Position the camera view when zoomed in.
-                  </p>
-                </div>
-              </div>
-
-              <!-- Right side: Camera Preview -->
-              <div>
-                <label class="mb-1 block text-sm font-medium">Camera Preview</label>
-                <div class="relative w-full overflow-hidden rounded bg-black/40 shadow-inner">
-                  <video
-                    ref="videoPreview"
-                    class="aspect-video w-full rounded object-cover"
-                    autoplay
-                    muted
-                    playsinline
-                    :style="{ transform: `scale(${zoomLevel}) translate(${positionX}%, ${positionY}%)` }"
+            <section>
+              <h3 class="adt-section-title">
+                Framing
+              </h3>
+              <OptionRow description="How far the picture zooms in on the board." title="Zoom">
+                <div class="flex w-full items-center gap-3 sm:w-64">
+                  <AppSlider
+                    v-model="zoomLevel"
+                    :autofocus="false"
+                    :max="5"
+                    :min="1"
+                    :show-value="false"
+                    :step="0.1"
+                    class="flex-1"
                   />
-                  <div v-if="currentFps" class="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-1 text-xs text-white">
-                    {{ currentFps }} FPS
-                  </div>
+                  <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ zoomLevel.toFixed(1) }}×</span>
                 </div>
-              </div>
-            </div>
+              </OptionRow>
+              <template v-if="zoomLevel > 1">
+                <OptionRow description="Where the zoomed picture sits, side to side." title="Left and right">
+                  <div class="flex w-full items-center gap-3 sm:w-64">
+                    <AppSlider
+                      v-model="positionX"
+                      :autofocus="false"
+                      :max="100"
+                      :min="-100"
+                      :show-value="false"
+                      class="flex-1"
+                    />
+                    <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ panLabel(positionX, "left", "right") }}</span>
+                  </div>
+                </OptionRow>
+                <OptionRow description="And top to bottom." title="Up and down">
+                  <div class="flex w-full items-center gap-3 sm:w-64">
+                    <AppSlider
+                      v-model="positionY"
+                      :autofocus="false"
+                      :max="100"
+                      :min="-100"
+                      :show-value="false"
+                      class="flex-1"
+                    />
+                    <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ panLabel(positionY, "up", "down") }}</span>
+                  </div>
+                </OptionRow>
+              </template>
+            </section>
           </div>
         </div>
       </div>
@@ -224,23 +204,43 @@
 </template>
 
 <script setup lang="ts">
-import AppInput from "../AppInput.vue";
-import AppToggle from "../AppToggle.vue";
+import AppAlert from "../AppAlert.vue";
 import AppButton from "../AppButton.vue";
+import AppNumberInput from "../AppNumberInput.vue";
+import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSelect from "../AppSelect.vue";
 import AppSlider from "../AppSlider.vue";
+import AppToggle from "../AppToggle.vue";
+
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+
+const VIEW_MODES = [
+  { label: "Board only", value: "board-only" },
+  { label: "Full page", value: "full-page" },
+];
+
 const { config } = useConfig();
 const videoPreview = ref<HTMLVideoElement | null>(null);
 const mediaStream = ref<MediaStream | null>(null);
 const hasCameraPermission = ref(false);
 const cameraError = ref<string | null>(null);
+/**
+ * Holds the "Camera access needed" block back while the browser can answer by
+ * itself, access having been given before. True from the first render until
+ * the check says otherwise, so the block does not flash in and out.
+ */
+const answeringItself = ref(true);
 const cameraDevices = ref<MediaDeviceInfo[]>([]);
 const isLoadingDevices = ref(false);
 const currentFps = ref<number | null>(null);
 
 // Computed properties
+const cameraHint = computed(() => (cameraDevices.value.length
+  ? "Only cameras no other app is using are listed."
+  : "No free camera found. Another app may be using it: close that, then look again."));
+
 const cameraOptions = computed(() => {
   return cameraDevices.value.map(device => ({
     label: device.label || `Camera ${device.deviceId.substring(0, 5)}...`,
@@ -316,12 +316,23 @@ onUnmounted(() => {
   }
 });
 
+/** Whether camera access was given before. False where the browser cannot say, as older Firefox cannot. */
+async function cameraGranted(): Promise<boolean> {
+  try {
+    const status = await navigator.permissions.query({ name: "camera" as PermissionName });
+    return status.state === "granted";
+  } catch {
+    return false;
+  }
+}
+
 async function checkCameraPermission() {
   if (!isCameraSupported.value) {
     cameraError.value = "Your browser does not support camera access.";
     return;
   }
 
+  answeringItself.value = await cameraGranted();
   try {
     // Standard approach for all browsers
     await navigator.mediaDevices.getUserMedia({ video: true })
@@ -337,6 +348,8 @@ async function checkCameraPermission() {
       });
   } catch (error) {
     console.error("Error checking camera permission:", error);
+  } finally {
+    answeringItself.value = false;
   }
 }
 
@@ -499,6 +512,12 @@ function measureFpsManually() {
   };
 
   requestAnimationFrame(measureFrame);
+}
+
+/** Where a pan slider stands, in words: "Centre", "40% left". */
+function panLabel(value: number, negative: string, positive: string): string {
+  if (value === 0) return "Centre";
+  return `${Math.abs(value)}% ${value < 0 ? negative : positive}`;
 }
 
 async function toggleFeature() {

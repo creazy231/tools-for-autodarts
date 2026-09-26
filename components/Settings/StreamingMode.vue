@@ -1,179 +1,106 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div
-      v-if="config"
-      class="adt-container min-h-56"
-    >
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>Configure the streaming mode settings for your broadcasts.</p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Replaces the match screen with a broadcast overlay: a chroma key or image background, the board, and a scoreboard you
+          place where you want it. Switch it on and off from the stream icon in the match header; changes here show at once.
+        </p>
 
-            <div class="mt-4 space-y-4">
-              <!-- Which of the two scoreboards the overlay draws -->
-              <h4 class="font-semibold">
-                Design
-              </h4>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Scoreboard
+          </h3>
+          <OptionRow description="Autodarts follows the site's own design: flat surfaces, and one blue for whoever is throwing." title="Design">
+            <AppRadioGroup v-model="config.streamingMode.design" :options="DESIGNS" aria-label="Design" button-size="sm" />
+          </OptionRow>
+          <OptionRow description="The darts of the visit in progress and its total, or Bust." title="Throws">
+            <AppToggle v-model="config.streamingMode.throws" aria-label="Throws" size="sm" />
+          </OptionRow>
+          <OptionRow description="The route left for the player at the oche, moved along as each dart lands." title="Checkout suggestions">
+            <AppToggle v-model="config.streamingMode.checkout" aria-label="Checkout suggestions" size="sm" />
+          </OptionRow>
+          <OptionRow description="The leg, set and match average beside each name." title="Averages">
+            <AppToggle v-model="config.streamingMode.avg" aria-label="Averages" size="sm" />
+          </OptionRow>
+          <OptionRow description="Your own line along the bottom of the overlay." stacked title="Footer text">
+            <AppInput
+              id="streaming-footer"
+              v-model="config.streamingMode.footerText"
+              aria-label="Footer text"
+              placeholder="Game provided by Autodarts.com"
+            />
+          </OptionRow>
+        </section>
 
-              <div class="flex">
-                <AppRadioGroup
-                  v-model="config.streamingMode.design"
-                  :options="[
-                    { label: 'Classic', value: 'classic' },
-                    { label: 'Autodarts', value: 'v2' },
-                  ]"
-                />
-              </div>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Board
+          </h3>
+          <OptionRow description="The dartboard beside the scoreboard." title="Show the board">
+            <AppToggle v-model="config.streamingMode.board" aria-label="Show the board" size="sm" />
+          </OptionRow>
+          <OptionRow
+            v-if="config.streamingMode.board"
+            description="The drawn board is a live copy that stays sharp at any size, and stands in while no camera runs. With Board Skins or Board View on, that feature decides."
+            title="View"
+          >
+            <AppRadioGroup v-model="config.streamingMode.boardImage" :options="BOARD_VIEWS" aria-label="Board view" button-size="sm" />
+          </OptionRow>
+        </section>
 
-              <p class="text-sm text-white/50">
-                Autodarts follows the site's own design — flat surfaces, one blue for whoever is
-                throwing. Switching takes effect straight away, so you can compare both mid-match.
-              </p>
-
-              <!-- Background Mode Selection -->
-              <h4 class="font-semibold">
-                Background Type
-              </h4>
-
-              <div class="flex">
-                <AppRadioGroup
-                  v-model="backgroundMode"
-                  :options="[
-                    { label: 'Image Background', value: true },
-                    { label: 'Chroma Key Color', value: false },
-                  ]"
-                />
-              </div>
-
-              <!-- Chroma Key Color Selection (when in chroma key mode) -->
-              <div v-if="!backgroundMode" class="mt-4">
-                <h4 class="mb-2 font-semibold">
-                  Chroma Key Color
-                </h4>
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="relative min-h-14 w-full">
-                    <input
-                      v-model="config.streamingMode.chromaKeyColor"
-                      type="color"
-                      class="size-full overflow-hidden rounded-md border-none border-transparent p-0 outline-none"
-                    >
-                    <span
-                      class="pointer-events-none absolute inset-0 flex items-center justify-center p-2 text-center text-xs drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
-                    >Chroma Key Color</span>
-                  </div>
-                  <div
-                    class="flex h-14 w-full items-center justify-center rounded-md"
-                    :style="{ backgroundColor: config.streamingMode.chromaKeyColor }"
-                  >
-                    <span class="text-xs text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">Preview</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Background Image Upload (when in image mode) -->
-              <div v-if="backgroundMode" class="grid grid-cols-[auto_1fr] items-center gap-4">
-                <AppButton
-                  @click="handleStreamingModeBackgroundFileSelect"
-                  class="whitespace-nowrap"
-                >
-                  <span class="icon-[pixelarticons--image] mr-2" />
-                  <span>Upload Background</span>
-                </AppButton>
-                <p>Upload a custom background image for streaming mode</p>
-                <input @change="handleStreamingModeBackgroundFileSelected" ref="streamingModeBackgroundFileSelect" type="file" accept="image/*" class="hidden">
-              </div>
-
-              <!-- Reset Background Button -->
-              <div v-if="backgroundMode && config.streamingMode.image" class="grid grid-cols-[auto_1fr] items-center gap-4">
-                <AppButton
-                  @click="handleStreamingModeBackgroundReset"
-                  type="danger"
-                  class="whitespace-nowrap"
-                >
-                  <span class="icon-[pixelarticons--close] mr-2" />
-                  <span>Reset Background</span>
-                </AppButton>
-                <p>Remove the current background image</p>
-              </div>
-
-              <!-- Background Preview -->
-              <div v-if="backgroundMode && config.streamingMode.image" class="mt-4">
-                <p class="mb-2">
-                  Current Background:
-                </p>
-                <img :src="config.streamingMode.image" alt="Streaming Mode Background" class="max-h-40 rounded border border-white/10">
-              </div>
-
-              <!-- Display Options -->
-              <div class="mt-6 space-y-3">
-                <h4 class="font-semibold">
-                  Display Options
-                </h4>
-
-                <!-- Display Throws Toggle -->
-                <div class="grid grid-cols-[auto_1fr] items-center gap-4">
-                  <AppToggle v-model="config.streamingMode.throws" />
-                  <p>Display Throws</p>
-                </div>
-
-                <!-- Display Board Toggle -->
-                <div class="grid grid-cols-[auto_1fr] items-center gap-4">
-                  <AppToggle v-model="config.streamingMode.board" />
-                  <p>Display Board</p>
-                </div>
-
-                <!-- Board Mode Selection (only if board display is enabled) -->
-                <div v-if="config.streamingMode.board" class="grid grid-cols-[auto_1fr] items-center gap-4">
-                  <AppRadioGroup
-                    v-model="config.streamingMode.boardImage"
-                    :options="[
-                      { label: 'Live Board', value: true },
-                      { label: 'Image Board', value: false },
-                    ]"
-                  />
-                </div>
-
-                <!-- Display AVG Score Toggle -->
-                <div class="grid grid-cols-[auto_1fr] items-center gap-4">
-                  <AppToggle v-model="config.streamingMode.avg" />
-                  <p>Display AVG Score</p>
-                </div>
-
-                <!-- Display Checkout Toggle -->
-                <div class="grid grid-cols-[auto_1fr] items-center gap-4">
-                  <AppToggle v-model="config.streamingMode.checkout" />
-                  <p>Display Checkout Suggestions</p>
-                </div>
-              </div>
-
-              <!-- Footer Text Input -->
-              <div class="mt-6">
-                <p class="mb-2 font-semibold">
-                  Overlay Footer Text
-                </p>
-                <input
-                  v-model="config.streamingMode.footerText"
-                  placeholder="Enter text to display at the bottom of the streaming overlay"
-                  class="w-full rounded-md border border-white/10 bg-transparent px-3 py-2 outline-none placeholder:opacity-50"
-                >
-              </div>
-
-              <!-- Reset Positions Button -->
-              <div class="mt-6 grid grid-cols-[auto_1fr] items-center gap-4">
-                <AppButton
-                  @click="handleResetPositions"
-                  type="danger"
-                  class="whitespace-nowrap"
-                >
-                  <span class="icon-[pixelarticons--reload] mr-2" />
-                  <span>Reset Positions</span>
-                </AppButton>
-                <p>Reset the board and scoreboard positions and scales to default</p>
-              </div>
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Background
+          </h3>
+          <OptionRow description="A flat colour to key out in your streaming software, or a picture of your own." title="Background">
+            <AppRadioGroup v-model="config.streamingMode.backgroundImage" :options="BACKGROUNDS" aria-label="Background" button-size="sm" />
+          </OptionRow>
+          <OptionRow v-if="!config.streamingMode.backgroundImage" description="Pick one that appears nowhere else on the overlay." title="Colour">
+            <div class="flex items-center gap-3">
+              <span class="text-sm uppercase tabular-nums text-[var(--ad-text-muted)]">{{ config.streamingMode.chromaKeyColor }}</span>
+              <input
+                v-model="config.streamingMode.chromaKeyColor"
+                aria-label="Chroma key colour"
+                class="adt-color-input size-9 shrink-0"
+                type="color"
+              >
             </div>
-          </div>
-        </div>
+          </OptionRow>
+          <OptionRow v-else description="Covers the whole overlay. Until there is one, the chroma key colour shows." title="Image">
+            <div class="flex items-center gap-2">
+              <img
+                v-if="config.streamingMode.image"
+                :src="config.streamingMode.image"
+                alt="Background image"
+                class="h-12 w-20 rounded-[var(--ad-radius-sm)] object-cover ring-1 ring-inset ring-[var(--ad-border-strong)]"
+              >
+              <AppButton @click="streamingModeBackgroundFileSelect.click()" auto size="sm">
+                <span class="flex items-center gap-1.5">
+                  <span class="icon-[material-symbols--upload-rounded] text-base" />
+                  {{ config.streamingMode.image ? "Replace" : "Upload image" }}
+                </span>
+              </AppButton>
+              <ConfirmDeleteButton @confirm="config.streamingMode.image = ''" v-if="config.streamingMode.image" label="background image" />
+            </div>
+            <input @change="handleStreamingModeBackgroundFileSelected" ref="streamingModeBackgroundFileSelect" accept="image/*" class="hidden" type="file">
+          </OptionRow>
+        </section>
+
+        <section>
+          <h3 class="adt-section-title">
+            Layout
+          </h3>
+          <OptionRow
+            description="Puts the board and the scoreboard back where they started, at their first size. An overlay that is up follows at once."
+            title="Positions"
+          >
+            <AppButton @click="handleResetPositions" auto size="sm">
+              Reset positions
+            </AppButton>
+          </OptionRow>
+        </section>
       </div>
     </div>
   </template>
@@ -212,29 +139,32 @@
 
 <script setup lang="ts">
 import AppButton from "../AppButton.vue";
-import AppToggle from "../AppToggle.vue";
+import AppInput from "../AppInput.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
+import AppToggle from "../AppToggle.vue";
+
+import ConfirmDeleteButton from "./Library/ConfirmDeleteButton.vue";
+import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
-const { config, ready } = useConfig();
+
+const DESIGNS = [
+  { label: "Classic", value: "classic" },
+  { label: "Autodarts", value: "v2" },
+];
+/** `boardImage` is the camera's picture when true, autodarts' drawn board when false. */
+const BOARD_VIEWS = [
+  { label: "Camera", value: true },
+  { label: "Drawn board", value: false },
+];
+const BACKGROUNDS = [
+  { label: "Chroma key", value: false },
+  { label: "Image", value: true },
+];
+
+const { config } = useConfig();
 const streamingModeBackgroundFileSelect = ref() as Ref<HTMLInputElement>;
-const backgroundMode = ref(true);
 const imageUrl = browser.runtime.getURL("/images/streaming-mode.png");
-
-onMounted(async () => {
-  await ready();
-  // Initialize backgroundMode based on config
-  if (config.value) {
-    backgroundMode.value = config.value.streamingMode.backgroundImage;
-  }
-});
-
-// Watch for changes to backgroundMode and update config
-watch(backgroundMode, (newValue) => {
-  if (config.value) {
-    config.value.streamingMode.backgroundImage = newValue;
-  }
-});
 
 async function toggleFeature() {
   if (!config.value) return;
@@ -250,10 +180,6 @@ async function toggleFeature() {
   }
 }
 
-function handleStreamingModeBackgroundFileSelect() {
-  streamingModeBackgroundFileSelect.value.click();
-}
-
 function handleStreamingModeBackgroundFileSelected() {
   const file = streamingModeBackgroundFileSelect.value.files?.[0];
   if (!file) return;
@@ -267,12 +193,6 @@ function handleStreamingModeBackgroundFileSelected() {
   reader.readAsDataURL(file);
 
   streamingModeBackgroundFileSelect.value.value = "";
-}
-
-function handleStreamingModeBackgroundReset() {
-  if (config.value) {
-    config.value.streamingMode.image = "";
-  }
 }
 
 async function handleResetPositions() {

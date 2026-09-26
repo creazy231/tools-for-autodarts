@@ -1,69 +1,63 @@
 <template>
   <template v-if="!$attrs['data-feature-index']">
     <!-- Settings Panel -->
-    <div v-if="config" class="adt-container min-h-56">
-      <div class="relative z-10 flex h-full flex-col justify-between">
-        <div>
-          <div class="space-y-3 text-white/70">
-            <p>
-              Draws autodarts' board in the design you pick, for everyone who throws on it — bots
-              included. A camera's picture has no board to redraw, so this also keeps the drawn
-              board up while a game is on, pressing the camera button until it shows.
-            </p>
+    <div v-if="config" class="adt-container">
+      <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <p class="mb-6 max-w-3xl">
+          Draws autodarts' board in the design you pick, for everyone who throws on it, bots included. A camera's picture has
+          no board to redraw, so this also keeps the drawn board up while a game is on.
+        </p>
 
-            <div class="mt-4">
-              <h4 class="mb-2 font-semibold">
-                Board
-              </h4>
-              <!-- Three to a row across the dialog, two on a phone. -->
-              <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4" role="group">
-                <button
-                  @click="config.boardSkins.skin = skin.id"
-                  v-for="skin in BOARD_SKINS"
-                  :key="skin.id"
-                  :aria-pressed="config.boardSkins.skin === skin.id"
-                  class="flex flex-col overflow-hidden rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)] text-center transition-colors hover:bg-[var(--ad-surface-card-hover)] focus-visible:shadow-[var(--ad-focus-ring)] focus-visible:outline-none"
-                  :class="{ 'ring-1 ring-inset ring-[var(--ad-border-strong)]': config.boardSkins.skin === skin.id }"
-                  type="button"
+        <section>
+          <h3 class="adt-section-title mb-4">
+            Skin
+          </h3>
+          <!-- Three to a row across the dialog, two on a phone. -->
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4" role="group" aria-label="Skin">
+            <button
+              @click="config.boardSkins.skin = skin.id"
+              v-for="skin in BOARD_SKINS"
+              :key="skin.id"
+              :aria-pressed="config.boardSkins.skin === skin.id"
+              class="flex flex-col overflow-hidden rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)] text-center transition-colors hover:bg-[var(--ad-surface-card-hover)] focus-visible:shadow-[var(--ad-focus-ring)] focus-visible:outline-none"
+              :class="{ 'ring-1 ring-inset ring-[var(--ad-border-strong)]': config.boardSkins.skin === skin.id }"
+              type="button"
+            >
+              <!-- Round, as the match screen clips it: a picture's corners are not part of the board. -->
+              <span class="block p-3 sm:p-5">
+                <img
+                  :src="skin.preview"
+                  :alt="`${skin.label} board`"
+                  class="aspect-square w-full rounded-full"
+                  draggable="false"
                 >
-                  <!-- Round, as the match screen clips it: a picture's corners are not part of the board. -->
-                  <span class="block p-3 sm:p-5">
-                    <img
-                      :src="skin.preview"
-                      :alt="`${skin.label} board`"
-                      class="aspect-square w-full rounded-full"
-                      draggable="false"
-                    >
-                  </span>
-                  <!-- Picked the way a segmented control's option is: the hot gradient on a navy track. -->
-                  <span
-                    class="block px-3 py-2.5 text-[length:var(--ad-text-md)] text-white"
-                    :class="config.boardSkins.skin === skin.id ? 'bg-[image:var(--ad-gradient-hot)] font-bold' : 'bg-[var(--ad-navy-400)] font-semibold'"
-                  >
-                    {{ skin.label }}
-                  </span>
-                </button>
-              </div>
-              <p class="mt-2 text-sm text-white/60">
-                {{ selected.description }}
-                <template v-if="selected.art">
-                  The darts, the yellow of a hit and aiming by hand all work as they do on autodarts'
-                  own board, and Darts Zoom's close-ups and Streaming Mode's board wear it too.
-                </template>
-                <template v-else>
-                  Nothing about the board changes; it is only kept on the drawn board.
-                </template>
-              </p>
-            </div>
-
-            <p class="text-sm text-white/60">
-              Pressing the camera button yourself, or autodarts' own 1, 2 and 3 keys, leaves the
-              view to you until the next leg begins. While this is on it is the one in charge of the
-              view: <em>Board View</em> stands aside, and Darts Zoom and Streaming Mode no longer
-              switch the board.
-            </p>
+              </span>
+              <!-- Picked the way a segmented control's option is: the hot gradient on a navy track. -->
+              <span
+                class="block px-3 py-2.5 text-[length:var(--ad-text-md)] text-white"
+                :class="config.boardSkins.skin === skin.id ? 'bg-[image:var(--ad-gradient-hot)] font-bold' : 'bg-[var(--ad-navy-400)] font-semibold'"
+              >
+                {{ skin.label }}
+              </span>
+            </button>
           </div>
-        </div>
+          <p class="mt-3 max-w-3xl text-sm text-[var(--ad-text-muted)]">
+            <span class="font-semibold text-[var(--ad-text-primary)]">{{ selected.label }}:</span>
+            {{ selected.description }}
+            <template v-if="selected.art">
+              The darts, the yellow of a hit and aiming by hand work as on autodarts' own board, and Darts Zoom's close-ups
+              and Streaming Mode's board wear it too.
+            </template>
+            <template v-else>
+              Nothing about the board changes; it is only kept on the drawn board.
+            </template>
+          </p>
+        </section>
+
+        <p class="mt-8 max-w-3xl border-t border-[var(--ad-border-subtle)] pt-4 text-sm text-[var(--ad-text-muted)]">
+          Pressing the camera button yourself, or autodarts' own 1, 2 and 3 keys, leaves the view to you until the next leg.
+          While this is on, Board View stands aside, and Darts Zoom and Streaming Mode no longer switch the board.
+        </p>
       </div>
     </div>
   </template>

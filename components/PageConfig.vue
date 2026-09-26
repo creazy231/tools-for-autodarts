@@ -286,8 +286,8 @@ interface Feature {
   v2Ready?: boolean;
   /**
    * Give this feature's settings dialog the widest shell. For the panels that
-   * pair a grid of tiles with a column of options and do not fit the standard
-   * one.
+   * pair a grid of tiles, or a preview, with a column of options and do not
+   * fit the standard one.
    */
   wideSettings?: boolean;
   /**
@@ -323,7 +323,7 @@ const featureGroups: FeatureGroup[] = [
     features: [
       { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
       { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false, v2Ready: true },
-      { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true },
+      { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true, fillSettings: true },
       { id: "team-lobby", title: "Team Lobby Settings", component: TeamLobby, hasSettings: false, v2Ready: true },
       { id: "qr-code", title: "QR Code Settings", component: QrCode, hasSettings: false, v2Ready: true },
     ],
@@ -336,11 +336,11 @@ const featureGroups: FeatureGroup[] = [
     features: [
       { id: "colors", title: "Colors Settings", component: Colors, hasSettings: true, v2Ready: true, wideSettings: true },
       { id: "takeout-notification", title: "Takeout Notification Settings", component: TakeoutNotification, hasSettings: false, v2Ready: true },
-      { id: "next-player-on-takeout-stuck", title: "Next Player On Takeout Stuck Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
+      { id: "next-player-on-takeout-stuck", title: "Auto Next Player on Takeout Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
       { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true, v2Ready: true },
       { id: "smaller-scores", title: "Smaller Scores Settings", component: SmallerScores, hasSettings: false, v2Ready: true },
       { id: "streaming-mode", title: "Streaming Mode Settings", component: StreamingMode, hasSettings: true, v2Ready: true },
-      { id: "larger-legs-sets", title: "Larger Legs Sets Settings", component: LargerLegsSets, hasSettings: true, v2Ready: true },
+      { id: "larger-legs-sets", title: "Larger Legs/Sets Settings", component: LargerLegsSets, hasSettings: true, v2Ready: true },
       { id: "larger-player-names", title: "Larger Player Names Settings", component: LargerPlayerNames, hasSettings: true, v2Ready: true },
       { id: "larger-player-match-data", title: "Larger Player Match Data Settings", component: LargerPlayerMatchData, hasSettings: true, v2Ready: true },
       { id: "winner-animation", title: "Winner Animation Settings", component: WinnerAnimation, hasSettings: false, v2Ready: true },
@@ -350,7 +350,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "board-skins", title: "Board Skins Settings", component: BoardSkins, hasSettings: true, v2Ready: true },
       { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true, v2Ready: true },
       { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
-      { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true, v2Ready: true },
+      { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true, v2Ready: true, wideSettings: true },
       { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false, v2Ready: true },
     ],
     settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "board-view", "board-skins", "quick-correction", "instant-replay" ],
