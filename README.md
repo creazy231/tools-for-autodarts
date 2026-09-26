@@ -228,6 +228,7 @@ Everyone else — a remote opponent, a bot — keeps the sound. When you are onl
 The Caller feature provides voice announcements during your darts gameplay, similar to professional darts tournaments:
 
 #### Configuration Options
+- **Game modes**: The games the Caller calls in, from **Game modes** under Options: X01, Cricket, the practice games (Count Up, Around The Clock, Random Checkout, Round the World, Segment Training, Bob's 27, 121), the party games (Shanghai, Gotcha, Bermuda, Killer) and the bull-off. Every game is on until you switch one off
 - **Call Every Dart**: Announces each dart as it's thrown, rather than waiting for the end of a turn
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
   - Covers **Gotcha** too, which autodarts works out no route for: the number left to reach the target score is announced the same way
@@ -342,6 +343,9 @@ The caller has a sophisticated fallback system to provide complete coverage even
 ### 🔊 Sound FX Feature
 The Sound FX feature adds ambient sound effects to your gameplay experience:
 
+#### Game Modes
+**Game modes** under Options keeps Sound FX to the games you choose: X01, Cricket, the practice games (Count Up, Around The Clock, Random Checkout, Round the World, Segment Training, Bob's 27, 121), the party games (Shanghai, Gotcha, Bermuda, Killer) and the bull-off. Every game is on until you switch one off. Lobby and tournament sounds play in any game.
+
 #### Game Event Sounds
 Add sound effects for various game events:
 - **Point Triggers**: Sounds can be triggered for any score from `ambient_0` to `ambient_180`
@@ -455,6 +459,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Effect Management**: Add, edit, enable/disable, and reorder lighting effects. **Add** holds a new effect and the CSV import, **⋯** sorting by trigger and deleting everything, and each effect has a play button to send it, as its editor has **Test**
 - **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
 - **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
+- **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
 - **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
@@ -599,6 +604,7 @@ The Animations feature allows you to display custom GIF animations for special e
 - **A length for one animation**: An animation's editor has its own **Show for**, which overrides the option for that GIF; leave it empty to use the option. **Use the GIF's length** fills in how long one run of the GIF takes, read from the file, so it plays exactly once. An animation with a length of its own shows it on its picture
 - **Fit**: Choose between **Cover** (fill the space, cropping the GIF if needed) or **Contain** (show all of it)
 - **Covers**: Choose between **Board only** (the animation covers the dartboard) or **Full page** (it covers the whole page, over a blurred background)
+- **Game modes**: The games animations show in, such as everything but Round the World, where a visit scores little and an animation on low scores would go off all the time. Every game is on until you switch one off
 - **Add**: Upload GIFs, or add one from a link, whose editor previews it. Sorting by trigger and deleting everything are under **⋯**
 - **Search and Filters**: Find an animation by its trigger or link, and narrow the grid with the pills to scores, throws, events, other triggers, or the animations you have switched off. Drag an animation by its handle to reorder the grid, while no search or filter narrows it
 - **Bulk Upload with Trigger Assignment**: When uploading multiple GIF files, each file shows the triggers its name gives before anything is saved, or choose **The same for all** to give every file the same triggers, making it easy to set up larger animation sets

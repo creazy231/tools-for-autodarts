@@ -50,6 +50,9 @@
           <OptionRow description="Just the board, or the whole page over a blurred background." title="Covers">
             <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" button-size="sm" />
           </OptionRow>
+          <OptionRow description="The games it shows GIFs in." title="Game modes">
+            <GameModesField v-model="config.animations.disabledGameModes" feature="animations" intro="Animations only show in the games switched on here." />
+          </OptionRow>
         </section>
 
         <LibrarySection
@@ -295,6 +298,7 @@ import AppSwitch from "../AppSwitch.vue";
 import AppToggle from "../AppToggle.vue";
 
 import ConfirmDeleteButton from "./Library/ConfirmDeleteButton.vue";
+import GameModesField from "./Library/GameModesField.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";
 import TriggerChips from "./Library/TriggerChips.vue";

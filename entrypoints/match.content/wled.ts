@@ -1,6 +1,7 @@
 import type { ILobbies } from "@/utils/websocket-helpers";
 
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
+import { pageVariant, playsIn } from "@/utils/game-modes";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage";
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
@@ -61,14 +62,6 @@ function eventTrigger(trigger: string) {
   if (isTriggerPresent(trigger) && isConfiguredBoard()) setEffectByTrigger(trigger);
 }
 
-function _is_enabled(config: IConfig, gameMode: string | unknown): boolean {
-  if (!gameMode) return false;
-  return (
-    config.wledFx.enabled &&
-    !config.wledFx.disabledGameModes?.includes(gameMode as GameMode)
-  )
-}
-
 async function checkStatus(boardData: IBoard): Promise<void> {
   const boardEvent: string | undefined = boardData.event;
   const boardStatus: string | undefined = boardData.status;
@@ -120,7 +113,7 @@ export async function wledFx() {
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch(
         (gameData: IGameData, oldGameData: IGameData) => {
-          if (!_is_enabled(config, gameData.match?.variant)) return;
+          if (!playsIn(config?.wledFx, gameData.match?.variant)) return;
           settled.push(gameData, oldGameData);
         },
       );
@@ -130,7 +123,7 @@ export async function wledFx() {
         /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
       )?.[0];
 
-      if (gameData.match?.id === matchId && _is_enabled(config, gameData.match?.variant)) {
+      if (gameData.match?.id === matchId && playsIn(config?.wledFx, gameData.match?.variant)) {
         processGameData(gameData, gameData);
       }
     }
@@ -162,9 +155,10 @@ export async function wledFx() {
 
     if (!boardDataWatcherUnwatch) {
       boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (boardData: IBoard) => {
-        const { match } = await AutodartsToolsGameData.getValue();
-        if (_is_enabled(config, match?.variant))
-          checkStatus(boardData).catch(e => console.error(e));
+        // A board event follows the game of this page's own match: in a lobby the
+        // stored match is the last one played, and its game says nothing here.
+        const stored = await AutodartsToolsGameData.getValue();
+        if (playsIn(config?.wledFx, pageVariant(stored?.match, window.location.href))) checkStatus(boardData).catch(e => console.error(e));
       });
     }
 

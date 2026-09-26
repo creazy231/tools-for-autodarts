@@ -1,4 +1,5 @@
-import { AutodartsToolsGameData, GameMode, type IGameData } from "@/utils/game-data-storage";
+import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
+import { pageVariant, playsIn } from "@/utils/game-modes";
 import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/storage";
 import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { gotchaCheckout } from "@/utils/checkout";
@@ -102,14 +103,6 @@ function checkBoardStatus(boardData: IBoard): void {
     playSound("calibration_finished");
 }
 
-function _is_enabled(config: IConfig, gameMode: string | unknown): boolean {
-  if (!gameMode) return false;
-  return (
-    config.caller.enabled &&
-    !config.caller.disabledGameModes?.includes(gameMode as GameMode)
-  )
-}
-
 export async function caller() {
   console.log("Autodarts Tools: caller");
 
@@ -126,7 +119,7 @@ export async function caller() {
 
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch((gameData: IGameData, oldGameData: IGameData) => {
-        if (!_is_enabled(config, gameData.match?.variant)) return;
+        if (!playsIn(config?.caller, gameData.match?.variant)) return;
         console.log("Autodarts Tools: caller game data updated");
         settled.push(gameData, oldGameData);
       });
@@ -134,16 +127,17 @@ export async function caller() {
       const url = window.location.href;
       const matchId = url.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)?.[0];
 
-      if (gameData.match?.id === matchId && _is_enabled(config, gameData.match?.variant)) {
+      if (gameData.match?.id === matchId && playsIn(config?.caller, gameData.match?.variant)) {
         processGameData(gameData, gameData);
       }
     }
 
     if (!boardDataWatcherUnwatch) {
       boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (boardData: IBoard) => {
-        const { match } = await AutodartsToolsGameData.getValue();
-        if (_is_enabled(config, match?.variant))
-          checkBoardStatus(boardData);
+        // A board event follows the game of this page's own match: in a lobby the
+        // stored match is the last one played, and its game says nothing here.
+        const stored = await AutodartsToolsGameData.getValue();
+        if (playsIn(config?.caller, pageVariant(stored?.match, window.location.href))) checkBoardStatus(boardData);
       });
     }
   } catch (error) {

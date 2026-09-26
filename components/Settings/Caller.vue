@@ -25,6 +25,9 @@
             </template>
             <AppToggle v-model="config.caller.preferCombinedThrows" size="sm" />
           </OptionRow>
+          <OptionRow description="The games it calls in." title="Game modes">
+            <GameModesField v-model="config.caller.disabledGameModes" feature="caller" intro="The Caller only calls in the games switched on here." />
+          </OptionRow>
         </section>
 
         <LibrarySection
@@ -296,6 +299,7 @@ import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppToggle from "../AppToggle.vue";
 
+import GameModesField from "./Library/GameModesField.vue";
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";

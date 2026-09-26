@@ -9,6 +9,15 @@
           triggers you give it. Start them with <code class="adt-code">ambient_</code> to keep them apart from the Caller's.
         </p>
 
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow description="The games it plays in. Lobby and tournament sounds play in any game." title="Game modes">
+            <GameModesField v-model="config.soundFx.disabledGameModes" feature="soundFx" intro="Sound FX only plays in the games switched on here." />
+          </OptionRow>
+        </section>
+
         <LibrarySection
           @reorder="moveSound"
           :entries="entries"
@@ -189,8 +198,10 @@ import AppModal from "../AppModal.vue";
 import AppNotification from "../AppNotification.vue";
 import AppToggle from "../AppToggle.vue";
 
+import GameModesField from "./Library/GameModesField.vue";
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
+import OptionRow from "./Library/OptionRow.vue";
 import PlayButton from "./Library/PlayButton.vue";
 import SoundDialog from "./Library/SoundDialog.vue";
 import SoundSource from "./Library/SoundSource.vue";

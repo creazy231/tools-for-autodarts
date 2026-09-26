@@ -2,7 +2,7 @@ import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
 import type { IConfig, ISound } from "@/utils/storage";
 
-import { GameMode } from "@/utils/game-data-storage";
+import { GameMode } from "@/utils/game-modes";
 
 export const isX01 = () => document.getElementById("ad-ext-game-variant")?.textContent === GameMode.X01;
 export const isBullOff = () => document.getElementById("ad-ext-game-variant")?.textContent === "Bull-off";

@@ -1,6 +1,7 @@
 import type { BoardStatus } from "@/utils/types";
 
 import { defaultColors, normalizeColors } from "@/utils/colors";
+import type { GameMode } from "@/utils/game-modes";
 
 export interface IConfig {
   version: number;
@@ -114,7 +115,13 @@ export interface IConfig {
 
   animations: {
     enabled: boolean;
-    disabledGameModes: GameMode[];
+    /**
+     * The game modes it doesn't play in: see playsIn in utils/game-modes.ts,
+     * the only reader. Missing plays everywhere, so every config saved before
+     * this plays as it did and nothing was migrated; it is only stored while a
+     * mode is switched off.
+     */
+    disabledGameModes?: GameMode[];
     duration?: number;
     delayStart?: number;
     objectFit?: "cover" | "contain";
@@ -123,7 +130,8 @@ export interface IConfig {
   };
   caller: {
     enabled: boolean;
-    disabledGameModes: GameMode[];
+    /** As `animations.disabledGameModes`. */
+    disabledGameModes?: GameMode[];
     callEveryDart: boolean;
     callCheckout: boolean;
     preferCombinedThrows: boolean;
@@ -131,7 +139,8 @@ export interface IConfig {
   };
   soundFx: {
     enabled: boolean;
-    disabledGameModes: GameMode[];
+    /** As `animations.disabledGameModes`. */
+    disabledGameModes?: GameMode[];
     sounds: ISound[];
   };
   /**
@@ -209,7 +218,8 @@ export interface IConfig {
   };
   wledFx: {
     enabled: boolean;
-    disabledGameModes: GameMode[];
+    /** As `animations.disabledGameModes`. */
+    disabledGameModes?: GameMode[];
     onlyOnce: boolean;
     boardIds: string[];
     effects: IWled[];
@@ -426,7 +436,7 @@ export interface IWled {
 export type TBoardStatus = BoardStatus | undefined;
 
 export const defaultConfig: IConfig = {
-  version: 23,
+  version: 22,
   discord: {
     enabled: false,
     manually: false,
@@ -484,7 +494,6 @@ export const defaultConfig: IConfig = {
   },
   caller: {
     enabled: false,
-    disabledGameModes: [],
     callEveryDart: false,
     callCheckout: false,
     preferCombinedThrows: false,
@@ -565,7 +574,6 @@ export const defaultConfig: IConfig = {
   },
   animations: {
     enabled: false,
-    disabledGameModes: [],
     duration: 5,
     delayStart: 1,
     objectFit: "cover",
@@ -678,7 +686,6 @@ export const defaultConfig: IConfig = {
   },
   soundFx: {
     enabled: false,
-    disabledGameModes: [],
     sounds: [
       {
         name: "busted",
@@ -775,7 +782,6 @@ export const defaultConfig: IConfig = {
   },
   wledFx: {
     enabled: false,
-    disabledGameModes: [],
     onlyOnce: true,
     boardIds: [],
     effects: [

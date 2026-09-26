@@ -35,6 +35,9 @@
           >
             <AppToggle v-model="config.wledFx.onlyOnce" size="sm" />
           </OptionRow>
+          <OptionRow description="The games it lights up in. Lobby and tournament effects play in any game." title="Game modes">
+            <GameModesField v-model="config.wledFx.disabledGameModes" feature="wledFx" intro="WLED only lights up in the games switched on here." />
+          </OptionRow>
         </section>
 
         <LibrarySection
@@ -295,6 +298,7 @@ import AppTextarea from "../AppTextarea.vue";
 import AppToggle from "../AppToggle.vue";
 import AppTokenInput from "../AppTokenInput.vue";
 
+import GameModesField from "./Library/GameModesField.vue";
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";

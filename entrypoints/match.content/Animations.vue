@@ -33,6 +33,7 @@ import type { IThrow } from "@/utils/websocket-helpers";
 
 import { animationDuration } from "@/utils/animation-duration";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { playsIn } from "@/utils/game-modes";
 import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/helpers";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, type IAnimation, type IConfig } from "@/utils/storage";
@@ -85,14 +86,6 @@ const overlayStyle = computed(() => {
   };
 });
 
-function _is_enabled(config: IConfig, gameMode: string | unknown): boolean {
-  if (!gameMode) return false;
-  return (
-    config.animations.enabled &&
-    !config.animations.disabledGameModes?.includes(gameMode as GameMode)
-  )
-}
-
 onMounted(async () => {
   console.log("Autodarts Tools: Animations mounted");
 
@@ -104,8 +97,7 @@ onMounted(async () => {
     // Keep the handle: without it a remount — a new leg, or the hand-off out of
     // a bull-off — stacks a second watcher and every animation plays twice.
     unwatchGameData = AutodartsToolsGameData.watch((gameData: IGameData) => {
-      if (_is_enabled(config.value as IConfig, gameData.match?.variant))
-        processGameData(gameData);
+      if (playsIn(config.value?.animations, gameData.match?.variant)) processGameData(gameData);
     });
   } catch (error) {
     console.error("Autodarts Tools: Animations - initialization error", error);
