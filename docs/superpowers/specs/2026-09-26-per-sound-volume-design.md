@@ -152,3 +152,38 @@ passes through anything the page could amplify.
     is, at volume 1.
 - `yarn compile` (the 14 known errors, none new), ESLint on the touched files, `yarn build`.
 - Not tested: Firefox, Safari, iOS (the dev browser is Chrome), and real hardware.
+
+## After review
+
+A fresh review of the whole change found one important problem, and three smaller ones were graded up
+by their effect. All four are fixed, each with a test that failed first:
+
+- **A copy that arrived late could play over the next sound.** While a sound waited for its copy, its
+  pool element sat paused and looked free. So once the lane was given up (the watchdog, or every sound
+  stopped for a correction), the next sound usually took that same element. The old check compared
+  elements only, so the late copy still passed it and replaced the newer sound. Each lane now carries
+  a hold counter, bumped whenever it is taken or given up, and a sound plays its copy only if the hold
+  it took is still the current one. A Node harness runs the real engine code against a fake audio pool
+  and a copy whose arrival the test controls. It showed the stale copy playing in four cases (stop and
+  watchdog, both engines); every case now drops it.
+- **The slider's thumb and pointer disagreed at its ends.** Keeping the thumb inside the track moved
+  its centre up to 10 px from where the pointer mapping put it. Pressing the thumb at 0% of 0–200 gave
+  5%, at 200% gave 195%, and the TTS volume's 100% gave 95%. The pointer now maps over the stretch the
+  thumb's centre travels.
+- **A copy that failed while being written rejected instead of resolving null**, for example when a
+  long file runs out of memory. It then stayed rejected, so the sound was skipped for good rather than
+  played as it is. The write is caught now.
+- **At 100%, Sound FX called an async function without waiting for it**, so an error there went
+  unhandled and the lane waited for the watchdog. The plan is now decided where the sound is started:
+  a copy goes to its own function, which cannot reject, and everything else plays synchronously inside
+  the old `try`, exactly as before.
+
+Left as they are, for a later change:
+
+- On iOS, an unreadable link turned *down* stays at 100%, and the editor says nothing about it.
+- The settings keep a copy for each previewed volume until the dialog closes.
+- A lobby prepares copies it rarely plays.
+- The editor's note blames the site even when a link downloads but doesn't decode.
+
+The review also suggested checking the copies in Firefox, where reading decoded samples across the
+content script's boundary may be slow. That has not been done.
