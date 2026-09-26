@@ -491,6 +491,7 @@ function saveAnimation() {
     triggers: validTriggers,
     enabled: true, // New animations are enabled by default
     animationId: newAnimation.value.animationId ?? undefined,
+    duration: 0,
   };
 
   if (isEditMode.value && editingIndex.value !== null) {
@@ -595,6 +596,7 @@ async function processGifFiles({ files, fromNames, triggers: shared }: { files: 
           url: "", // Empty URL since we're storing in OPFS
           triggers: fromNames ? extractTriggersFromGifFilename(file.name) : [ ...sharedTriggers ],
           enabled: true,
+          duration: 0,
         };
 
         // Save to OPFS

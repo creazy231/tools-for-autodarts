@@ -3497,6 +3497,11 @@ get-tsconfig@^4.7.5:
   dependencies:
     resolve-pkg-maps "^1.0.0"
 
+gif-info@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/gif-info/-/gif-info-1.0.1.tgz#003765fc0c4c65a8de64d5568c1e8ead309d09dc"
+  integrity sha512-HGZRrn/q2TyBsIijOGbVoiFYRIJCA17/wwngtOQ/OWlCNTBB7ooafY9jZAzI62S9QljmgWWGLa9ZSiUWx298vw==
+
 "giget@^1.2.3 || ^2.0.0 || ^3.0.0":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/giget/-/giget-3.1.2.tgz#6fa9841b6220b1d178f09c64da0661f6da801508"
