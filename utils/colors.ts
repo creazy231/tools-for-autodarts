@@ -49,8 +49,11 @@ export const SITE_BUTTON = "#0b55df";
  * mid grey nothing carrying white type can out-contrast, and there the hue is
  * what tells the active one apart, as it is for raspberry. The site's own
  * palettes come first, under their own names (`player-colors-*.js`). Lime is
- * darkened at its teal end, which is 2.2:1 as the site has it. The rest are
- * muted pairs in the manner of FankiDarts' Playerbox presets.
+ * darkened at its teal end, which is 2.2:1 as the site has it. Then muted
+ * pairs in the manner of FankiDarts' Playerbox presets, and last the pair that
+ * goes with Board Skins' qwellcode board: its dark ring, #125b2c, into its
+ * lime (#bad26b, 1.6:1), turned a little greener and darkened to 4.2:1, where
+ * a lime that dark would be olive.
  */
 export const CARD_PRESETS: readonly ColorPreset[] = [
   { id: "blueberry", label: "Blueberry", from: "#002a77", to: "#6d28de" },
@@ -61,11 +64,14 @@ export const CARD_PRESETS: readonly ColorPreset[] = [
   { id: "crimson", label: "Crimson", from: "#6a1624", to: "#b8323f" },
   { id: "gold", label: "Gold", from: "#5c4a12", to: "#8e7328" },
   { id: "slate", label: "Slate", from: "#253247", to: "#497097" },
+  { id: "qwellcode", label: "qwellcode", from: "#125b2c", to: "#558413" },
 ];
 
 /**
  * Pairs for the page. What the site draws straight onto the page is light
  * type, so these stay as dark as its own midnight: black-90 into a deep colour.
+ * qwellcode's is the qwellcode board's dark ring, its hue and saturation kept,
+ * at Forest's depth.
  */
 export const PAGE_PRESETS: readonly ColorPreset[] = [
   { id: "royal", label: "Royal", from: "#01040b", to: "#002a77" },
@@ -75,6 +81,7 @@ export const PAGE_PRESETS: readonly ColorPreset[] = [
   { id: "plum", label: "Plum", from: "#01040b", to: "#3d0c4d" },
   { id: "ember", label: "Ember", from: "#01040b", to: "#4a1f08" },
   { id: "graphite", label: "Graphite", from: "#01040b", to: "#262626" },
+  { id: "qwellcode", label: "qwellcode", from: "#01040b", to: "#0b391c" },
 ];
 
 /** What Colors starts from: autodarts' own, all of it. A fresh object every call. */

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **Animations**, the **Caller**, **Sound FX** and **WLED** can be searched. A field above each list finds sounds, GIFs and effects by name, by trigger, or by where they come from, whether a link, the words a voice speaks or a WLED address. The exact trigger comes first, so `26` finds the sound on 26 before the one on 126, and a number also finds the ranges that take it in, so `150` answers "what plays on 150?" with the sound on `100-180`. Pills under the field narrow the list to scores, single darts and combinations, game events, board status, player names or what is switched off, each with a count of what the search has left. A trigger that is none of the built-in ones counts as a player's name, since that is how the Caller, Sound FX and WLED read it, so a misspelt trigger turns up there too
+- **Colors** has a *qwellcode* pair for the player card and another for the background, to go with the qwellcode board in **Board Skins**. The card runs from the board's dark green ring into its lime, turned a little greener and darkened until the card's white type reads on it as well as it does on autodarts' raspberry, since a lime that dark would be olive. The background goes from black into the ring's dark green, as deep as *Forest*, and the bottom bar and its buttons turn green with it
 
 ### Changed
 
@@ -23,6 +24,7 @@ All notable changes to this project will be documented in this file.
   - **Instant Replay** shows the camera's picture beside its settings, kept in view while they scroll, and says when no camera is free
   - **Discord Webhooks** says under the webhook field when there is none, or when it is not a Discord webhook. *Post live scores* shows as unavailable, since that half of the feature does not run on the rebuilt site yet
   - **Quick Correction**'s note that it does not work in Safari is a warning rather than yellow text
+- **Board Skins**' *qwellcode* board has a new design: black and white segments where they were black and cream, and rings that alternate between dark green and lime, as a classic board's alternate between red and green, where every ring was lime. The bull's outer ring is black rather than lime. It is drawn to the same grid as before, so the darts and a hit land on it where they did, and the Board Skins card on the settings page shows a match on the new board
 - **The settings page** has two menus where it had four buttons for moving settings between installations: **Export** downloads them as a file or copies them to the clipboard, and **Import** loads a file or pastes what was copied. Each choice has a line on what it does, and Import's both say that they replace all your settings. A coffee cup beside the gear opens the Ko-fi page in a new tab. On most phones the buttons fit on one row instead of three, and a menu that is wider than the room beside its button slides along to stay on the screen
 
 ### Fixed

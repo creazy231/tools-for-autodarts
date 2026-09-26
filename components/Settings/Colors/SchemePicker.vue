@@ -18,13 +18,14 @@
       :key="option.id"
       :aria-pressed="modelValue.preset === option.id"
       :title="option.label"
-      class="flex w-16 flex-col items-center gap-1.5 rounded-[var(--ad-radius-sm)] p-1 text-[length:var(--ad-text-xs)] transition-colors focus-visible:shadow-[var(--ad-focus-ring)] focus-visible:outline-none"
+      class="flex w-16 flex-col items-center gap-1.5 rounded-[var(--ad-radius-sm)] py-1 text-[length:var(--ad-text-xs)] transition-colors focus-visible:shadow-[var(--ad-focus-ring)] focus-visible:outline-none"
       :class="modelValue.preset === option.id ? 'font-semibold text-white' : 'text-white/60 hover:text-white'"
       type="button"
     >
+      <!-- Inset from the button's sides, where the name is not: a picked name is bold, and bold "qwellcode" is 58px wide. -->
       <span
         :style="swatch(option)"
-        class="block h-9 w-full rounded-[var(--ad-radius-sm)]"
+        class="block h-9 w-14 rounded-[var(--ad-radius-sm)]"
         :class="modelValue.preset === option.id ? 'ring-2 ring-white' : 'ring-1 ring-inset ring-white/15'"
       />
       <span class="w-full truncate text-center">{{ option.label }}</span>
