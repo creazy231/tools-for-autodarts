@@ -58,6 +58,7 @@
               </template>
               <template #meta>
                 <SoundSource :sound="config.soundFx.sounds[entry.index]" :voices="voices" />
+                <VolumeBadge :sound="config.soundFx.sounds[entry.index]" />
               </template>
             </LibraryItem>
           </template>
@@ -84,8 +85,10 @@
       v-model:name="newSound.name"
       v-model:triggers="newSound.triggers"
       v-model:url="newSound.url"
+      v-model:volume="newSound.volume"
       :editing="isEditMode"
       :has-file="draftHasFile"
+      :louder-blocked="louderBlocked"
       :playing="playingKey === DRAFT_KEY"
       :show="showSoundModal"
       :url-error="urlError"
@@ -116,6 +119,7 @@
       v-model:text="ttsForm.text"
       v-model:triggers="ttsForm.triggers"
       v-model:voice="ttsForm.voiceURI"
+      v-model:volume="ttsForm.volume"
       :editing="ttsEditingIndex !== null"
       :show="showTTSModal"
       :speaking="isSpeaking"
@@ -192,10 +196,12 @@ import SoundDialog from "./Library/SoundDialog.vue";
 import SoundSource from "./Library/SoundSource.vue";
 import TtsDialog from "./Library/TtsDialog.vue";
 import UploadDialog from "./Library/UploadDialog.vue";
+import VolumeBadge from "./Library/VolumeBadge.vue";
 import { stableKey } from "./Library/stable-key";
 
 import type { LibraryEntry } from "@/utils/library-search";
 
+import { useLouderCheck } from "@/composables/useLouderCheck";
 import { useNotification } from "@/composables/useNotification";
 import { useTTS } from "@/composables/useTTS";
 import { type ISound } from "@/utils/storage";
@@ -207,6 +213,8 @@ import {
   isSafari,
   saveSoundFxToIndexedDB,
 } from "@/utils/helpers";
+import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
+import { DEFAULT_VOLUME, cappedVolume, isLink, planVolume, soundVolume } from "@/utils/sound-volume";
 
 const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "sound-fx");
@@ -218,7 +226,7 @@ const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/sound-fx.png");
 const showSoundModal = ref(false);
 const isEditMode = ref(false);
-const newSound = ref({ url: "", name: "", base64: "", triggers: [] as string[] });
+const newSound = ref({ url: "", name: "", base64: "", triggers: [] as string[], volume: DEFAULT_VOLUME });
 const editingIndex = ref<number | null>(null);
 const urlError = ref("");
 
@@ -237,6 +245,8 @@ const playingKey = ref<number | null>(null);
 let currentPlayer: HTMLAudioElement | null = null;
 /** Stopping a voice ends its speech, which is not the end of the one we start next. */
 let ignoreSpeechEnd = false;
+/** Copies of sounds at volumes their files don't have, for the play buttons — see utils/sound-copies.ts. */
+const copies = soundCopies();
 
 const { notification, showNotification, hideNotification } = useNotification();
 
@@ -251,6 +261,7 @@ const ttsForm = ref({
   lang: "",
   rate: 1,
   pitch: 1,
+  volume: DEFAULT_VOLUME,
   triggers: [] as string[],
 });
 
@@ -271,6 +282,14 @@ const draftHasFile = computed(() => {
   if (!isEditMode.value || editingIndex.value === null) return false;
   return !!config.value?.soundFx.sounds[editingIndex.value]?.soundId;
 });
+
+/** A link set above 100% that the extension cannot read, so the editor can say it plays at 100% at most. */
+const louderBlocked = useLouderCheck(copies, () => ({
+  open: showSoundModal.value,
+  url: newSound.value.url,
+  volume: newSound.value.volume,
+  hasFile: draftHasFile.value,
+}));
 
 const addActions = computed(() => [
   { label: "Upload files", hint: "MP3, WAV or OGG, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openUploadModal },
@@ -312,7 +331,10 @@ watch(isSpeaking, (speaking) => {
   if (!currentPlayer) playingKey.value = null;
 });
 
-onBeforeUnmount(stopPlayback);
+onBeforeUnmount(() => {
+  stopPlayback();
+  copies.forget();
+});
 
 function moveSound(from: number, to: number) {
   const sounds = config.value?.soundFx.sounds;
@@ -339,9 +361,9 @@ function previewDraft() {
     stopPlayback();
     return;
   }
-  const { url, base64, name } = newSound.value;
+  const { url, base64, name, volume } = newSound.value;
   const stored = isEditMode.value && editingIndex.value !== null ? config.value?.soundFx.sounds[editingIndex.value] : undefined;
-  playSound({ name, url: url.trim(), base64, soundId: base64 ? undefined : stored?.soundId, enabled: true, triggers: [] }, DRAFT_KEY);
+  playSound({ name, url: url.trim(), base64, soundId: base64 ? undefined : stored?.soundId, enabled: true, triggers: [], volume }, DRAFT_KEY);
 }
 
 function stopPlayback() {
@@ -357,7 +379,7 @@ function stopPlayback() {
 
 // Modal handling
 function openAddSoundModal() {
-  newSound.value = { name: "", url: "", base64: "", triggers: [] };
+  newSound.value = { name: "", url: "", base64: "", triggers: [], volume: DEFAULT_VOLUME };
   isEditMode.value = false;
   editingIndex.value = null;
   urlError.value = "";
@@ -366,7 +388,7 @@ function openAddSoundModal() {
 
 function closeSoundModal() {
   if (playingKey.value === DRAFT_KEY) stopPlayback();
-  newSound.value = { name: "", url: "", base64: "", triggers: [] };
+  newSound.value = { name: "", url: "", base64: "", triggers: [], volume: DEFAULT_VOLUME };
   showSoundModal.value = false;
   editingIndex.value = null;
   urlError.value = "";
@@ -381,6 +403,7 @@ function editSound(index: number) {
     url: sound.url || "",
     base64: "", // loaded below if needed
     triggers: Array.isArray(sound.triggers) ? [ ...sound.triggers ] : [],
+    volume: soundVolume(sound),
   };
 
   // If we have a soundId, load from IndexedDB
@@ -464,6 +487,8 @@ async function saveSound() {
     enabled: true, // New sounds are enabled by default
     triggers,
   };
+  // Only a volume other than the file's own is stored
+  if (newSound.value.volume !== DEFAULT_VOLUME) sound.volume = newSound.value.volume;
 
   if (isEditMode.value && editingIndex.value !== null) {
     // Update existing sound
@@ -504,10 +529,18 @@ async function removeSound(index: number) {
 async function playSound(sound: ISound, key: number) {
   stopPlayback();
   playingKey.value = key;
+  const percent = soundVolume(sound);
 
   // Handle TTS sounds; the isSpeaking watcher clears the key when it is done.
   if (sound.tts) {
-    preview(sound.tts.text, sound.tts.voiceURI, sound.tts.rate, sound.tts.pitch);
+    preview(sound.tts.text, sound.tts.voiceURI, sound.tts.rate, sound.tts.pitch, percent);
+    return;
+  }
+
+  const plan = planVolume(percent, elementVolumeWorks());
+  // At 0% there is nothing to hear.
+  if (plan.kind === "silent") {
+    playingKey.value = null;
     return;
   }
 
@@ -522,61 +555,42 @@ async function playSound(sound: ISound, key: number) {
     playingKey.value = null;
   };
 
-  // Try to get base64 from IndexedDB first if sound has a soundId
+  // The stored upload first, then the config's copy, then the link
   let source = "";
   let blobUrl: string | undefined;
-
   if (sound.soundId && isIndexedDBAvailable()) {
-    const base64Data = await getSoundFxFromIndexedDB(sound.soundId);
-    if (base64Data) {
-      source = base64Data;
-
-      // For Safari: convert base64 to blob for better compatibility
-      if (isSafari()) {
-        try {
-          const blob = base64toBlob(base64Data);
-          blobUrl = URL.createObjectURL(blob);
-          source = blobUrl;
-        } catch (error) {
-          console.error("Error creating blob from base64:", error);
-          // Fall back to direct base64 if blob creation fails
-          source = base64Data;
-        }
-      }
-    }
+    source = (await getSoundFxFromIndexedDB(sound.soundId)) || "";
   }
-
-  // If no source from IndexedDB, fall back to config values
+  if (!source) source = sound.base64 || sound.url;
   if (!source) {
-    if (sound.base64) {
-      source = sound.base64;
-
-      // For Safari: convert base64 to blob for better compatibility
-      if (isSafari()) {
-        try {
-          const blob = base64toBlob(sound.base64);
-          blobUrl = URL.createObjectURL(blob);
-          source = blobUrl;
-        } catch (error) {
-          console.error("Error creating blob from base64:", error);
-          // Fall back to direct base64 if blob creation fails
-          source = sound.base64;
-        }
-      }
-    } else if (sound.url) {
-      source = sound.url;
-    } else {
-      // No audio source available
-      showNotification("No audio source available for this sound", "error");
-      finish();
-      return;
-    }
+    // No audio source available
+    showNotification("No audio source available for this sound", "error");
+    finish();
+    return;
   }
+
+  // A volume the file doesn't have plays from a copy made at that volume.
+  const copy = plan.kind === "copy" ? await copies.copyAt(source, plan.percent) : null;
 
   // Stopped, or another sound started, while the file was read.
-  if (currentPlayer !== audio) {
-    if (blobUrl) URL.revokeObjectURL(blobUrl);
-    return;
+  if (currentPlayer !== audio) return;
+
+  if (copy) {
+    source = copy;
+  } else {
+    // Without a copy, the file as it is, as loud as the element goes
+    audio.volume = plan.kind === "element" ? plan.volume : cappedVolume(percent);
+
+    // For Safari: convert base64 to blob for better compatibility
+    if (!isLink(source) && isSafari()) {
+      try {
+        blobUrl = URL.createObjectURL(base64toBlob(source));
+        source = blobUrl;
+      } catch (error) {
+        // Fall back to direct base64 if blob creation fails
+        console.error("Error creating blob from base64:", error);
+      }
+    }
   }
 
   // Set the source
@@ -596,6 +610,7 @@ async function playSound(sound: ISound, key: number) {
       // Fallback: try direct source if blob approach failed
       if (sound.base64 && source !== sound.base64) {
         const fallbackAudio = new Audio();
+        fallbackAudio.volume = audio.volume;
         fallbackAudio.src = sound.base64;
         fallbackAudio.play().catch((err) => {
           console.error("Fallback playback also failed:", err);
@@ -775,6 +790,7 @@ function openTTSModal(sound?: ISound, index?: number) {
       lang: sound.tts.lang || "",
       rate: sound.tts.rate ?? 1,
       pitch: sound.tts.pitch ?? 1,
+      volume: soundVolume(sound),
       triggers: Array.isArray(sound.triggers) ? [ ...sound.triggers ] : [],
     };
   } else {
@@ -787,6 +803,7 @@ function openTTSModal(sound?: ISound, index?: number) {
       lang: "",
       rate: lastRate.value,
       pitch: lastPitch.value,
+      volume: DEFAULT_VOLUME,
       triggers: [],
     };
   }
@@ -802,7 +819,7 @@ function closeTTSModal() {
 function prelistenTTS() {
   if (!ttsForm.value.text) return;
   stopPlayback();
-  preview(ttsForm.value.text, ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
+  preview(ttsForm.value.text, ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch, ttsForm.value.volume);
 }
 
 function saveTTSSound() {
@@ -828,6 +845,8 @@ function saveTTSSound() {
       pitch: ttsForm.value.pitch,
     },
   };
+  // Only a volume other than the voice's own is stored
+  if (ttsForm.value.volume !== DEFAULT_VOLUME) sound.volume = ttsForm.value.volume;
 
   // Read before closing, which resets it.
   const editing = ttsEditingIndex.value;

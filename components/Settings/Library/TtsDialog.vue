@@ -24,6 +24,12 @@
         </div>
       </div>
 
+      <VolumeField v-model="volume" :max="MAX_TTS_VOLUME">
+        <template #hint>
+          Up to 100%: a voice can be turned down, but no louder than it speaks.
+        </template>
+      </VolumeField>
+
       <TriggerField
         id="tts-triggers"
         v-model="triggers"
@@ -51,6 +57,7 @@
 
 <script setup lang="ts">
 import TriggerField from "./TriggerField.vue";
+import VolumeField from "./VolumeField.vue";
 
 import type { TriggerFeature } from "@/utils/trigger-catalog";
 
@@ -59,6 +66,7 @@ import AppInput from "@/components/AppInput.vue";
 import AppModal from "@/components/AppModal.vue";
 import AppSelect from "@/components/AppSelect.vue";
 import AppSlider from "@/components/AppSlider.vue";
+import { MAX_TTS_VOLUME } from "@/utils/sound-volume";
 
 const props = defineProps<{
   show: boolean;
@@ -72,6 +80,7 @@ const text = defineModel<string>("text", { required: true });
 const voice = defineModel<string>("voice", { required: true });
 const rate = defineModel<number>("rate", { required: true });
 const pitch = defineModel<number>("pitch", { required: true });
+const volume = defineModel<number>("volume", { required: true });
 const triggers = defineModel<string[]>("triggers", { required: true });
 const missingTrigger = ref(false);
 

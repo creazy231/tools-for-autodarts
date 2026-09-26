@@ -4,16 +4,21 @@ import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/
 import { gotchaCheckout } from "@/utils/checkout";
 import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
+import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
+import { DEFAULT_VOLUME, cappedVolume, isLink, planVolume, soundVolume } from "@/utils/sound-volume";
 import { winId } from "@/utils/win";
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
 let config: IConfig;
 
+/** A sound waiting its turn, and the volume it plays at (utils/sound-volume.ts). */
+interface QueuedSound { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS; volume?: number }
+
 // Audio player for Safari compatibility
 let audioPlayer: HTMLAudioElement | null = null;
 // Queue for sounds to be played
-const soundQueue: { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS }[] = [];
+const soundQueue: QueuedSound[] = [];
 // Flag to track if we're currently playing a sound
 let isPlaying = false;
 // Flag to track if audio has been unlocked
@@ -68,8 +73,14 @@ const LANE_HOLD_TIMEOUT_MS = 6000;
 // no longer owns.
 let laneHolder: HTMLAudioElement | null = null;
 let laneTimeout: number | null = null;
+// Bumped whenever the lane is taken or given up. A sound that waited for its
+// copy checks it still has its own hold, not just its element: a pool element
+// that sat paused through the wait is the first one a later sound takes.
+let laneHold = 0;
 // Tracking URLs that need to be revoked
 const blobUrlsToRevoke: string[] = [];
+// Copies of sounds at volumes their files don't have — see utils/sound-copies.ts
+const copies = soundCopies();
 
 function checkBoardStatus(boardData: IBoard): void {
   const boardEvent = boardData.event;
@@ -101,6 +112,9 @@ export async function caller() {
 
     // Initialize audio player for Safari compatibility
     initAudioPlayer();
+
+    // Copies of the sounds set to volumes their files don't have, made before they are needed
+    void copies.prepare(config.caller?.sounds ?? [], sourceOf);
 
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch((gameData: IGameData, oldGameData: IGameData) => {
@@ -169,6 +183,9 @@ export function callerOnRemove() {
   // Drop the lane and its watchdog
   releaseLane(false);
 
+  // Drop the copies made at other volumes
+  copies.forget();
+
   // Revoke any blob URLs
   blobUrlsToRevoke.forEach((url) => {
     try {
@@ -221,6 +238,7 @@ function releaseLane(advance: boolean = true): void {
     laneTimeout = null;
   }
   laneHolder = null;
+  laneHold++;
   isPlaying = false;
   if (advance) playNextSound();
 }
@@ -229,7 +247,13 @@ function releaseLane(advance: boolean = true): void {
 function holdLane(audioElement: HTMLAudioElement): void {
   if (laneTimeout !== null) clearTimeout(laneTimeout);
   laneHolder = audioElement;
+  laneHold++;
   laneTimeout = window.setTimeout(() => releaseLane(), LANE_HOLD_TIMEOUT_MS);
+}
+
+/** Whether `audioElement` still has the hold it took the lane with — see laneHold. */
+function stillHolds(audioElement: HTMLAudioElement, hold: number): boolean {
+  return laneHolder === audioElement && laneHold === hold;
 }
 
 /**
@@ -873,6 +897,7 @@ function playSound(trigger: string): void {
               url: soundToPlay.url,
               base64: soundToPlay.base64,
               name: soundToPlay.name,
+              volume: soundVolume(soundToPlay),
               soundId: soundToPlay.soundId,
               tts: soundToPlay.tts,
             });
@@ -892,6 +917,7 @@ function playSound(trigger: string): void {
                   url: numberSoundToPlay.url,
                   base64: numberSoundToPlay.base64,
                   name: numberSoundToPlay.name,
+                  volume: soundVolume(numberSoundToPlay),
                   soundId: numberSoundToPlay.soundId,
                   tts: numberSoundToPlay.tts,
                 });
@@ -944,6 +970,7 @@ function playSound(trigger: string): void {
               url: soundToPlay.url,
               base64: soundToPlay.base64,
               name: soundToPlay.name,
+              volume: soundVolume(soundToPlay),
               soundId: soundToPlay.soundId,
               tts: soundToPlay.tts,
             });
@@ -963,6 +990,7 @@ function playSound(trigger: string): void {
                   url: numberSoundToPlay.url,
                   base64: numberSoundToPlay.base64,
                   name: numberSoundToPlay.name,
+                  volume: soundVolume(numberSoundToPlay),
                   soundId: numberSoundToPlay.soundId,
                   tts: numberSoundToPlay.tts,
                 });
@@ -1029,6 +1057,7 @@ function playSound(trigger: string): void {
         url: soundToPlay.url,
         base64: soundToPlay.base64,
         name: soundToPlay.name,
+        volume: soundVolume(soundToPlay),
         soundId: soundToPlay.soundId,
         tts: soundToPlay.tts,
       });
@@ -1064,9 +1093,24 @@ async function playNextSound(): Promise<void> {
     try {
       console.log(`Autodarts Tools: Playing sound: ${nextSound.name || "unnamed"}`);
 
+      const percent = nextSound.volume ?? DEFAULT_VOLUME;
+      const plan = planVolume(percent, elementVolumeWorks());
+
+      // Turned all the way down: nothing plays, and nothing behind it waits
+      if (plan.kind === "silent") {
+        releaseLane();
+        return;
+      }
+
       // Handle TTS sounds
       if (nextSound.tts) {
-        playTTSSound(nextSound.tts);
+        playTTSSound(nextSound.tts, percent);
+        return;
+      }
+
+      // A volume the file doesn't have plays from a copy made at that volume
+      if (plan.kind === "copy") {
+        await playCopy(nextSound, percent);
         return;
       }
 
@@ -1077,7 +1121,7 @@ async function playNextSound(): Promise<void> {
           const base64Data = await getSoundFromIndexedDB(nextSound.soundId);
           if (base64Data) {
             console.log("Autodarts Tools: Successfully loaded sound from IndexedDB");
-            playBase64Sound(base64Data);
+            playBase64Sound(base64Data, plan.volume);
             return;
           } else {
             console.warn("Autodarts Tools: Sound not found in IndexedDB, falling back to base64/URL");
@@ -1089,7 +1133,7 @@ async function playNextSound(): Promise<void> {
 
       // Fall back to base64 in config if available
       if (nextSound.base64) {
-        playBase64Sound(nextSound.base64);
+        playBase64Sound(nextSound.base64, plan.volume);
       } else if (nextSound.url) {
         // Use URL source if available
         console.log("Autodarts Tools: Using URL source");
@@ -1112,6 +1156,9 @@ async function playNextSound(): Promise<void> {
 
         // Stop any current playback
         audioElement.pause();
+
+        // Pool elements are shared, so the last sound's volume must not carry over
+        audioElement.volume = plan.volume;
 
         // Set the source to the URL
         audioElement.src = nextSound.url;
@@ -1150,10 +1197,98 @@ async function playNextSound(): Promise<void> {
   }
 }
 
+/** The file a sound plays from, found as the queue finds it: its upload in IndexedDB, then the config's copy, then its link. */
+async function sourceOf(sound: { url?: string; base64?: string; soundId?: string }): Promise<string | undefined> {
+  if (sound.soundId && isIndexedDBAvailable()) {
+    try {
+      const stored = await getSoundFromIndexedDB(sound.soundId);
+      if (stored) return stored;
+    } catch (error) {
+      console.error("Autodarts Tools: Error loading sound from IndexedDB", error);
+    }
+  }
+  return sound.base64 || sound.url || undefined;
+}
+
+/**
+ * Plays a sound at a volume its file doesn't have, from a copy made at that
+ * volume. The copy is made while the sound holds the lane, as an IndexedDB
+ * read would be. If the lane is given up in the meantime (the watchdog, or
+ * every sound being stopped) the sound is dropped rather than played late,
+ * even when the next sound has taken the same element since. Without a copy
+ * it plays the file as it is, as loud as the element goes.
+ */
+async function playCopy(sound: QueuedSound, percent: number): Promise<void> {
+  const audioElement = takeAudioElement();
+  if (!audioElement) {
+    console.error("Autodarts Tools: Audio element not found in pool");
+    releaseLane();
+    return;
+  }
+  holdLane(audioElement);
+  const hold = laneHold;
+  audioElement.pause();
+
+  let source: string | undefined;
+  let copy: string | null = null;
+  try {
+    source = await sourceOf(sound);
+    if (source) copy = await copies.copyAt(source, percent);
+  } catch (error) {
+    console.error("Autodarts Tools: A sound could not be made at its volume", error);
+  }
+  if (!stillHolds(audioElement, hold)) return;
+
+  if (!source) {
+    console.error("Autodarts Tools: Sound has neither URL, base64 data, nor soundId");
+    releaseLane();
+    return;
+  }
+
+  if (copy) {
+    startOnElement(audioElement, copy, 1, hold);
+  } else if (isLink(source)) {
+    startOnElement(audioElement, source, cappedVolume(percent), hold);
+  } else {
+    const blobUrl = createAudioBlobUrl(source);
+    if (!blobUrl) {
+      releaseLane();
+      return;
+    }
+    blobUrlsToRevoke.push(blobUrl);
+    startOnElement(audioElement, blobUrl, cappedVolume(percent), hold, blobUrl);
+  }
+}
+
+/** Plays `src` on the pool element holding the lane on `hold`. `blobUrl` is revoked if it fails to play. */
+function startOnElement(audioElement: HTMLAudioElement, src: string, volume: number, hold: number, blobUrl?: string): void {
+  audioElement.volume = volume;
+  audioElement.src = src;
+  audioElement.play()
+    .then(() => {
+      console.log("Autodarts Tools: Sound playing at its volume");
+      if (laneHold === hold) releaseLaneIfLongSound(audioElement);
+    })
+    .catch((error) => {
+      console.error("Autodarts Tools: Error playing a sound at its volume", error);
+      if (isAutoplayBlocked(error)) {
+        showInteractionNotification();
+        unlockAudio();
+      }
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+        const index = blobUrlsToRevoke.indexOf(blobUrl);
+        if (index > -1) blobUrlsToRevoke.splice(index, 1);
+      }
+      // Only a hold this sound still has: another may have the lane, or even this element, by now
+      if (stillHolds(audioElement, hold)) releaseLane();
+    });
+}
+
 /**
  * Play a TTS sound using the Web Speech API
  */
-function playTTSSound(tts: ISoundTTS): void {
+function playTTSSound(tts: ISoundTTS, percent: number = DEFAULT_VOLUME): void {
   if (!window.speechSynthesis) {
     console.error("Autodarts Tools: speechSynthesis not available");
     releaseLane();
@@ -1173,6 +1308,8 @@ function playTTSSound(tts: ISoundTTS): void {
 
   utterance.rate = tts.rate;
   utterance.pitch = tts.pitch;
+  // Speech can be turned down, never up
+  utterance.volume = cappedVolume(percent);
 
   // Safety timeout for iOS (10 seconds)
   const safetyTimeout = setTimeout(() => {
@@ -1198,7 +1335,7 @@ function playTTSSound(tts: ISoundTTS): void {
 /**
  * Play a sound from base64 data
  */
-function playBase64Sound(base64Data: string): void {
+function playBase64Sound(base64Data: string, volume: number = 1): void {
   console.log("Autodarts Tools: Using base64 source");
 
   try {
@@ -1233,6 +1370,9 @@ function playBase64Sound(base64Data: string): void {
 
     // Stop any current playback
     audioElement.pause();
+
+    // Pool elements are shared, so the last sound's volume must not carry over
+    audioElement.volume = volume;
 
     // Set the source to the blob URL
     audioElement.src = audioUrl;

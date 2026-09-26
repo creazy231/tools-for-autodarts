@@ -3,6 +3,8 @@ import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from 
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
+import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
+import { DEFAULT_VOLUME, cappedVolume, planVolume, soundVolume } from "@/utils/sound-volume";
 import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
 import { winId } from "@/utils/win";
 
@@ -17,9 +19,11 @@ let localUserId: string | null = null;
 // Audio player for Safari compatibility
 let audioPlayer: HTMLAudioElement | null = null;
 let audioPlayer2: HTMLAudioElement | null = null;
+/** A sound waiting its turn, and the volume it plays at (utils/sound-volume.ts). */
+interface QueuedSound { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS; volume?: number }
 // Queue for sounds to be played
-const soundQueue: { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS }[] = [];
-const soundQueue2: { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS }[] = [];
+const soundQueue: QueuedSound[] = [];
+const soundQueue2: QueuedSound[] = [];
 // Flag to track if we're currently playing a sound
 let isPlaying = false;
 let isPlaying2 = false;
@@ -49,6 +53,8 @@ let currentAudioIndex = 0;
 let currentAudioIndex2 = 0;
 // Tracking URLs that need to be revoked
 const blobUrlsToRevoke: string[] = [];
+// Copies of sounds at volumes their files don't have — see utils/sound-copies.ts
+const copies = soundCopies();
 
 // Sounds play one after another so ordered pairs stay in order (the
 // "ambient_t19" fallback queues "triple" then "19", and they must not overlap).
@@ -69,6 +75,11 @@ let laneHolder: HTMLAudioElement | null = null;
 let laneHolder2: HTMLAudioElement | null = null;
 let laneTimeout: number | null = null;
 let laneTimeout2: number | null = null;
+// Bumped whenever a channel's lane is taken or given up. A sound that waited
+// for its copy checks it still has its own hold, not just its element: a pool
+// element that sat paused through the wait is the first one a later sound takes.
+let laneHold = 0;
+let laneHold2 = 0;
 
 /** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
 function isOnALobbyPage(): boolean {
@@ -105,6 +116,9 @@ export async function soundFx() {
 
     // Initialize audio player for Safari compatibility
     initAudioPlayer();
+
+    // Copies of the sounds set to volumes their files don't have, made before they are needed
+    void copies.prepare(config.soundFx?.sounds ?? [], sourceOf);
 
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch((gameData: IGameData, oldGameData: IGameData) => {
@@ -230,6 +244,9 @@ export function soundFxOnRemove() {
   releaseLane(1, false);
   releaseLane(2, false);
 
+  // Drop the copies made at other volumes
+  copies.forget();
+
   // Revoke any blob URLs
   blobUrlsToRevoke.forEach((url) => {
     try {
@@ -276,6 +293,7 @@ function releaseLane(channel: number, advance: boolean = true): void {
       laneTimeout2 = null;
     }
     laneHolder2 = null;
+    laneHold2++;
     isPlaying2 = false;
     if (advance) playNextSound(2);
   } else {
@@ -284,6 +302,7 @@ function releaseLane(channel: number, advance: boolean = true): void {
       laneTimeout = null;
     }
     laneHolder = null;
+    laneHold++;
     isPlaying = false;
     if (advance) playNextSound(1);
   }
@@ -294,12 +313,24 @@ function holdLane(audioElement: HTMLAudioElement, channel: number): void {
   if (channel === 2) {
     if (laneTimeout2 !== null) clearTimeout(laneTimeout2);
     laneHolder2 = audioElement;
+    laneHold2++;
     laneTimeout2 = window.setTimeout(() => releaseLane(2), LANE_HOLD_TIMEOUT_MS);
   } else {
     if (laneTimeout !== null) clearTimeout(laneTimeout);
     laneHolder = audioElement;
+    laneHold++;
     laneTimeout = window.setTimeout(() => releaseLane(1), LANE_HOLD_TIMEOUT_MS);
   }
+}
+
+/** The hold `channel`'s lane is on now — see laneHold. */
+function holdOf(channel: number): number {
+  return channel === 2 ? laneHold2 : laneHold;
+}
+
+/** Whether `audioElement` still has the hold it took `channel`'s lane with. */
+function stillHolds(audioElement: HTMLAudioElement, channel: number, hold: number): boolean {
+  return (channel === 2 ? laneHolder2 : laneHolder) === audioElement && holdOf(channel) === hold;
 }
 
 /**
@@ -1116,6 +1147,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  volume: soundVolume(soundToPlay),
                   tts: soundToPlay.tts,
                 });
 
@@ -1129,6 +1161,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  volume: soundVolume(soundToPlay),
                   tts: soundToPlay.tts,
                 });
 
@@ -1176,6 +1209,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  volume: soundVolume(soundToPlay),
                   tts: soundToPlay.tts,
                 });
 
@@ -1189,6 +1223,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   base64: soundToPlay.base64,
                   soundId: soundToPlay.soundId,
                   name: soundToPlay.name,
+                  volume: soundVolume(soundToPlay),
                   tts: soundToPlay.tts,
                 });
 
@@ -1345,6 +1380,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
               base64: tripleSoundToPlay.base64,
               soundId: tripleSoundToPlay.soundId,
               name: tripleSoundToPlay.name,
+              volume: soundVolume(tripleSoundToPlay),
               tts: tripleSoundToPlay.tts,
             });
 
@@ -1393,6 +1429,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
               base64: tripleSoundToPlay.base64,
               soundId: tripleSoundToPlay.soundId,
               name: tripleSoundToPlay.name,
+              volume: soundVolume(tripleSoundToPlay),
               tts: tripleSoundToPlay.tts,
             });
 
@@ -1579,6 +1616,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
           base64: wordSoundToPlay.base64,
           soundId: wordSoundToPlay.soundId,
           name: wordSoundToPlay.name,
+          volume: soundVolume(wordSoundToPlay),
           tts: wordSoundToPlay.tts,
         });
 
@@ -1592,6 +1630,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             base64: numberSoundToPlay.base64,
             soundId: numberSoundToPlay.soundId,
             name: numberSoundToPlay.name,
+            volume: soundVolume(numberSoundToPlay),
             tts: numberSoundToPlay.tts,
           });
           console.log("Autodarts Tools: Added number sound to queue (channel 2)");
@@ -1609,6 +1648,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
           base64: wordSoundToPlay.base64,
           soundId: wordSoundToPlay.soundId,
           name: wordSoundToPlay.name,
+          volume: soundVolume(wordSoundToPlay),
           tts: wordSoundToPlay.tts,
         });
 
@@ -1622,6 +1662,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             base64: numberSoundToPlay.base64,
             soundId: numberSoundToPlay.soundId,
             name: numberSoundToPlay.name,
+            volume: soundVolume(numberSoundToPlay),
             tts: numberSoundToPlay.tts,
           });
           console.log("Autodarts Tools: Added number sound to queue");
@@ -1660,6 +1701,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                 url: soundToPlay.url,
                 base64,
                 name: soundToPlay.name,
+                volume: soundVolume(soundToPlay),
               });
 
               // Start playing if not already playing
@@ -1671,6 +1713,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                 url: soundToPlay.url,
                 base64,
                 name: soundToPlay.name,
+                volume: soundVolume(soundToPlay),
               });
 
               // Start playing if not already playing
@@ -1687,6 +1730,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   url: soundToPlay.url,
                   base64: undefined,
                   name: soundToPlay.name,
+                  volume: soundVolume(soundToPlay),
                 });
 
                 // Start playing if not already playing
@@ -1698,6 +1742,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                   url: soundToPlay.url,
                   base64: undefined,
                   name: soundToPlay.name,
+                  volume: soundVolume(soundToPlay),
                 });
 
                 // Start playing if not already playing
@@ -1717,6 +1762,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                 url: soundToPlay.url,
                 base64: undefined,
                 name: soundToPlay.name,
+                volume: soundVolume(soundToPlay),
               });
 
               // Start playing if not already playing
@@ -1728,6 +1774,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
                 url: soundToPlay.url,
                 base64: undefined,
                 name: soundToPlay.name,
+                volume: soundVolume(soundToPlay),
               });
 
               // Start playing if not already playing
@@ -1746,6 +1793,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             url: soundToPlay.url,
             base64: soundToPlay.base64,
             name: soundToPlay.name,
+            volume: soundVolume(soundToPlay),
             tts: soundToPlay.tts,
           });
 
@@ -1758,6 +1806,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
             url: soundToPlay.url,
             base64: soundToPlay.base64,
             name: soundToPlay.name,
+            volume: soundVolume(soundToPlay),
             tts: soundToPlay.tts,
           });
 
@@ -1779,7 +1828,7 @@ function playSound(trigger: string, soundChannel: number = 1): void {
 /**
  * Play a TTS sound using the Web Speech API
  */
-function playTTSSound(tts: ISoundTTS, channel: number): void {
+function playTTSSound(tts: ISoundTTS, channel: number, percent: number = DEFAULT_VOLUME): void {
   if (!window.speechSynthesis) {
     console.error("Autodarts Tools: speechSynthesis not available");
     releaseLane(channel);
@@ -1799,6 +1848,8 @@ function playTTSSound(tts: ISoundTTS, channel: number): void {
 
   utterance.rate = tts.rate;
   utterance.pitch = tts.pitch;
+  // Speech can be turned down, never up
+  utterance.volume = cappedVolume(percent);
 
   // Safety timeout for iOS (10 seconds)
   const safetyTimeout = setTimeout(() => {
@@ -1849,9 +1900,18 @@ function playNextSound(channel: number = 1): void {
       return;
     }
 
+    const percent = nextSound.volume ?? DEFAULT_VOLUME;
+    const plan = planVolume(percent, elementVolumeWorks());
+
+    // Turned all the way down: nothing plays, and nothing behind it waits
+    if (plan.kind === "silent") {
+      playNextSound(2);
+      return;
+    }
+
     // Handle TTS sounds on channel 2
     if (nextSound.tts) {
-      playTTSSound(nextSound.tts, 2);
+      playTTSSound(nextSound.tts, 2, percent);
       return;
     }
 
@@ -1876,8 +1936,16 @@ function playNextSound(channel: number = 1): void {
       // Stop any current playback
       audioElement.pause();
 
-      // Play based on available source (URL, IndexedDB, or base64)
-      playWithAvailableSource(nextSound, audioElement, 2);
+      if (plan.kind === "copy") {
+        // A volume the file doesn't have plays from a copy made at that volume
+        void playCopy(nextSound, audioElement, 2, plan.percent);
+      } else {
+        // Pool elements are shared, so the last sound's volume must not carry over
+        audioElement.volume = plan.volume;
+
+        // Play based on available source (URL, IndexedDB, or base64)
+        playWithAvailableSource(nextSound, audioElement, 2);
+      }
     } catch (error) {
       console.error("Autodarts Tools: Exception while setting up audio for channel 2", error);
       // Move to next sound on error
@@ -1910,9 +1978,18 @@ function playNextSound(channel: number = 1): void {
       return;
     }
 
+    const percent = nextSound.volume ?? DEFAULT_VOLUME;
+    const plan = planVolume(percent, elementVolumeWorks());
+
+    // Turned all the way down: nothing plays, and nothing behind it waits
+    if (plan.kind === "silent") {
+      playNextSound(1);
+      return;
+    }
+
     // Handle TTS sounds on channel 1
     if (nextSound.tts) {
-      playTTSSound(nextSound.tts, 1);
+      playTTSSound(nextSound.tts, 1, percent);
       return;
     }
 
@@ -1937,8 +2014,16 @@ function playNextSound(channel: number = 1): void {
       // Stop any current playback
       audioElement.pause();
 
-      // Play based on available source (URL, IndexedDB, or base64)
-      playWithAvailableSource(nextSound, audioElement, 1);
+      if (plan.kind === "copy") {
+        // A volume the file doesn't have plays from a copy made at that volume
+        void playCopy(nextSound, audioElement, 1, plan.percent);
+      } else {
+        // Pool elements are shared, so the last sound's volume must not carry over
+        audioElement.volume = plan.volume;
+
+        // Play based on available source (URL, IndexedDB, or base64)
+        playWithAvailableSource(nextSound, audioElement, 1);
+      }
     } catch (error) {
       console.error("Autodarts Tools: Exception while setting up audio for channel 1", error);
       // Move to next sound on error
@@ -1947,9 +2032,75 @@ function playNextSound(channel: number = 1): void {
   }
 }
 
+/** The file a sound plays from, found as playWithAvailableSource finds it: its link, then its upload in IndexedDB, then the config's copy. */
+async function sourceOf(sound: { url?: string; base64?: string; soundId?: string }): Promise<string | undefined> {
+  if (sound.url) return sound.url;
+  if (sound.soundId && isIndexedDBAvailable()) {
+    try {
+      const stored = await getSoundFxFromIndexedDB(sound.soundId);
+      if (stored) return stored;
+    } catch (error) {
+      console.error("Autodarts Tools: Error loading sound from IndexedDB", error);
+    }
+  }
+  return sound.base64 || undefined;
+}
+
+/**
+ * Plays a queued sound from a copy made at its volume, on the pool element
+ * holding `channel`'s lane. The copy is made while the sound holds the lane.
+ * If the lane is given up in the meantime (the watchdog, or every sound being
+ * stopped) the sound is dropped rather than played late, even when the next
+ * sound has taken the same element since. Without a copy it plays the file as
+ * it is, as loud as the element goes.
+ */
+async function playCopy(nextSound: QueuedSound, audioElement: HTMLAudioElement, channel: number, percent: number): Promise<void> {
+  const hold = holdOf(channel);
+  let copy: string | null = null;
+  try {
+    const source = await sourceOf(nextSound);
+    if (source) copy = await copies.copyAt(source, percent);
+  } catch (error) {
+    console.error(`Autodarts Tools: A sound could not be made at its volume (channel ${channel})`, error);
+  }
+  if (!stillHolds(audioElement, channel, hold)) return;
+
+  try {
+    if (copy) {
+      startCopy(audioElement, copy, channel, hold);
+      return;
+    }
+    audioElement.volume = cappedVolume(percent);
+    playWithAvailableSource(nextSound, audioElement, channel);
+  } catch (error) {
+    console.error(`Autodarts Tools: Exception while setting up audio for channel ${channel}`, error);
+    if (stillHolds(audioElement, channel, hold)) releaseLane(channel);
+  }
+}
+
+/** Plays a copy made at a sound's volume on the pool element holding `channel`'s lane on `hold`. */
+function startCopy(audioElement: HTMLAudioElement, copy: string, channel: number, hold: number): void {
+  audioElement.volume = 1;
+  audioElement.src = copy;
+  audioElement.play()
+    .then(() => {
+      console.log(`Autodarts Tools: Sound playing at its volume (channel ${channel})`);
+      if (holdOf(channel) === hold) releaseLaneIfLongSound(audioElement, channel);
+    })
+    .catch((error) => {
+      console.error(`Autodarts Tools: Error playing a sound at its volume (channel ${channel})`, error);
+      if (isAutoplayBlocked(error)) {
+        showInteractionNotification();
+        unlockAudio();
+      }
+      // Only a hold this sound still has: another may have the lane, or even this element, by now
+      if (stillHolds(audioElement, channel, hold)) releaseLane(channel);
+    });
+}
+
 // Helper function to play sound based on available source
 function playWithAvailableSource(
-  nextSound: { url?: string; base64?: string; name?: string; soundId?: string },
+  nextSound: QueuedSound,
   audioElement: HTMLAudioElement,
   channel: number,
 ): void {

@@ -32,6 +32,18 @@
         </p>
       </div>
 
+      <div>
+        <VolumeField v-model="volume">
+          <template #hint>
+            100% is the file as it is. Up to 200% makes a quiet one louder.
+          </template>
+        </VolumeField>
+        <AppAlert v-if="louderBlocked" class="mt-3" compact variant="warning">
+          This link's site doesn't let the extension read the file, so it plays at 100% at most. To make it louder,
+          upload the file instead.
+        </AppAlert>
+      </div>
+
       <AppInput id="sound-name" v-model="name" label="Name" placeholder="Optional: shown in the list" />
 
       <TriggerField id="sound-triggers" v-model="triggers" :feature="feature" />
@@ -51,9 +63,11 @@
 <script setup lang="ts">
 import PlayButton from "./PlayButton.vue";
 import TriggerField from "./TriggerField.vue";
+import VolumeField from "./VolumeField.vue";
 
 import type { TriggerFeature } from "@/utils/trigger-catalog";
 
+import AppAlert from "@/components/AppAlert.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppInput from "@/components/AppInput.vue";
 import AppModal from "@/components/AppModal.vue";
@@ -66,12 +80,16 @@ withDefaults(defineProps<{
   feature: TriggerFeature;
   urlError?: string;
   playing?: boolean;
+  /** Set above 100% on a link whose file the extension cannot read, which then plays at 100% at most. */
+  louderBlocked?: boolean;
 }>(), {
   urlError: "",
   playing: false,
+  louderBlocked: false,
 });
 const emit = defineEmits<{ close: []; save: []; play: [] }>();
 const name = defineModel<string>("name", { required: true });
 const url = defineModel<string>("url", { required: true });
 const triggers = defineModel<string[]>("triggers", { required: true });
+const volume = defineModel<number>("volume", { required: true });
 </script>

@@ -243,6 +243,13 @@ export interface ISound {
   triggers: string[];
   soundId?: string;
   tts?: ISoundTTS;
+  /**
+   * How loud it plays, as a percentage of its file: 0–200, or 0–100 for text
+   * to speech. Missing is 100, so every sound saved before this plays as it
+   * always has; it is only stored when it is something else. Read it through
+   * soundVolume in utils/sound-volume.ts, never directly.
+   */
+  volume?: number;
 }
 
 export interface IAnimation {

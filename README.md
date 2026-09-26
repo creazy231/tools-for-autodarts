@@ -235,6 +235,7 @@ The Caller feature provides voice announcements during your darts gameplay, simi
 - **Custom Sound Library**: Add, edit, and organize voice clips for different game events. Everything that adds sounds is under **Add**: a predefined caller set, uploaded files, text-to-speech, or a link. Sorting by trigger and deleting everything are under **⋯**
 - **Search and Filters**: Find a sound by its name or trigger with the search above the list. A number also finds the ranges that cover it, so `150` finds a sound on `100-180`. The pills narrow the list to scores, throws, events, board status, player names, or the sounds you have switched off. Drag a sound by its handle to reorder the list, while no search or filter narrows it
 - **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text under **Add › Generate a sound**, with no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.
+- **Volume per Sound**: Each sound's editor has a volume from 0 to 200%. 100% plays the file as it is, so a quiet recording can be turned up and a loud one down, and the list shows any sound that is set to something else. Text-to-speech sounds go up to 100%, since a voice can't be made louder than it speaks. A sound on a link can only be turned up when its site lets the extension read the file; the editor says when it can't, and uploading the file works instead
 - **Bulk Upload with Trigger Assignment**: When uploading multiple files, each file shows the trigger its name gives before anything is saved, or choose **The same for all** to give every file the same triggers. That makes it easy to set up larger sound sets without assigning triggers to each file individually
 - **Triggers as chips**: Type a trigger and press Enter; the named ones are suggested as you type, with what each does. A pasted list becomes one trigger per line
 
@@ -373,6 +374,9 @@ Add sound effects for various game events:
 - **Cricket Mode**: Special triggers for Cricket games:
   - `cricket_hit`: Triggered when hitting Cricket targets (15-20 and Bull) that are still open
   - `cricket_miss`: Triggered when hitting non-Cricket targets (Miss-14) or hitting targets already closed by all players
+
+#### Volume per Sound
+Every sound has a volume from 0 to 200% in its editor, so each can be tuned on its own. The default Bull, for one, is much quieter than the triples; at 200% it is about as loud as T18. 100% plays the file as it is, 0% silences a sound without taking it out of the list, and the list shows any sound that isn't at 100%. Text-to-speech sounds go up to 100%. A sound on a link can only be turned up when its site lets the extension read the file, which the default *busted* and *gameshot* on myinstants.com do not; the editor says so, and uploading the file works instead
 
 #### Match vs Game Winning Sounds
 The Sound FX feature distinguishes between winning a single game (gameshot) and winning the entire match (matchshot):

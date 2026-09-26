@@ -10,6 +10,13 @@
         class="absolute h-full rounded-full bg-[var(--adt-overlay-strong)]"
         :style="{ width: `${percentage}%` }"
       />
+      <!--
+        The thumb stays inside the track, as a native range input's does: its
+        centre runs from half its width in at the minimum to half its width in
+        at the maximum, and updateValue maps the pointer over the same stretch.
+        Centred on the very end, it hung 10px past it and scrolled a dialog
+        sideways whenever a slider was at its top.
+      -->
       <div
         @keydown="handleKeyDown"
         @mousedown="handleThumbMouseDown"
@@ -18,8 +25,10 @@
         :aria-valuemin="min"
         :aria-valuemax="max"
         :aria-valuenow="modelValue"
+        :aria-label="label"
+        :aria-valuetext="formatLabel(modelValue)"
         class="absolute top-[-6px] size-5 rounded-full border border-[var(--adt-text)] bg-[var(--adt-overlay-strong)] !outline-none transition-colors focus:outline-none focus:ring-offset-0 disabled:pointer-events-none disabled:opacity-50"
-        :style="{ left: `calc(${percentage}% - 10px)` }"
+        :style="{ left: `calc(${percentage}% - ${(percentage * THUMB_SIZE) / 100}px)` }"
         tabindex="0"
         role="slider"
       />
@@ -57,6 +66,8 @@ const props = withDefaults(defineProps<{
    * down to the slider as it opened.
    */
   autofocus?: boolean;
+  /** What the slider sets, for screen readers: the thumb's accessible name. */
+  label?: string;
 }>(), {
   min: 0,
   max: 100,
@@ -65,9 +76,13 @@ const props = withDefaults(defineProps<{
   showValue: true,
   formatLabel: (value: number) => value.toString(),
   autofocus: true,
+  label: undefined,
 });
 
 const emit = defineEmits([ "update:modelValue" ]);
+
+/** The thumb's width in px (size-5), which the track's ends leave room for. */
+const THUMB_SIZE = 20;
 
 const percentage = computed(() => {
   return ((props.modelValue - props.min) / (props.max - props.min)) * 100;
@@ -81,7 +96,9 @@ function updateValue(clientX: number) {
   if (!track.value) return;
 
   const rect = track.value.getBoundingClientRect();
-  const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+  // Over the stretch the thumb's centre travels, so pressing the thumb where it is drawn leaves it there
+  const span = rect.width - THUMB_SIZE;
+  const percentage = span > 0 ? Math.max(0, Math.min(100, ((clientX - rect.left - THUMB_SIZE / 2) / span) * 100)) : 0;
   const rawValue = (percentage / 100) * (props.max - props.min) + props.min;
 
   // Apply step and round to avoid floating point artifacts (e.g. 1.4000000000000001)

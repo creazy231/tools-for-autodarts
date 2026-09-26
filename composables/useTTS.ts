@@ -1,6 +1,8 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useStorage } from "@vueuse/core";
 
+import { DEFAULT_VOLUME, cappedVolume } from "@/utils/sound-volume";
+
 export interface TTSVoiceOption {
   value: string;
   label: string;
@@ -48,7 +50,7 @@ export function useTTS() {
     }
   });
 
-  function preview(text: string, voiceURI: string, rate: number, pitch: number) {
+  function preview(text: string, voiceURI: string, rate: number, pitch: number, volume: number = DEFAULT_VOLUME) {
     if (!window.speechSynthesis || !text) return;
 
     // Cancel any ongoing speech
@@ -63,6 +65,8 @@ export function useTTS() {
       if (voice) utterance.voice = voice;
       utterance.rate = rate;
       utterance.pitch = pitch;
+      // Speech can be turned down, never up
+      utterance.volume = cappedVolume(volume);
 
       utterance.onend = () => { isSpeaking.value = false; };
       utterance.onerror = () => { isSpeaking.value = false; };
