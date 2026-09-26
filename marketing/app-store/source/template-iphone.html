@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@600&display=block">
+<style>
+  /* Canvas: the App Store 6.9" portrait size. Everything inside .screen is in
+     the iPhone 17 Pro Max's own pixels (1320 × 2868, 3× of 440 × 956 pt),
+     measured on the iOS 26.5 simulator's Safari. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: {{W}}px; height: {{H}}px; overflow: hidden; }
+  body {
+    position: relative;
+    color: #fff;
+    font-family: "Manrope", system-ui, sans-serif;
+    background:
+      radial-gradient(120% 70% at 0% 0%, #3d86ff 0%, rgba(61,134,255,0) 58%),
+      linear-gradient(160deg, #0b55df 0%, #0c3f9e 46%, #061c52 100%);
+  }
+
+  .copy { position: absolute; left: 60px; right: 60px; top: {{COPY_TOP}}px; text-align: center; }
+  .headline {
+    font-family: "Bebas Neue", sans-serif; font-weight: 400; text-transform: uppercase;
+    font-size: {{HEAD_SIZE}}px; line-height: .92; letter-spacing: .012em; white-space: nowrap;
+    text-shadow: 0 4px 18px rgba(0,0,0,.28);
+  }
+  .sub {
+    margin: {{SUB_GAP}}px auto 0; max-width: {{SUB_MAX}}px;
+    font-size: {{SUB_SIZE}}px; line-height: 1.26; font-weight: 600; color: rgba(255,255,255,.9);
+    text-wrap: balance;
+  }
+
+  /* The phone, drawn at its real size and scaled down as a whole. */
+  .phone {
+    position: absolute; left: 50%; top: {{PHONE_TOP}}px;
+    width: 1428px; height: 2976px; padding: 14px; border-radius: 244px;
+    transform-origin: top center; transform: translateX(-50%) scale({{S}});
+    background: linear-gradient(135deg, #5a5d63 0%, #25262a 22%, #3a3c41 50%, #1b1c1f 78%, #4a4c52 100%);
+    box-shadow: 0 70px 150px rgba(1, 8, 32, .55), 0 20px 50px rgba(1, 8, 32, .35);
+  }
+  .button { position: absolute; width: 12px; border-radius: 6px; background: linear-gradient(90deg, #2a2b2f, #55585e 50%, #2a2b2f); }
+  .button.left { left: -9px; } .button.right { right: -9px; }
+  .glass { width: 100%; height: 100%; border-radius: 230px; background: #050505; padding: 40px; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06); }
+  .screen { position: relative; width: 1320px; height: 2868px; border-radius: 190px; overflow: hidden; background: #000; }
+
+  .statusbar { position: absolute; left: 0; top: 0; width: 1320px; height: 186px; background: {{TOP}}; }
+  .time {
+    position: absolute; left: 151px; width: 200px; top: 63px; text-align: center;
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; font-size: 58px; line-height: 70px;
+    font-weight: 600; letter-spacing: -.5px; color: #fff;
+  }
+  .island { position: absolute; left: 472px; top: 42px; width: 376px; height: 108px; border-radius: 54px; background: #000; }
+  .status-icons { position: absolute; left: 930px; top: 70px; width: 280px; height: 56px; }
+
+  .page { position: absolute; left: 0; top: 186px; width: 1320px; height: 2388px; display: block; }
+
+  /* Safari's toolbar zone under the page: the page's own bottom colour,
+     fading darker, with the three glass controls floating in it. */
+  .toolzone { position: absolute; left: 0; top: 2574px; width: 1320px; height: 294px; overflow: hidden; background: {{BOTTOM_DARK}}; }
+  /* The page carries on under Safari's bar: its bottom edge, mirrored, blurred and darkened. */
+  .toolzone .edge { position: absolute; left: -60px; top: -40px; width: 1440px; height: 320px; overflow: hidden;
+    filter: blur(22px) brightness(.72); }
+  .toolzone .edge img { position: absolute; left: 60px; top: 40px; width: 1320px; height: 2388px; transform: scaleY(-1); transform-origin: 50% 0; top: calc(40px + 2388px); }
+  .toolzone .fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, {{BOTTOM_DARK}} 62%, {{BOTTOM_DARK}} 100%); }
+  .ctl {
+    position: absolute; top: 48px; height: 143px; border-radius: 72px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, rgba(58,62,76,.66) 0%, rgba(30,32,42,.78) 100%);
+    box-shadow: inset 0 0 0 2.5px rgba(180,200,255,.17), inset 0 3px 0 rgba(255,255,255,.12), 0 10px 28px rgba(0,0,0,.28);
+    backdrop-filter: blur(24px) saturate(150%);
+  }
+  .ctl.back { left: 103px; width: 142px; }
+  .ctl.more { left: 1075px; width: 143px; }
+  .ctl.address { left: 271px; width: 778px; justify-content: space-between; padding: 0 42px 0 46px; }
+  .url {
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; font-size: 51px; font-weight: 400;
+    letter-spacing: -.2px; color: #fff; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <div class="headline" id="headline">{{HEADLINE}}</div>
+    <div class="sub">{{SUB}}</div>
+  </div>
+
+  <div class="phone">
+    <div class="button left" style="top: 430px; height: 116px"></div>
+    <div class="button left" style="top: 640px; height: 196px"></div>
+    <div class="button left" style="top: 880px; height: 196px"></div>
+    <div class="button right" style="top: 740px; height: 300px"></div>
+    <div class="button right" style="top: 1620px; height: 190px"></div>
+    <div class="glass">
+      <div class="screen">
+        <div class="statusbar">
+          <div class="time">9:41</div>
+          <div class="island"></div>
+          <svg class="status-icons" viewBox="930 70 280 56" xmlns="http://www.w3.org/2000/svg">
+            <!-- cellular -->
+            <rect x="937" y="103" width="12" height="15" rx="3" fill="#fff"/>
+            <rect x="954" y="96" width="12" height="22" rx="3" fill="#fff"/>
+            <rect x="971" y="87" width="12" height="31" rx="3" fill="#fff"/>
+            <rect x="988" y="78" width="12" height="40" rx="3" fill="#fff"/>
+            <!-- wi-fi: three bands and a wedge, fanned from (1051.5, 118) -->
+            <g transform="translate(1051.5 117)">
+              <path d="M-27.6 -27.6 A39 39 0 0 1 27.6 -27.6 L21.2 -21.2 A30 30 0 0 0 -21.2 -21.2 Z" fill="#fff" transform="translate(0 -5)"/>
+              <path d="M-17.7 -17.7 A25 25 0 0 1 17.7 -17.7 L11.3 -11.3 A16 16 0 0 0 -11.3 -11.3 Z" fill="#fff" transform="translate(0 -3)"/>
+              <path d="M0 0 L-7.1 -7.1 A10 10 0 0 1 7.1 -7.1 Z" fill="#fff"/>
+            </g>
+            <!-- battery, full -->
+            <rect x="1106.5" y="79.5" width="78" height="37" rx="11" fill="none" stroke="rgba(255,255,255,.42)" stroke-width="3"/>
+            <rect x="1112" y="85" width="67" height="26" rx="7" fill="#fff"/>
+            <path d="M1189 91 h2.5 a3.5 3.5 0 0 1 3.5 3.5 v7 a3.5 3.5 0 0 1 -3.5 3.5 h-2.5 z" fill="rgba(255,255,255,.42)"/>
+          </svg>
+        </div>
+
+        <img class="page" src="{{IMG}}" alt="">
+
+        <div class="toolzone">
+          <div class="edge"><img src="{{IMG}}" alt=""></div>
+          <div class="fade"></div>
+          <div class="ctl back">
+            <svg width="44" height="70" viewBox="0 0 44 70"><path d="M33 7 L9 35 L33 63" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="ctl address">
+            <svg width="52" height="54" viewBox="0 0 52 54"><rect x="4" y="3" width="44" height="28" rx="7" fill="none" stroke="#fff" stroke-width="5"/><path d="M4 41 H48 M4 51 H34" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>
+            <span class="url">play.autodarts.com</span>
+            <svg width="52" height="56" viewBox="0 0 52 56"><path d="M40.5 21 A18 18 0 1 1 26 10" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M22 2.5 L31 10 L22 17.5" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="ctl more">
+            <svg width="70" height="16" viewBox="0 0 70 16"><circle cx="9" cy="8" r="6.5" fill="#fff"/><circle cx="35" cy="8" r="6.5" fill="#fff"/><circle cx="61" cy="8" r="6.5" fill="#fff"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Shrink the headline until it fits on one line, never below a floor.
+  const h = document.getElementById("headline");
+  const max = h.parentElement.clientWidth;
+  let size = parseFloat(getComputedStyle(h).fontSize);
+  while (h.scrollWidth > max && size > {{HEAD_MIN}}) { size -= 2; h.style.fontSize = size + "px"; }
+  if (h.scrollWidth > max) h.style.whiteSpace = "normal";
+</script>
+</body>
+</html>

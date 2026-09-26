@@ -1,0 +1,19 @@
+{
+  "iphone": [
+    { "name": "01-match-screen", "capture": "iphone-01-match.png", "headline": "Every dart up close", "sub": "Darts Zoom shows where each dart landed, right under the score" },
+    { "name": "02-caller", "capture": "iphone-02-caller.png", "headline": "Your own caller", "sub": "Scores, checkouts and game events, called out loud" },
+    { "name": "03-lobby", "capture": "iphone-03-lobby.png", "headline": "Start games faster", "sub": "Your saved players, one tap away" },
+    { "name": "04-settings", "capture": "iphone-04-settings.png", "headline": "Everything in one place", "sub": "Switch any feature on or off with one tap" },
+    { "name": "05-leg-won", "capture": "iphone-05-leg-won.png", "headline": "Celebrate every leg", "sub": "A winner animation, then the next leg starts itself" },
+    { "name": "06-takeout", "capture": "iphone-06-takeout.png", "headline": "Takeout at a glance", "sub": "A clear sign while the darts are being pulled" }
+  ],
+  "mac": [
+    { "name": "01-match-screen", "capture": "mac-01-match.png", "headline": "Every dart up close", "sub": "Darts Zoom and the points above every throw" },
+    { "name": "02-caller", "capture": "mac-02-caller.png", "headline": "Your own caller", "sub": "Scores, checkouts and game events, called out loud" },
+    { "name": "03-streaming-mode", "capture": "mac-03-streaming-mode.png", "headline": "Ready to stream", "sub": "The board and a scoreboard on a green screen" },
+    { "name": "04-lobby", "capture": "mac-04-lobby.png", "headline": "Start games faster", "sub": "Saved players, a QR code to join and Auto Start" },
+    { "name": "05-settings", "capture": "mac-05-settings.png", "headline": "Everything in one place", "sub": "Switch any feature on or off with one click" },
+    { "name": "06-leg-won", "capture": "mac-06-leg-won.png", "headline": "Celebrate every leg", "sub": "A winner animation, then the next leg starts itself" },
+    { "name": "07-takeout", "capture": "mac-07-takeout.png", "headline": "Takeout at a glance", "sub": "A clear sign while the darts are being pulled" }
+  ]
+}
