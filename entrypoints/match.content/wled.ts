@@ -61,6 +61,14 @@ function eventTrigger(trigger: string) {
   if (isTriggerPresent(trigger) && isConfiguredBoard()) setEffectByTrigger(trigger);
 }
 
+function _is_enabled(config: IConfig, gameMode: string | unknown): boolean {
+  if (!gameMode) return false;
+  return (
+    config.wledFx.enabled &&
+    !config.wledFx.disabledGameModes?.includes(gameMode as GameMode)
+  )
+}
+
 async function checkStatus(boardData: IBoard): Promise<void> {
   const boardEvent: string | undefined = boardData.event;
   const boardStatus: string | undefined = boardData.status;
@@ -112,7 +120,7 @@ export async function wledFx() {
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch(
         (gameData: IGameData, oldGameData: IGameData) => {
-          if (!config.wledFx?.enabled) return;
+          if (!_is_enabled(config, gameData.match?.variant)) return;
           settled.push(gameData, oldGameData);
         },
       );
@@ -122,7 +130,7 @@ export async function wledFx() {
         /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
       )?.[0];
 
-      if (gameData.match?.id === matchId) {
+      if (gameData.match?.id === matchId && _is_enabled(config, gameData.match?.variant)) {
         processGameData(gameData, gameData);
       }
     }
@@ -153,8 +161,10 @@ export async function wledFx() {
     }
 
     if (!boardDataWatcherUnwatch) {
-      boardDataWatcherUnwatch = AutodartsToolsBoardData.watch((boardData: IBoard) => {
-        checkStatus(boardData).catch(e => console.error(e));
+      boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (boardData: IBoard) => {
+        const { match } = await AutodartsToolsGameData.getValue();
+        if (_is_enabled(config, match?.variant))
+          checkStatus(boardData).catch(e => console.error(e));
       });
     }
 

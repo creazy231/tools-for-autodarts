@@ -404,8 +404,6 @@ function message(gameData: IGameData): string {
   // does not say is how many darts it took.
   //
   // `match.variant` is the site's own name for the game, from the match data.
-  // `gameData.gameMode` was read off an `h2` on the old site's new-lobby page,
-  // which the rebuilt site does not have, so it never left its default.
   if (match.variant !== "X01" || !darts) return "";
 
   const settings = match.settings as { baseScore?: number };
