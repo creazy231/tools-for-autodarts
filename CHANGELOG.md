@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - **Animations**, the **Caller**, **Sound FX** and **WLED** can be searched. A field above each list finds sounds, GIFs and effects by name, by trigger, or by where they come from, whether a link, the words a voice speaks or a WLED address. The exact trigger comes first, so `26` finds the sound on 26 before the one on 126, and a number also finds the ranges that take it in, so `150` answers "what plays on 150?" with the sound on `100-180`. Pills under the field narrow the list to scores, single darts and combinations, game events, board status, player names or what is switched off, each with a count of what the search has left. A trigger that is none of the built-in ones counts as a player's name, since that is how the Caller, Sound FX and WLED read it, so a misspelt trigger turns up there too
 - **Colors** has a *qwellcode* pair for the player card and another for the background, to go with the qwellcode board in **Board Skins**. The card runs from the board's dark green ring into its lime, turned a little greener and darkened until the card's white type reads on it as well as it does on autodarts' raspberry, since a lime that dark would be olive. The background goes from black into the ring's dark green, as deep as *Forest*, and the bottom bar and its buttons turn green with it
 - **The Caller** and **Sound FX** have a volume on every sound, from 0 to 200%, in the sound's editor. 100% plays the file as it is, so a quiet sound can be turned up and a loud one down: Sound FX's default Bull, 12 dB quieter than T20, is about as loud as T18 at 200%. The list shows any sound that isn't at 100%, and the play buttons play at the volume set. Text-to-speech sounds go up to 100%, since a voice can't be made louder than it speaks. A sound on a link can only be turned up when its site lets the extension read the file, which myinstants.com does not; the editor says so, and uploading the file works instead (#253)
+- **Animations** can each have a length of their own. The editor has a *Show for* field that stands in for the option of the same name when it is filled in, and **Use the GIF's length** fills it with one run of the GIF, read from the file whether it is a link or an upload. An animation with a length of its own shows it on its picture. A GIF now loads during the start delay and its time starts once it has, so the first play of a GIF no longer loses its end to the download (#254)
+  - Contributed by @MeisterBob
 
 ### Changed
 
@@ -38,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - The settings of **Auto Next Player on Takeout** and **Larger Legs/Sets** carry their cards' names
 - **The Caller** keeps an uploaded sound's recording when its name or triggers are saved before the recording has finished loading into the editor. It used to be saved without it, which left the sound silent
 - **Sound FX** and the **Caller** say "TTS sound updated" when an existing text-to-speech sound is saved; they always said "added"
+- **Animations** skip a GIF that can't be loaded. A dead link used to put up an empty overlay for the whole duration, and blur the page behind it in *Full page*
 
 ## [3.0.9] - 2026-09-25
 

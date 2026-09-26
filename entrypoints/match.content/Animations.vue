@@ -16,6 +16,9 @@
     :style="[ overlayStyle, { zIndex: LAYERS.animations } ]"
   >
     <img
+      @error="hide"
+      @load="startClock"
+      ref="image"
       :src="currentUrl"
       class="size-full transition-opacity duration-300"
       :class="[shown ? 'opacity-100' : 'opacity-0', objectFit === 'contain' ? 'object-contain' : 'object-cover']"
@@ -28,6 +31,7 @@
 import type { IGameData } from "@/utils/game-data-storage";
 import type { IThrow } from "@/utils/websocket-helpers";
 
+import { animationDuration } from "@/utils/animation-duration";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/helpers";
 import { SELECTORS, qs } from "@/utils/selectors";
@@ -41,6 +45,8 @@ const FADE_MS = 300;
 const FADE_IN_DELAY_MS = 50;
 /** Between the turn total and the three-dart combination, so both are seen. */
 const COMBINATION_GAP_MS = 500;
+/** How much longer than its duration an animation waits for its GIF before giving up on it. */
+const LOAD_WAIT_MS = 3000;
 
 const config = ref<IConfig | null>(null);
 
@@ -48,17 +54,22 @@ const config = ref<IConfig | null>(null);
 const visible = ref(false);
 const shown = ref(false);
 const currentUrl = ref("");
+const image = ref<HTMLImageElement | null>(null);
 
 /** Where "board only" puts the overlay, in viewport coordinates. */
 const boardRect = ref({ top: 0, left: 0, width: 0, height: 0 });
 
 let hideTimer: number | null = null;
+/** The duration of the animation on screen, in ms, held until its GIF has loaded. */
+let heldDuration: number | null = null;
 let unwatchGameData: (() => void) | undefined;
 /** The win the gameshot last played for — see {@link winId}. */
 let announcedWin: string | undefined;
 
 /** Object URLs handed out by OPFS, revoked on unmount. */
 const opfsUrls = new Map<string, string>();
+/** Links whose GIF failed to load, so a dead one never covers the board. */
+const failedUrls = new Set<string>();
 
 const fullPage = computed(() => config.value?.animations?.viewMode === "full-page");
 const objectFit = computed(() => config.value?.animations?.objectFit ?? "cover");
@@ -118,6 +129,7 @@ function hide(): void {
     clearTimeout(hideTimer);
     hideTimer = null;
   }
+  heldDuration = null;
 
   shown.value = false;
   hideTimer = window.setTimeout(() => {
@@ -192,7 +204,7 @@ function hasTrigger(trigger: string): boolean {
   ));
 }
 
-/** Pick an animation for a trigger, at random when several match. */
+/** Pick an animation for a trigger, at random when several match, with how long it stays up in seconds. */
 async function resolveAnimation(trigger: string): Promise<{ url: string; duration: number } | null> {
   const animations = config.value?.animations?.data;
   if (!animations?.length) return null;
@@ -208,7 +220,7 @@ async function resolveAnimation(trigger: string): Promise<{ url: string; duratio
     : picked.url;
   if (!url) return null;
 
-  return { url, duration: picked.duration };
+  return { url, duration: animationDuration(picked, config.value?.animations?.duration ?? 5) };
 }
 
 function matchesTrigger(animation: IAnimation, trigger: string): boolean {
@@ -253,6 +265,9 @@ async function play(trigger: string): Promise<void> {
 
     console.log("Autodarts Tools: Animations - playing", trigger);
 
+    // Loaded while the start delay runs, so the GIF is ready when it appears.
+    preload(animation.url);
+
     // The board moves with the window and with the player count, so its
     // position is only worth knowing at the moment it is covered.
     measureBoard();
@@ -263,20 +278,53 @@ async function play(trigger: string): Promise<void> {
     }
 
     const delay = (config.value?.animations?.delayStart ?? 1) * 1000;
-    // A duration of 0 on the animation means "use the global one".
-    const duration = (animation.duration || (config.value?.animations?.duration ?? 5)) * 1000;
+    const duration = animation.duration * 1000;
 
     currentUrl.value = animation.url;
 
     setTimeout(() => {
+      // A GIF that could not be loaded shows nothing, rather than an empty overlay.
+      if (failedUrls.has(currentUrl.value)) return;
+
       visible.value = true;
       setTimeout(() => (shown.value = true), FADE_IN_DELAY_MS);
-
-      if (hideTimer) clearTimeout(hideTimer);
-      hideTimer = window.setTimeout(hide, duration);
+      holdUntilLoaded(duration);
     }, delay);
   } catch (error) {
     console.error("Autodarts Tools: Animations - play error", error);
   }
+}
+
+/** Starts loading a GIF before it is shown, and remembers whether its link is dead. */
+function preload(url: string): void {
+  failedUrls.delete(url);
+  const loader = new Image();
+  loader.onload = () => failedUrls.delete(url);
+  loader.onerror = () => failedUrls.add(url);
+  loader.src = url;
+}
+
+/**
+ * Starts the clock once the GIF on screen has loaded, so a download slower than
+ * the start delay does not come off the end of it. A GIF that never loads is
+ * hidden LOAD_WAIT_MS after it would have been.
+ */
+function holdUntilLoaded(duration: number): void {
+  heldDuration = duration;
+  if (hideTimer) clearTimeout(hideTimer);
+  hideTimer = window.setTimeout(hide, duration + LOAD_WAIT_MS);
+
+  // A GIF that was already on screen and loaded fires no load event again.
+  nextTick(() => {
+    if (image.value?.complete && image.value.naturalWidth > 0) startClock();
+  });
+}
+
+/** The GIF on screen has loaded: its duration runs from now. */
+function startClock(): void {
+  if (heldDuration === null) return;
+  if (hideTimer) clearTimeout(hideTimer);
+  hideTimer = window.setTimeout(hide, heldDuration);
+  heldDuration = null;
 }
 </script>

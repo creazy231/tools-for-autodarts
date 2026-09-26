@@ -110,6 +110,15 @@
                   <ConfirmDeleteButton @confirm="removeAnimation(entry.index)" glass label="animation" />
                 </div>
                 <span v-if="!entry.enabled" class="adt-chip absolute bottom-2 left-2 !bg-black/70">Off</span>
+                <span
+                  v-if="ownLengthLabels[entry.index]"
+                  :title="`Stays up for ${ownLengthLabels[entry.index]}`"
+                  class="adt-chip absolute bottom-2 right-2 gap-1 !bg-black/70"
+                >
+                  <span aria-hidden="true" class="icon-[material-symbols--timer-outline-rounded]" />
+                  <span class="sr-only">Stays up for</span>
+                  {{ ownLengthLabels[entry.index] }}
+                </span>
               </div>
               <div class="flex items-center gap-2 p-2.5">
                 <TriggerChips :max="2" :query="query" :triggers="entry.triggers" :wrap="false" class="flex-1" />
@@ -154,7 +163,38 @@
             </template>
           </AppInput>
           <p v-if="isUploadedGif" class="adt-field-hint">
-            Kept in this browser as {{ uploadedGifFilename }}. Only its triggers can be changed.
+            Kept in this browser as {{ uploadedGifFilename }}. Its triggers and how long it stays up can be changed.
+          </p>
+        </div>
+        <div>
+          <label class="adt-field-label" for="animation-duration">Show for</label>
+          <!-- The button takes a line of its own where the field and it don't fit, as on a phone -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="w-28">
+              <AppInput
+                id="animation-duration"
+                v-model="durationText"
+                :placeholder="showForText"
+                class="text-right"
+                dense
+                min="0.1"
+                step="0.1"
+                type="number"
+              />
+            </div>
+            <span class="text-sm">s</span>
+            <AppButton @click="readGifLength" :disabled="!previewSrc" :loading="readingLength" auto class="h-10">
+              <span class="flex items-center gap-1.5">
+                <span class="icon-[material-symbols--timer-outline-rounded] text-lg" />
+                Use the GIF's length
+              </span>
+            </AppButton>
+          </div>
+          <p v-if="lengthError" class="adt-field-hint !text-[var(--ad-rose-500)]">
+            {{ lengthError }}
+          </p>
+          <p v-else class="adt-field-hint">
+            Leave it empty to use the Show for option ({{ showForText }} s).
           </p>
         </div>
         <TriggerField id="animation-triggers" v-model="animationTriggers" :validate="validateAnimationTrigger" feature="animations" />
@@ -258,7 +298,8 @@ import type { ComponentPublicInstance } from "vue";
 import type { LibraryEntry } from "@/utils/library-search";
 
 import { useNotification } from "@/composables/useNotification";
-import { deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
+import { MIN_ANIMATION_DURATION, bytesOfDataUrl, durationToSave, formatSeconds, gifRunLength, ownDuration, roundedSeconds } from "@/utils/animation-duration";
+import { backgroundFetch, deleteAnimationFromOPFS, getAnimationFromOPFS, getAnimationNameFromOPFS, isOPFSAvailable, saveAnimationToOPFS, validateAnimationTriggers } from "@/utils/helpers";
 import { type IAnimation } from "@/utils/storage";
 
 const emit = defineEmits([ "toggle" ]);
@@ -269,6 +310,12 @@ const FITS = [ { label: "Cover", value: "cover" }, { label: "Contain", value: "c
 const VIEW_MODES = [ { label: "Board only", value: "board-only" }, { label: "Full page", value: "full-page" } ];
 /** Drawn until a GIF comes near the view. */
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+/** Why "Use the GIF's length" found none, said under the field. */
+const LENGTH_ERRORS = {
+  link: "This link's site doesn't let the extension read the file, so its length can't be read.",
+  upload: "The uploaded GIF couldn't be read.",
+  notAnimated: "This isn't an animated GIF, so it has no length to read.",
+};
 
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/animations.png");
@@ -279,6 +326,10 @@ const newAnimation = ref<{ url: string; animationId: string | null }>({
   animationId: null,
 });
 const animationTriggers = ref<string[]>([]);
+/** The dialog's Show for, as typed: empty for the option's. */
+const durationText = ref("");
+const readingLength = ref(false);
+const lengthError = ref("");
 const editingIndex = ref<number | null>(null);
 
 // Which animations have come near the view
@@ -347,6 +398,14 @@ const previewSrc = computed(() => {
   return /^https?:\/\/\S+$/.test(url.trim()) ? url.trim() : "";
 });
 
+const showForText = computed(() => formatSeconds(config.value?.animations.duration ?? 5));
+
+/** "2.37 s" for each animation with a length of its own, for its tile. */
+const ownLengthLabels = computed(() => (config.value?.animations.data ?? []).map((animation) => {
+  const seconds = ownDuration(animation);
+  return seconds === undefined ? undefined : `${formatSeconds(seconds)} s`;
+}));
+
 const addActions = [
   { label: "Upload GIFs", hint: "From your computer, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openGifUploadModal },
   { label: "Add from a link", hint: "A GIF on the web, e.g. from Tenor or Giphy", icon: "icon-[material-symbols--link-rounded]", action: openAddAnimationModal },
@@ -369,6 +428,11 @@ const moreActions = computed(() => [
     action: openDeleteAllModal,
   },
 ]);
+
+// Another link is another GIF: what was said about the last one no longer applies
+watch(() => newAnimation.value.url, () => {
+  lengthError.value = "";
+});
 
 onUnmounted(() => {
   intersectionObserver?.disconnect();
@@ -435,6 +499,41 @@ async function loadAnimationSource(animation: IAnimation) {
   }
 }
 
+/** Fills in how long one run of the dialog's GIF takes, read from its link or its uploaded file. */
+async function readGifLength() {
+  const source = previewSrc.value;
+  if (!source || readingLength.value) return;
+  readingLength.value = true;
+  lengthError.value = "";
+  try {
+    const bytes = await gifBytes(source);
+    // The link changed while it was being read: this answer is about another GIF
+    if (source !== previewSrc.value) return;
+    const run = bytes && gifRunLength(bytes);
+    if (!bytes) lengthError.value = isUploadedGif.value ? LENGTH_ERRORS.upload : LENGTH_ERRORS.link;
+    else if (run === null) lengthError.value = LENGTH_ERRORS.notAnimated;
+    else durationText.value = formatSeconds(Math.max(MIN_ANIMATION_DURATION, roundedSeconds(run)));
+  } finally {
+    readingLength.value = false;
+  }
+}
+
+/**
+ * A GIF's bytes: an uploaded one from the object URL its preview uses, a link
+ * through the background's relay, as the Caller's louder copies do. null when
+ * they can't be had.
+ */
+async function gifBytes(source: string): Promise<Uint8Array | null> {
+  try {
+    if (source.startsWith("blob:")) return new Uint8Array(await (await fetch(source)).arrayBuffer());
+    const response = await backgroundFetch(source);
+    return response.ok && response.data?.startsWith("data:") ? bytesOfDataUrl(response.data) : null;
+  } catch (error) {
+    console.error("Autodarts Tools: Animations - could not read the GIF", error);
+    return null;
+  }
+}
+
 async function editAnimation(index: number) {
   if (!config.value || !config.value.animations.data[index]) return;
 
@@ -456,6 +555,9 @@ async function editAnimation(index: number) {
     animationId: animation.animationId || null,
   };
   animationTriggers.value = Array.isArray(animation.triggers) ? [ ...animation.triggers ] : [];
+  const own = ownDuration(animation);
+  durationText.value = own === undefined ? "" : formatSeconds(own);
+  lengthError.value = "";
   isEditMode.value = true;
   editingIndex.value = index;
   showAnimationModal.value = true;
@@ -491,8 +593,11 @@ function saveAnimation() {
     triggers: validTriggers,
     enabled: true, // New animations are enabled by default
     animationId: newAnimation.value.animationId ?? undefined,
-    duration: 0,
   };
+
+  // Only a length of its own is stored: without one it stays up for Show for
+  const duration = durationToSave(durationText.value);
+  if (duration !== undefined) animation.duration = duration;
 
   if (isEditMode.value && editingIndex.value !== null) {
     // Update existing animation
@@ -510,6 +615,8 @@ function saveAnimation() {
 function closeAnimationModal() {
   newAnimation.value = { url: "", animationId: null };
   animationTriggers.value = [];
+  durationText.value = "";
+  lengthError.value = "";
   showAnimationModal.value = false;
   editingIndex.value = null;
   isUploadedGif.value = false;
@@ -533,6 +640,8 @@ function removeAnimation(index: number) {
 function openAddAnimationModal() {
   newAnimation.value = { url: "", animationId: null };
   animationTriggers.value = [];
+  durationText.value = "";
+  lengthError.value = "";
   isUploadedGif.value = false;
   uploadedGifFilename.value = "";
   isEditMode.value = false;
@@ -596,7 +705,6 @@ async function processGifFiles({ files, fromNames, triggers: shared }: { files: 
           url: "", // Empty URL since we're storing in OPFS
           triggers: fromNames ? extractTriggersFromGifFilename(file.name) : [ ...sharedTriggers ],
           enabled: true,
-          duration: 0,
         };
 
         // Save to OPFS

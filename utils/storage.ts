@@ -257,7 +257,14 @@ export interface IAnimation {
   triggers: string[];
   enabled: boolean;
   animationId?: string;
-  duration: number;
+  /**
+   * How long it stays up, in seconds, when it has a length of its own. Missing
+   * is the Show for option (`animations.duration`), so every animation saved
+   * before this plays as it always has; it is only stored when it is set. Read
+   * it through ownDuration / animationDuration in utils/animation-duration.ts,
+   * never directly.
+   */
+  duration?: number;
 }
 
 export interface IGlobalStatus {
@@ -415,7 +422,7 @@ export interface IWled {
 export type TBoardStatus = BoardStatus | undefined;
 
 export const defaultConfig: IConfig = {
-  version: 23,
+  version: 22,
   discord: {
     enabled: false,
     manually: false,
@@ -562,121 +569,101 @@ export const defaultConfig: IConfig = {
         url: "https://media.tenor.com/G4cRydvvtU4AAAAM/ted-hankey-darts.gif",
         triggers: [ "t20_t20_bull" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/uhkDiMdcP44AAAAd/rapid-darts-darts.gif",
         triggers: [ "gameshot" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/QriSf7Rc78cAAAAd/darts-niner.gif",
         triggers: [ "gameshot" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/VGyxDGucFyAAAAAM/dancing-bubbly.gif",
         triggers: [ "gameshot" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/2SQcMaUE_D8AAAAd/celebrate-winner.gif",
         triggers: [ "gameshot" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/HhqlzHe8tXsAAAAd/bulls-eye-anderson.gif",
         triggers: [ "bull", "s50" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/Oqlecl-G3xAAAAAd/simon-whitlock-darts-bull.gif",
         triggers: [ "bull", "s50" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/pJJbIyu-Bf0AAAAd/tony-o-shea-tony.gif",
         triggers: [ "bull", "s50" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/bYQ_X5uvRrIAAAAd/gerwyn-price-darts.gif",
         triggers: [ "180" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/lTiUQMnV_qQAAAAC/gerwynprice-darts.gif",
         triggers: [ "180" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/xFkVft-1xMQAAAAM/gerwyn-price-darts.gif",
         triggers: [ "180" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/uL_HJCSQfkIAAAAM/throw-toss.gif",
         triggers: [ "180" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/psyC1iEr058AAAAd/bulls-eye-animation.gif",
         triggers: [ "outside" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/x715u156Jz4AAAAd/bbc-america-darts-bbca.gif",
         triggers: [ "outside" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/sbknQ0awa2sAAAAM/bbc-america-darts-bbca.gif",
         triggers: [ "outside" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/kD_PH0LHaHEAAAAM/sigh-growl.gif",
         triggers: [ "outside" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media1.tenor.com/m/jaqTZHiIA7EAAAAd/james-wade-darts.gif",
         triggers: [ "busted" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/LU60882wezcAAAAM/fallon-sherrock-sports.gif",
         triggers: [ "busted" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/Rpa8qRNWZ3UAAAAM/glen-durrant-miss.gif",
         triggers: [ "busted" ],
         enabled: true,
-        duration: 0,
       },
       {
         url: "https://media.tenor.com/tfkMfGGbcLoAAAAM/bbc-america-darts-bbca.gif",
         triggers: [ "busted" ],
         enabled: true,
-        duration: 0,
       },
     ],
   },

@@ -596,6 +596,7 @@ The Animations feature allows you to display custom GIF animations for special e
 #### Configuration
 - **Start delay**: Set how long to wait before showing the animation (in seconds)
 - **Show for**: Set how long the animation should display (in seconds)
+- **A length for one animation**: An animation's editor has its own **Show for**, which overrides the option for that GIF; leave it empty to use the option. **Use the GIF's length** fills in how long one run of the GIF takes, read from the file, so it plays exactly once. An animation with a length of its own shows it on its picture
 - **Fit**: Choose between **Cover** (fill the space, cropping the GIF if needed) or **Contain** (show all of it)
 - **Covers**: Choose between **Board only** (the animation covers the dartboard) or **Full page** (it covers the whole page, over a blurred background)
 - **Add**: Upload GIFs, or add one from a link, whose editor previews it. Sorting by trigger and deleting everything are under **⋯**
@@ -603,7 +604,7 @@ The Animations feature allows you to display custom GIF animations for special e
 - **Bulk Upload with Trigger Assignment**: When uploading multiple GIF files, each file shows the triggers its name gives before anything is saved, or choose **The same for all** to give every file the same triggers, making it easy to set up larger animation sets
 - **Trigger checking**: A trigger animations don't know is marked as soon as it is added, rather than when saving
 
-Clicking an animation dismisses it early, so a long GIF never has to be waited out mid-leg.
+Clicking an animation dismisses it early, so a long GIF never has to be waited out mid-leg. A GIF loads during the start delay and its time on screen starts once it has, so a slow download doesn't cut its end off, and a GIF that can't be loaded isn't shown.
 
 #### Supported Triggers
 Animations can be triggered by various game events using these tags:
