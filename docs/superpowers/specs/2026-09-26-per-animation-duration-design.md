@@ -87,8 +87,8 @@ So a length of one run covers the whole GIF on every play, as long as the GIF ha
    Links on Tenor send `Access-Control-Allow-Origin`, so the relay reads them. A link the relay cannot read, or a file that is not an animated GIF, gets a line under the field saying the length could not be read, and nothing is changed.
 
 5. **The editor.** The *Add an animation from a link* / *Edit animation* dialog gets a **Show for** field straight after the link or uploaded GIF, before Triggers, where the sound editor puts Volume:
-   - A dense number field in seconds (`min` 0.1, `step` 0.1, any precision kept), with `s` after it. Its placeholder is the *Show for* option's value.
-   - A neutral **Use the GIF's length** button beside it (not blue, since the dialog's blue button is Save). It is greyed out while there is no link and no uploaded GIF, and shows its loading state while it reads.
+   - A dense number field in seconds (`min` 0.1, `step` 0.1, any precision kept), with `s` after it. It is as wide as the option rows' fields and has no spin buttons, because the browser draws them as a white box on the dark field. Its placeholder is the *Show for* option's value.
+   - **Use the GIF's length** sits on the label row, at the right, as *All triggers* does on the triggers field: small blue text with a timer icon. It is greyed out while there is no link and no uploaded GIF, and its icon spins while it reads. (Until 2026-09-27 it was a grey button beside the field. It looked heavier than the field it fills, and on a phone it needed a line of its own.)
    - A hint under the field, "Leave it empty to use the Show for option (5 s)." A failed read replaces it with the error, in the dialog's own error colour.
    - Saving:
      - An empty field, 0 or a negative number saves no `duration`.

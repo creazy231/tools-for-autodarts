@@ -167,15 +167,29 @@
           </p>
         </div>
         <div>
-          <label class="adt-field-label" for="animation-duration">Show for</label>
-          <!-- The button takes a line of its own where the field and it don't fit, as on a phone -->
-          <div class="flex flex-wrap items-center gap-2">
-            <div class="w-28">
+          <!-- Reading the GIF's length sits on the label row, as All triggers does on the triggers' -->
+          <div class="adt-field-label justify-between">
+            <label for="animation-duration">Show for</label>
+            <button
+              @click="readGifLength"
+              :aria-busy="readingLength"
+              :disabled="!previewSrc || readingLength"
+              :title="previewSrc ? 'Fill in how long one run of this GIF takes' : 'Add a link to a GIF first'"
+              class="flex items-center gap-1 text-xs font-semibold text-[var(--ad-blue-300)] enabled:hover:text-white disabled:cursor-not-allowed disabled:text-[var(--ad-text-disabled)]"
+              type="button"
+            >
+              <span class="text-sm" :class="readingLength ? 'icon-[pixelarticons--loader] animate-spin' : 'icon-[material-symbols--timer-outline-rounded]'" />
+              Use the GIF's length
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-24">
+              <!-- No spin buttons: the browser's are a white box on this dark field, and a length is typed or read -->
               <AppInput
                 id="animation-duration"
                 v-model="durationText"
                 :placeholder="showForText"
-                class="text-right"
+                class="text-right [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 dense
                 min="0.1"
                 step="0.1"
@@ -183,12 +197,6 @@
               />
             </div>
             <span class="text-sm">s</span>
-            <AppButton @click="readGifLength" :disabled="!previewSrc" :loading="readingLength" auto class="h-10">
-              <span class="flex items-center gap-1.5">
-                <span class="icon-[material-symbols--timer-outline-rounded] text-lg" />
-                Use the GIF's length
-              </span>
-            </AppButton>
           </div>
           <p v-if="lengthError" class="adt-field-hint !text-[var(--ad-rose-500)]">
             {{ lengthError }}
