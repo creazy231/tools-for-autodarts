@@ -4,9 +4,15 @@ import { addStyles, removeStyles } from "@/utils";
 /**
  * Smaller Scores — shrink the waiting players' scores so the thrower's stands out.
  *
- * v1 keyed this off `.ad-ext-player-active`. The rebuilt site marks the active
- * player by painting that card with its gradient instead of by class, so the
- * rule targets the cards that do *not* carry it.
+ * v1 keyed this off `.ad-ext-player-active`. The rebuilt site marks a card by
+ * painting its face instead, and not only for whose turn it is: a bust turns
+ * the thrower's card grey and a won leg gives the winner's its own gradient,
+ * each taking the resting colour off. So the rule targets the cards still at
+ * rest, as Colors does. Keyed on "no turn gradient", it shrank the thrower's
+ * score the moment they busted or won, and everything around the card moved
+ * with it: in the stacked layout the whole row of cards above the board, and
+ * the board. With three or more players that layout draws the thrower's card
+ * with no colour of its own, so it shrank the one big score it shows.
  *
  * The card, not the column it sits in: the widest layout stacks two or three
  * cards in one column, and a rule keyed on "the column without the gradient"
@@ -22,10 +28,11 @@ const STYLE_ID = "score-smaller";
 export async function smallerScores() {
   try {
     const card = anyOf(SELECTORS.match.scoreCard);
+    const idle = anyOf(SELECTORS.match.idleCard);
     const score = SELECTORS.match.playerScore[0];
 
     addStyles(`
-      ${card}:not([class*="bg-raspberry"]) ${score} {
+      ${card}${idle} ${score} {
         font-size: 3rem !important;
         height: auto !important;
         line-height: 1 !important;

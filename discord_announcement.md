@@ -24,6 +24,8 @@ Every feature that has options is **redesigned**, built from the new Autodarts s
 🔢 Number fields keep what you type until you leave them, so a 15 no longer jumps to 5 on its first digit.
 
 ### 🛠️ Fixed
+📏 **Smaller Scores** keeps the thrower's score full size when they bust or win the leg, so the board no longer jumps on a tablet held upright.
+
 👥 A saved player you delete stays deleted, instead of coming back in the next lobby.
 
 🔈 The **Caller** keeps an uploaded sound's recording when you save before it has loaded, and **Animations** skip a GIF that can't be loaded instead of putting up an empty overlay.
