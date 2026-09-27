@@ -1,7 +1,7 @@
 """Build the App Store screenshots from raw captures. See marketing/README.md.
 
     python3 build.py prepare <captures-dir> <work-dir>   captures → sRGB, one HTML page per screenshot
-    node render.mjs <work-dir> <out-dir>                 pages → PNG at the App Store sizes
+    node render.mjs <work-dir> <out-dir>                 pages → PNG: iphone-6.9, iphone-6.5 and mac
     python3 build.py finish <out-dir>                    optimise, tag sRGB, check size and alpha
 
 Captures come straight from the yarn dev Chrome, which writes them in Display P3
@@ -82,8 +82,11 @@ def prepare(captures, work):
             print(f"{platform}/{shot['name']}")
 
 
+OUTPUTS = {"iphone-6.9": (1320, 2868), "iphone-6.5": (1284, 2778), "mac": (2880, 1800)}
+
+
 def finish(out):
-    for platform, (width, height) in SIZES.items():
+    for platform, (width, height) in OUTPUTS.items():
         folder = os.path.join(out, platform)
         for name in sorted(os.listdir(folder)):
             if not name.endswith(".png"):

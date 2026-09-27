@@ -81,25 +81,32 @@ CREAZY" under the guest on 04.
 
 ## App Store (iPhone and Mac)
 
-`app-store/` holds the screenshots for the Safari apps, taken with 3.0.9: six for iPhone and
-seven for Mac. The App Store has no caption field, so each image carries its own headline, drawn
+`app-store/` holds the screenshots for the Safari apps, taken with 3.0.9: six for iPhone, in two
+sizes, and seven for Mac. The App Store has no caption field, so each image carries its own headline, drawn
 in the promo tiles' Bebas Neue and Manrope on the marquee tile's blue. The iPhone shots sit in an
 iPhone 17 Pro Max with Safari's status and address bars; the Mac shots sit in a Safari window.
 Quick Correction is left out, because Safari doesn't have it.
 
 Every file is a PNG at the size App Store Connect asks for, with no transparency and an sRGB
-profile. `asc screenshots validate` passes both sets (`--device-type IPHONE_69` and `DESKTOP`).
+profile. `asc screenshots validate` passes all three sets (`--device-type IPHONE_69`,
+`IPHONE_65` and `DESKTOP`).
 
-### iPhone (6.9" display, 1320×2868)
+### iPhone
+
+The same six shots come in two sizes, one for each iPhone slot App Store Connect accepts as the
+main one:
+- `app-store/iphone-6.9/`: 1320×2868, for the 6.9" Display slot.
+- `app-store/iphone-6.5/`: 1284×2778, for the 6.5" Display slot. It is the same page rendered at
+  1284/1320 scale, so the text is drawn at that size rather than resampled.
 
 | File | Headline | Subline |
 |---|---|---|
-| `app-store/iphone/01-match-screen.png` | Every dart up close | Darts Zoom shows where each dart landed, right under the score |
-| `app-store/iphone/02-caller.png` | Your own caller | Scores, checkouts and game events, called out loud |
-| `app-store/iphone/03-lobby.png` | Start games faster | Your saved players, one tap away |
-| `app-store/iphone/04-settings.png` | Everything in one place | Switch any feature on or off with one tap |
-| `app-store/iphone/05-leg-won.png` | Celebrate every leg | A winner animation, then the next leg starts itself |
-| `app-store/iphone/06-takeout.png` | Takeout at a glance | A clear sign while the darts are being pulled |
+| `01-match-screen.png` | Every dart up close | Darts Zoom shows where each dart landed, right under the score |
+| `02-caller.png` | Your own caller | Scores, checkouts and game events, called out loud |
+| `03-lobby.png` | Start games faster | Your saved players, one tap away |
+| `04-settings.png` | Everything in one place | Switch any feature on or off with one tap |
+| `05-leg-won.png` | Celebrate every leg | A winner animation, then the next leg starts itself |
+| `06-takeout.png` | Takeout at a glance | A clear sign while the darts are being pulled |
 
 ### Mac (2880×1800)
 
@@ -117,18 +124,24 @@ profile. `asc screenshots validate` passes both sets (`--device-type IPHONE_69` 
 
 - Screenshots can't be changed while a version is in review, and both 3.0.8 versions were
   Waiting for Review on 2026-09-26. So these go on the next version of each app.
-- **iPhone:** drop the six files, in order, into the 6.9" Display slot. The live listing still
-  has its own v1-site screenshots for 6.5" and 5.5". A size with screenshots of its own shows
-  them instead of the scaled 6.9" set, so delete those two sets in Media Manager, or those phones
-  keep showing the old site.
+- **iPhone:** App Store Connect checks every file against the slot it is dropped into, and turns
+  the wrong size away ("Mindestens ein Screenshot weist falsche Maße auf", with that slot's sizes).
+  - The 6.5" Display slot, which holds the listing's three v1-site screenshots, takes
+    `iphone-6.5/`. Delete the three old ones, then drop in the six in order.
+  - The 6.9" Display slot takes `iphone-6.9/`.
+  - Either set on its own is enough: Apple asks for 6.9" or 6.5" and fills the smaller iPhones
+    from what is there. Filling both gives the largest phones a sharper picture.
+  - The 5.5" set in Media Manager is v1-site screenshots too. Delete it, or those phones keep
+    showing the old site.
 - **iPad:** the 13", 12.9" and 11" sets are v1-site screenshots too. Nothing here replaces them.
 - **Mac:** replace the three v1-site screenshots with the seven.
 
 ### Requirements (checked 2026-09-26)
 
 From Apple's [screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/):
-- iPhone 6.9": 1260×2736, 1290×2796 or 1320×2868 portrait. Required, unless 6.5" screenshots
-  are given instead. Smaller iPhones show scaled screenshots when they have none of their own.
+- iPhone 6.9": 1260×2736, 1290×2796 or 1320×2868 portrait. iPhone 6.5": 1242×2688 or 1284×2778
+  portrait. One of the two is required. Smaller iPhones show scaled screenshots when they have
+  none of their own.
 - Mac: 1280×800, 1440×900, 2560×1600 or 2880×1800 (16:10). Required for a Mac app.
 - 1 to 10 per set, PNG or JPEG, no alpha.
 
