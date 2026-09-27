@@ -1,38 +1,37 @@
-# 🎯 Tools for Autodarts v3.0.8(9) 🎯
+# 🎯 Tools for Autodarts v3.1.0 🎯
+
+### 🎛️ Settings, rebuilt
+Every feature that has options is **redesigned**, built from the new Autodarts site's own parts: a line on what it does, then a row per setting with what it does and its control.
+
+📚 **Animations**, the **Caller**, **Sound FX** and **WLED** are libraries now: a row per sound or effect, with a play button, its triggers as chips and a switch (animations stay a grid of GIFs). Everything that adds something is under one blue **Add**.
+
+🔎 **Search** every list by name, trigger or link. A number also finds ranges, so `150` turns up the sound on `100-180`, and pills narrow the list to scores, darts, events, player names or what's switched off.
+
+🗑️ Deleting takes a second click on the red **Delete**, so a stray click no longer throws away a sound and its file.
 
 ### ✨ New
-🎨 **Board Skins** — play on Autodarts' board in another design: the one it had before the rebuild, *qwellcode*, *Opal*, *Marble* or *Sorbet*. Your darts and the hit highlight stay on top, so aiming by hand lands exactly where it did, and the new look shows in Darts Zoom's close-ups and in Streaming Mode too. With a board camera, it keeps the drawn board up for you.
+🎚️ **A volume for every sound** in the Caller and Sound FX, from 0 to 200%: turn the quiet default Bull up, or a loud gameshot down *(#253)*.
 
-🌈 **Colors, reworked** — give the card of the player whose turn it is, and the page behind the match, a colour pair each: Autodarts' own, a preset, or two colours of your own, picked beside a live preview of the match screen. It now reaches every card in every layout and at every window size, 3+ players included, the bottom bar keeps its colour after a won leg, and the page colour can go on every Autodarts page. Your old colours carry over.
+⏱️ **A length for every animation**: give a GIF its own *Show for*, or let **Use the GIF's length** fill in one run of it *(#254)*.
 
-🖼️ The feature cards on the **settings page** show fresh pictures, taken on the new site.
+🎮 **Game modes**: keep the Caller, Sound FX, WLED and Animations to the games you choose, say no low-score animation in Round the World. Every game stays on until you switch it off *(#222)*.
 
-### 🔊 Sound & WLED
-🏆 **Finish no longer celebrates a match twice** — the Caller, Sound FX, Animations and WLED all went off again when you pressed it *(#243)*.
-
-📣 **No more skipped visits** for the Caller, Sound FX and WLED when the next turn comes quickly — mostly on Firefox, where a visit handed over within a second could go uncalled *(#249)*.
-
-💡 WLED's `outside` effect fires on a miss at last *(#240)*.
-
-⏰ The **tournament ready-up** sound plays again when Autodarts asks you to mark ready, and WLED's `tournament_ready` goes off with it, for every match rather than just the first *(#246)*.
-
-### 🖥️ Lobby & match
-👥 Players added from **Saved players** go on your board, so their darts are scored like yours *(#244)*.
-
-🗂️ A second Autodarts tab no longer switches off the lobby features, or Sound FX and WLED on a tournament page.
-
-🔍 **Darts Zoom** stays out of the way of Autodarts' match chat *(#247)*, animations play in front of its close-ups *(#245)*, and *On Board* no longer zooms in on a dart you enter by hand.
+🟢 **qwellcode**: the board in **Board Skins** has a new design, dark green and lime rings on black and white, and **Colors** has a card and a background pair to match.
 
 ### ⚙️ Settings page
-🔄 Stays open when you reload it.
+📤 **Export** and **Import** are two menus, each for a file or the clipboard, and fit on one row on most phones. The ☕ beside the gear opens Ko-fi.
 
-🧩 Works next to the **FankiDarts** userscript — no more blank page, and typing an *s* into a field no longer opens FankiDarts' settings.
+🔢 Number fields keep what you type until you leave them, so a 15 no longer jumps to 5 on its first digit.
 
-### 👋 Gone
-✅ **Checkout Guide** — Autodarts now shows a route for every player itself. The Gotcha route beside your score goes with it; the Caller still calls it, and the Gotcha Helper still marks every player you could knock back.
+### 🛠️ Fixed
+👥 A saved player you delete stays deleted, instead of coming back in the next lobby.
+
+🔈 The **Caller** keeps an uploaded sound's recording when you save before it has loaded, and **Animations** skip a GIF that can't be loaded instead of putting up an empty overlay.
+
+✅ Your settings carry over as they are, and the new options start where you were: every game on, every sound at 100%, every animation on your *Show for*.
 
 ### 🤝 Community
-Thanks to **@msbreton** *(#240)*, **@andypech06** *(#243)* and **@KingBubbaTruck** *(#244)* for the reports, and to all of you in the bug channels for the rest 🎉
+Thanks to **@MeisterBob** for game modes *(#251)* and animation lengths *(#254)*, to **@andypech06** *(#222)* and **@vesperwatcher** *(#253)* for the ideas, and to all of you in the bug channels 🎉
 
 ---
 
