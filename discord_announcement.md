@@ -1,47 +1,43 @@
 # 🎯 Tools for Autodarts v3.1.0 🎯
 
-### 🎛️ Settings, rebuilt
-Every feature that has options is **redesigned**, built from the new Autodarts site's own parts: a line on what it does, then a row per setting with what it does and its control.
+### 🎨 Settings, rebuilt
+Every feature's settings are rebuilt in Autodarts' own design language, and every setting shows what it does.
 
-📚 **Animations**, the **Caller**, **Sound FX** and **WLED** are libraries now: a row per sound or effect, with a play button, its triggers as chips and a switch (animations stay a grid of GIFs). Everything that adds something is under one blue **Add**.
+🗂️ **Animations**, the **Caller**, **Sound FX** and **WLED** each show one list: every sound or effect is listed with a play button, its triggers and a switch. Everything new is added with one **Add** button.
 
-🔎 **Search** every list by name, trigger or link. A number also finds ranges, so `150` turns up the sound on `100-180`, and pills narrow the list to scores, darts, events, player names or what's switched off.
+🔍 **Search** every list by name or trigger, and show only the scores, darts or player names you want to see.
 
-🗑️ Deleting takes a second click on the red **Delete**, so a stray click no longer throws away a sound and its file.
+🖐️ Removing a sound takes a second click, so a single click no longer throws one out.
 
 ### ✨ New
-🎚️ **A volume for every sound** in the Caller and Sound FX, from 0 to 200%: turn the quiet default Bull up, or a loud gameshot down *(#253)*.
+🔊 **Turn every sound up or down on its own** in the Caller and Sound FX, up to twice as loud, so the quiet Bull can be heard over the rest *(#253)*.
 
-⏱️ **A length for every animation**: give a GIF its own *Show for*, or let **Use the GIF's length** fill in one run of it *(#254)*.
+⏱️ **Set how long each animation stays up**, one by one, or let the extension take the time of one run of it *(#254)*.
 
-🎮 **Game modes**: keep the Caller, Sound FX, WLED and Animations to the games you choose, say no low-score animation in Round the World. Every game stays on until you switch it off *(#222)*.
-
-🟢 **qwellcode**: the board in **Board Skins** has a new design, dark green and lime rings on black and white, and **Colors** has a card and a background pair to match.
+💡 **Game modes**: keep the Caller, Sound FX, WLED and Animations to the games you pick. Every game is on until you switch it off *(#222)*.
 
 ### ⚙️ Settings page
-📤 **Export** and **Import** are two menus, each for a file or the clipboard, and fit on one row on most phones. The ☕ beside the gear opens Ko-fi.
+🧩 **Export** and **Import** are two menus now, each for a file or the clipboard.
 
-🔢 Number fields keep what you type until you leave them, so a 15 no longer jumps to 5 on its first digit.
+📊 Typing a number keeps it as typed until you leave the field, so 15 no longer turns into 5.
 
-### 🛠️ Fixed
-📏 **Smaller Scores** keeps the thrower's score full size when they bust or win the leg, so the board no longer jumps on a tablet held upright.
+### 🔧 Notable fixes
+🖥️ **Smaller Scores** no longer makes your score smaller when a visit goes over or you finish the leg, so the board stays where it is when both players are at the top.
 
-👥 A saved player you delete stays deleted, instead of coming back in the next lobby.
+👥 A saved guest name you remove stays gone, instead of coming back in the next lobby.
 
-🔈 The **Caller** keeps an uploaded sound's recording when you save before it has loaded, and **Animations** skip a GIF that can't be loaded instead of putting up an empty overlay.
+📣 The **Caller** keeps a sound added from a file, and **Animations** are skipped when they cannot be shown, instead of leaving a blank screen.
 
-✅ Your settings carry over as they are, and the new options start where you were: every game on, every sound at 100%, every animation on your *Show for*.
+✅ Your settings, sounds, animations and WLED presets carry over, and every new option starts where you were: every game on, every sound as loud as before.
 
 ### 🤝 Community
-Thanks to **@MeisterBob** for game modes *(#251)* and animation lengths *(#254)*, to **@andypech06** *(#222)* and **@vesperwatcher** *(#253)* for the ideas, and to all of you in the bug channels 🎉
+Thanks to **@MeisterBob** for game modes *(#251)* and the animation times *(#254)*, to **@andypech06** *(#222)* for asking for them, and to all of you in the bug channels 🎉
 
 ---
 
 Please report any bugs in
-:flag_de: https://discord.com/channels/802528604067201055/1255293632110530612/1255293632110530612
-:flag_gb: https://discord.com/channels/802528604067201055/1255293651756650616/1255293651756650616
-or on GitHub: <https://github.com/creazy231/tools-for-autodarts/issues>
+:flag_de: <#1255293632110530612>
+:flag_gb: <#1255293651756650616>
+or on GitHub, where you'll also find the full changelog.
 
-Full changelog: <https://github.com/creazy231/tools-for-autodarts/blob/main/CHANGELOG.md>
-
-*Updates getting rolled out right now. Keep an eye on the GitHub page for the status of each browser:* <https://github.com/creazy231/tools-for-autodarts/tree/main?tab=readme-ov-file#tools-for-autodarts>
+*Updates getting rolled out right now. Keep an eye on the GitHub page for the status of each browser.*
