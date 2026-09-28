@@ -62,6 +62,7 @@ The file's own comment and the 3.0.0 changelog say seeking such a file "is unrel
   - missing fields come from the defaults; `duration` and the long-dead `delay` are dropped
 - **WXT migration 14** (`CONFIG_VERSION` 13 → 14) runs it on the stored config.
 - **Imports** (file and clipboard, `PageConfig.vue`) run it next to `normalizeColors`, because an old export is merged over the defaults unmigrated.
+- **The settings page** runs it on load (`withDefaults` in `composables/useConfig.ts`), next to `normalizeColors`. The migration dialog's legacy branch writes old settings back as they were, after migration 14 has already run, and without this *Before* and *After* would show as empty fields. Added after the final review.
 - **The match script** reads its config through it too, so an old shape never reaches the recorder.
 
 The old *Duration* was labelled "Before the winning dart", so it carries over as *Before*. *After* starts from *Start delay*, the time the old replay ran on past the dart. The start delay itself is unchanged.
@@ -93,10 +94,10 @@ As today:
 
 ### When things fail
 
-- **No `loadedmetadata`, or no `seeked`, within 3 s:** the replay plays from the start of the take, a longer run-up rather than a shorter one, and logs why.
+- **No `loadedmetadata`, or no `seeked`, within 3 s, or a seek that lands more than a second from the run-up:** the replay plays from wherever the video is, the start of the take at worst, a longer run-up rather than a shorter one, and logs why. A seek into a part of the file the browser can't reach is clamped and still reports `seeked`, so where it landed is what counts (found in the final review, pinned by a clamped-seek scenario).
 - **A recorder that never reports back:** stopping a take resolves after 1.5 s at most, and no replay follows. As today.
 - **A camera unplugged mid-match:** starting a take throws, and rotation stops. A held take still plays what it has.
-- **The overlay's safety timer** is set from the clip's real length, so a fallback clip is not cut short.
+- **The overlay's safety timer** runs from where the picture really starts to the end of the take (the video's own duration, or the measured length where the browser doesn't know it), so a fallback clip is not cut short.
 
 ## Testing
 
@@ -133,3 +134,33 @@ As today:
 
 - Saving replays (#154), other triggers and playing beside GIFs (#155).
 - The What's New dialog, which describes 3.0 and is the maintainer's to write per release.
+
+## After review
+
+A fresh review of the whole change found one important problem, and a smaller one was graded up by
+its effect. Both are fixed, each with a test that failed first:
+
+- **A seek the browser couldn't honour cut the replay short of the gameshot.** A position outside
+  `seekable` is clamped, and `seeked` still fires. So a seek that landed at 0 counted as cued, and the
+  safety timer, set for the clip from the run-up on, took the whole take off screen part way through.
+  The end-to-end harness gained a scenario that clamps every seek to 0. There, the last frame shown
+  was 4.8 s *before* the dart. Now a seek counts only if it lands within a second of the run-up, and
+  the timer runs from where the picture really starts. The whole take plays, through to the dart and
+  the *after* seconds.
+- **The settings page showed *Before* and *After* as empty fields** for settings the migration
+  dialog's legacy branch writes back as they were, after migration 14 has run. A config seeded in
+  that shape showed both fields empty. The page now runs the normalizer on load, as it does for
+  Colors, and shows 7 and 2 for a *Duration* of 7 and a *Start delay* of 2.
+
+Left as they are, for a later change:
+
+- A replay that ends, or is called off, during a click-started fade loses its picture before the
+  fade is over.
+- A win during an overlap starts a third recorder for the length of the overlap. A win taken back
+  after retiring has already run leaves its take recording until the next rotation.
+- A run-up that starts at 0 still seeks there. An engine that skips a seek to where it already is
+  would wait 3 s, inside the start delay.
+- The old-shape literal in `migration-config.ts` can no longer run, and could go.
+
+Firefox and Safari have still not been run. The review suggested a Firefox check before the release
+that ships this: a win about 40 s into a match, checking that the last frame is the dart.
