@@ -1,6 +1,7 @@
 import type { BoardStatus } from "@/utils/types";
 
 import { defaultColors, normalizeColors } from "@/utils/colors";
+import { defaultInstantReplay, normalizeInstantReplay } from "@/utils/instant-replay";
 import type { GameMode } from "@/utils/game-modes";
 
 export interface IConfig {
@@ -207,9 +208,11 @@ export interface IConfig {
   instantReplay: {
     enabled: boolean;
     deviceId: string;
-    /** Seconds of footage to play back. */
-    duration: number;
-    /** Seconds to wait after the leg is won before the replay covers the screen. */
+    /** Seconds of footage from before the winning dart. */
+    before: number;
+    /** Seconds of footage from after it. The replay can only start once these are filmed. */
+    after: number;
+    /** Seconds to wait after the leg is won before the replay covers the screen, or `after` where that is longer. */
     startDelay: number;
     viewMode?: "full-page" | "board-only";
     zoom: number;
@@ -562,16 +565,7 @@ export const defaultConfig: IConfig = {
   enhancedScoringDisplay: {
     enabled: false,
   },
-  instantReplay: {
-    enabled: false,
-    deviceId: "",
-    duration: 10,
-    startDelay: 3,
-    viewMode: "board-only",
-    zoom: 1,
-    positionX: 0,
-    positionY: 0,
-  },
+  instantReplay: defaultInstantReplay(),
   animations: {
     enabled: false,
     duration: 5,
@@ -828,7 +822,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 13;
+const CONFIG_VERSION = 14;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -842,6 +836,13 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Instant Replay is cut to the second now, so *Duration* is split into
+       * the seconds before the winning dart and the seconds after it. See
+       * normalizeInstantReplay for how the old numbers carry over.
+       */
+      14: (config: any) => ({ ...config, instantReplay: normalizeInstantReplay(config.instantReplay) }),
+
       /**
        * Colors has a colour scheme for the active player's card and one for
        * the page, where it had one flat colour for every card and one for a

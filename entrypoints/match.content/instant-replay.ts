@@ -1,8 +1,9 @@
-import type { IConfig } from "@/utils/storage";
 import type { IGameData } from "@/utils/game-data-storage";
+import type { InstantReplayConfig } from "@/utils/instant-replay";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { normalizeInstantReplay } from "@/utils/instant-replay";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { LAYERS } from "@/utils/layers";
@@ -13,7 +14,8 @@ import { LAYERS } from "@/utils/layers";
  * This is a camera pointed at the board by hand, not the board's own: the board
  * camera is on the board, and nothing in the browser can reach it. So the
  * feature holds a rolling recording of whatever camera you picked, and when a
- * leg is won it plays the last few seconds of it over the screen.
+ * leg is won it plays the seconds around the winning dart over the screen:
+ * `before` of them leading up to it and `after` of what follows.
  *
  * v1 did this by reading every frame back off a canvas with `getImageData` and
  * keeping them in a list — a GPU-to-CPU copy per frame, and around half a
@@ -24,16 +26,21 @@ import { LAYERS } from "@/utils/layers";
  *
  * This records with `MediaRecorder` instead — compressed by the same encoder
  * the browser uses for video calls, a few megabytes rather than hundreds — and
- * plays a real clip. The recording is cut into segments a replay long, of which
- * the last two are kept; a replay is the newest ones that add up to the
- * configured length, played back to back.
+ * plays a real clip.
  *
- * Segments rather than one long recording, because a `MediaRecorder` file
- * cannot be trimmed from the front: the header lives at the start and the
- * duration is never written, so seeking into one is unreliable in Chrome and
- * worse elsewhere. Playing whole segments needs neither. The seam between them
- * falls at the start of the replay, never at the throw, which is always in the
- * final segment.
+ * A recorder hands its file over only once it is stopped, and a file cannot be
+ * trimmed from the front, so the recording is a series of takes, each started
+ * while the one before is still running. A take is kept until the next one
+ * holds a whole run-up by itself: whenever a leg is won, one of them started at
+ * least `before` seconds earlier. That one records on through the `after`
+ * seconds, is stopped, and is played from the second the run-up begins — one
+ * file, so the replay has no seam in it anywhere. Two recorders run at once
+ * only for the overlap: `before` and a second, in every half minute or more.
+ *
+ * The one seek is to that first second. A file recorded in one piece, with no
+ * timeslice, carries its length and an index in Chrome, and a seek lands on the
+ * frame asked for. A browser that cannot seek plays the take from its start
+ * instead: a longer run-up, never a shorter one.
  */
 const HOST_ID = "adt-instant-replay";
 const STYLE_ID = "instant-replay";
@@ -41,14 +48,20 @@ const STYLE_ID = "instant-replay";
 /** Matches the fade in the stylesheet. */
 const FADE_MS = 500;
 
-/**
- * How many finished segments to hold on to.
- *
- * Two, plus the one being recorded, is what guarantees a full replay: the
- * segment in hand can be almost empty when the leg ends, so there has to be a
- * whole one behind it.
- */
-const KEEP_SEGMENTS = 2;
+/** On top of the run-up, before a take is let go: timers run late. */
+const OVERLAP_SLACK_MS = 1000;
+
+/** New takes no more often than this, so two recorders run at once for a small part of the time. */
+const MIN_PERIOD_MS = 30_000;
+
+/** Less than this recorded before the winning dart, and there is no run-up to show. */
+const MIN_RUN_UP_MS = 1000;
+
+/** How long the video gets to load a take, and then to find the run-up in it. */
+const CUE_TIMEOUT_MS = 3000;
+
+/** How long a recorder gets to hand its footage over once stopped. */
+const STOP_TIMEOUT_MS = 1500;
 
 /** Ordered by preference; Safari has none of the WebM ones. */
 const FORMATS = [
@@ -117,29 +130,34 @@ const STYLES = `
   }
 `;
 
-interface Segment {
-  blob: Blob;
-  ms: number;
+interface Take {
+  recorder: MediaRecorder;
+  /** When it began, by `performance.now()`: where its first frame sits, to within a frame. */
+  start: number;
+  /** Its footage, once it has been stopped; null when it recorded nothing. */
+  footage: Promise<Blob | null>;
 }
 
 let gameDataWatcherUnwatch: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let host: HTMLElement | null = null;
 let video: HTMLVideoElement | null = null;
-let config: IConfig["instantReplay"] | null = null;
+let config: InstantReplayConfig | null = null;
 
 let stream: MediaStream | null = null;
-let recorder: MediaRecorder | null = null;
 let recording = false;
-let chunks: Blob[] = [];
-let segments: Segment[] = [];
-let segmentStart = 0;
+/** Oldest first. */
+let takes: Take[] = [];
+/** The take a won leg is holding on to, which retiring passes by. */
+let held: Take | null = null;
 let rotateTimer: ReturnType<typeof setTimeout> | undefined;
-/** Whoever is waiting for the segment being recorded to be closed and banked. */
-let banked: Array<() => void> = [];
+let retireTimer: ReturnType<typeof setTimeout> | undefined;
 
-let urls: string[] = [];
+let url: string | null = null;
 let legWon = false;
+/** Goes up with every replay begun or called off, so a step still waiting can tell it is out of date. */
+let replay = 0;
+let captureTimer: ReturnType<typeof setTimeout> | undefined;
 let showTimer: ReturnType<typeof setTimeout> | undefined;
 let endTimer: ReturnType<typeof setTimeout> | undefined;
 let clearTimer: ReturnType<typeof setTimeout> | undefined;
@@ -148,7 +166,7 @@ export async function instantReplay() {
   console.log("Autodarts Tools: Instant Replay");
 
   const stored = await AutodartsToolsConfig.getValue();
-  config = stored.instantReplay;
+  config = normalizeInstantReplay(stored.instantReplay);
 
   if (!await startCamera()) return;
 
@@ -177,9 +195,12 @@ export function instantReplayOnRemove() {
     onReposition = null;
   }
 
+  replay++;
+  clearTimeout(captureTimer);
   clearTimeout(showTimer);
   clearTimeout(endTimer);
   clearTimeout(clearTimer);
+  captureTimer = undefined;
   showTimer = undefined;
   endTimer = undefined;
   clearTimer = undefined;
@@ -240,9 +261,14 @@ function releaseCamera(): void {
 
 // ---------------------------------------------------------------- the recording
 
-/** A replay's worth, and never so short that rotating costs more than it saves. */
-function segmentMs(): number {
-  return Math.max(3000, (config?.duration ?? 10) * 1000);
+/** How long a take is kept once the next has started: until that one alone holds a run-up. */
+function overlapMs(): number {
+  return (config?.before ?? 10) * 1000 + OVERLAP_SLACK_MS;
+}
+
+/** How often a take starts: twice the overlap at least, so two overlap half the time at most. */
+function periodMs(): number {
+  return Math.max(MIN_PERIOD_MS, 2 * overlapMs());
 }
 
 function recorderOptions(): MediaRecorderOptions {
@@ -252,136 +278,106 @@ function recorderOptions(): MediaRecorderOptions {
 
 function startRecording(): void {
   recording = true;
-  segments = [];
-  startSegment();
+  takes = [];
+  held = null;
+  rotate();
+}
+
+/** Start the next take, and let the older ones go once it holds a run-up of its own. */
+function rotate(): void {
+  if (!recording) return;
+
+  clearTimeout(rotateTimer);
+  rotateTimer = undefined;
+  if (!startTake()) {
+    recording = false;
+    return;
+  }
+
+  clearTimeout(retireTimer);
+  retireTimer = setTimeout(retire, overlapMs());
+  rotateTimer = setTimeout(rotate, periodMs());
+}
+
+/** Every take but the newest, which holds a whole run-up by now — and but the one a won leg is holding. */
+function retire(): void {
+  retireTimer = undefined;
+  for (const take of takes.slice(0, -1)) {
+    if (take !== held) dropTake(take);
+  }
 }
 
 /**
- * Started without a timeslice: the data then arrives in one piece when the
- * segment is closed, which is the only moment anything here cares about.
+ * Started without a timeslice: the footage then arrives in one piece when the
+ * take is stopped, which is the only moment anything here wants it — and a file
+ * made in one piece carries its own length and index, which is what lets the
+ * replay start at the right second.
  */
-function startSegment(): void {
-  if (!stream || !recording) return;
+function startTake(): Take | null {
+  if (!stream) return null;
 
-  chunks = [];
-  segmentStart = performance.now();
-
+  let recorder: MediaRecorder;
   try {
     recorder = new MediaRecorder(stream, recorderOptions());
   } catch (error) {
     console.warn("Autodarts Tools: Instant Replay - cannot record this camera", error);
-    recording = false;
-    recorder = null;
-    return;
+    return null;
   }
 
-  recorder.ondataavailable = (event: BlobEvent) => {
-    if (event.data?.size) chunks.push(event.data);
-  };
-  recorder.onstop = bankSegment;
+  const chunks: Blob[] = [];
+  const footage = new Promise<Blob | null>((resolve) => {
+    recorder.ondataavailable = (event: BlobEvent) => {
+      if (event.data?.size) chunks.push(event.data);
+    };
+    recorder.onstop = () => resolve(chunks.length
+      ? new Blob(chunks, { type: chunks[0].type || recorder.mimeType || "video/webm" })
+      : null);
+  });
 
   try {
     recorder.start();
   } catch (error) {
     // A camera unplugged mid-match ends its track, and the recorder goes with it.
     console.warn("Autodarts Tools: Instant Replay - recording stopped", error);
-    recording = false;
-    recorder = null;
-    return;
+    return null;
   }
 
-  clearTimeout(rotateTimer);
-  rotateTimer = setTimeout(() => {
-    if (recorder?.state === "recording") recorder.stop();
-  }, segmentMs());
-}
-
-/** Close the books on a segment and open the next, without a break in between. */
-function bankSegment(): void {
-  // The last stop of a match arrives here after the shelf has been cleared —
-  // bank that one and it would be waiting, a match old, for the next replay.
-  if (!recording) {
-    chunks = [];
-    const leaving = banked;
-    banked = [];
-    leaving.forEach(resolve => resolve());
-    return;
-  }
-
-  const blob = chunks.length
-    ? new Blob(chunks, { type: chunks[0].type || recorder?.mimeType || "video/webm" })
-    : null;
-  const ms = performance.now() - segmentStart;
-  chunks = [];
-
-  if (blob?.size) {
-    segments.push({ blob, ms });
-    while (segments.length > KEEP_SEGMENTS) segments.shift();
-  }
-
-  startSegment();
-
-  const waiting = banked;
-  banked = [];
-  waiting.forEach(resolve => resolve());
+  const take = { recorder, start: performance.now(), footage };
+  takes.push(take);
+  return take;
 }
 
 /**
- * Close the segment being recorded so it can be played, and carry on recording.
+ * Stop a take and hand its footage over.
  *
  * Resolves on a timer as well, because a recorder that never reports back would
  * otherwise mean a replay that never appears.
  */
-function flush(): Promise<void> {
-  return new Promise((resolve) => {
-    if (!recorder || recorder.state !== "recording") return resolve();
+function stopTake(take: Take): Promise<Blob | null> {
+  takes = takes.filter(other => other !== take);
+  try {
+    if (take.recorder.state !== "inactive") take.recorder.stop();
+  } catch {
+    // a recorder whose track has already gone throws on stop; nothing to do
+  }
+  return Promise.race([ take.footage, new Promise<null>(resolve => setTimeout(resolve, STOP_TIMEOUT_MS, null)) ]);
+}
 
-    let done = false;
-    const once = () => {
-      if (done) return;
-      done = true;
-      resolve();
-    };
-
-    banked.push(once);
-    setTimeout(once, 1500);
-
-    clearTimeout(rotateTimer);
-    recorder.stop();
-  });
+/** Stop a take and throw its footage away. */
+function dropTake(take: Take): void {
+  take.recorder.ondataavailable = null;
+  void stopTake(take);
 }
 
 function stopRecording(): void {
   recording = false;
   clearTimeout(rotateTimer);
+  clearTimeout(retireTimer);
   rotateTimer = undefined;
-
-  try {
-    if (recorder && recorder.state !== "inactive") recorder.stop();
-  } catch {
-    // a recorder whose track has already gone throws on stop; nothing to do
-  }
-
-  recorder = null;
-  chunks = [];
-  segments = [];
-
-  const waiting = banked;
-  banked = [];
-  waiting.forEach(resolve => resolve());
-}
-
-/** The newest segments that add up to a replay, oldest first. */
-function clip(wantMs: number): Segment[] {
-  const picked: Segment[] = [];
-  let have = 0;
-
-  for (let index = segments.length - 1; index >= 0 && have < wantMs; index--) {
-    picked.unshift(segments[index]);
-    have += segments[index].ms;
-  }
-
-  return picked;
+  retireTimer = undefined;
+  held = null;
+  [ ...takes ].forEach(dropTake);
+  takes = [];
 }
 
 // ------------------------------------------------------------------ the overlay
@@ -399,6 +395,7 @@ function mount(): void {
   video = document.createElement("video");
   video.muted = true;
   video.playsInline = true;
+  video.preload = "auto";
   // The zoom and offset the settings page framed the board with. Scaled about
   // the middle first, so the offset is in the magnified picture's own terms —
   // which is how it was framed in the preview.
@@ -435,53 +432,74 @@ function place(): void {
   host.style.height = `${board.height}px`;
 }
 
-async function show(): Promise<void> {
+/**
+ * Put a won leg's take on screen: loaded, and moved to the second its run-up
+ * starts while the overlay is still out of sight; then shown once autodarts has
+ * had its own moment.
+ *
+ * `offset` is where the run-up starts in the take and `length` how long the
+ * take is, both in milliseconds.
+ */
+async function present(id: number, footage: Blob, offset: number, length: number, won: number): Promise<void> {
   if (!host || !video || !config) return;
-
-  await flush();
-
-  // Closing the segment takes a moment, and the throw can be corrected inside
-  // it — at which point there is no longer a win to celebrate.
-  if (!legWon) return;
-
-  const picked = clip(Math.max(1, config.duration ?? 10) * 1000);
-  if (!picked.length) {
-    console.warn("Autodarts Tools: Instant Replay - nothing recorded yet");
-    return;
-  }
 
   clearTimeout(clearTimer);
   clearTimer = undefined;
+  revokeUrl();
+  url = URL.createObjectURL(footage);
+  video.onended = null;
+  video.src = url;
+
+  // A browser that cannot seek into the take plays it from the start: more run-up, never less.
+  // Such a seek still reports `seeked`, landing wherever the file allows, so where it
+  // landed is what counts.
+  const cued = await when(video, "loadedmetadata", CUE_TIMEOUT_MS)
+    && await seek(video, offset / 1000)
+    && Math.abs(video.currentTime * 1000 - offset) < 1000;
+  if (id !== replay || !host || !video) return;
+  if (!cued) console.warn("Autodarts Tools: Instant Replay - cannot find the run-up in the recording, playing all of it");
+
+  // The site has its own moment first — the card lights up and it says GAME
+  // SHOT — and the darts are still in the board.
+  const wait = won + config.startDelay * 1000 - performance.now();
+  if (wait > 0) {
+    await new Promise((resolve) => {
+      showTimer = setTimeout(resolve, wait);
+    });
+    showTimer = undefined;
+    if (id !== replay || !host || !video) return;
+  }
 
   place();
-  playClip(picked);
   host.setAttribute("data-open", "");
-}
-
-function playClip(picked: Segment[]): void {
-  if (!video) return;
-
-  revokeUrls();
-  urls = picked.map(segment => URL.createObjectURL(segment.blob));
-
-  let index = 0;
-  video.onended = () => {
-    if (++index >= urls.length) return hide();
-    video!.src = urls[index];
-    void video!.play().catch(() => hide());
-  };
-
-  video.src = urls[0];
+  video.onended = hide;
   void video.play().catch((error) => {
     console.warn("Autodarts Tools: Instant Replay - playback failed", error);
     hide();
   });
 
   // `ended` never arrives from a clip the decoder will not take, and this
-  // covers the board — so it comes off on a timer whatever happens.
-  const total = picked.reduce((sum, segment) => sum + segment.ms, 0);
+  // covers the board — so it comes off on a timer whatever happens, counted from
+  // where the picture really starts.
+  const total = Number.isFinite(video.duration) ? video.duration * 1000 : length;
   clearTimeout(endTimer);
-  endTimer = setTimeout(hide, total + 3000);
+  endTimer = setTimeout(hide, total - video.currentTime * 1000 + 3000);
+}
+
+/** Whether `type` fires on `target` within `ms`. */
+function when(target: EventTarget, type: string, ms: number): Promise<boolean> {
+  const done = new AbortController();
+  return new Promise<boolean>((resolve) => {
+    target.addEventListener(type, () => resolve(true), { once: true, signal: done.signal });
+    setTimeout(resolve, ms, false);
+  }).finally(() => done.abort());
+}
+
+/** Move to `seconds` into the clip, and whether it got there. */
+function seek(element: HTMLVideoElement, seconds: number): Promise<boolean> {
+  const seeked = when(element, "seeked", CUE_TIMEOUT_MS);
+  element.currentTime = seconds;
+  return seeked;
 }
 
 function hide(): void {
@@ -490,7 +508,8 @@ function hide(): void {
   showTimer = undefined;
   endTimer = undefined;
 
-  if (!host?.hasAttribute("data-open")) return;
+  // A replay still being put together has nothing on screen to fade.
+  if (!host?.hasAttribute("data-open")) return clearVideo();
   host.removeAttribute("data-open");
 
   // Let the fade finish first: dropping the source now would black the picture
@@ -507,12 +526,12 @@ function clearVideo(): void {
     video.removeAttribute("src");
     video.load();
   }
-  revokeUrls();
+  revokeUrl();
 }
 
-function revokeUrls(): void {
-  urls.forEach(URL.revokeObjectURL);
-  urls = [];
+function revokeUrl(): void {
+  if (url) URL.revokeObjectURL(url);
+  url = null;
 }
 
 // ------------------------------------------------------------------ the trigger
@@ -541,12 +560,56 @@ function onGameData(gameData: IGameData): void {
   if (won === legWon) return;
   legWon = won;
 
-  if (!won) return hide();
+  if (!won) return cancel();
+  capture(performance.now());
+}
 
-  // The site has its own moment first — the card lights up and it says GAME
-  // SHOT — and the darts are still in the board.
-  clearTimeout(showTimer);
-  showTimer = setTimeout(() => {
-    void show();
-  }, Math.max(0, config?.startDelay ?? 3) * 1000);
+/**
+ * Hold on to the take with this leg's run-up, and stop it once the seconds
+ * after the gameshot are in. `won` is when the leg was won.
+ */
+function capture(won: number): void {
+  if (!config) return;
+
+  const from = won - config.before * 1000;
+  // The newest take already rolling when the run-up began; early in a match, the oldest there is.
+  const take = takes.filter(candidate => candidate.start <= from).at(-1) ?? takes[0];
+  // A page opened on a leg that was already won has nothing from before the dart.
+  if (!take || won - take.start < MIN_RUN_UP_MS) {
+    console.warn("Autodarts Tools: Instant Replay - nothing recorded before the winning dart");
+    return;
+  }
+
+  const id = ++replay;
+  held = take;
+  // The next leg is recorded in a take of its own.
+  rotate();
+
+  clearTimeout(captureTimer);
+  captureTimer = setTimeout(() => {
+    captureTimer = undefined;
+    void finishCapture(id, take, from, won);
+  }, config.after * 1000);
+}
+
+/** The seconds after the gameshot are in: stop the take and put it on screen. */
+async function finishCapture(id: number, take: Take, from: number, won: number): Promise<void> {
+  const length = performance.now() - take.start;
+  const footage = await stopTake(take);
+  if (held === take) held = null;
+  if (id !== replay) return;
+  if (!footage) {
+    console.warn("Autodarts Tools: Instant Replay - nothing recorded");
+    return;
+  }
+  await present(id, footage, Math.max(0, from - take.start), length, won);
+}
+
+/** The win was taken back: drop the replay being put together, or put away the one on screen. */
+function cancel(): void {
+  replay++;
+  held = null;
+  clearTimeout(captureTimer);
+  captureTimer = undefined;
+  hide();
 }

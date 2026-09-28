@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **Instant Replay** plays from a set number of seconds before the gameshot to a set number after it. *Duration* is now *Before the gameshot* and keeps its number, and *After the gameshot* is new, starting at your *Start delay*. The replay used to be counted back from the moment it appeared, so it ran on past the winning dart for as long as the start delay, and it played whole stretches of recording that added up to at least *Duration*: at the defaults, anywhere from 7 to 17 seconds of run-up, changing from leg to leg. It now plays what is set, 10 seconds before the dart and 3 after by default. The start delay still holds the replay back for autodarts' own celebration, but never past the seconds after the gameshot, which have to be filmed first
+  - The recording is a run of overlapping takes rather than back-to-back segments. Each take starts while the one before is still recording and is kept until the new one holds a whole run-up of its own, so whenever a leg is won, one take goes back far enough. That take records on through the seconds after the gameshot and is played from the second the run-up starts. A replay is one file, with no seam anywhere in it. A second recorder runs only for the overlap: the run-up plus a second, in every 30 seconds or more
+  - Starting at that second takes a seek. The 3.0.0 entry below says seeking into such a recording is unreliable in Chrome. It isn't any more: a recording made in one piece carries its length and an index, and a seek lands on the frame. A browser that can't seek plays the whole take instead, showing more of the run-up, never less
+
 ## [3.1.0] - 2026-09-27
 
 ### Added

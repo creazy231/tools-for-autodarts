@@ -182,10 +182,10 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Color-coded buttons matching dart board segments
   - Keyboard shortcuts for accessing throws (/, *, -) and making corrections
 - **Instant Replay**: Plays the winning dart back from your own webcam whenever a leg is won
-  - Point any webcam at your board and pick it in the settings; a rolling recording is kept while you are in a match, and the last few seconds are played over the screen once the leg ends
+  - Point any webcam at your board and pick it in the settings; a rolling recording is kept while you are in a match, and the seconds around the winning dart are played over the screen once the leg ends
   - This is your webcam, not the board's camera — the browser cannot reach that one. Nothing is uploaded and nothing is written to disk; the recording lives in memory and is dropped when the match does
-  - **Duration** sets how many seconds leading up to the winning dart to play (5–30). A little more may be shown, never less
-  - **Start delay** sets how long to wait after the leg is won before the replay appears (0–10 seconds), leaving room for autodarts' own celebration
+  - **Before the gameshot** sets how many seconds leading up to the winning dart to play (1–30), and **After the gameshot** how many of what follows it (0–10). Both are counted from the moment autodarts reports the dart
+  - **Start delay** sets how long to wait after the leg is won before the replay appears (0–10 seconds), leaving room for autodarts' own celebration. The seconds after the gameshot have to be filmed first, so the replay never appears sooner than those
   - Shows over the whole page or over the board alone, with adjustable zoom and framing for the picture
   - Click the replay to dismiss it early; correcting the winning throw takes it away by itself
   - Skipped for the bull-off

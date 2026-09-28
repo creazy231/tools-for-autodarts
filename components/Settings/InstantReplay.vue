@@ -5,8 +5,8 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="max-w-3xl">
-          Point a webcam at your board, and the last seconds before the winning dart are played back over the screen
-          whenever a leg is won. A click on the replay puts it away early.
+          Point a webcam at your board, and the winning dart is played back over the screen whenever a leg is won, from
+          a few seconds before it to a few after. A click on the replay puts it away early.
         </p>
         <p class="mb-6 mt-2 max-w-3xl text-sm text-[var(--ad-text-muted)]">
           It records only while you are in a match, and nothing leaves your computer. This is your own webcam, not the
@@ -98,16 +98,25 @@
               <h3 class="adt-section-title">
                 Replay
               </h3>
-              <OptionRow description="Before the winning dart. A little more may show, never less." title="Duration">
+              <OptionRow description="How much of the run-up to the winning dart the replay shows." title="Before the gameshot">
                 <AppNumberInput
-                  v-model="config.instantReplay.duration"
+                  v-model="config.instantReplay.before"
                   :max="30"
-                  :min="5"
-                  label="Duration"
+                  :min="1"
+                  label="Before the gameshot"
                   unit="s"
                 />
               </OptionRow>
-              <OptionRow description="From the won leg to the replay, leaving room for autodarts' own celebration." title="Start delay">
+              <OptionRow description="And how much of what follows it." title="After the gameshot">
+                <AppNumberInput
+                  v-model="config.instantReplay.after"
+                  :max="10"
+                  :min="0"
+                  label="After the gameshot"
+                  unit="s"
+                />
+              </OptionRow>
+              <OptionRow :description="startDelayHint" title="Start delay">
                 <AppNumberInput
                   v-model="config.instantReplay.startDelay"
                   :max="10"
@@ -240,6 +249,13 @@ const currentFps = ref<number | null>(null);
 const cameraHint = computed(() => (cameraDevices.value.length
   ? "Only cameras no other app is using are listed."
   : "No free camera found. Another app may be using it: close that, then look again."));
+
+/** Start delay's line, which says so when the seconds after the gameshot hold the replay back for longer. */
+const startDelayHint = computed(() => {
+  const after = config.value?.instantReplay?.after ?? 0;
+  if (after <= (config.value?.instantReplay?.startDelay ?? 0)) return "From the won leg to the replay, leaving room for autodarts' own celebration.";
+  return `From the won leg to the replay. The ${after} s after the gameshot have to be filmed first, so it starts after ${after} s.`;
+});
 
 const cameraOptions = computed(() => {
   return cameraDevices.value.map(device => ({

@@ -264,6 +264,7 @@ import type { IConfig, ISound } from "@/utils/storage";
 
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 import { normalizeColors } from "@/utils/colors";
+import { normalizeInstantReplay } from "@/utils/instant-replay";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
 import AppMenu from "@/components/AppMenu.vue";
@@ -590,8 +591,10 @@ function importSettings() {
             ...JSON.parse(JSON.stringify(importedData.config)),
           };
           // An export from before a change of shape is merged as it is, so
-          // Colors is brought up to date here; see normalizeColors.
+          // Colors and Instant Replay are brought up to date here; see
+          // normalizeColors and normalizeInstantReplay.
           newConfig.colors = normalizeColors(newConfig.colors);
+          newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
 
           // Set the local ref
           config.value = newConfig;
@@ -843,8 +846,10 @@ function pasteFromClipboard() {
           ...JSON.parse(JSON.stringify(importedData.config)),
         };
         // An export from before a change of shape is merged as it is, so
-        // Colors is brought up to date here; see normalizeColors.
+        // Colors and Instant Replay are brought up to date here; see
+        // normalizeColors and normalizeInstantReplay.
         newConfig.colors = normalizeColors(newConfig.colors);
+        newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
 
         // Set the local ref
         config.value = newConfig;
