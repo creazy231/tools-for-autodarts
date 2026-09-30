@@ -6,6 +6,7 @@ import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
 import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
 import { DEFAULT_VOLUME, cappedVolume, planVolume, soundVolume } from "@/utils/sound-volume";
+import { legWinNames, loadTeamCalls, matchWinNames, turnNames } from "@/utils/team-calls";
 import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
 import { winId } from "@/utils/win";
 
@@ -112,6 +113,7 @@ export async function soundFx() {
 
   try {
     config = await AutodartsToolsConfig.getValue();
+    await loadTeamCalls();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log("Autodarts Tools: Config loaded", config?.soundFx?.sounds?.length || 0, "sounds available");
 
@@ -666,6 +668,58 @@ function removeInteractionNotification(): void {
 /**
  * Process game data to trigger sounds based on game events
  */
+/** Whether Sound FX has an enabled sound for `trigger`, which may be set up with or without its ambient_ prefix. */
+function hasSound(trigger: string): boolean {
+  const bare = trigger.replace(/^ambient_/, "");
+  return Boolean(config?.soundFx?.sounds?.some(sound => sound.enabled && sound.triggers && (sound.triggers.includes(`ambient_${bare}`) || sound.triggers.includes(bare))));
+}
+
+/** A name as a trigger is looked up: in lower case, and with underscores for its spaces. */
+function spellings(name: string): string[] {
+  const lower = name.toLowerCase();
+  const underscored = lower.replace(/\s+/g, "_");
+  return underscored === lower ? [ lower ] : [ lower, underscored ];
+}
+
+/**
+ * The name sound when a visit starts: the first of `names` there is a sound
+ * for (with Teams, the player and then their team), under both spellings.
+ * False when there is none.
+ */
+function playTurnName(names: readonly string[]): boolean {
+  for (const name of names) {
+    const forms = spellings(name);
+    if (!forms.some(form => hasSound(`ambient_${form}`))) continue;
+    for (const form of forms) playSound(`ambient_${form}`);
+    return true;
+  }
+  return false;
+}
+
+/**
+ * A win's sound: `ambient_matchshot_<name>` for a match, then
+ * `ambient_gameshot_<name>`, for the first of `names` that has one (with
+ * Teams, the team first for a match and the player first for a leg), each
+ * name with underscores first; else the plain matchshot or gameshot.
+ */
+function playWin(match: boolean, names: readonly string[]) {
+  for (const event of match ? [ "matchshot", "gameshot" ] : [ "gameshot" ]) {
+    for (const name of names) {
+      for (const form of spellings(name).reverse()) {
+        if (!hasSound(`ambient_${event}_${form}`)) continue;
+        playSound(`ambient_${event}_${form}`);
+        return;
+      }
+    }
+  }
+  playSound(match ? "ambient_matchshot" : "ambient_gameshot");
+}
+
+/** Teams' partner rule has a sound of its own for the checkout it takes back, when there is one. */
+function bustSound(match: IGameData["match"]): string {
+  return match?.adtTeams?.bust && hasSound("ambient_partner_rule") ? "ambient_partner_rule" : "ambient_busted";
+}
+
 async function processGameData(gameData: IGameData, oldGameData: IGameData, fromWebSocket: boolean = false): Promise<void> {
   if (!gameData.match || !gameData.match.turns?.length) return;
 
@@ -683,33 +737,11 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
 
   // Play gameon sound if it's the first round and variant is not Bull-off
   if (gameData.match.round === 1 && gameData.match.turns[0].throws.length === 0 && gameData.match.player === 0) {
-    const playerName = currentPlayer?.name;
-
     if (isBot) {
       console.log("Autodarts Tools: Bot player detected");
       playSound("ambient_bot");
-    } else if (playerName) {
-      console.log("Autodarts Tools: Player starting game", playerName);
-      // Try to play the player name (both regular and underscore version)
-      const playerNameLower = playerName.toLowerCase();
-      const playerNameWithUnderscores = playerNameLower.replace(/\s+/g, "_");
-      const hasPlayerNameSound = config.soundFx.sounds?.some(sound =>
-        sound.enabled && sound.triggers && (
-          sound.triggers.includes(`ambient_${playerNameLower}`)
-          || sound.triggers.includes(`ambient_${playerNameWithUnderscores}`)
-          || sound.triggers.includes(playerNameLower)
-          || sound.triggers.includes(playerNameWithUnderscores)
-        ),
-      );
-
-      if (hasPlayerNameSound) {
-        console.log(`Autodarts Tools: Found player name sound for "${playerNameLower}" or "${playerNameWithUnderscores}"`);
-        // Try both versions of the name with ambient_ prefix
-        playSound(`ambient_${playerNameLower}`);
-        if (playerNameWithUnderscores !== playerNameLower) {
-          playSound(`ambient_${playerNameWithUnderscores}`);
-        }
-      }
+    } else {
+      playTurnName(turnNames(gameData.match));
     }
 
     // Play gameon after player name/bot
@@ -718,37 +750,10 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
     && gameData.match.player !== undefined
     && oldGameData.match.player !== gameData.match.player
     && gameData.match.round >= 1) {
-    // Get player name and play sound with player name as trigger
-    const playerName = currentPlayer?.name;
-
     if (isBot) {
       console.log("Autodarts Tools: Bot player detected");
       playSound("ambient_bot");
-    } else if (playerName) {
-      console.log("Autodarts Tools: Player changed to", playerName);
-      // Try to play the player name (both regular and underscore version), if no sound found, fall back to ambient_next_player
-      const playerNameLower = playerName.toLowerCase();
-      const playerNameWithUnderscores = playerNameLower.replace(/\s+/g, "_");
-      const hasPlayerNameSound = config.soundFx.sounds?.some(sound =>
-        sound.enabled && sound.triggers && (
-          sound.triggers.includes(`ambient_${playerNameLower}`)
-          || sound.triggers.includes(`ambient_${playerNameWithUnderscores}`)
-          || sound.triggers.includes(playerNameLower)
-          || sound.triggers.includes(playerNameWithUnderscores)
-        ),
-      );
-
-      if (hasPlayerNameSound) {
-        console.log(`Autodarts Tools: Found player name sound for "${playerNameLower}" or "${playerNameWithUnderscores}"`);
-        // Try both versions of the name with ambient_ prefix
-        playSound(`ambient_${playerNameLower}`);
-        if (playerNameWithUnderscores !== playerNameLower) {
-          playSound(`ambient_${playerNameWithUnderscores}`);
-        }
-      } else {
-        playSound("ambient_next_player");
-      }
-    } else {
+    } else if (!playTurnName(turnNames(gameData.match))) {
       playSound("ambient_next_player");
     }
   }
@@ -862,88 +867,10 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
       }
       announcedWin = win;
 
-      // Check if there's a winner player index and name available
-      const winnerPlayerName = gameData.match.players?.[gameData.match.gameWinner]?.name;
-
-      if (winnerPlayerName) {
-        // First try to play player-specific gameshot sound with underscores
-        const playerSpecificTrigger = `ambient_${winnerMatch ? "matchshot" : "gameshot"}_${winnerPlayerName.toLowerCase().replace(/\s+/g, "_")}`;
-        console.log(`Autodarts Tools: Trying player-specific ${winnerMatch ? "matchshot" : "gameshot"} sound "${playerSpecificTrigger}"`);
-
-        // Check if the player-specific sound with underscores exists
-        const playerSpecificSoundExists = config?.soundFx?.sounds?.some(sound =>
-          sound.enabled && sound.triggers && (
-            sound.triggers.includes(playerSpecificTrigger)
-            || sound.triggers.includes(playerSpecificTrigger.replace("ambient_", ""))
-          ),
-        );
-
-        if (playerSpecificSoundExists) {
-          playSound(playerSpecificTrigger);
-        } else {
-          // Try with spaces instead of underscores
-          const playerSpecificTriggerWithSpaces = `ambient_${winnerMatch ? "matchshot" : "gameshot"}_${winnerPlayerName.toLowerCase()}`;
-          console.log(`Autodarts Tools: Trying alternate player-specific ${winnerMatch ? "matchshot" : "gameshot"} sound "${playerSpecificTriggerWithSpaces}"`);
-
-          const playerSpecificSoundWithSpacesExists = config?.soundFx?.sounds?.some(sound =>
-            sound.enabled && sound.triggers && (
-              sound.triggers.includes(playerSpecificTriggerWithSpaces)
-              || sound.triggers.includes(playerSpecificTriggerWithSpaces.replace("ambient_", ""))
-            ),
-          );
-
-          if (playerSpecificSoundWithSpacesExists) {
-            playSound(playerSpecificTriggerWithSpaces);
-          } else {
-            // If this is a matchshot but we couldn't find player-specific matchshot sound, try gameshot variant
-            if (winnerMatch) {
-              const gameWinnerSpecificTrigger = `ambient_gameshot_${winnerPlayerName.toLowerCase().replace(/\s+/g, "_")}`;
-              console.log(`Autodarts Tools: No matchshot sound found for "${winnerPlayerName}", trying gameshot variant "${gameWinnerSpecificTrigger}"`);
-
-              const gamePlayerSpecificSoundExists = config?.soundFx?.sounds?.some(sound =>
-                sound.enabled && sound.triggers && (
-                  sound.triggers.includes(gameWinnerSpecificTrigger)
-                  || sound.triggers.includes(gameWinnerSpecificTrigger.replace("ambient_", ""))
-                ),
-              );
-
-              if (gamePlayerSpecificSoundExists) {
-                playSound(gameWinnerSpecificTrigger);
-              } else {
-                // Finally try with spaces instead of underscores for gameshot
-                const gamePlayerSpecificTriggerWithSpaces = `ambient_gameshot_${winnerPlayerName.toLowerCase()}`;
-                const gamePlayerSpecificSoundWithSpacesExists = config?.soundFx?.sounds?.some(sound =>
-                  sound.enabled && sound.triggers && (
-                    sound.triggers.includes(gamePlayerSpecificTriggerWithSpaces)
-                    || sound.triggers.includes(gamePlayerSpecificTriggerWithSpaces.replace("ambient_", ""))
-                  ),
-                );
-
-                if (gamePlayerSpecificSoundWithSpacesExists) {
-                  playSound(gamePlayerSpecificTriggerWithSpaces);
-                } else {
-                  // Fallback to regular matchshot/gameshot sound if no player-specific sound found
-                  console.log(`Autodarts Tools: No player-specific sound found for "${winnerPlayerName}", falling back to standard ${winnerMatch ? "matchshot" : "gameshot"}`);
-                  playSound(winnerMatch ? "ambient_matchshot" : "ambient_gameshot");
-                }
-              }
-            } else {
-              // Fallback to regular gameshot sound if no player-specific sound found
-              console.log(`Autodarts Tools: No player-specific gameshot sound found for "${winnerPlayerName}", falling back to standard gameshot`);
-              playSound("ambient_gameshot");
-            }
-          }
-        }
-      } else {
-        // Fallback if no player name available
-        if (winnerMatch) {
-          playSound("ambient_matchshot");
-        } else {
-          playSound("ambient_gameshot");
-        }
-      }
+      // With Teams, the team's name first for a match and the player's for a leg (utils/team-calls.ts).
+      playWin(winnerMatch, winnerMatch ? matchWinNames(gameData.match) : legWinNames(gameData.match));
     } else if (busted) {
-      playSound("ambient_busted");
+      playSound(bustSound(gameData.match));
     } else if (isLastThrow) {
       // Special case: if throwName is "25" and throwBed is "Single", check for "ambient_s25" first
       if (throwName.toLowerCase() === "25" && throwBed === "Single") {
@@ -991,36 +918,10 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
       }
       announcedWin = win;
 
-      // Same winner logic as non-Cricket
-      const winnerPlayerName = gameData.match.players?.[gameData.match.gameWinner]?.name;
-
-      if (winnerPlayerName) {
-        const playerSpecificTrigger = `ambient_gameshot_${winnerPlayerName.toLowerCase().replace(/\s+/g, "_")}`;
-        if (config?.soundFx?.sounds?.some(sound =>
-          sound.enabled && sound.triggers && (
-            sound.triggers.includes(playerSpecificTrigger)
-            || sound.triggers.includes(playerSpecificTrigger.replace("ambient_", ""))
-          ),
-        )) {
-          playSound(playerSpecificTrigger);
-        } else {
-          const playerSpecificTriggerWithSpaces = `ambient_gameshot_${winnerPlayerName.toLowerCase()}`;
-          if (config?.soundFx?.sounds?.some(sound =>
-            sound.enabled && sound.triggers && (
-              sound.triggers.includes(playerSpecificTriggerWithSpaces)
-              || sound.triggers.includes(playerSpecificTriggerWithSpaces.replace("ambient_", ""))
-            ),
-          )) {
-            playSound(playerSpecificTriggerWithSpaces);
-          } else {
-            playSound("ambient_gameshot");
-          }
-        }
-      } else {
-        playSound("ambient_gameshot");
-      }
+      // Cricket's wins are all gameshots, the player's name first (utils/team-calls.ts).
+      playWin(false, legWinNames(gameData.match));
     } else if (busted) {
-      playSound("ambient_busted");
+      playSound(bustSound(gameData.match));
     } else {
       // Special case: if throwName is "25" and throwBed is "Single", check for "ambient_s25" first
       if (throwName.toLowerCase() === "25" && throwBed === "Single") {

@@ -7,6 +7,7 @@ import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
 import { triggerPatterns } from "@/utils/helpers";
 import { settleGameData } from "@/utils/settle-game-data";
+import { legWinNames, loadTeamCalls, matchWinNames, turnNames } from "@/utils/team-calls";
 import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
 import { gameDataProcessor } from "@/utils/wled";
 import { winId } from "@/utils/win";
@@ -101,6 +102,7 @@ export async function wledFx() {
 
   try {
     config = await AutodartsToolsConfig.getValue();
+    await loadTeamCalls();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
 
@@ -249,35 +251,35 @@ async function processGameData(
   if (gameData.match.turns[0].throws.length === 0) {
     const currentPlayer = gameData.match.players?.[gameData.match.player];
     const isBot = currentPlayer?.cpuPPR !== null;
-    const playerName = currentPlayer?.name;
 
     if (isBot) {
       console.log("Autodarts Tools: WLED: Bot player detected");
       nextEffect = "bot_throw";
-    } else if (playerName) {
-      // Try to find player effect (both regular and underscore version)
-      const playerNameLower = playerName.toLowerCase();
-      const playerNameWithUnderscores = playerNameLower.replace(/\s+/g, "_");
-      const playerNameEffects = config.wledFx.effects?.filter(
-        effect =>
-          effect.enabled
-          && effect.triggers
-          && (effect.triggers.includes(playerNameLower)
-            || effect.triggers.includes(playerNameWithUnderscores)),
-      );
-
-      if (playerNameEffects.length > 0) {
-        console.log(
-          `Autodarts Tools: WLED: Found player name effect for ${playerNameWithUnderscores}`,
-        );
-
-        const randomIndex = Math.floor(Math.random() * playerNameEffects.length);
-        nextEffect = playerNameEffects[randomIndex];
+    } else {
+      // The first name with an effect: with Teams, the player's and then their
+      // team's (utils/team-calls.ts); each as typed and with underscores.
+      for (const name of turnNames(gameData.match)) {
+        const lower = name.toLowerCase();
+        const underscored = lower.replace(/\s+/g, "_");
+        const nameEffects = config.wledFx.effects?.filter(
+          effect =>
+            effect.enabled
+            && effect.triggers
+            && (effect.triggers.includes(lower)
+              || effect.triggers.includes(underscored)),
+        ) ?? [];
+        if (!nameEffects.length) continue;
+        console.log(`Autodarts Tools: WLED: Found player name effect for ${underscored}`);
+        nextEffect = nameEffects[Math.floor(Math.random() * nameEffects.length)];
+        break;
       }
     }
   }
 
-  const effect: string | null = await gameDataProcessor(gameData, oldGameData, fromWebSocket, isTriggerPresent);
+  const effect: string | null = await gameDataProcessor(gameData, oldGameData, fromWebSocket, isTriggerPresent, {
+    leg: legWinNames(gameData.match),
+    match: matchWinNames(gameData.match),
+  });
   if (effect) {
     // found effect for match variant
     nextEffect = effect;

@@ -1,10 +1,32 @@
 import { type IGameData } from "@/utils/game-data-storage";
 
+/**
+ * Whose names a win's effects are looked up under, in order: a leg's the player
+ * who checked out and then their team, a match's the team first
+ * (utils/teams.ts `legWinCallNames`, `matchWinCallNames`).
+ */
+export interface WinNames {
+  leg: readonly string[];
+  match: readonly string[];
+}
+
+/** The first `event_<name>` that has an effect, each name as typed and with underscores for its spaces. */
+function namedWin(event: "gameshot" | "matchshot", names: readonly string[], triggerPresentCB: (trigger: string) => boolean): string | null {
+  for (const name of names) {
+    const lower = name.toLowerCase();
+    for (const spelling of new Set([ lower, lower.replace(/\s+/g, "_") ])) {
+      if (triggerPresentCB(`${event}_${spelling}`)) return `${event}_${spelling}`;
+    }
+  }
+  return null;
+}
+
 export async function gameDataProcessor(
   gameData: IGameData,
   oldGameData: IGameData,
   fromWebSocket: boolean = false,
-  triggerPresentCB: (trigger: string) => boolean
+  triggerPresentCB: (trigger: string) => boolean,
+  names?: WinNames,
 ): Promise<string | null> {
   if (!gameData.match) return null;
 
@@ -12,17 +34,20 @@ export async function gameDataProcessor(
 
   const winner: boolean = gameData.match.gameWinner >= 0;
   const winnerMatch: boolean = gameData.match.winner >= 0;
-  const currentPlayer = gameData.match.players?.[gameData.match.player];
-  const playerName = currentPlayer?.name;
-  const playerNameLower = playerName.toLowerCase();
-  const playerNameWithUnderscores = playerNameLower.replace(/\s+/g, "_");
+  // Without the Teams names, the seat's own, as before.
+  const seatName = gameData.match.players?.[gameData.match.player]?.name;
+  const own = seatName ? [ seatName ] : [];
 
-  if (winnerMatch && triggerPresentCB("matchshot_" + playerNameLower)) return "gameshot_" + playerNameLower;
-  if (winnerMatch && triggerPresentCB("matchshot_" + playerNameWithUnderscores)) return "gameshot_" + playerNameWithUnderscores;
-  if (winnerMatch && triggerPresentCB("matchshot")) return "matchshot";
-  if (winner && triggerPresentCB("gameshot_" + playerNameLower)) return "gameshot_" + playerNameLower;
-  if (winner && triggerPresentCB("gameshot_" + playerNameWithUnderscores)) return "gameshot_" + playerNameWithUnderscores;
-  if (winner && triggerPresentCB("gameshot")) return "gameshot";
+  if (winnerMatch) {
+    const effect = namedWin("matchshot", names?.match ?? own, triggerPresentCB);
+    if (effect) return effect;
+    if (triggerPresentCB("matchshot")) return "matchshot";
+  }
+  if (winner) {
+    const effect = namedWin("gameshot", names?.leg ?? own, triggerPresentCB);
+    if (effect) return effect;
+    if (triggerPresentCB("gameshot")) return "gameshot";
+  }
 
   switch (gameData.match!.variant) {
     case "X01":
@@ -84,6 +109,8 @@ async function processX01Data(
 
   if (winnerMatch && triggerPresentCB("matchshot+" + throwName)) return "matchshot+" + throwName;
   if (winner && triggerPresentCB("gameshot+" + throwName)) return "gameshot+" + throwName;
+  // A checkout Teams' partner rule takes back (utils/teams.ts `teamView`).
+  if (busted && gameData.match.adtTeams?.bust && triggerPresentCB("partner_rule")) return "partner_rule";
   if (busted && triggerPresentCB("busted")) return "busted";
   if (isLastThrow && triggerPresentCB(combinedThrows)) return combinedThrows;
   if (!busted && isLastThrow && triggerPresentCB(points)) return points;

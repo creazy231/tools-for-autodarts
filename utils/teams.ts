@@ -346,16 +346,54 @@ export function shiftsOf(store: ShiftStore | undefined, matchId: string | undefi
   return (matchId && store?.[matchId]?.shifts) || {};
 }
 
+/** What the name triggers (the Caller, Sound FX, WLED) need to know of a match's teams. */
+export interface CallContext {
+  /** The saved teams, for shared-score seats. */
+  saved: readonly SavedTeam[];
+  /** Whose guests those seats are. */
+  hostId: string | null | undefined;
+  /** The match's tap-to-correct shifts. */
+  shifts: TeamShifts;
+  /** The match's own-score lineup, if it has one. */
+  lineup: Lineup | undefined;
+}
+
 /**
- * What the Caller calls when the seat up is a team, most specific first: the
- * player whose visit it is, then the team. Empty when the seat is no team.
+ * A seat as the name triggers call it: the player who throws for it, and the
+ * team it plays for. A shared-score seat is named after its team, and its
+ * player is whoever's visit it is (`playerUp`, with the card's tap-to-correct
+ * shift); an own-score seat is its player, on the lineup's team; any other
+ * seat is only its own name.
  */
-export function callNames(state: TurnState, teams: readonly SavedTeam[], hostId: string | null | undefined, shifts: TeamShifts): string[] {
-  const seat = state.player ?? 0;
-  const team = teamSeats(state.players ?? [], teams, hostId).get(seat);
-  if (!team) return [];
-  const up = team.players[playerUp(state, seat, team, shifts[team.name] ?? 0)];
-  return up ? [ up, team.name ] : [ team.name ];
+function seatCall(match: TurnState, seat: number, context: CallContext): string[] {
+  const players = match.players ?? [];
+  const name = players[seat]?.name ?? "";
+  const ownTeam = context.lineup ? lineupTeams(players, context.lineup).get(seat) : undefined;
+  if (ownTeam) return [ name, ownTeam.name ];
+  const shared = teamSeats(players, context.saved, context.hostId).get(seat);
+  if (shared) return [ shared.players[playerUp(match, seat, shared, context.shifts[shared.name] ?? 0)] ?? "", shared.name ];
+  return [ name ];
+}
+
+const present = (names: readonly string[]) => [ ...new Set(names.filter(Boolean)) ];
+
+/** The names to try, in turn, when a seat's visit starts: the player, then their team. */
+export function turnCallNames(match: TurnState, context: CallContext): string[] {
+  return present(seatCall(match, match.player ?? 0, context));
+}
+
+/** A leg won: the player who checked out, then their team. */
+export function legWinCallNames(match: TeamMatch, context: CallContext): string[] {
+  const seat = match.gameWinner ?? -1;
+  return seat < 0 ? [] : present(seatCall(match, seat, context));
+}
+
+/** A match won: the team first, since it is the team's win, then the player who checked out. */
+export function matchWinCallNames(match: TeamMatch, context: CallContext): string[] {
+  const seat = (match.gameWinner ?? -1) >= 0 ? match.gameWinner! : match.winner ?? -1;
+  if (seat < 0) return [];
+  const [ player, team ] = seatCall(match, seat, context);
+  return present(team ? [ team, player ] : [ player ]);
 }
 
 function sameColour(a: ColorScheme, b: ColorScheme): boolean {

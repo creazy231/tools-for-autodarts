@@ -80,12 +80,12 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - **Two formats**, chosen in the drawer: *Shared score* makes the team one player on your board, and its players take turns on that score. *Own scores* keeps everyone on their own score, and a leg counts for the team of whoever checks out: the first team to the lobby's "First to N legs" wins the match. The first team in a lobby sets its format
   - With own scores, a team can mix guests, people playing on their own board and bots (bots in X01 and Cricket). Pick seats already in the lobby or type new names, and the seats are kept in turn order so the teams alternate. Own scores play legs, not sets, and only the browser you host from shows the teams
   - When an own-score team wins, the pill says so and Next Leg is held back. The site still counts the match per player, so it's only saved to your history when the winning leg also took one player to the target
-  - **Partner rule** (settings, own scores, X01, two teams): nobody may check out while their partner has more left than both opponents together. A checkout that breaks it counts as a bust, and the pill warns before the visit
+  - **Partner rule** (settings, own scores, X01, two teams): nobody may check out while their partner has more left than both opponents together. A checkout that breaks it counts as a bust, and the pill warns before the visit. The Caller, Sound FX and WLED play their `partner_rule` trigger for it (`ambient_partner_rule` in Sound FX), or `busted` when they have none
   - The colours are the card colours from **Colors**: raspberry, its nine pairs, or a pair of your own. A colour another team in the lobby already has is greyed out, and a saved team whose colour is taken joins in the next free one
   - In the lobby, a team's row wears its colour and lists its players in order, and the pencil beside it edits the team
   - In the match, the card of the team that's up is filled with the team's colour instead of raspberry, and a waiting team's name tag carries its colour. Each card lists the team's players, the one throwing filled white. A pill under the turn bar says who's up ("TOM to throw"), and fades to the next team's colour at each handover
   - Every new leg starts with each team's next player. The order is worked out from the site's own set, leg and round, so a reload or an undo doesn't throw it off. **Tap a name** in a team's card to make that player the one who's up (or next), and the order carries on from them
-  - The **Caller** calls the player whose turn it is if it has a sound for their name, then the team's name, then `next_player`
+  - The **Caller**, **Sound FX** and **WLED** call the player whose turn it is by their name, by their team's name when they have nothing for the player, and with their own fallback after that (`next_player`, `ambient_next_player`), with a shared score and with own scores alike. A leg won goes to the player who checked out and then the team (`gameshot_<name>`), a match won to the team first (`matchshot_<name>`)
   - Teams are remembered by name: any guest of yours with a saved team's name plays as that team, in any lobby
   - With a shared score, each team is a guest on your board, so teams play in **lobbies you host**, and only the browser you host from shows them. Bots can play against a team but not in one, since the server throws every visit of a bot's seat
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything
@@ -266,13 +266,14 @@ You can assign sounds to be played based on these triggers:
   - `gameshot`: When a player wins the game
   - `you_require`: Plays before announcing checkout combinations (numbers are called separately)
   - `busted`: When a player busts
+  - `partner_rule`: When Teams' partner rule takes a checkout back; `busted` plays when there is no sound for it
   - `double`, `triple`: Generic announcements for dart types
   - `outside`: When a dart lands outside the scoring area
   - `next_player`: Plays when switching to the next player (fallback if no player name sound is found)
   - `bot`: Plays instead of player name when the player is a CPU/bot player
   - `bulloff`: Once when the bull-off begins, not again as the throw passes between players
   - `playername`: Player name sounds play automatically when it's their turn. Example: If your name is `creazy.eth` on Autodarts, simply use `creazy.eth` (supports spaces or `_` like `player_name` or `player name`)
-    - In a **Teams** match, the name of the team's player whose turn it is works the same way, and the team's name is the fallback. With own scores, everyone is called by their own name, and the leg that wins a team the match calls `matchshot` and the team's name
+    - In a **Teams** match, the player whose turn it is is called by their name, and their team's name is the fallback, with a shared score and with own scores alike. A match won calls `matchshot`, then the team's name, then the player's who checked out
 - **Board Status**:
   - `board_started`: When the board has started
   - `board_stopped`: When the board has stopped or disconnected
@@ -366,13 +367,13 @@ Add sound effects for various game events:
 - **Point Ranges**: A range between `0` and `180`, e.g. `0-20` or `100-180` (point totals). Format: `ambient_100-180` or `100-180` (with or without the `ambient_` prefix)
 - **Individual Throws**: Sounds for specific throws like `ambient_s20`, `ambient_d16`, `ambient_t19`, etc.
 - **Combined Throws**: Trigger sounds based on a sequence of throws using format `s20_t19_d12`
-- **Special Events**: Dedicated sounds for `ambient_gameon`, `gameshot`, `busted`, and more
+- **Special Events**: Dedicated sounds for `ambient_gameon`, `gameshot`, `busted`, and more. `ambient_partner_rule` plays instead of `ambient_busted` when Teams' partner rule takes a checkout back
 - **Player Turn Sounds**: 
   - `ambient_next_player`: Plays when switching to the next player (fallback if no player name sound exists)
   - `ambient_bot`: Plays when switching to a CPU/bot player
   - `bot_throw`: Plays when a bot player throws a dart
   - `opponent_throw`: Plays when a remote opponent (any real player other than you, on a different board) throws a dart — useful as throw feedback when playing online without looking at the screen. Your own throws and bot throws are excluded (bots use `bot_throw`), and so are players sharing your board (e.g. a friend visiting to play on your board with their own account) since that board already makes the throw noise
-  - Player-specific sounds using format: `ambient_playername` or `ambient_player_name`
+  - Player-specific sounds using format: `ambient_playername` or `ambient_player_name`. In a **Teams** match a team's name works too: the player whose turn it is first, then their team
 - **Lobby Sounds**:
   - `ambient_lobby_in`: Plays when a player joins the lobby
   - `ambient_lobby_out`: Plays when a player leaves the lobby
@@ -389,6 +390,7 @@ Add sound effects for various game events:
   - `gameshot_player name` (spaces preserved)
   - `gameshot_player_name` (with underscores replacing spaces)
   - With ambient prefix: `ambient_gameshot_player_name`
+  - In a **Teams** match a team's name works too: the player who checked out first, then their team
 - **Cricket Mode**: Special triggers for Cricket games:
   - `cricket_hit`: Triggered when hitting Cricket targets (15-20 and Bull) that are still open
   - `cricket_miss`: Triggered when hitting non-Cricket targets (Miss-14) or hitting targets already closed by all players
@@ -404,6 +406,7 @@ The Sound FX feature distinguishes between winning a single game (gameshot) and 
   - `matchshot_player_name` (with underscores)
   - `matchshot_player name` (with spaces)
   - With ambient prefix: `ambient_matchshot_player_name`
+  - In a **Teams** match the team's name comes first, then the player's who checked out
 
 #### Ambient Sound Prefix
 - Use the `ambient_` prefix (e.g., `ambient_180`, `ambient_t20`) to create separate sound sets for caller and ambient sounds
@@ -427,8 +430,8 @@ The Sound FX feature includes a sophisticated multi-level fallback system:
 - For `miss` or `m` prefixed throws, it falls back to `outside` sounds
 - In Cricket games, `miss` triggers may fall back to `cricket_miss` sounds
 - **Matchshot Fallbacks**: When a player wins a match, the system tries sounds in this order:
-  - Player-specific matchshot: `ambient_matchshot_player_name`
-  - Player-specific gameshot: `ambient_gameshot_player_name`
+  - Player-specific matchshot: `ambient_matchshot_player_name` (in a **Teams** match the team's name, then the player's)
+  - Player-specific gameshot: `ambient_gameshot_player_name` (the same names, in the same order)
   - Generic matchshot: `ambient_matchshot`
   - Generic gameshot: `ambient_gameshot`
 - If no match is found after all fallback attempts, no sound is played
@@ -501,6 +504,7 @@ Effects can be triggered by various game events using these triggers:
 - **`matchshot`**: When a player wins the entire match
 - **`matchshot+[throwName]`**: When a player wins the entire match with the specified throw (e.g. `matchshot+bull`)
 - **`busted`**: When a player busts (scores more than needed)
+- **`partner_rule`**: When Teams' partner rule takes a checkout back; `busted` plays when there is no effect for it
 - **`bulloff`**: Once when the bull-off begins, not again as the throw passes between players
 - **`idle`**: When leaving the match (cleanup effect)
 
@@ -531,12 +535,13 @@ Effects can be triggered by various game events using these triggers:
 - **`tournament_ready`**: When a tournament match of yours is ready and autodarts asks you to *Mark Ready*, the same moment Sound FX plays `ambient_tournament_ready` on: once for each of your matches, while the tournament's page is open
 
 ##### Player-Specific Effects
-- **Player Names**: Use the exact player name as it appears in Autodarts. This is triggered instead of the generic `gameon` effect.
+- **Player Names**: Use the exact player name as it appears in Autodarts. This is triggered instead of the generic `gameon` effect. In a **Teams** match a team's name works too: the player whose turn it is first, then their team.
 - **Spaces**: Player names with spaces are supported (e.g., `john doe`)
 - **Underscores**: Alternative format with whitespaces replaced by underscores (e.g., `john_doe`)
 - **`bot_throw`**: Triggered when a CPU/bot player throws
 - **`gameshot_[player name]`**: player specific gameshot trigger
 - **`matchshot_[player name]`**: player specific matchshot trigger
+- In a **Teams** match both take a team's name too: a leg the player who checked out first, a match the team first
 
 ##### Board-Specific Effects
 - **Board IDs**: Configure specific board IDs to limit effects to certain boards. Leave the list empty and effects play everywhere

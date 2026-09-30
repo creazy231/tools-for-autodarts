@@ -1,22 +1,18 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { pageVariant, playsIn } from "@/utils/game-modes";
-import { AutodartsToolsConfig, AutodartsToolsTeamShifts, type IConfig, type ISoundTTS } from "@/utils/storage";
-import { getSoundFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
+import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/storage";
+import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { gotchaCheckout } from "@/utils/checkout";
 import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
 import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
 import { DEFAULT_VOLUME, cappedVolume, isLink, planVolume, soundVolume } from "@/utils/sound-volume";
 import { winId } from "@/utils/win";
-import { type ShiftStore, callNames, normalizeTeams, shiftsOf } from "@/utils/teams";
+import { loadTeamCalls, matchWinNames, turnNames } from "@/utils/team-calls";
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
 let config: IConfig;
-/** For Teams: whose guests are teams, and the match's tap-to-corrections (utils/teams.ts). */
-let teamHostId: string | null = null;
-let teamShifts: ShiftStore = {};
-let teamShiftsUnwatch: (() => void) | undefined;
 
 /** A sound waiting its turn, and the volume it plays at (utils/sound-volume.ts). */
 interface QueuedSound { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS; volume?: number }
@@ -113,12 +109,7 @@ export async function caller() {
 
   try {
     config = await AutodartsToolsConfig.getValue();
-    teamHostId = await getUserIdFromToken();
-    teamShifts = (await AutodartsToolsTeamShifts.getValue()) ?? {};
-    teamShiftsUnwatch?.();
-    teamShiftsUnwatch = AutodartsToolsTeamShifts.watch((value: ShiftStore) => {
-      teamShifts = value ?? {};
-    });
+    await loadTeamCalls();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log("Autodarts Tools: Config loaded", config?.caller?.sounds?.length || 0, "sounds available");
 
@@ -167,9 +158,6 @@ export function callerOnRemove() {
     boardDataWatcherUnwatch();
     boardDataWatcherUnwatch = null;
   }
-
-  teamShiftsUnwatch?.();
-  teamShiftsUnwatch = undefined;
 
   // Drop any update still settling
   settled.cancel();
@@ -545,14 +533,23 @@ function isSoundInQueue(trigger: string): boolean {
  */
 let lastScore: number = 0;
 /**
- * The names to call when a seat's turn starts: for a team (Teams), the player
- * whose visit it is and then the team's name; for anyone else, the seat's own.
+ * The name after a match shot: with Teams, the team's and then the player's
+ * who checked out (utils/team-calls.ts); a bot on no team is called "bot". A
+ * leg won on its own calls no name.
  */
-function turnNames(match: IGameData["match"]): string[] {
-  if (!match) return [];
-  const own = match.players?.[match.player]?.name;
-  const team = config.teams?.enabled ? callNames(match, normalizeTeams(config.teams).saved, teamHostId, shiftsOf(teamShifts, match.id)) : [];
-  return team.length ? team : own ? [ own ] : [];
+function callMatchWinner(match: NonNullable<IGameData["match"]>) {
+  const names = matchWinNames(match);
+  if (match.players?.[match.gameWinner]?.cpuPPR && names.length <= 1) {
+    playSound("bot");
+    return;
+  }
+  for (const trigger of nameTriggers(names) ?? []) playSound(trigger);
+}
+
+/** Teams' partner rule has a call of its own for the checkout it takes back, when there is a sound for it. */
+function bustTrigger(match: NonNullable<IGameData["match"]>): string {
+  const ruled = match.adtTeams?.bust && config.caller.sounds?.some(sound => sound.enabled && sound.triggers?.includes("partner_rule"));
+  return ruled ? "partner_rule" : "busted";
 }
 
 /**
@@ -705,25 +702,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
 
       if (winnerMatch) {
         playSound("matchshot");
+        callMatchWinner(gameData.match);
       } else {
         playSound("gameshot");
       }
-      // An own-score team's deciding leg is the team's match (utils/teams.ts):
-      // call the team, not the player who happened to check out.
-      const decidedTeam = gameData.match.adtTeams?.decided;
-      const winnerPlayer = gameData.match.players?.find(player => player.index === gameData.match?.winner);
-      const winnerPlayerName = winnerPlayer?.name;
-      const isBot = !!winnerPlayer?.cpuPPR;
-
-      if (decidedTeam) {
-        for (const trigger of nameTriggers([ decidedTeam ]) ?? []) playSound(trigger);
-      } else if (isBot) {
-        playSound("bot");
-      } else if (winnerPlayerName) {
-        playSound(winnerPlayerName.toLowerCase());
-      }
     } else if (busted) {
-      playSound("busted");
+      playSound(bustTrigger(gameData.match));
     } else if (isLastThrow) {
       if (config.caller.callEveryDart) {
         // Special case: if throwName is "25" and throwBed is "Single", check for "s25" first
@@ -777,25 +761,12 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
 
       if (winnerMatch) {
         playSound("matchshot");
+        callMatchWinner(gameData.match);
       } else {
         playSound("gameshot");
       }
-      // An own-score team's deciding leg is the team's match (utils/teams.ts):
-      // call the team, not the player who happened to check out.
-      const decidedTeam = gameData.match.adtTeams?.decided;
-      const winnerPlayer = gameData.match.players?.find(player => player.index === gameData.match?.winner);
-      const winnerPlayerName = winnerPlayer?.name;
-      const isBot = !!winnerPlayer?.cpuPPR;
-
-      if (decidedTeam) {
-        for (const trigger of nameTriggers([ decidedTeam ]) ?? []) playSound(trigger);
-      } else if (isBot) {
-        playSound("bot");
-      } else if (winnerPlayerName) {
-        playSound(winnerPlayerName.toLowerCase());
-      }
     } else if (busted) {
-      playSound("busted");
+      playSound(bustTrigger(gameData.match));
     } else if (gameData.match.players && gameData.match.players.length > 1 && isLastThrow) {
       if (config.caller.callEveryDart) {
         // Special case: if throwName is "25" and throwBed is "Single", check for "s25" first

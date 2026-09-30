@@ -24,9 +24,9 @@ export const TRIGGER_DOCS: Record<TriggerFeature, string> = {
 
 /** The pattern-shaped triggers, in one line. */
 export const TRIGGER_PATTERNS: Record<TriggerFeature, string> = {
-  caller: "Also scores 0–180, ranges like 100-180, s1–s20, d1–d20, t1–t20, combinations like s20_s5_s1, and a player's name.",
-  soundFx: "Also scores 0–180, ranges like 100-180, s/d/t1–20, combinations like s20_t19_d12 and a player's name, each with or without ambient_.",
-  wled: "Also scores 0–180, range_100_180, s/d/t1–20, m1–m20, combinations like t20_t20_t20, target7, and a player's name.",
+  caller: "Also scores 0–180, ranges like 100-180, s1–s20, d1–d20, t1–t20, combinations like s20_s5_s1, and a player's or team's name.",
+  soundFx: "Also scores 0–180, ranges like 100-180, s/d/t1–20, combinations like s20_t19_d12 and a player's or team's name, each with or without ambient_.",
+  wled: "Also scores 0–180, range_100_180, s/d/t1–20, m1–m20, combinations like t20_t20_t20, target7, and a player's or team's name.",
   animations: "Also scores 0–180, ranges like 100-180, s0–s20, d1–d20, t1–t20, and combinations like s20_s5_d20.",
 };
 
@@ -51,6 +51,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
     { trigger: "gameon", description: "At the start of a new game" },
     { trigger: "gameshot", description: "A player wins the leg" },
     { trigger: "busted", description: "A player busts" },
+    { trigger: "partner_rule", description: "Teams' partner rule takes a checkout back (busted when there is no sound for it)" },
     { trigger: "you_require", description: "Before a checkout is called" },
     { trigger: "next_player", description: "The next player is up and has no sound of their own" },
     { trigger: "bot", description: "Instead of the name when a bot is up" },
@@ -67,6 +68,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
     { trigger: "ambient_gameshot", description: "A player wins the leg" },
     { trigger: "ambient_matchshot", description: "A player wins the match" },
     { trigger: "ambient_busted", description: "A player busts" },
+    { trigger: "ambient_partner_rule", description: "Teams' partner rule takes a checkout back (ambient_busted when there is no sound for it)" },
     { trigger: "ambient_bull", description: "A bullseye" },
     { trigger: "ambient_miss", description: "A missed dart" },
     { trigger: "ambient_outside", description: "A missed dart, when there is no ambient_miss" },
@@ -86,6 +88,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
     { trigger: "gameshot", description: "A player wins the leg" },
     { trigger: "matchshot", description: "A player wins the match" },
     { trigger: "busted", description: "A player busts" },
+    { trigger: "partner_rule", description: "Teams' partner rule takes a checkout back (busted when there is no effect for it)" },
     { trigger: "bulloff", description: "Once, when the bull-off begins" },
     { trigger: "idle", description: "Leaving the match" },
     { trigger: "bull", description: "A bullseye" },
