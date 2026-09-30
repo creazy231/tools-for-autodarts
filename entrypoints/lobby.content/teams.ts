@@ -314,23 +314,42 @@ function pruneSeats(lineup: Lineup) {
  * the drawer is about to change the teams.
  */
 async function keepOrder(lineup: Lineup) {
-  if (reordering || drawerUi || opening || !isHost()) return;
+  if (reordering || drawerUi || opening || !isHost() || !lobby) return;
   const teamOf = (id: string) => lineup.teams.find(team => team.seatIds.includes(id))?.name;
   const order = () => (lobby?.players ?? []).map(seat => seat.id ?? "");
   if (order().some(id => !id) || interleave(order(), teamOf).join() === order().join()) return;
 
   reordering = true;
   try {
-    for (let moves = 0; moves < MAX_REORDER_MOVES; moves++) {
-      const current = order();
-      const [ move ] = seatMoves(current, interleave(current, teamOf));
-      if (!move) break;
-      const updated = nextLobbyUpdate();
-      if (!await moveSeat(move.index, move.toIndex, "Teams")) break;
-      await updated;
-    }
+    await oneTabAtATime(lobby.id, async () => {
+      for (let moves = 0; moves < MAX_REORDER_MOVES; moves++) {
+        const current = order();
+        const [ move ] = seatMoves(current, interleave(current, teamOf));
+        if (!move) break;
+        const updated = nextLobbyUpdate();
+        if (!await moveSeat(move.index, move.toIndex, "Teams")) break;
+        await updated;
+      }
+    });
   } finally {
     reordering = false;
+  }
+}
+
+/**
+ * Runs the reorder in one tab only (utils/teams-lease.ts): the same lobby open
+ * in two tabs would send every move twice, and the seats would swap back and
+ * forth. The tab the service worker gives the lobby to moves; any other leaves
+ * it, and sees the order it brings. A service worker that can't be asked
+ * doesn't stop a lone tab.
+ */
+async function oneTabAtATime(lobbyId: string, run: () => Promise<void>) {
+  const granted = await browser.runtime.sendMessage({ type: "teams:reorder-lease", lobbyId }).then(Boolean, () => true);
+  if (!granted) return;
+  try {
+    await run();
+  } finally {
+    browser.runtime.sendMessage({ type: "teams:reorder-lease", lobbyId, release: true }).catch(e => console.error(e));
   }
 }
 

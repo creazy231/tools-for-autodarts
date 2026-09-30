@@ -1,4 +1,5 @@
 import { AutodartsToolsGlobalStatus } from "@/utils/storage";
+import { claimLease, releaseLease } from "@/utils/teams-lease";
 import { undoVisit } from "@/utils/teams-undo";
 
 console.log("Background script loading...");
@@ -17,6 +18,15 @@ export default defineBackground({
     // Handle messages from content scripts
     browser.runtime.onMessage.addListener(async (message, sender) => {
       console.log("Background: Received message", message.type, "from", sender?.tab?.url || "unknown");
+
+      // Teams' own scores: one tab at a time reorders a lobby's seats.
+      if (message.type === "teams:reorder-lease") {
+        const holder = `${sender?.tab?.id ?? "?"}:${sender?.frameId ?? 0}`;
+        const lobbyId = String(message.lobbyId ?? "");
+        if (!message.release) return claimLease(lobbyId, holder, Date.now());
+        releaseLease(lobbyId, holder);
+        return true;
+      }
 
       // Teams' partner rule: a checkout that broke it is undone here, once.
       if (message.type === "teams:undo-visit") {
