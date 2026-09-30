@@ -477,12 +477,17 @@ function addSaved(team: SavedTeam) {
 
 /** Tab stays inside the dialog while it is open. */
 function trapFocus(event: KeyboardEvent) {
-  const focusable = [ ...(panel.value?.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled)") ?? []) ];
+  const focusable = [ ...(panel.value?.querySelectorAll<HTMLElement>("button:not(:disabled), input:not(:disabled), select:not(:disabled)") ?? []) ];
   if (!focusable.length) return;
   const first = focusable[0];
   const last = focusable[focusable.length - 1];
-  const active = (panel.value?.getRootNode() as ShadowRoot | Document).activeElement;
-  if (event.shiftKey && active === first) {
+  const active = (panel.value?.getRootNode() as ShadowRoot | Document).activeElement as HTMLElement | null;
+  // From the dialog itself, where focus starts when saved teams show, Tab goes
+  // to the first control and Shift+Tab to the last, as from anywhere outside them.
+  if (!active || !focusable.includes(active)) {
+    event.preventDefault();
+    (event.shiftKey ? last : first).focus();
+  } else if (event.shiftKey && active === first) {
     event.preventDefault();
     last.focus();
   } else if (!event.shiftKey && active === last) {
