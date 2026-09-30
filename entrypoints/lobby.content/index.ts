@@ -4,6 +4,7 @@ import { soundFx, soundFxOnRemove } from "../match.content/sound-fx";
 import { wledFx, wledFxOnRemove } from "../match.content/wled";
 
 import { localLobby, onRemove as onLocalLobbyRemove } from "./local-lobby";
+import { onRemove as onTeamsRemove, teams } from "./teams";
 
 import type { IConfig } from "@/utils/storage";
 
@@ -41,7 +42,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * entrypoints/match.content/index.ts. v1 is being retired, and the unported
  * implementations go with it.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "localLobby", "qrCode", "soundFx", "wledFx" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "localLobby", "teams", "qrCode", "soundFx", "wledFx" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -124,6 +125,11 @@ export default defineContentScript({
           await initScript(localLobby, url).catch(e => console.error(e));
         }
 
+        if (isOn(config, "teams")) {
+          // Needs ctx: its drawer is a Vue app in a shadow root.
+          await initScript(() => teams(ctx), url).catch(e => console.error(e));
+        }
+
         if (isOn(config, "soundFx")) {
           await initScript(soundFx, url).catch(e => console.error(e));
         }
@@ -147,6 +153,7 @@ export default defineContentScript({
         await onQrCodeRemove();
         await onRecentLocalPlayersRemove();
         await onLocalLobbyRemove();
+        await onTeamsRemove();
         await soundFxOnRemove();
         await wledFxOnRemove();
       }

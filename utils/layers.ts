@@ -70,6 +70,8 @@ const FEATURE_LAYERS = {
   takeout: 200,
   /** Instant Replay's clip, over the takeout notice it usually follows. */
   instantReplay: 210,
+  /** Teams' Add Team drawer in the lobby, over the site's own sheets (z-50). */
+  teamsDrawer: 220,
   /** Quick Correction, which is asking a question and has to be reachable. */
   quickCorrection: 10000,
 } as const;

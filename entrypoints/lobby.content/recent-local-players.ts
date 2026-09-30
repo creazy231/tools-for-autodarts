@@ -25,14 +25,8 @@ import RecentLocalPlayersStrip from "./RecentLocalPlayers.vue";
 
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig } from "@/utils/storage";
-import { fetchWithAuth, getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
-
-/**
- * Where the site keeps the board picked for autoscoring: its id, or `manual`
- * when the darts are entered by hand.
- */
-const BOARD_KEY = "selectedBoard";
+import { addGuest } from "@/utils/lobby-guests";
 
 /** Shared with the strip; see RecentLocalPlayers.vue. */
 const names = ref<string[]>([]);
@@ -200,48 +194,11 @@ function sameList(a: string[], b: string[]): boolean {
 /**
  * Add a saved player to the lobby.
  *
- * This is the request the site's own Add Player dialog makes, body and all.
- * Going straight to it keeps a click a click, rather than opening a dialog,
- * typing into it and pressing its button on the user's behalf.
- *
- * The board is the part that is easy to lose. A guest is autoscored only by the
- * board they were added with, and the lobby looks the same either way — a
- * guest added without one just never has a dart scored.
+ * This is the request the site's own Add Player dialog makes, body and all
+ * (utils/lobby-guests.ts). Going straight to it keeps a click a click, rather
+ * than opening a dialog, typing into it and pressing its button on the user's
+ * behalf.
  */
-async function addPlayer(name: string): Promise<boolean> {
-  const lobbyId = window.location.pathname.match(/\/lobby\/([0-9a-f-]+)/i)?.[1];
-  const hostId = await getUserIdFromToken();
-
-  if (!lobbyId || !hostId) {
-    console.warn("Autodarts Tools: Recent Local Players - Cannot add a player without a lobby and a user id");
-    return false;
-  }
-
-  try {
-    const response = await fetchWithAuth(`https://api.autodarts.com/gs/v0/lobbies/${lobbyId}/players`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, hostId, boardId: selectedBoard() }),
-    });
-
-    if (!response.ok) {
-      console.error("Autodarts Tools: Recent Local Players - Failed to add player", response.status, response.statusText);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Autodarts Tools: Recent Local Players - Error adding player:", error);
-    return false;
-  }
-}
-
-/**
- * The board the site's dialog adds a guest on: the one picked for autoscoring,
- * or none when that is `manual` or nothing has been picked. Left `undefined`,
- * the field drops out of the request, as it does from the site's.
- */
-function selectedBoard(): string | undefined {
-  const board = localStorage.getItem(BOARD_KEY);
-  return board && board !== "manual" ? board : undefined;
+function addPlayer(name: string): Promise<boolean> {
+  return addGuest(name, "Recent Local Players");
 }

@@ -358,6 +358,21 @@ export const SELECTORS = {
      */
     playerBoardButton: [ "button[data-slot='button']:has([data-icon='house'])" ],
     playerRemoveButton: [ "button[data-slot='button']:has([data-icon='xmark'])" ],
+
+    /**
+     * Add Bot, which Add Team is a copy of, and Add Player for a redesign
+     * that drops the robot. FontAwesome stamps `data-icon` on the glyph each
+     * draws, which names them without their translated labels. Party games
+     * draw Add Bot disabled; the copy is enabled on its own terms.
+     */
+    addBotButton: [ "[data-slot='card-content'] button[data-slot='button']:has([data-icon='robot'])" ],
+    addPlayerButton: [ "[data-slot='card-content'] button[data-slot='button']:has([data-icon='plus'])" ],
+    /**
+     * The middle of a player row: its name tag, then the "Playing with …"
+     * line, stacked on a phone and side by side from the expanded breakpoint
+     * (relative to a row).
+     */
+    playerNameColumn: [ ":scope > div.flex-col.min-w-0", ":scope > div:has(span.font-display)" ],
   },
 
   /**
@@ -413,6 +428,14 @@ export const SELECTORS = {
      */
     markReadyText: [ "Mark Ready", "Als bereit markieren", "Gereed melden" ],
     markUnreadyText: [ "Mark Unready", "Als nicht bereit markieren", "Gereedmelding intrekken" ],
+  },
+
+  /** The site's NameTag, wherever it draws one: in the lobby's rows and on the score cards. */
+  nameTag: {
+    /** The body that holds the name: the one div with the name as a direct child. */
+    body: [ "div:has(> span.font-display)" ],
+    /** The slanted end drawn after the body, in the tag's colour (`currentColor`). */
+    shape: [ "svg[data-slot='nametag-shape']" ],
   },
 
   /**

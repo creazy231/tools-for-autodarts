@@ -16,10 +16,12 @@
       @click="pick(option)"
       v-for="option in options"
       :key="option.id"
+      :aria-disabled="isDisabled(option)"
       :aria-pressed="modelValue.preset === option.id"
+      :disabled="isDisabled(option)"
       :title="option.label"
       class="flex w-16 flex-col items-center gap-1.5 rounded-[var(--ad-radius-sm)] py-1 text-[length:var(--ad-text-xs)] transition-colors focus-visible:shadow-[var(--ad-focus-ring)] focus-visible:outline-none"
-      :class="modelValue.preset === option.id ? 'font-semibold text-white' : 'text-white/60 hover:text-white'"
+      :class="[modelValue.preset === option.id ? 'font-semibold text-white' : 'text-white/60 hover:text-white', { 'cursor-not-allowed opacity-[.35]': isDisabled(option) }]"
       type="button"
     >
       <!-- Inset from the button's sides, where the name is not: a picked name is bold, and bold "qwellcode" is 58px wide. -->
@@ -80,6 +82,8 @@ const props = defineProps<{
    * carries each one's hue.
    */
   texture?: string;
+  /** Preset ids another team already has (Teams): shown, but not pickable. */
+  disabledPresets?: readonly string[];
 }>();
 
 const emit = defineEmits<{ "update:modelValue": [ value: ColorScheme ] }>();
@@ -98,7 +102,12 @@ function swatch(option: ColorPreset) {
   };
 }
 
+function isDisabled(option: ColorPreset): boolean {
+  return option.id !== props.modelValue.preset && (props.disabledPresets ?? []).includes(option.id);
+}
+
 function pick(option: ColorPreset) {
+  if (isDisabled(option)) return;
   emit("update:modelValue", { preset: option.id, from: option.from, to: option.to });
 }
 
