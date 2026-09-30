@@ -27,7 +27,8 @@ import { createApp, reactive } from "vue";
 import TeamsPill from "./TeamsPill.vue";
 
 import type { IMatch } from "@/utils/websocket-helpers";
-import type { Lineup, LineupStore, LineupTeam, SavedTeam, ShiftStore } from "@/utils/teams";
+import type { Lineup, LineupStore, LineupTeam, PillNote, SavedTeam, ShiftStore } from "@/utils/teams";
+import type { PillView } from "@/utils/teams-pill";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SITE_CARD, normalizeColors } from "@/utils/colors";
@@ -35,7 +36,8 @@ import { SELECTORS, anyOf, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { TEAMS_PILL_TAG, assignCards, bustText, decidedTeam, decidedText, lineupOf, lineupTeams, normalizeName, normalizeTeams, partnerRuleApplies, partnerRuleBreach, playerUp, resultText, shiftFor, shiftsOf, teamLegs, teamSeats, toThrowText, undoFailedText, warningText, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, ruleBustNote, ruleRefusedNote, shiftFor, shiftsOf, teamLegs, teamSeats, withShift } from "@/utils/teams";
+import { ownPill, sharedPill } from "@/utils/teams-pill";
 
 const STYLE_ID = "teams-match";
 const CARD_ATTR = "data-adt-team";
@@ -88,34 +90,11 @@ const BASE_CSS = `
   }
 `;
 
-/** What the pill shows; shared with TeamsPill.vue. */
-export interface PillView {
-  /** Changes whenever a new visit (or another player) comes up; the text animates on it. */
-  turnKey: string;
-  text: string;
-  /** The team's name, or "" for a seat that is no team. */
-  team: string;
-  from: string;
-  to: string;
-  /** Own scores: every team's legs, in the lineup's order. */
-  tally: { name: string; legs: number; from: string; to: string }[];
-  /** "First to N", or 0. */
-  target: number;
-  /** A line under the pill: the partner rule's warning, or its bust. */
-  note: string;
-  noteKind: "" | "rule" | "bust";
-  /**
-   * The note's line is kept, empty, wherever the partner rule can come in:
-   * the warning shows for one team's turns and not the other's, and the board
-   * must not move down and up with it.
-   */
-  noteSpace: boolean;
-}
-
 /** Anything with a name and a colour: a saved team, or a lineup's. */
 interface Coloured { name: string; colour: { from: string; to: string } }
 
-const pill = reactive<PillView>({ turnKey: "", text: "", team: "", ...SITE_CARD, tally: [], target: 0, note: "", noteKind: "", noteSpace: false });
+/** What the pill shows (utils/teams-pill.ts); shared with TeamsPill.vue. */
+const pill = reactive<PillView>({ turnKey: "", text: "", detail: "", ...SITE_CARD, left: [], right: [], target: 0, noteKind: "" });
 
 let ctxRef: any = null;
 let pillUi: any = null;
@@ -131,7 +110,8 @@ let otherCard: { from: string; to: string } = SITE_CARD;
 let shiftStore: ShiftStore = {};
 let lineupStore: LineupStore = {};
 let unwatchLineups: (() => void) | null = null;
-let partnerRule = false;
+/** The partner rule for a lineup that has none of its own: the last one set in a lobby. */
+let partnerRuleDefault = false;
 let holding = false;
 /** The partner-rule bust last sent to be undone, by match and darts. */
 let lastUndo = "";
@@ -140,7 +120,7 @@ let lastUndo = "";
  * it. `bustTurn` is the busted visit, whose frames go on arriving while the
  * undo runs; `shownFor` is the first visit after it.
  */
-let bustNote: { text: string; bustTurn: string; shownFor?: string } | undefined;
+let bustNote: { note: PillNote; bustTurn: string; shownFor?: string } | undefined;
 let match: IMatch | undefined;
 let lastStyles = "";
 let lastTurn = "";
@@ -206,7 +186,7 @@ export function onRemove() {
 function readConfig(config: any) {
   const teamsConfig = normalizeTeams(config?.teams);
   saved = teamsConfig.saved;
-  partnerRule = teamsConfig.partnerRule;
+  partnerRuleDefault = teamsConfig.partnerRule;
   const colors = normalizeColors(config?.colors);
   otherCard = colors.enabled && colors.card.preset !== "default" ? colors.card : SITE_CARD;
 }
@@ -257,7 +237,7 @@ function applyShared() {
   const upTeam = seats.get(up);
   writeStyles([ ...new Set(seats.values()) ]);
   dressCards(seats, shifts, up);
-  updatePill(upTeam, up, shifts[upTeam?.name ?? ""] ?? 0);
+  Object.assign(pill, sharedPill(match, seats, shifts, otherCard, siteLanguage()));
   ensurePill();
   handover(upTeam, up);
   holdNextLeg(false);
@@ -277,7 +257,7 @@ function applyOwn(lineup: Lineup) {
   askUndo();
   writeStyles(decided ? undefined : lineup.teams);
   dressOwnCards(seats, up, lineup);
-  updateOwnPill(lineup, upTeam, up, decided);
+  Object.assign(pill, ownPill(match!, lineup, { other: otherCard, language: siteLanguage(), partnerRule: lineupPartnerRule(lineup, partnerRuleDefault), note: shownBustNote(up) }));
   ensurePill();
   holdNextLeg(Boolean(decided && panelUp));
   handover(decided ? undefined : upTeam, up);
@@ -295,13 +275,13 @@ function askUndo() {
   const key = `${match.id}|${bust.dartIds.join(",")}`;
   if (key === lastUndo) return;
   lastUndo = key;
-  const note = { text: bustText(bust.breach), bustTurn: turnKeyOf(bust.seat) };
+  const note = { note: ruleBustNote(bust.breach), bustTurn: turnKeyOf(bust.seat) };
   bustNote = note;
   // When autodarts refuses, the checkout still stands on the site: say so,
   // rather than that it didn't count.
   const settle = (result?: { ok?: boolean }) => {
     if (result?.ok !== false || bustNote !== note) return;
-    note.text = undoFailedText(bust.breach);
+    note.note = ruleRefusedNote(bust.breach);
     apply();
   };
   browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).then(settle, (e) => {
@@ -463,62 +443,18 @@ function siteLanguage(): string {
   return localStorage.getItem("autodarts.settings.language") || navigator.language || "en";
 }
 
-function updatePill(upTeam: SavedTeam | undefined, up: number, shift: number) {
-  const seat = match!.players?.[up];
-  const player = upTeam ? upTeam.players[playerUp(match!, up, upTeam, shift)] : normalizeName(seat?.name);
-  const colour = upTeam?.colour ?? otherCard;
-  pill.text = toThrowText(player ?? "", siteLanguage());
-  pill.team = upTeam?.name ?? "";
-  pill.from = colour.from;
-  pill.to = colour.to;
-  pill.turnKey = `${match!.set}|${match!.leg}|${match!.round}|${up}|${player}`;
-  pill.tally = [];
-  pill.target = 0;
-  pill.note = "";
-  pill.noteKind = "";
-  pill.noteSpace = false;
-}
-
-function updateOwnPill(lineup: Lineup, upTeam: LineupTeam | undefined, up: number, decided: string | undefined) {
-  const legs = teamLegs(match!, lineup);
-  pill.tally = lineup.teams.map(team => ({ name: team.name, legs: legs[team.name] ?? 0, from: team.colour.from, to: team.colour.to }));
-  pill.target = match!.legs ?? 0;
-  pill.note = "";
-  pill.noteKind = "";
-  pill.noteSpace = partnerRule && partnerRuleApplies(match!, lineup);
-  if (decided) {
-    const team = lineup.teams.find(candidate => candidate.name === decided);
-    pill.text = decidedText(decided);
-    pill.team = resultText(legs, decided, lineup);
-    pill.from = team?.colour.from ?? otherCard.from;
-    pill.to = team?.colour.to ?? otherCard.to;
-    pill.turnKey = `decided|${decided}`;
-    return;
-  }
-  const player = normalizeName(match!.players?.[up]?.name);
-  const colour = upTeam?.colour ?? otherCard;
-  pill.text = toThrowText(player, siteLanguage());
-  pill.team = upTeam?.name ?? "";
-  pill.from = colour.from;
-  pill.to = colour.to;
-  pill.turnKey = turnKeyOf(up);
-  // The bust's line stays through the busted visit, while the undo runs, and
-  // the visit after it; it goes when the next one comes up.
-  if (bustNote) {
-    const onBustVisit = pill.turnKey === bustNote.bustTurn;
-    if (!onBustVisit) bustNote.shownFor ??= pill.turnKey;
-    if (onBustVisit || bustNote.shownFor === pill.turnKey) {
-      pill.note = bustNote.text;
-      pill.noteKind = "bust";
-      return;
-    }
-    bustNote = undefined;
-  }
-  const breach = partnerRule ? partnerRuleBreach(match!, lineup, up) : undefined;
-  if (breach) {
-    pill.note = warningText(breach);
-    pill.noteKind = "rule";
-  }
+/**
+ * The bust's line, from the busted visit, whose frames go on arriving while
+ * the undo runs, through the visit after it. It goes when the next one comes up.
+ */
+function shownBustNote(up: number): PillNote | undefined {
+  if (!bustNote) return undefined;
+  const turn = turnKeyOf(up);
+  const onBustVisit = turn === bustNote.bustTurn;
+  if (!onBustVisit) bustNote.shownFor ??= turn;
+  if (onBustVisit || bustNote.shownFor === turn) return bustNote.note;
+  bustNote = undefined;
+  return undefined;
 }
 
 /**

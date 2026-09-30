@@ -1003,21 +1003,6 @@ export function resultText(legs: Record<string, number>, decided: string, lineup
   return [ legs[decided] ?? 0, ...others ].join(" – ");
 }
 
-/** The line under the pill while the partner rule stops the player up from checking out. */
-export function warningText(breach: Breach): string {
-  return `No checkout this visit: ${breach.teammate} has ${breach.teammateLeft} left, more than ${joinNames(breach.opponents)} together (${breach.opponentsLeft})`;
-}
-
-/** The line after a checkout the rule turned into a bust. */
-export function bustText(breach: Breach): string {
-  return `${breach.player}'s checkout didn't count: partner rule.`;
-}
-
-/** The pill's line when autodarts refused to take a rule-breaking checkout back. */
-export function undoFailedText(breach: Breach): string {
-  return `${breach.player}'s checkout breaks the partner rule, but autodarts didn't take it back. Undo it yourself.`;
-}
-
 /** A partner-rule line in the pill's two parts: the news, then the reason at lower emphasis. */
 export interface PillNote {
   primary: string;
