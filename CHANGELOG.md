@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Teams**: two or more players share one score and take turns at your board. **Add Team**, beside *Add Player* and *Add Bot* in a lobby you host, opens a drawer like the site's own, with the team's name, its colour and its players in throwing order: saved players are a tap away, new names can be typed in, and the order is dragged into place. The team joins the lobby as a guest on your board and is remembered by its name, so next time it is one tap under *Saved teams*, and any guest of yours with that name plays as that team. In the lobby, a team's row wears its colour and lists its players, with a pencil beside it to edit the team. Thanks to Andy Pech's [Teams for Autodarts](https://chromewebstore.google.com/detail/teams-for-autodarts/hdhjfeojcjknkahhngnbklnchiffdiog) and MartinHH's [Autodarts – Team 2vs2](https://greasyfork.org/scripts/575890-autodarts-team-2vs2-4-players) for the idea
+  - The colours are **Colors**' card colours: raspberry, the nine pairs, or a pair of your own. A pair another team in the lobby already has is greyed out, and each new team gets the next free one, red against blue first
+  - On the match screen, the card of the team that's up is filled with its colour instead of raspberry, and a waiting team's name tag carries its colour. Each card lists the team's players, the one throwing filled white and the waiting team's next one outlined, and a pill under the turn bar says who's up, "TOM to throw", in the site's language. At each handover the pill fades to the next team's colour and the card that's up pulses once, unless reduced motion is on. A bust and a won leg keep the site's grey and green, and a seat that isn't a team keeps its card colour, the pill naming it while it throws
+  - Every leg starts with each team's next player, and the order is worked out from the site's own set, leg and round numbers, so a reload or an undo never throws it off. When a visit went to the wrong player, tapping a name in the team's card makes that player the one who's up, or next, and the order carries on from them
+  - The **Caller** calls the player whose turn it is when it has a sound for the name, the team's name when it hasn't, and `next_player` after that
+  - Bots can play against a team but not in one, since the server throws every visit of a bot's seat. Teams whose players each keep a score of their own aren't part of it
+
 ### Changed
 
 - **Team Lobby is now Local Lobby**, the name the site gives its own local play: in a local tournament "every player will play on boards provided by you", which is what the feature sets a lobby up for. It works as before, and if it was on, it stays on. For team games, there is Teams now

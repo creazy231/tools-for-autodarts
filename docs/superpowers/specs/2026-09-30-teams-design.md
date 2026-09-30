@@ -118,7 +118,10 @@ include a bot. Keep the design as close to autodarts' own as possible.
    - Each team's card lists its players in order. The one throwing is filled
      white, and the waiting team's next player is outlined in its colour.
    - A pill under the turn bar, in the throwing team's gradient with white
-     text, says who's up in the site's own words.
+     text, says who's up in the site's own words. In a match with a team in
+     it, the pill stays up while any other seat throws as well, naming that
+     seat in its own card colours, so the board doesn't jump down and up every
+     turn.
    - At each handover, the pill fades to the new gradient, the next name slides
      in and the card that's up pulses once. With reduced motion switched on,
      the colours change but nothing pulses or slides.
@@ -327,7 +330,11 @@ ids, and `match.players` rotates every leg.
      colour at 60%, fading out towards the edges, round the pill.
    - The pill is the team's gradient with white text: "TOM to throw", then the
      team's name at lower emphasis.
-   - While a non-team seat is up, it shows nothing.
+   - While a non-team seat is up, it stays, and names that seat ("BOT LEVEL 5
+     to throw", with no team name after it) in the seat's card colours:
+     Colors' pair when Colors is on, raspberry when it isn't. Hiding it would
+     move the board down and back up at every turn. A match with no team in
+     it gets no pill at all.
    - Whether it sits in the flow or over the top of the board's column is
      settled live in each of the three layouts: it must never cover the board's
      scoring area or Darts Zoom's strip.
