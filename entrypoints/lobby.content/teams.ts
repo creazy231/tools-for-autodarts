@@ -71,6 +71,12 @@ export interface DrawerState {
   editing: SavedTeam | null;
   /** The lobby's guests, except the team being edited. */
   guestNames: string[];
+  /**
+   * Names a suggestion must not take: the lobby's guests and the saved teams,
+   * so a new team never quietly replaces a saved one. Typing one on purpose
+   * still does.
+   */
+  reservedNames: string[];
   /** Player → the other team they're on, for the greyed-out chips and the checks. */
   playerTeams: Record<string, string>;
   /** The other teams' colours, which the picker greys out. */
@@ -100,6 +106,7 @@ let scheduled = false;
 const drawer = reactive<DrawerState>({
   editing: null,
   guestNames: [],
+  reservedNames: [],
   playerTeams: {},
   takenColours: [],
   offered: [],
@@ -324,6 +331,7 @@ function drawerContext(editing: SavedTeam | null): Omit<DrawerState, "submit" | 
   return {
     editing,
     guestNames: guests.filter(name => name !== editing?.name),
+    reservedNames: uniqueNames([ ...guests, ...saved.map(team => team.name) ]),
     playerTeams,
     takenColours: lobbyTeams.map(team => team.colour),
     offered: uniqueNames([ ...savedPlayers, ...siteGuests(), ...saved.flatMap(team => team.players) ]),

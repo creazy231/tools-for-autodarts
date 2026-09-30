@@ -313,9 +313,20 @@ export function checkTeam(draft: TeamDraft, context: DraftContext): string | und
   return undefined;
 }
 
-/** The saved teams with this one first, in place of one of the same name. */
+/** A team as plain data: its fields copied out of whatever reactive proxy holds them. */
+function plainTeam(team: SavedTeam): SavedTeam {
+  const { preset, from, to } = team.colour;
+  return { name: team.name, players: [ ...team.players ], colour: { preset, from, to } };
+}
+
+/**
+ * The saved teams with this one first, in place of one of the same name, as
+ * plain data. The drawer hands over Vue's reactive copies, and browser storage
+ * cannot clone a proxy: it stored a team's players as `{0: …, 1: …}`, which
+ * {@link normalizeTeams} then rightly dropped.
+ */
 export function rememberTeam(saved: readonly SavedTeam[], team: SavedTeam): SavedTeam[] {
-  return [ team, ...saved.filter(other => other.name !== team.name) ];
+  return [ plainTeam(team), ...saved.filter(other => other.name !== team.name).map(plainTeam) ];
 }
 
 /** "TOM to throw", in the site's own words for its language (Killer's `game.killer.toThrow`). */

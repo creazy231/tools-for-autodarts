@@ -146,7 +146,7 @@ const nameInput = ref<HTMLInputElement>();
 const list = ref<HTMLElement>();
 const players = ref<string[]>([ ...(props.state.editing?.players ?? []) ]);
 const colour = ref({ ...(props.state.editing?.colour ?? nextFreeColour(props.state.takenColours)) });
-const name = ref(props.state.editing?.name ?? suggestName(colour.value, props.state.guestNames));
+const name = ref(props.state.editing?.name ?? suggestName(colour.value, props.state.reservedNames));
 /** Once typed into, the name no longer follows the colour. */
 const nameTouched = ref(Boolean(props.state.editing));
 const query = ref("");
@@ -184,7 +184,7 @@ onMounted(() => {
 });
 
 watch(colour, (value) => {
-  if (!nameTouched.value) name.value = suggestName(value, props.state.guestNames);
+  if (!nameTouched.value) name.value = suggestName(value, props.state.reservedNames);
 });
 
 onBeforeUnmount(() => sorter?.destroy());
