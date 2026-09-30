@@ -189,20 +189,27 @@ watch(colour, (value) => {
 
 onBeforeUnmount(() => sorter?.destroy());
 
-function addPlayer(raw: string) {
+/** Puts a player in the team, or says why not. Whether they are in it now. */
+function addPlayer(raw: string): boolean {
   const player = normalizeName(raw);
   error.value = "";
-  if (!player || players.value.includes(player) || players.value.length >= MAX_PLAYERS) return;
+  if (!player) return false;
+  if (players.value.includes(player)) return true;
   if (props.state.playerTeams[player]) {
     error.value = `${player} is already on ${props.state.playerTeams[player]}.`;
-    return;
+    return false;
+  }
+  if (players.value.length >= MAX_PLAYERS) {
+    error.value = `A team can have ${MAX_PLAYERS} players at most.`;
+    return false;
   }
   players.value = [ ...players.value, player ];
   query.value = "";
+  return true;
 }
 
-function addTyped() {
-  addPlayer(query.value);
+function addTyped(): boolean {
+  return addPlayer(query.value);
 }
 
 function removePlayer(index: number) {
@@ -221,7 +228,10 @@ async function run(task: () => Promise<string | undefined>) {
 }
 
 function submit() {
-  if (query.value.trim()) addTyped();
+  // A name still in the field joins the team first. One that can't, being on
+  // another team say, stops here with its reason, rather than the team being
+  // added without it.
+  if (query.value.trim() && !addTyped()) return;
   run(() => props.state.submit({ name: name.value, players: players.value, colour: colour.value }));
 }
 

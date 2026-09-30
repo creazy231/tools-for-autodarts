@@ -30,7 +30,7 @@ import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
 import { addGuest, lobbyIdFromUrl } from "@/utils/lobby-guests";
-import { checkTeam, colourTaken, findTeam, isHostedGuest, normalizeName, normalizeTeams, rememberTeam, uniqueNames } from "@/utils/teams";
+import { checkTeam, colourTaken, findTeam, isHostedGuest, normalizeName, normalizeTeams, rememberTeam, uniqueNames, withFreeColour } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const STYLE_ID = "teams-lobby";
@@ -94,6 +94,14 @@ export interface DrawerState {
 
 let ctxRef: any = null;
 let drawerUi: any = null;
+/**
+ * A drawer on its way in. createShadowRootUi fetches the entrypoint's CSS
+ * before it returns, and a second tap in that time used to mount a second
+ * drawer that nothing held, so nothing could close it.
+ */
+let opening = false;
+/** Closed before it had even appeared: it must not appear after all. */
+let closedWhileOpening = false;
 let observer: MutationObserver | null = null;
 let unwatchLobby: (() => void) | null = null;
 let unwatchConfig: (() => void) | null = null;
@@ -251,38 +259,39 @@ function dressRows() {
 
 function dress(row: HTMLElement, team: SavedTeam) {
   const key = `${team.name}|${team.players.join(",")}|${team.colour.from}|${team.colour.to}`;
-  const whole = row.querySelector(".adt-team-order") && row.querySelector(".adt-team-edit");
-  if (row.getAttribute(ROW_ATTR) === key && whole) return;
+  // Keyed on the order row alone. The pencil needs the row's ✕ to copy, and a
+  // row drawn without one was redrawn every frame waiting for it.
+  if (row.getAttribute(ROW_ATTR) !== key || !row.querySelector(".adt-team-order")) {
+    row.setAttribute(ROW_ATTR, key);
+    row.style.setProperty("--adt-team-from", team.colour.from);
+    row.style.setProperty("--adt-team-to", team.colour.to);
 
-  row.setAttribute(ROW_ATTR, key);
-  row.style.setProperty("--adt-team-from", team.colour.from);
-  row.style.setProperty("--adt-team-to", team.colour.to);
-
-  row.querySelector(".adt-team-order")?.remove();
-  qs<HTMLElement>(SELECTORS.lobby.playerNameColumn, row)?.append(orderRow(team.players));
-
-  if (!row.querySelector(".adt-team-edit")) {
-    const remove = qs<HTMLButtonElement>(SELECTORS.lobby.playerRemoveButton, row);
-    if (remove) {
-      // A copy of the row's own ✕, so it sits and hovers like the site's
-      // buttons, before the first of them.
-      const edit = remove.cloneNode(false) as HTMLButtonElement;
-      edit.classList.add("adt-team-edit");
-      edit.type = "button";
-      edit.disabled = false;
-      edit.title = "Edit team";
-      edit.setAttribute("aria-label", `Edit ${team.name}`);
-      edit.innerHTML = ICON_EDIT;
-      edit.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const name = normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent);
-        const current = findTeam(saved, name);
-        if (current) openDrawer(current);
-      });
-      const firstButton = [ ...row.children ].find(child => child.matches("button[data-slot='button']")) ?? remove;
-      firstButton.before(edit);
-    }
+    row.querySelector(".adt-team-order")?.remove();
+    qs<HTMLElement>(SELECTORS.lobby.playerNameColumn, row)?.append(orderRow(team.players));
   }
+  if (!row.querySelector(".adt-team-edit")) addEditButton(row, team);
+}
+
+/** A copy of the row's own ✕, so it sits and hovers like the site's buttons, before the first of them. */
+function addEditButton(row: HTMLElement, team: SavedTeam) {
+  const remove = qs<HTMLButtonElement>(SELECTORS.lobby.playerRemoveButton, row);
+  if (!remove) return;
+
+  const edit = remove.cloneNode(false) as HTMLButtonElement;
+  edit.classList.add("adt-team-edit");
+  edit.type = "button";
+  edit.disabled = false;
+  edit.title = "Edit team";
+  edit.setAttribute("aria-label", `Edit ${team.name}`);
+  edit.innerHTML = ICON_EDIT;
+  edit.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const name = normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent);
+    const current = findTeam(saved, name);
+    if (current) openDrawer(current);
+  });
+  const firstButton = [ ...row.children ].find(child => child.matches("button[data-slot='button']")) ?? remove;
+  firstButton.before(edit);
 }
 
 function undress(row: HTMLElement) {
@@ -343,26 +352,38 @@ function drawerContext(editing: SavedTeam | null): Omit<DrawerState, "submit" | 
 async function openDrawer(editing: SavedTeam | null) {
   if (!isHost() || !ctxRef) return;
   Object.assign(drawer, drawerContext(editing));
-  if (drawerUi) return;
+  if (drawerUi || opening) return;
 
-  drawerUi = await createShadowRootUi(ctxRef, {
-    name: "autodarts-tools-teams-drawer",
-    position: "inline",
-    // On body, appended last, and pinned from inside: see match.content's
-    // overlays for why the host itself cannot be positioned.
-    anchor: "body",
-    append: "last",
-    onMount: (container: HTMLElement) => {
-      const app = createApp(AddTeamDrawer, { state: drawer });
-      app.mount(container);
-      return app;
-    },
-    onRemove: (app: any) => app?.unmount(),
-  });
-  drawerUi.mount();
+  opening = true;
+  closedWhileOpening = false;
+  try {
+    const ui = await createShadowRootUi(ctxRef, {
+      name: "autodarts-tools-teams-drawer",
+      position: "inline",
+      // On body, appended last, and pinned from inside: see match.content's
+      // overlays for why the host itself cannot be positioned.
+      anchor: "body",
+      append: "last",
+      onMount: (container: HTMLElement) => {
+        const app = createApp(AddTeamDrawer, { state: drawer });
+        app.mount(container);
+        return app;
+      },
+      onRemove: (app: any) => app?.unmount(),
+    });
+    if (closedWhileOpening) {
+      ui.remove();
+      return;
+    }
+    drawerUi = ui;
+    ui.mount();
+  } finally {
+    opening = false;
+  }
 }
 
 function closeDrawer() {
+  if (opening) closedWhileOpening = true;
   drawerUi?.remove();
   drawerUi = null;
 }
@@ -393,8 +414,11 @@ async function submitDraft(draft: TeamDraft): Promise<string | undefined> {
   return undefined;
 }
 
-async function addSavedTeam(team: SavedTeam): Promise<string | undefined> {
+async function addSavedTeam(savedTeam: SavedTeam): Promise<string | undefined> {
   if (drawer.full) return "The lobby is full.";
+  // Another team here may have its colour by now, say a new team offered the
+  // same red; then it plays in the next free one, and keeps that.
+  const team = withFreeColour(savedTeam, drawer.takenColours);
   const problem = checkTeam(team, { guestNames: drawer.guestNames, otherTeamPlayers: Object.keys(drawer.playerTeams) });
   if (problem) return problem;
   await saveTeam(team);

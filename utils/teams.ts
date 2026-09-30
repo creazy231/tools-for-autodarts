@@ -276,6 +276,14 @@ export function nextFreeColour(taken: readonly ColorScheme[]): ColorScheme {
 }
 
 /**
+ * A saved team as it joins a lobby: in its own colour, or in the next free one
+ * when another team there already has it, so no two teams in a lobby look alike.
+ */
+export function withFreeColour(team: SavedTeam, taken: readonly ColorScheme[]): SavedTeam {
+  return colourTaken(team.colour, taken) ? { ...team, colour: nextFreeColour(taken) } : team;
+}
+
+/**
  * The name a new team is offered: TEAM and its colour's word, numbered when
  * that is taken ("TEAM RED 2"). A custom pair has no word, so it is TEAM 1,
  * TEAM 2 and so on.
