@@ -14,6 +14,7 @@ import { winnerAnimation, winnerAnimationOnRemove } from "./winner-animation";
 import { soundFx, soundFxOnRemove } from "./sound-fx";
 import { wledFx, wledFxOnRemove } from "./wled";
 import { caller, callerOnRemove } from "./caller";
+import { teams, onRemove as teamsOnRemove } from "./teams";
 import { gotcha, gotchaOnRemove } from "./gotcha";
 import { zoom, zoomOnRemove } from "./zoom";
 import { boardView, boardViewOnRemove } from "./board-view";
@@ -83,6 +84,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "boardSkins",
   "instantReplay",
   "streamingMode",
+  "teams",
 ]);
 
 /**
@@ -361,6 +363,11 @@ async function initMatch(ctx, url: string, matchId?: string) {
   // anyone to find it — including anyone who wants it off.
   await initScript(quietOwnDarts, url).catch(e => console.error(e));
 
+  if (isOn(config, "teams")) {
+    // Needs ctx: its pill is a Vue app in a shadow root.
+    await initScript(() => teams(ctx), url).catch(e => console.error(e));
+  }
+
   if (isOn(config, "caller")) {
     await initScript(caller, url).catch(e => console.error(e));
   }
@@ -398,6 +405,7 @@ function clearMatch(fromBullOff: boolean = false) {
   if (!fromBullOff) automaticFullscreenOnRemove();
   winnerAnimationOnRemove();
   callerOnRemove();
+  teamsOnRemove();
   soundFxOnRemove();
   wledFxOnRemove();
   nextPlayerOnTakeOutStuckOnRemove();

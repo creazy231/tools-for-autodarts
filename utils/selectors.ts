@@ -622,6 +622,38 @@ export const SELECTORS = {
     idleCard: [ ".bg-black-80", ".bg-black-60" ],
     /** Player name, relative to a card. */
     playerName: [ "span.font-display" ],
+    /** A full score card: every layout's own cards, and the thrower's when stacked. The first of {@link scoreCard}. */
+    fullScoreCard: [ "main div.\\@container:has(span.font-display):has(div.font-number)" ],
+    /** A small cell of the stacked layout's top bar, with three or more players. The second of {@link scoreCard}. */
+    smallScoreCard: [ "main div.overflow-clip:not(.\\@container):has(span.font-display):has(div.font-number)" ],
+    /**
+     * Cricket's player cell at the head of each column: `isolate overflow-hidden`
+     * rather than the score cards' `overflow-clip`, with the name row as a
+     * direct child (measured 2026-09-30). {@link scoreCard} does not reach it,
+     * since cricket's points are not a `div.font-number`.
+     */
+    cricketPlayerCell: [ "main div.isolate.overflow-hidden.flex-col:has(> div.w-full span.font-display)" ],
+    /**
+     * The row a card's name tag sits in, relative to a card: the starter's dot,
+     * the tag and a spacer on a full card, the tag alone in a small cell, and
+     * in a cricket cell the tag one wrapper further in.
+     */
+    nameRow: [
+      "div.w-full.flex.justify-center:has(> .isolate span.font-display)",
+      "div.w-full.flex.justify-center:has(> div > .isolate span.font-display)",
+      "div:has(> .isolate span.font-display)",
+    ],
+    /**
+     * The padded row the turn bar's panel sits in, which the Teams pill goes
+     * after: a `py-3` box round the panel in all three layouts (measured
+     * 2026-09-30). Its parent is a plain block in each, so a box after it
+     * takes its own line, and in the wide layout's grid it stays inside the
+     * first row rather than becoming a row of its own.
+     */
+    turnBarRow: [
+      "main div.py-3:has(> div.rounded-2xl > div > div.max-w-25)",
+      "main div.py-3:has(> div.rounded-2xl > div.\\@container.font-number)",
+    ],
     /**
      * The remaining score, relative to a card.
      *

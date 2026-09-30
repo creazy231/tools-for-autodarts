@@ -12,6 +12,7 @@ import type { BoardView } from "./board-view";
 import { dressBoardCopy } from "./board-skins";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { LAYERS } from "@/utils/layers";
+import { TEAMS_PILL_TAG } from "@/utils/teams";
 
 /**
  * Darts Zoom — a close-up of where each dart of the current visit landed.
@@ -930,7 +931,10 @@ function place(): void {
 
   const turnBar = qs<HTMLElement>(SELECTORS.match.turnBarPanel)?.getBoundingClientRect();
   if (config.position === "top") {
-    host.style.top = `${Math.round((turnBar?.bottom ?? 0) + 8)}px`;
+    // Teams' pill sits under the turn bar while a team plays; the strip goes under it.
+    const pill = document.querySelector(TEAMS_PILL_TAG)?.getBoundingClientRect();
+    const below = pill && pill.height > 0 ? Math.max(turnBar?.bottom ?? 0, pill.bottom) : (turnBar?.bottom ?? 0);
+    host.style.top = `${Math.round(below + 8)}px`;
     host.style.left = turnBar ? `${Math.round(turnBar.left)}px` : "";
     host.style.width = turnBar ? `${Math.round(turnBar.width)}px` : "";
   } else {
