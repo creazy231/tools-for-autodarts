@@ -97,8 +97,8 @@ export type SeatSlot =
   | { kind: "bot"; name: string; ppr: number }
   | { kind: "missing"; name: string };
 
-/** A player picked in the drawer: a seat already in the lobby, or a name to add as a guest. */
-export type OwnPick = { seatId: string; name: string } | { guest: string };
+/** A player picked in the drawer: a seat already in the lobby, a name to add as a guest, or a bot to add at a level (its cpuPPR). */
+export type OwnPick = { seatId: string; name: string } | { guest: string } | { bot: number; name: string; key: string };
 
 export interface OwnDraft {
   name: string;
@@ -142,7 +142,7 @@ export interface DraftContext {
   otherTeamPlayers: readonly string[];
 }
 
-export const MIN_PLAYERS = 2;
+export const MIN_PLAYERS = 1;
 export const MAX_PLAYERS = 6;
 export const MAX_NAME_LENGTH = 24;
 /** How long a match's tap-to-corrections are kept. */
@@ -450,7 +450,7 @@ export function checkTeam(draft: TeamDraft, context: DraftContext): string | und
 
   const players = draft.players.map(normalizeName).filter(Boolean);
   if (new Set(players).size !== players.length) return "Each player can only be in the team once.";
-  if (players.length < MIN_PLAYERS) return `A team needs at least ${MIN_PLAYERS} players.`;
+  if (players.length < MIN_PLAYERS) return "Add at least one player.";
   if (players.length > MAX_PLAYERS) return `A team can have ${MAX_PLAYERS} players at most.`;
 
   const others = new Set(uniqueNames(context.otherTeamPlayers));
@@ -632,6 +632,27 @@ export function resolveSlots(slots: readonly SeatSlot[], known: ReadonlySet<stri
 /** The games autodarts has bots for; any other lobby answers a bot with `bots_not_supported`. */
 const BOT_VARIANTS: readonly string[] = [ "X01", "Cricket" ];
 
+/** The site's eleven bot levels, as its Add Bot dialog lists them: level n averages about 10n + 10. */
+export const BOT_LEVELS: readonly number[] = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+
+/** A level's cpuPPR, the site's measure of how well a bot throws. */
+export function botPpr(level: number): number {
+  return 10 + 10 * level;
+}
+
+/** The name the site gives a bot of that level. */
+export function botName(level: number): string {
+  return `Bot Level ${level}`;
+}
+
+/** Whether a game has bots. One whose variant isn't known yet gets the benefit of the doubt. */
+export function hasBots(variant: string | null | undefined): boolean {
+  return !variant || BOT_VARIANTS.includes(variant);
+}
+
+/** Why the drawer's bots are off. */
+export const BOTS_ONLY_TEXT = "Bots only play X01 and Cricket.";
+
 /** Why a lobby with sets has no own scores: a team result is counted in legs. */
 export const LEGS_ONLY_TEXT = "Own-score teams play legs. Set the lobby to legs to use them.";
 
@@ -643,7 +664,7 @@ export const LEGS_ONLY_TEXT = "Own-score teams play legs. Set the lobby to legs 
  */
 export function rejoinProblem(team: SavedTeam, slots: readonly SeatSlot[], game: { variant?: string | null; sets?: number | null }): string | undefined {
   if (game.sets) return LEGS_ONLY_TEXT;
-  if (!game.variant || BOT_VARIANTS.includes(game.variant) || !slots.some(slot => slot.kind === "bot")) return undefined;
+  if (hasBots(game.variant) || !slots.some(slot => slot.kind === "bot")) return undefined;
   return `${team.name} has a bot, and bots only play ${joinNames(BOT_VARIANTS)}.`;
 }
 
@@ -652,13 +673,22 @@ export function unseated(slots: readonly SeatSlot[], ids: readonly (string | und
   return slots.flatMap((slot, index) => (slot.kind === "guest" || slot.kind === "bot") && !ids[index] ? [ slot.name ] : []);
 }
 
+/** The drawer's picks as places to fill: a seat already there, or a guest or a bot to add. */
+export function pickSlots(picks: readonly OwnPick[]): SeatSlot[] {
+  return picks.map((pick): SeatSlot => {
+    if ("seatId" in pick) return { kind: "seat", seatId: pick.seatId };
+    if ("bot" in pick) return { kind: "bot", name: pick.name, ppr: pick.bot };
+    return { kind: "guest", name: normalizeName(pick.guest) };
+  });
+}
+
 /** What stops an own-score team from being added, in words for the drawer, or nothing. */
 export function checkOwnTeam(draft: OwnDraft, context: OwnContext): string | undefined {
   const name = normalizeName(draft.name);
   if (!name) return "Give the team a name.";
   if (name.length > MAX_NAME_LENGTH) return `A team name can be ${MAX_NAME_LENGTH} characters at most.`;
   if (uniqueNames(context.teamNames).includes(name)) return `There's already a team called ${name} in this lobby.`;
-  if (draft.picks.length < MIN_PLAYERS) return `A team needs at least ${MIN_PLAYERS} players.`;
+  if (draft.picks.length < MIN_PLAYERS) return "Add at least one player.";
   if (draft.picks.length > MAX_PLAYERS) return `A team can have ${MAX_PLAYERS} players at most.`;
 
   const seats = draft.picks.filter((pick): pick is { seatId: string; name: string } => "seatId" in pick);
@@ -669,7 +699,9 @@ export function checkOwnTeam(draft: OwnDraft, context: OwnContext): string | und
   const seated = new Set(uniqueNames(context.seatNames));
   const clash = guests.find(guest => seated.has(guest));
   if (clash) return `There's already a player called ${clash} in this lobby. Pick them under In this lobby.`;
-  if (guests.length > context.freeSeats) return `The lobby has room for ${context.freeSeats} more ${context.freeSeats === 1 ? "player" : "players"}.`;
+  // Bots join as seats of their own, as new guests do; bots may share a name.
+  const joining = guests.length + draft.picks.filter(pick => "bot" in pick).length;
+  if (joining > context.freeSeats) return `The lobby has room for ${context.freeSeats} more ${context.freeSeats === 1 ? "player" : "players"}.`;
   return undefined;
 }
 
@@ -686,6 +718,11 @@ export function unevenText(teams: readonly LineupTeam[]): string {
   const [ first, ...rest ] = teams;
   const firstPart = `${first.name} has ${first.seatIds.length} ${first.seatIds.length === 1 ? "player" : "players"}`;
   return `${joinNames([ firstPart, ...rest.map(team => `${team.name} ${team.seatIds.length}`) ])}: the bigger team throws more often each round.`;
+}
+
+/** A member's place in its own-score team, for the lobby row: "1 of 2", or nothing in a team of one. */
+export function memberLabel(place: number, size: number): string {
+  return size > 1 ? `${place} of ${size}` : "";
 }
 
 /** "TOM to throw", in the site's own words for its language (Killer's `game.killer.toThrow`). */
