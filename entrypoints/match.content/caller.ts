@@ -708,11 +708,16 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
       } else {
         playSound("gameshot");
       }
+      // An own-score team's deciding leg is the team's match (utils/teams.ts):
+      // call the team, not the player who happened to check out.
+      const decidedTeam = gameData.match.adtTeams?.decided;
       const winnerPlayer = gameData.match.players?.find(player => player.index === gameData.match?.winner);
       const winnerPlayerName = winnerPlayer?.name;
       const isBot = !!winnerPlayer?.cpuPPR;
 
-      if (isBot) {
+      if (decidedTeam) {
+        for (const trigger of nameTriggers([ decidedTeam ]) ?? []) playSound(trigger);
+      } else if (isBot) {
         playSound("bot");
       } else if (winnerPlayerName) {
         playSound(winnerPlayerName.toLowerCase());
@@ -775,11 +780,16 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
       } else {
         playSound("gameshot");
       }
+      // An own-score team's deciding leg is the team's match (utils/teams.ts):
+      // call the team, not the player who happened to check out.
+      const decidedTeam = gameData.match.adtTeams?.decided;
       const winnerPlayer = gameData.match.players?.find(player => player.index === gameData.match?.winner);
       const winnerPlayerName = winnerPlayer?.name;
       const isBot = !!winnerPlayer?.cpuPPR;
 
-      if (isBot) {
+      if (decidedTeam) {
+        for (const trigger of nameTriggers([ decidedTeam ]) ?? []) playSound(trigger);
+      } else if (isBot) {
         playSound("bot");
       } else if (winnerPlayerName) {
         playSound(winnerPlayerName.toLowerCase());

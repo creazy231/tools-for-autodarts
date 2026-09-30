@@ -3,6 +3,11 @@ import { AutodartsToolsBoardImages } from "./board-image-storage";
 import { AutodartsToolsGameData } from "./game-data-storage";
 import { AutodartsToolsLobbyData } from "./lobby-data-storage";
 
+import type { AdtTeams, LineupStore } from "@/utils/teams";
+
+import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
+import { lineupOf, normalizeTeams, teamView } from "@/utils/teams";
+
 interface IUserSettings {
   callCheckouts: boolean;
   callScores: boolean;
@@ -213,6 +218,8 @@ export interface IMatch {
   stats: IPlayerStats[];
   state: Record<string, any>;
   chalkboards?: IChalkboard[];
+  /** Set by Teams' team view (utils/teams.ts) on a frame it changed: not the server's. */
+  adtTeams?: AdtTeams;
 }
 
 /**
@@ -268,6 +275,42 @@ async function isWatchedBoard(id: string | undefined): Promise<boolean> {
   return known.size ? known.has(id) : true;
 }
 
+/**
+ * Teams' settings and own-score lineups, for the team view: read once, then
+ * kept current by watchers, so storing a frame waits on nothing after the first.
+ */
+let teamsContext: { enabled: boolean; partnerRule: boolean; lineups: LineupStore } | undefined;
+let teamsContextLoad: Promise<void> | undefined;
+
+function loadTeamsContext(): Promise<void> {
+  teamsContextLoad ??= (async () => {
+    const [ config, lineups ] = await Promise.all([ AutodartsToolsConfig.getValue(), AutodartsToolsTeamLineups.getValue() ]);
+    const teams = normalizeTeams(config?.teams);
+    teamsContext = { enabled: teams.enabled, partnerRule: teams.partnerRule, lineups: lineups ?? {} };
+    AutodartsToolsConfig.watch((next) => {
+      const nextTeams = normalizeTeams(next?.teams);
+      if (!teamsContext) return;
+      teamsContext.enabled = nextTeams.enabled;
+      teamsContext.partnerRule = nextTeams.partnerRule;
+    });
+    AutodartsToolsTeamLineups.watch((next) => {
+      if (teamsContext) teamsContext.lineups = next ?? {};
+    });
+  })();
+  return teamsContextLoad;
+}
+
+/**
+ * The match as Teams' rules see it (utils/teams.ts): an own-score team's
+ * deciding leg as the match won, a partner-rule checkout as a bust. Every
+ * feature reads game data from here, so none of them needs team code. The
+ * lineup is the frame's own match's, whatever page this tab is on.
+ */
+function asTeamsSee(match: IMatch): IMatch {
+  if (!teamsContext) return match;
+  return teamView(match, { enabled: teamsContext.enabled, partnerRule: teamsContext.partnerRule, lineup: lineupOf(teamsContext.lineups, match.id) });
+}
+
 export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string) {
   // do a switch on the channel
   switch (channel) {
@@ -292,6 +335,7 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
       if ((id !== data.id && !playersBoard) && (data as IMatch).activated === undefined) return;
 
       const gameData = await AutodartsToolsGameData.getValue();
+      await loadTeamsContext();
       if ((data as IMatch).activated !== undefined) {
         // Merge activated state with existing match data
         AutodartsToolsGameData.setValue({
@@ -309,7 +353,7 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
         // Replace entire match data
         AutodartsToolsGameData.setValue({
           ...gameData,
-          match: data as IMatch,
+          match: asTeamsSee(data as IMatch),
         });
       }
 

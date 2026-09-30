@@ -68,8 +68,13 @@ function onBoard(boardData: IBoard): void {
   countdown.start(findNextLegButton, seconds);
 }
 
+/**
+ * A leg is won, and the match goes on. Teams' team view marks the match won
+ * when an own-score team's legs reach the target while the site's own match is
+ * still open (utils/teams.ts), and Next Leg must stay unpressed then.
+ */
 function legIsWon(): boolean {
-  return (gameData?.match?.gameWinner ?? -1) >= 0;
+  return (gameData?.match?.gameWinner ?? -1) >= 0 && (gameData?.match?.winner ?? -1) < 0;
 }
 
 /**
