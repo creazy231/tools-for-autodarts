@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import type { IGameData } from "@/utils/game-data-storage";
-import type { IThrow } from "@/utils/websocket-helpers";
+import type { IPlayer, IThrow } from "@/utils/websocket-helpers";
 
 import { animationDuration } from "@/utils/animation-duration";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
@@ -152,39 +152,60 @@ async function processGameData(gameData: IGameData): Promise<void> {
   if (!gameData.match || gameData.match.activated !== undefined || !gameData.match.turns?.length) return;
   if (gameData.match.variant === "Bull-off") return;
 
-  const turn = gameData.match.turns[0];
+  const match = gameData.match;
+  const turn = match.turns[0];
   const currentThrow = turn.throws[turn.throws.length - 1];
   if (!currentThrow) return;
 
   // A won leg goes on being reported after the dart that won it — Finish sends
-  // it once more — and each report played that dart and the gameshot again.
-  const win = winId(gameData.match);
+  // it once more — and each report would otherwise play that dart and winner
+  // animation again.
+  const win = winId(match);
   if (win) {
     if (win === announcedWin) return;
     announcedWin = win;
   }
 
-  const throwName: string = dartName(currentThrow); // s1
+  const throwName: string = dartName(currentThrow);
   const isLastThrow: boolean = turn.throws.length >= 3;
-  const winner: boolean = gameData.match.gameWinner >= 0;
+  const winner: boolean = match.gameWinner >= 0;
+  const winnerMatch: boolean = match.winner >= 0;
   const busted: boolean = turn.busted;
   const points: number = turn.points;
   const miss: boolean = throwName.startsWith("m");
   const combination: string = turn.throws.map(dartName).join("_");
 
-  // `25` is what setups have always used for the single bull, so it goes on
-  // meaning that; `s25` takes over only when an animation is waiting on it.
-  play(throwName === "s25" && !hasTrigger("s25") ? "25" : throwName);
-  if (winner) play("gameshot");
-  if (busted) play("busted");
-  if (isLastThrow && !busted) {
-    play(points.toString());
-    await new Promise(resolve => setTimeout(resolve, COMBINATION_GAP_MS));
-    play(combination);
-  }
-  if (miss) play("outside");
-}
+  const currentPlayer = findTurnPlayer(match.players, turn.playerId, match.player);
+  const gameWinnerPlayer = findGameWinnerPlayer(match.players, match.gameWinner) ?? currentPlayer;
+  const matchWinnerPlayer = findMatchWinnerPlayer(match.players, match.winner) ?? gameWinnerPlayer;
 
+  // `25` is what setups have always used for the single bull, so it goes on
+  // meaning that; `s25` takes over only when an applicable animation waits on it.
+  void play(
+    throwName === "s25" && !hasTriggerForPlayer("s25", currentPlayer) ? "25" : throwName,
+    currentPlayer,
+  );
+
+  if (winner) {
+    playWinner(
+      winnerMatch,
+      winnerMatch ? matchWinnerPlayer : gameWinnerPlayer,
+      combination,
+      throwName,
+      currentPlayer,
+    );
+  }
+
+  if (busted) void play("busted", currentPlayer);
+
+  if (isLastThrow && !busted) {
+    void play(points.toString(), currentPlayer);
+    await new Promise(resolve => setTimeout(resolve, COMBINATION_GAP_MS));
+    void play(combination, currentPlayer);
+  }
+
+  if (miss) void play("outside", currentPlayer);
+}
 /**
  * What a dart is called in a trigger.
  *
@@ -200,48 +221,269 @@ function dartName(dart: IThrow): string {
   return name === "25" && dart.segment.bed === "Single" ? "s25" : name;
 }
 
-/** Whether an enabled animation is waiting on this exact trigger. */
-function hasTrigger(trigger: string): boolean {
-  return Boolean(config.value?.animations?.data?.some(
-    animation => animation.enabled && Array.isArray(animation.triggers) && animation.triggers.includes(trigger),
-  ));
+function findTurnPlayer(
+  players: IPlayer[] | undefined,
+  playerId: string,
+  fallbackPosition: number,
+): IPlayer | undefined {
+  if (!players) return undefined;
+
+  return players.find(player => player.id === playerId || player.userId === playerId)
+    ?? players[fallbackPosition];
 }
 
-/** Pick an animation for a trigger, at random when several match, with how long it stays up in seconds. */
-async function resolveAnimation(trigger: string): Promise<{ url: string; duration: number } | null> {
+/**
+ * `gameWinner` indexes the current leg's reordered `match.players` array.
+ * The player's `index` remains the stable match slot.
+ */
+function findGameWinnerPlayer(
+  players: IPlayer[] | undefined,
+  gameWinner: number,
+): IPlayer | undefined {
+  if (!players || gameWinner < 0) return undefined;
+  return players[gameWinner];
+}
+
+/** `winner` is the stable match slot exposed by `player.index`. */
+function findMatchWinnerPlayer(
+  players: IPlayer[] | undefined,
+  winner: number,
+): IPlayer | undefined {
+  if (!players || winner < 0) return undefined;
+  return players.find(player => player.index === winner);
+}
+
+interface TriggerScope {
+  suffixes: string[];
+  displaySuffix: string;
+}
+
+/**
+ * Specificity for ordinary animation triggers:
+ * player name -> stable player slot -> generic.
+ */
+function triggerScopes(player: IPlayer | undefined): TriggerScope[] {
+  const scopes: TriggerScope[] = [];
+
+  if (player?.name) {
+    const nameWithSpaces = player.name.trim().toLowerCase();
+    const nameWithUnderscores = nameWithSpaces.replace(/\s+/g, "_");
+    const suffixes = [ ...new Set([ nameWithUnderscores, nameWithSpaces ].filter(Boolean)) ];
+
+    if (suffixes.length) {
+      scopes.push({ suffixes, displaySuffix: nameWithUnderscores });
+    }
+  }
+
+  if (player && Number.isInteger(player.index) && player.index >= 0) {
+    const slot = `player${player.index + 1}`;
+    scopes.push({ suffixes: [ slot ], displaySuffix: slot });
+  }
+
+  scopes.push({ suffixes: [ "" ], displaySuffix: "" });
+  return scopes;
+}
+
+/** Exact event trigger or an applicable numeric range. */
+function baseTriggerMatches(configuredTrigger: string, eventTrigger: string): boolean {
+  if (configuredTrigger === eventTrigger) return true;
+
+  const asNumber = Number(eventTrigger);
+  if (Number.isNaN(asNumber)) return false;
+
+  const range = configuredTrigger.match(triggerPatterns.ranges);
+  return range
+    ? asNumber >= Number(range[1]) && asNumber <= Number(range[2])
+    : false;
+}
+
+function matchesScope(
+  animation: IAnimation,
+  eventTrigger: string,
+  scope: TriggerScope,
+): boolean {
+  if (!Array.isArray(animation.triggers)) return false;
+
+  return animation.triggers.some((rawTrigger: string) => {
+    const configuredTrigger = rawTrigger.trim().toLowerCase();
+
+    for (const suffix of scope.suffixes) {
+      if (!suffix) {
+        if (baseTriggerMatches(configuredTrigger, eventTrigger)) return true;
+        continue;
+      }
+
+      const ending = `_${suffix}`;
+      if (!configuredTrigger.endsWith(ending)) continue;
+
+      const baseTrigger = configuredTrigger.slice(0, -ending.length);
+      if (baseTriggerMatches(baseTrigger, eventTrigger)) return true;
+    }
+
+    return false;
+  });
+}
+
+/**
+ * Find the first specificity level that contains matching animations.
+ * Multiple animations inside that level are still chosen at random.
+ */
+function matchingAnimations(
+  trigger: string,
+  player: IPlayer | undefined,
+): { animations: IAnimation[]; resolvedTrigger: string } | null {
   const animations = config.value?.animations?.data;
   if (!animations?.length) return null;
 
-  const matched = animations.filter(animation => animation.enabled && matchesTrigger(animation, trigger));
-  if (!matched.length) return null;
+  const eventTrigger = trigger.trim().toLowerCase();
 
-  const picked = matched[Math.floor(Math.random() * matched.length)];
+  for (const scope of triggerScopes(player)) {
+    const matched = animations.filter(
+      animation => animation.enabled && matchesScope(animation, eventTrigger, scope),
+    );
 
-  // Uploaded GIFs live in OPFS and are addressed by id; the rest are plain URLs.
+    if (matched.length) {
+      return {
+        animations: matched,
+        resolvedTrigger: scope.displaySuffix
+          ? `${eventTrigger}_${scope.displaySuffix}`
+          : eventTrigger,
+      };
+    }
+  }
+
+  return null;
+}
+
+function hasTriggerForPlayer(trigger: string, player: IPlayer | undefined): boolean {
+  return matchingAnimations(trigger, player) !== null;
+}
+
+function normalizedPlayerNameSuffixes(player: IPlayer | undefined): string[] {
+  if (!player?.name) return [];
+
+  const nameWithSpaces = player.name.trim().toLowerCase();
+  const nameWithUnderscores = nameWithSpaces.replace(/\s+/g, "_");
+
+  return [ ...new Set([ nameWithUnderscores, nameWithSpaces ].filter(Boolean)) ];
+}
+
+function hasExactTrigger(trigger: string): boolean {
+  const animations = config.value?.animations?.data;
+  if (!animations?.length) return false;
+
+  return animations.some(
+    animation => animation.enabled
+      && Array.isArray(animation.triggers)
+      && animation.triggers.some(
+        rawTrigger => rawTrigger.trim().toLowerCase() === trigger,
+      ),
+  );
+}
+
+/**
+ * Winner priority inside one family:
+ * player name + complete visit
+ * -> stable slot + complete visit
+ * -> generic complete visit
+ * -> player name + winning dart
+ * -> stable slot + winning dart
+ * -> generic winning dart
+ * -> player name
+ * -> stable slot
+ * -> generic.
+ */
+function winnerTriggerCandidates(
+  baseTrigger: "gameshot" | "matchshot",
+  player: IPlayer | undefined,
+  winningCombination: string,
+  winningThrow: string,
+): string[] {
+  const candidates: string[] = [];
+  const names = normalizedPlayerNameSuffixes(player);
+
+  const slot = player && Number.isInteger(player.index) && player.index >= 0
+    ? `player${player.index + 1}`
+    : null;
+
+  const addScope = (eventSuffix?: string): void => {
+    const tail = eventSuffix ? `_${eventSuffix}` : "";
+
+    for (const name of names) {
+      candidates.push(`${baseTrigger}_${name}${tail}`);
+    }
+
+    if (slot) {
+      candidates.push(`${baseTrigger}_${slot}${tail}`);
+    }
+
+    candidates.push(`${baseTrigger}${tail}`);
+  };
+
+  if (winningCombination) addScope(winningCombination);
+  if (winningThrow && winningThrow !== winningCombination) addScope(winningThrow);
+  addScope();
+
+  return [ ...new Set(candidates) ];
+}
+
+/**
+ * A match win first tries every matchshot candidate, then the complete
+ * gameshot chain. A leg win only uses the gameshot chain.
+ */
+function playWinner(
+  matchWinner: boolean,
+  player: IPlayer | undefined,
+  winningCombination: string,
+  winningThrow: string,
+  boardPlayer: IPlayer | undefined,
+): void {
+  const triggerFamilies: Array<"gameshot" | "matchshot"> = matchWinner
+    ? [ "matchshot", "gameshot" ]
+    : [ "gameshot" ];
+
+  for (const baseTrigger of triggerFamilies) {
+    const resolvedTrigger = winnerTriggerCandidates(
+      baseTrigger,
+      player,
+      winningCombination,
+      winningThrow,
+    ).find(hasExactTrigger);
+
+    if (resolvedTrigger) {
+      // Winner identity determines the exact trigger. The player who physically
+      // threw the winning dart is used separately for board filtering.
+      void play(resolvedTrigger, undefined, boardPlayer);
+      return;
+    }
+  }
+}
+
+/**
+ * Pick an animation for a trigger, at random when several match, while keeping
+ * the individual 3.1.0 animation duration.
+ */
+async function resolveAnimation(
+  trigger: string,
+  player: IPlayer | undefined,
+): Promise<{ url: string; duration: number; resolvedTrigger: string } | null> {
+  const result = matchingAnimations(trigger, player);
+  if (!result) return null;
+
+  const picked = result.animations[Math.floor(Math.random() * result.animations.length)];
+
   const url = picked.animationId && !picked.url
     ? opfsUrls.get(picked.animationId) ?? await loadFromOPFS(picked.animationId)
     : picked.url;
+
   if (!url) return null;
 
-  return { url, duration: animationDuration(picked, config.value?.animations?.duration ?? 5) };
+  return {
+    url,
+    duration: animationDuration(picked, config.value?.animations?.duration ?? 5),
+    resolvedTrigger: result.resolvedTrigger,
+  };
 }
-
-function matchesTrigger(animation: IAnimation, trigger: string): boolean {
-  if (!Array.isArray(animation.triggers)) return false;
-
-  // Range triggers ("100-140") only ever apply to a numeric trigger.
-  const asNumber = Number(trigger);
-  if (!Number.isNaN(asNumber)) {
-    const inRange = animation.triggers.some((t: string) => {
-      const range = t.match(triggerPatterns.ranges);
-      return range ? asNumber >= Number(range[1]) && asNumber <= Number(range[2]) : false;
-    });
-    if (inRange) return true;
-  }
-
-  return animation.triggers.includes(trigger);
-}
-
 async function loadFromOPFS(animationId: string): Promise<string | null> {
   if (!isOPFSAvailable()) {
     console.error("Autodarts Tools: Animations - OPFS not available, cannot load", animationId);
@@ -261,12 +503,40 @@ async function loadFromOPFS(animationId: string): Promise<string | null> {
   return null;
 }
 
-async function play(trigger: string): Promise<void> {
+function isAnimationBoardAllowed(player: IPlayer | undefined): boolean {
+  const boardIds = (config.value?.animations?.boardIds ?? [])
+    .map(id => id.trim().toLowerCase())
+    .filter(Boolean);
+
+  // Empty list = filter disabled.
+  if (!boardIds.length) return true;
+
+  const boardId = player?.boardId?.trim().toLowerCase();
+  return Boolean(boardId && boardIds.includes(boardId));
+}
+
+async function play(
+  trigger: string,
+  player?: IPlayer,
+  boardPlayer?: IPlayer,
+): Promise<void> {
   try {
-    const animation = await resolveAnimation(trigger);
+    const filterPlayer = boardPlayer ?? player;
+
+    if (!isAnimationBoardAllowed(filterPlayer)) {
+      console.log(
+        "Autodarts Tools: Animations - skipped",
+        trigger,
+        "for board",
+        filterPlayer?.boardId || "unknown",
+      );
+      return;
+    }
+
+    const animation = await resolveAnimation(trigger, player);
     if (!animation) return;
 
-    console.log("Autodarts Tools: Animations - playing", trigger);
+    console.log("Autodarts Tools: Animations - playing", animation.resolvedTrigger);
 
     // Loaded while the start delay runs, so the GIF is ready when it appears.
     preload(animation.url);
@@ -297,7 +567,6 @@ async function play(trigger: string): Promise<void> {
     console.error("Autodarts Tools: Animations - play error", error);
   }
 }
-
 /** Starts loading a GIF before it is shown, and remembers whether its link is dead. */
 function preload(url: string): void {
   failedUrls.delete(url);

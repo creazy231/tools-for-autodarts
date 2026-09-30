@@ -625,11 +625,39 @@ Animations can be triggered by various game events using these tags:
   - `outside`: When a dart lands outside the scoring area
   - `busted`: When a player busts (scores more than needed)
   - `gameshot`: When a player wins the game or leg
+  - `matchshot`: When a player wins the complete match
 
 #### Combination Tags
 You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`
 
 Example: `s20_s5_d20` would trigger when a player throws single 20, then single 5, then double 20. Use `s25` for a single bull and `bull` for a bullseye — e.g. `s25_s25_bull`.
+
+- **Player-specific triggers**: Add a player's name or player slot to a trigger to create personalized animations.
+  - Examples:
+    - `180_player1` → plays only when player 1 scores 180
+    - `180_Kai` → plays only when Kai scores 180
+    - `gameshot_Stefan` → plays only when Stefan wins a leg
+  - More specific triggers take priority:
+    - Player name → Player slot → Generic trigger
+
+- **Personalized game and match wins**:
+  - `gameshot` triggers when a player wins a leg
+  - `matchshot` triggers when a player wins the complete match
+  - Examples:
+    - `gameshot_player1`
+    - `gameshot_Kai_d20`
+    - `matchshot_Kai`
+    - `matchshot_player1`
+
+- **Board filtering**: Limit animations to specific boards.
+  - This prevents animations from being triggered by other boards in online matches.
+  - Add one or more Board IDs in the Animation settings.
+  - If no Board IDs are configured, animations work on every board.
+  - Example:
+    ```
+    Boards:
+    6a501a61-53a5-468a-a56a-17134ace3099
+    ```
 
 You can add multiple triggers for the same animation by entering each trigger on a new line in the animation settings.
 

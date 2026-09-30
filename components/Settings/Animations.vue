@@ -50,6 +50,19 @@
           <OptionRow description="Just the board, or the whole page over a blurred background." title="Covers">
             <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" button-size="sm" />
           </OptionRow>
+          <OptionRow stacked title="Boards">
+            <template #description>
+              Animations play only for throws and wins on these boards, and on every board while the list is empty.
+              This is useful in online matches so a remote opponent does not trigger your local GIFs.
+            </template>
+            <AppTokenInput
+              id="animation-boards"
+              v-model="boardIds"
+              :lowercase="false"
+              :validate="validateBoardId"
+              placeholder="Paste a board ID and press Enter"
+            />
+          </OptionRow>
           <OptionRow description="The games it shows GIFs in." title="Game modes">
             <GameModesField v-model="config.animations.disabledGameModes" feature="animations" intro="Animations only show in the games switched on here." />
           </OptionRow>
@@ -296,6 +309,7 @@ import AppNotification from "../AppNotification.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSwitch from "../AppSwitch.vue";
 import AppToggle from "../AppToggle.vue";
+import AppTokenInput from "../AppTokenInput.vue";
 
 import ConfirmDeleteButton from "./Library/ConfirmDeleteButton.vue";
 import GameModesField from "./Library/GameModesField.vue";
@@ -320,6 +334,7 @@ useStorage("adt:active-settings", "animations");
 
 const FITS = [ { label: "Cover", value: "cover" }, { label: "Contain", value: "contain" } ];
 const VIEW_MODES = [ { label: "Board only", value: "board-only" }, { label: "Full page", value: "full-page" } ];
+const BOARD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** Drawn until a GIF comes near the view. */
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
 /** Why "Use the GIF's length" found none, said under the field. */
@@ -330,6 +345,12 @@ const LENGTH_ERRORS = {
 };
 
 const { config } = useConfig();
+const boardIds = computed<string[]>({
+  get: () => config.value?.animations.boardIds ?? [],
+  set: (ids) => {
+    if (config.value) config.value.animations.boardIds = ids;
+  },
+});
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
@@ -469,6 +490,10 @@ function setSeconds(key: "delayStart" | "duration", value: string, min: number) 
   const seconds = Number(value);
   if (!config.value || value === "" || Number.isNaN(seconds)) return;
   config.value.animations[key] = Math.max(min, seconds);
+}
+
+function validateBoardId(id: string): string {
+  return BOARD_ID.test(id) ? "" : "That doesn't look like a board ID. They look like 6a501a61-53a5-468a-a56a-17134ace3099.";
 }
 
 function validateAnimationTrigger(trigger: string): string {

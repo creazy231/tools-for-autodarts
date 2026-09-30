@@ -104,6 +104,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
   ],
   animations: [
     { trigger: "gameshot", description: "A player wins the leg" },
+    { trigger: "matchshot", description: "A player wins the match" },
     { trigger: "busted", description: "A player busts" },
     { trigger: "bull", description: "A bullseye" },
     { trigger: "s25", description: "The single bull" },
