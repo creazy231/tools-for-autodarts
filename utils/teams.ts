@@ -591,6 +591,24 @@ export function resolveSlots(slots: readonly SeatSlot[], known: ReadonlySet<stri
   });
 }
 
+/** The games autodarts has bots for; any other lobby answers a bot with `bots_not_supported`. */
+const BOT_VARIANTS: readonly string[] = [ "X01", "Cricket" ];
+
+/**
+ * What stops a saved own-score team from rejoining this lobby before anyone is
+ * added, or nothing: a bot to add in a game without bots, which would leave
+ * the team short of whoever comes after it.
+ */
+export function rejoinProblem(team: SavedTeam, slots: readonly SeatSlot[], variant: string | undefined): string | undefined {
+  if (!variant || BOT_VARIANTS.includes(variant) || !slots.some(slot => slot.kind === "bot")) return undefined;
+  return `${team.name} has a bot, and bots only play ${joinNames(BOT_VARIANTS)}.`;
+}
+
+/** The guests and bots that were to be added and have no seat: the lobby didn't take them. */
+export function unseated(slots: readonly SeatSlot[], ids: readonly (string | undefined)[]): string[] {
+  return slots.flatMap((slot, index) => (slot.kind === "guest" || slot.kind === "bot") && !ids[index] ? [ slot.name ] : []);
+}
+
 /** What stops an own-score team from being added, in words for the drawer, or nothing. */
 export function checkOwnTeam(draft: OwnDraft, context: OwnContext): string | undefined {
   const name = normalizeName(draft.name);

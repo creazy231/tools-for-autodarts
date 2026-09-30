@@ -30,7 +30,7 @@ import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lobbyFormat, memberOf, normalizeName, normalizeTeams, pruneLineup, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, withFreeColour, withLineup } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lobbyFormat, memberOf, normalizeName, normalizeTeams, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
@@ -702,11 +702,17 @@ async function addSavedOwnTeam(savedTeam: SavedTeam): Promise<string | undefined
   const others = currentLineup()?.teams ?? [];
   const team = withFreeColour(savedTeam, others.map(other => other.colour));
   const slots = rejoinSlots(team, lobby.players ?? [], hostId, new Set(others.flatMap(other => other.seatIds)));
+  const problem = rejoinProblem(team, slots, lobby.variant);
+  if (problem) return problem;
   const adding = slots.filter(slot => slot.kind === "guest" || slot.kind === "bot").length;
   const free = Math.max(0, (lobby.maxPlayers || 6) - (lobby.players?.length ?? 0));
   if (adding > free) return `The lobby has room for ${free} more ${free === 1 ? "player" : "players"}.`;
 
   const ids = await seatSlots(slots);
+  // Half a team is not written: whoever did join stays as a plain seat, and
+  // is picked up again when the team is added once more.
+  const left = unseated(slots, ids);
+  if (left.length) return `autodarts didn't add ${joinNames(left)}. Try again.`;
   const seatIds = ids.filter((id): id is string => Boolean(id));
   if (seatIds.length < 1) return "autodarts didn't add the team. Try again.";
   await writeLineupTeam({ name: team.name, colour: team.colour, seatIds });
