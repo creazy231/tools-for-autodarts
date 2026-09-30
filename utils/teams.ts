@@ -660,6 +660,7 @@ export interface TeamMatch extends TurnState {
   gameScores?: readonly number[];
   gameWinner?: number;
   winner?: number;
+  finished?: boolean;
   gameFinished?: boolean;
   turnBusted?: boolean;
   turns?: readonly { points?: number; busted?: boolean; throws?: readonly { id: string }[] }[];
@@ -784,10 +785,14 @@ export function teamView<M extends TeamMatch>(match: M, context: TeamViewContext
     const gameScores = [ ...(match.gameScores ?? []) ];
     gameScores[winner] = (gameScores[winner] ?? 0) + (visit.points ?? 0);
     const scores = match.scores ? match.scores.map((score, index) => index === winner ? { ...score, legs: Math.max(0, score.legs - 1) } : score) : match.scores;
+    // A checkout that also ended the site's match (its thrower reached the
+    // target alone) is taken back with the match it won.
     return {
       ...match,
       gameWinner: -1,
       gameFinished: false,
+      winner: -1,
+      finished: false,
       turnBusted: true,
       gameScores,
       scores,
@@ -857,4 +862,9 @@ export function warningText(breach: Breach): string {
 /** The line after a checkout the rule turned into a bust. */
 export function bustText(breach: Breach): string {
   return `${breach.player}'s checkout didn't count: partner rule.`;
+}
+
+/** The pill's line when autodarts refused to take a rule-breaking checkout back. */
+export function undoFailedText(breach: Breach): string {
+  return `${breach.player}'s checkout breaks the partner rule, but autodarts didn't take it back. Undo it yourself.`;
 }

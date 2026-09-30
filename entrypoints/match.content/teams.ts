@@ -35,7 +35,7 @@ import { SELECTORS, anyOf, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { TEAMS_PILL_TAG, assignCards, bustText, decidedTeam, decidedText, lineupOf, lineupTeams, normalizeName, normalizeTeams, partnerRuleApplies, partnerRuleBreach, playerUp, resultText, shiftFor, shiftsOf, teamLegs, teamSeats, toThrowText, warningText, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, bustText, decidedTeam, decidedText, lineupOf, lineupTeams, normalizeName, normalizeTeams, partnerRuleApplies, partnerRuleBreach, playerUp, resultText, shiftFor, shiftsOf, teamLegs, teamSeats, toThrowText, undoFailedText, warningText, withShift } from "@/utils/teams";
 
 const STYLE_ID = "teams-match";
 const CARD_ATTR = "data-adt-team";
@@ -293,8 +293,19 @@ function askUndo() {
   const key = `${match.id}|${bust.dartIds.join(",")}`;
   if (key === lastUndo) return;
   lastUndo = key;
-  bustNote = { text: bustText(bust.breach), bustTurn: turnKeyOf(bust.seat) };
-  browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).catch(e => console.error(e));
+  const note = { text: bustText(bust.breach), bustTurn: turnKeyOf(bust.seat) };
+  bustNote = note;
+  // When autodarts refuses, the checkout still stands on the site: say so,
+  // rather than that it didn't count.
+  const settle = (result?: { ok?: boolean }) => {
+    if (result?.ok !== false || bustNote !== note) return;
+    note.text = undoFailedText(bust.breach);
+    apply();
+  };
+  browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).then(settle, (e) => {
+    console.error(e);
+    settle({ ok: false });
+  });
 }
 
 function writeStyles(upTeam?: Coloured) {
