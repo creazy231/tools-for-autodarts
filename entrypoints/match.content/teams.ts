@@ -178,7 +178,9 @@ export async function teams(ctx: any) {
 
   observer?.disconnect();
   observer = new MutationObserver(() => schedule());
-  observer.observe(document.body, { childList: true, subtree: true });
+  // Text too: the phone layout's top bar keeps its cells and writes the next
+  // player's name into them, which adds and removes no node at all.
+  observer.observe(document.body, { childList: true, characterData: true, subtree: true });
   apply();
   console.log("Autodarts Tools: Teams - Started (match)");
 }
