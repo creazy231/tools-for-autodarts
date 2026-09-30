@@ -233,6 +233,7 @@ import DiscordWebhooks from "./Settings/DiscordWebhooks.vue";
 import AutoStart from "./Settings/AutoStart.vue";
 import RecentLocalPlayers from "./Settings/RecentLocalPlayers.vue";
 import LocalLobby from "./Settings/LocalLobby.vue";
+import Teams from "./Settings/Teams.vue";
 import QrCode from "./Settings/QrCode.vue";
 import Colors from "./Settings/Colors.vue";
 import TakeoutNotification from "./Settings/TakeoutNotification.vue";
@@ -328,9 +329,10 @@ const featureGroups: FeatureGroup[] = [
       { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false, v2Ready: true },
       { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true, fillSettings: true },
       { id: "local-lobby", title: "Local Lobby Settings", component: LocalLobby, hasSettings: false, v2Ready: true },
+      { id: "teams", title: "Teams Settings", component: Teams, hasSettings: true, v2Ready: true, fillSettings: true },
       { id: "qr-code", title: "QR Code Settings", component: QrCode, hasSettings: false, v2Ready: true },
     ],
-    settingIds: [ "discord-webhooks", "recent-local-players" ],
+    settingIds: [ "discord-webhooks", "recent-local-players", "teams" ],
   },
   // Matches (Tab 1)
   {

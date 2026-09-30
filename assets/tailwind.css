@@ -733,6 +733,14 @@ body {
   padding-left: 8px;
 }
 
+/* …and its line under the name, when it has one (the saved teams' players). */
+.adt-row.is-plain.has-meta {
+  grid-template-areas:
+    "lead title actions"
+    "lead meta actions";
+  row-gap: 2px;
+}
+
 /* The friends drawer's search field: a light pill on the dark surface. */
 .adt-search {
   position: relative;

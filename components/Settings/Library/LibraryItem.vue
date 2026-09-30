@@ -5,7 +5,7 @@
     under it, then the triggers with the actions, so nothing is squeezed to a
     few letters. A plain row is the name and its delete on one line.
   -->
-  <div class="adt-row" :class="[{ 'is-off': !enabled, 'is-plain': plain }]">
+  <div class="adt-row" :class="[{ 'is-off': !enabled, 'is-plain': plain, 'has-meta': plain && Boolean($slots.meta) }]">
     <span v-if="!plain" class="adt-drag-handle [grid-area:handle]" :class="[{ invisible: !draggable }]" aria-hidden="true" title="Drag to reorder">
       <span class="icon-[material-symbols--drag-indicator]" />
     </span>
@@ -20,7 +20,7 @@
         </template>
       </template>
     </p>
-    <p v-if="$slots.meta && !plain" class="adt-row-dim flex min-w-0 items-center gap-1.5 text-xs text-[var(--ad-text-muted)] [grid-area:meta]">
+    <p v-if="$slots.meta" class="adt-row-dim flex min-w-0 items-center gap-1.5 text-xs text-[var(--ad-text-muted)] [grid-area:meta]">
       <slot name="meta" />
     </p>
     <template v-if="!plain">
@@ -56,8 +56,9 @@ withDefaults(defineProps<{
   draggable?: boolean;
   query?: string;
   /**
-   * Only the name and its delete, for a list with nothing to switch, edit or
-   * reorder: the saved players. No handle, chips, switch, edit or meta line.
+   * Only the name, a line under it if there is one, and its delete, for a list
+   * with nothing to switch, edit or reorder: the saved players, the saved
+   * teams. No handle, chips, switch or edit.
    */
   plain?: boolean;
 }>(), {
