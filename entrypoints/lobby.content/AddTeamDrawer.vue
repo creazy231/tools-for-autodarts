@@ -209,7 +209,7 @@ import type { OwnPick, SavedTeam } from "@/utils/teams";
 import SchemePicker from "@/components/Settings/Colors/SchemePicker.vue";
 import { CARD_PRESETS, SITE_CARD, gradient } from "@/utils/colors";
 import { LAYERS } from "@/utils/layers";
-import { MAX_NAME_LENGTH, MAX_PLAYERS, nextFreeColour, normalizeName, suggestName } from "@/utils/teams";
+import { LEGS_ONLY_TEXT, MAX_NAME_LENGTH, MAX_PLAYERS, nextFreeColour, normalizeName, suggestName } from "@/utils/teams";
 
 const props = defineProps<{ state: DrawerState }>();
 
@@ -247,7 +247,7 @@ const formats = computed(() => [
   { id: "own" as const, label: "Own scores", disabled: props.state.setsLobby || Boolean(props.state.lockedFormat && props.state.lockedFormat !== "own") },
 ]);
 const formatNote = computed(() => {
-  if (props.state.setsLobby && format.value !== "own" && !props.state.lockedFormat) return "Own-score teams play legs. Set the lobby to legs to use them.";
+  if (props.state.setsLobby && format.value !== "own" && !props.state.lockedFormat) return LEGS_ONLY_TEXT;
   if (!props.state.lockedFormat || !props.state.formatTeam || props.state.editing) return "";
   return props.state.lockedFormat === "own"
     ? `${props.state.formatTeam} already plays on own scores, so this lobby's teams do too.`

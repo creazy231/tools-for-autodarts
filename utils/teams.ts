@@ -594,13 +594,18 @@ export function resolveSlots(slots: readonly SeatSlot[], known: ReadonlySet<stri
 /** The games autodarts has bots for; any other lobby answers a bot with `bots_not_supported`. */
 const BOT_VARIANTS: readonly string[] = [ "X01", "Cricket" ];
 
+/** Why a lobby with sets has no own scores: a team result is counted in legs. */
+export const LEGS_ONLY_TEXT = "Own-score teams play legs. Set the lobby to legs to use them.";
+
 /**
  * What stops a saved own-score team from rejoining this lobby before anyone is
- * added, or nothing: a bot to add in a game without bots, which would leave
- * the team short of whoever comes after it.
+ * added, or nothing: a lobby with sets, where no team result is counted, or a
+ * bot to add in a game without bots, which would leave the team short of
+ * whoever comes after it.
  */
-export function rejoinProblem(team: SavedTeam, slots: readonly SeatSlot[], variant: string | undefined): string | undefined {
-  if (!variant || BOT_VARIANTS.includes(variant) || !slots.some(slot => slot.kind === "bot")) return undefined;
+export function rejoinProblem(team: SavedTeam, slots: readonly SeatSlot[], game: { variant?: string | null; sets?: number | null }): string | undefined {
+  if (game.sets) return LEGS_ONLY_TEXT;
+  if (!game.variant || BOT_VARIANTS.includes(game.variant) || !slots.some(slot => slot.kind === "bot")) return undefined;
   return `${team.name} has a bot, and bots only play ${joinNames(BOT_VARIANTS)}.`;
 }
 

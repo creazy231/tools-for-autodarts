@@ -556,7 +556,8 @@ function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): 
     playerTeams,
     takenColours: format === "own" ? ownTeams.map(team => team.colour) : lobbyTeams.map(team => team.colour),
     offered: uniqueNames([ ...savedPlayers, ...siteGuests(), ...saved.flatMap(team => team.players) ]),
-    savedTeams: editing ? [] : saved.filter(team => (!format || team.format === format) && !inLobby(team)),
+    // A lobby with sets offers no own-score team (utils/teams.ts `rejoinProblem`).
+    savedTeams: editing ? [] : saved.filter(team => (!format || team.format === format) && !(lobby?.sets && team.format === "own") && !inLobby(team)),
     full: isFull(),
     lockedFormat: editing ? editing.format : format,
     formatTeam: format === "own" ? (lineup?.teams[0]?.name ?? "") : ([ ...teamsInLobby().keys() ][0] ?? ""),
@@ -702,7 +703,7 @@ async function addSavedOwnTeam(savedTeam: SavedTeam): Promise<string | undefined
   const others = currentLineup()?.teams ?? [];
   const team = withFreeColour(savedTeam, others.map(other => other.colour));
   const slots = rejoinSlots(team, lobby.players ?? [], hostId, new Set(others.flatMap(other => other.seatIds)));
-  const problem = rejoinProblem(team, slots, lobby.variant);
+  const problem = rejoinProblem(team, slots, lobby);
   if (problem) return problem;
   const adding = slots.filter(slot => slot.kind === "guest" || slot.kind === "bot").length;
   const free = Math.max(0, (lobby.maxPlayers || 6) - (lobby.players?.length ?? 0));
