@@ -27,20 +27,24 @@ import { createApp, reactive } from "vue";
 import TeamsPill from "./TeamsPill.vue";
 
 import type { IMatch } from "@/utils/websocket-helpers";
-import type { SavedTeam, ShiftStore } from "@/utils/teams";
+import type { Lineup, LineupStore, LineupTeam, SavedTeam, ShiftStore } from "@/utils/teams";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SITE_CARD, normalizeColors } from "@/utils/colors";
 import { SELECTORS, anyOf, qs } from "@/utils/selectors";
-import { AutodartsToolsConfig, AutodartsToolsTeamShifts } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { TEAMS_PILL_TAG, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamSeats, toThrowText, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, decidedTeam, decidedText, lineupOf, lineupTeams, normalizeName, normalizeTeams, partnerRuleApplies, partnerRuleBreach, playerUp, resultText, shiftFor, shiftsOf, teamLegs, teamSeats, toThrowText, warningText, withShift } from "@/utils/teams";
 
 const STYLE_ID = "teams-match";
 const CARD_ATTR = "data-adt-team";
 const WAITING_ATTR = "data-adt-team-waiting";
 const ARRIVE_ATTR = "data-adt-team-arrive";
+/** Own scores: under a member's name, the team and its legs. */
+const LEGS_CLASS = "adt-team-legs";
+/** Holds Next Leg back while the leg that decided the match is on screen. */
+const HOLD_STYLE_ID = "teams-match-hold";
 /** Cards narrower than this show only the player who's up. */
 const NARROW_CARD_PX = 220;
 
@@ -72,6 +76,12 @@ const BASE_CSS = `
     30% { box-shadow: inset 0 0 0 6px var(--adt-team-to); }
     100% { box-shadow: inset 0 0 0 0 transparent; }
   }
+  .${LEGS_CLASS} {
+    display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 9px 0 7px; margin: 2px auto 0;
+    border-radius: 999px; background: rgb(0 0 0 / 28%); color: #f7f8fa; font-size: 10.5px; font-weight: 800; letter-spacing: .02em; white-space: nowrap;
+  }
+  .${LEGS_CLASS} i { width: 9px; height: 9px; border-radius: 3px; background: linear-gradient(to right, var(--adt-team-from), var(--adt-team-to)); }
+  .${LEGS_CLASS} b { font-size: 12px; }
   @media (prefers-reduced-motion: reduce) {
     [${ARRIVE_ATTR}] { animation: none; }
     .adt-team-chip { transition: none; }
@@ -87,9 +97,25 @@ export interface PillView {
   team: string;
   from: string;
   to: string;
+  /** Own scores: every team's legs, in the lineup's order. */
+  tally: { name: string; legs: number; from: string; to: string }[];
+  /** "First to N", or 0. */
+  target: number;
+  /** A line under the pill: the partner rule's warning, or its bust. */
+  note: string;
+  noteKind: "" | "rule" | "bust";
+  /**
+   * The note's line is kept, empty, wherever the partner rule can come in:
+   * the warning shows for one team's turns and not the other's, and the board
+   * must not move down and up with it.
+   */
+  noteSpace: boolean;
 }
 
-const pill = reactive<PillView>({ turnKey: "", text: "", team: "", ...SITE_CARD });
+/** Anything with a name and a colour: a saved team, or a lineup's. */
+interface Coloured { name: string; colour: { from: string; to: string } }
+
+const pill = reactive<PillView>({ turnKey: "", text: "", team: "", ...SITE_CARD, tally: [], target: 0, note: "", noteKind: "", noteSpace: false });
 
 let ctxRef: any = null;
 let pillUi: any = null;
@@ -103,6 +129,10 @@ let saved: SavedTeam[] = [];
 /** The card gradient for seats that are no team: Colors' when it paints one, else the site's. */
 let otherCard: { from: string; to: string } = SITE_CARD;
 let shiftStore: ShiftStore = {};
+let lineupStore: LineupStore = {};
+let unwatchLineups: (() => void) | null = null;
+let partnerRule = false;
+let holding = false;
 let match: IMatch | undefined;
 let lastStyles = "";
 let lastTurn = "";
@@ -113,6 +143,7 @@ export async function teams(ctx: any) {
   hostId = await getUserIdFromToken();
   readConfig(await AutodartsToolsConfig.getValue());
   shiftStore = (await AutodartsToolsTeamShifts.getValue()) ?? {};
+  lineupStore = (await AutodartsToolsTeamLineups.getValue()) ?? {};
   match = thisMatch((await AutodartsToolsGameData.getValue())?.match);
 
   unwatchGameData?.();
@@ -129,6 +160,11 @@ export async function teams(ctx: any) {
   unwatchShifts?.();
   unwatchShifts = AutodartsToolsTeamShifts.watch((value) => {
     shiftStore = value ?? {};
+    schedule();
+  });
+  unwatchLineups?.();
+  unwatchLineups = AutodartsToolsTeamLineups.watch((value) => {
+    lineupStore = value ?? {};
     schedule();
   });
 
@@ -148,13 +184,17 @@ export function onRemove() {
   unwatchConfig = null;
   unwatchShifts?.();
   unwatchShifts = null;
+  unwatchLineups?.();
+  unwatchLineups = null;
   clear();
   match = undefined;
   lastTurn = "";
 }
 
 function readConfig(config: any) {
-  saved = normalizeTeams(config?.teams).saved;
+  const teamsConfig = normalizeTeams(config?.teams);
+  saved = teamsConfig.saved;
+  partnerRule = teamsConfig.partnerRule;
   const colors = normalizeColors(config?.colors);
   otherCard = colors.enabled && colors.card.preset !== "default" ? colors.card : SITE_CARD;
 }
@@ -184,9 +224,16 @@ function clear() {
   for (const card of document.querySelectorAll<HTMLElement>(`[${CARD_ATTR}]`)) undressCard(card);
   pillUi?.remove();
   pillUi = null;
+  holdNextLeg(false);
 }
 
 function apply() {
+  const lineup = match ? lineupOf(lineupStore, match.id) : undefined;
+  if (lineup) applyOwn(lineup);
+  else applyShared();
+}
+
+function applyShared() {
   const seats = match ? teamSeats(match.players ?? [], saved, hostId) : new Map<number, SavedTeam>();
   if (!match || !seats.size) {
     clear();
@@ -201,9 +248,29 @@ function apply() {
   updatePill(upTeam, up, shifts[upTeam?.name ?? ""] ?? 0);
   ensurePill();
   handover(upTeam, up);
+  holdNextLeg(false);
 }
 
-function writeStyles(upTeam?: SavedTeam) {
+/** Own scores: every member's card in its team's colours, the team's legs, and the team win. */
+function applyOwn(lineup: Lineup) {
+  const seats = lineupTeams(match!.players ?? [], lineup);
+  if (!seats.size) {
+    clear();
+    return;
+  }
+  const up = match!.player ?? 0;
+  const upTeam = seats.get(up);
+  const decided = match!.adtTeams?.decided ?? decidedTeam(match!, lineup);
+  const panelUp = (match!.gameWinner ?? -1) >= 0;
+  writeStyles(decided ? undefined : upTeam);
+  dressOwnCards(seats, up, lineup);
+  updateOwnPill(lineup, upTeam, up, decided);
+  ensurePill();
+  holdNextLeg(Boolean(decided && panelUp));
+  handover(decided ? undefined : upTeam, up);
+}
+
+function writeStyles(upTeam?: Coloured) {
   const rules = [ BASE_CSS ];
   if (upTeam) {
     // `html body` outranks Colors' `#root main …` rule, which has the same !important.
@@ -250,6 +317,48 @@ function undressCard(card: HTMLElement) {
   card.style.removeProperty("--adt-team-from");
   card.style.removeProperty("--adt-team-to");
   card.querySelector(":scope .adt-team-order")?.remove();
+  card.querySelector(`:scope .${LEGS_CLASS}`)?.remove();
+}
+
+function dressOwnCards(seats: Map<number, LineupTeam>, up: number, lineup: Lineup) {
+  const cards = allCards();
+  const players = match!.players ?? [];
+  const shown = assignCards(cards.map(card => ({
+    name: card.querySelector(SELECTORS.match.playerName[0])?.textContent ?? "",
+    small: card.matches(anyOf(SELECTORS.match.smallScoreCard)),
+  })), players, up);
+  const legs = teamLegs(match!, lineup);
+  cards.forEach((card, index) => {
+    const team = seats.get(shown[index]);
+    if (!team) {
+      if (card.hasAttribute(CARD_ATTR)) undressCard(card);
+      return;
+    }
+    if (card.getAttribute(CARD_ATTR) !== team.name) card.setAttribute(CARD_ATTR, team.name);
+    card.toggleAttribute(WAITING_ATTR, shown[index] !== up);
+    card.style.setProperty("--adt-team-from", team.colour.from);
+    card.style.setProperty("--adt-team-to", team.colour.to);
+    renderLegs(card, team, legs[team.name] ?? 0);
+  });
+}
+
+/** Under a member's name: the team, and its legs. */
+function renderLegs(card: HTMLElement, team: LineupTeam, legs: number) {
+  const key = `${team.name}|${legs}`;
+  const current = card.querySelector<HTMLElement>(`:scope .${LEGS_CLASS}`);
+  if (current?.dataset.key === key) return;
+  const nameRow = qs<HTMLElement>(SELECTORS.match.nameRow, card);
+  current?.remove();
+  if (!nameRow) return;
+  const label = document.createElement("span");
+  label.className = LEGS_CLASS;
+  label.dataset.key = key;
+  const swatch = document.createElement("i");
+  swatch.setAttribute("aria-hidden", "true");
+  const count = document.createElement("b");
+  count.textContent = String(legs);
+  label.append(swatch, `${team.name} `, count);
+  nameRow.after(label);
 }
 
 function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: number, throwing: boolean) {
@@ -303,6 +412,66 @@ function updatePill(upTeam: SavedTeam | undefined, up: number, shift: number) {
   pill.from = colour.from;
   pill.to = colour.to;
   pill.turnKey = `${match!.set}|${match!.leg}|${match!.round}|${up}|${player}`;
+  pill.tally = [];
+  pill.target = 0;
+  pill.note = "";
+  pill.noteKind = "";
+  pill.noteSpace = false;
+}
+
+function updateOwnPill(lineup: Lineup, upTeam: LineupTeam | undefined, up: number, decided: string | undefined) {
+  const legs = teamLegs(match!, lineup);
+  pill.tally = lineup.teams.map(team => ({ name: team.name, legs: legs[team.name] ?? 0, from: team.colour.from, to: team.colour.to }));
+  pill.target = match!.legs ?? 0;
+  pill.note = "";
+  pill.noteKind = "";
+  pill.noteSpace = partnerRule && partnerRuleApplies(match!, lineup);
+  if (decided) {
+    const team = lineup.teams.find(candidate => candidate.name === decided);
+    pill.text = decidedText(decided);
+    pill.team = resultText(legs, decided, lineup);
+    pill.from = team?.colour.from ?? otherCard.from;
+    pill.to = team?.colour.to ?? otherCard.to;
+    pill.turnKey = `decided|${decided}`;
+    return;
+  }
+  const player = normalizeName(match!.players?.[up]?.name);
+  const colour = upTeam?.colour ?? otherCard;
+  pill.text = toThrowText(player, siteLanguage());
+  pill.team = upTeam?.name ?? "";
+  pill.from = colour.from;
+  pill.to = colour.to;
+  pill.turnKey = `${match!.set}|${match!.leg}|${match!.round}|${up}|${player}`;
+  const breach = partnerRule ? partnerRuleBreach(match!, lineup, up) : undefined;
+  if (breach) {
+    pill.note = warningText(breach);
+    pill.noteKind = "rule";
+  }
+}
+
+/**
+ * While the leg that decided the match is on screen, its Next Leg is hidden
+ * and Space and Enter (the site's own shortcuts for it) are held back. The
+ * site's match is still open; the team's is over.
+ */
+function holdNextLeg(on: boolean) {
+  if (on === holding) return;
+  holding = on;
+  if (on) {
+    addStyles(`html body ${anyOf(SELECTORS.match.nextLegButton)} { display: none !important; }`, HOLD_STYLE_ID);
+    window.addEventListener("keydown", holdKeys, true);
+  } else {
+    removeStyles(HOLD_STYLE_ID);
+    window.removeEventListener("keydown", holdKeys, true);
+  }
+}
+
+function holdKeys(event: KeyboardEvent) {
+  const target = event.target as HTMLElement | null;
+  if (target?.closest("input, textarea, [contenteditable='true']")) return;
+  if (event.code !== "Space" && event.code !== "Enter" && event.code !== "NumpadEnter") return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
 }
 
 async function ensurePill() {
@@ -332,7 +501,7 @@ async function ensurePill() {
 }
 
 /** One pulse on the cards of the team whose turn has just come, never on the first paint. */
-function handover(upTeam: SavedTeam | undefined, up: number) {
+function handover(upTeam: Coloured | undefined, up: number) {
   const turn = `${match!.id}|${match!.set}|${match!.leg}|${match!.round}|${up}`;
   if (turn === lastTurn) return;
   const first = lastTurn === "";

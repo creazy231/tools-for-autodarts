@@ -718,10 +718,9 @@ export function decidedTeam(match: TeamMatch, lineup: Lineup | undefined): strin
  * thrower's changes, so everyone else's are what they were at its start.
  */
 export function partnerRuleBreach(match: TeamMatch, lineup: Lineup | undefined, seat: number): Breach | undefined {
-  if (match.variant !== "X01" || lineup?.teams.length !== 2) return undefined;
+  if (!lineup || !partnerRuleApplies(match, lineup)) return undefined;
   const players = match.players ?? [];
   const seats = lineupTeams(players, lineup);
-  if (seats.size !== players.length) return undefined;
   const own = seats.get(seat);
   if (!own || players[seat]?.cpuPPR) return undefined;
 
@@ -740,6 +739,13 @@ export function partnerRuleBreach(match: TeamMatch, lineup: Lineup | undefined, 
   });
   if (!teammate || teammate.left <= opponentsLeft) return undefined;
   return { player: normalizeName(players[seat]?.name), teammate: normalizeName(players[teammate.index]?.name), teammateLeft: teammate.left, opponentsLeft, opponents };
+}
+
+/** Whether the partner rule can come into this match at all: X01, with exactly two own-score teams and every seat on one of them. */
+export function partnerRuleApplies(match: TeamMatch, lineup: Lineup | undefined): boolean {
+  if (match.variant !== "X01" || lineup?.teams.length !== 2) return false;
+  const players = match.players ?? [];
+  return lineupTeams(players, lineup).size === players.length;
 }
 
 /**
@@ -784,11 +790,13 @@ export function teamView<M extends TeamMatch>(match: M, context: TeamViewContext
 /**
  * Which seat each card shows, by index into `players`, or -1. Cards carry only
  * a name ([[match-players-rotates-every-leg]]). Where seats share one (two bots
- * of one level), the rule depends on the card:
- *   - the wide and sidebar layouts draw full cards in seat order (`index`)
- *   - the top bar's small cells come in throwing order, which is `players`'s
- *   - a single full card among small ones is the stacked layout's card of
- *     whoever is up
+ * of one level), the layout decides:
+ *   - the wide and sidebar layouts draw one card per seat, in seat order
+ *     (`index`); the sidebar's compact rows are small cards, but in seat order
+ *     all the same
+ *   - the stacked layout draws one card more than there are seats: its top bar,
+ *     in throwing order (`players`'s own), and a big card for whoever is up
+ *   - a single full card among small ones is whoever is up, in either
  */
 export function assignCards(cards: readonly CardInfo[], players: readonly SeatLike[], up: number): number[] {
   const byName = new Map<string, number[]>();
@@ -796,17 +804,18 @@ export function assignCards(cards: readonly CardInfo[], players: readonly SeatLi
     const name = normalizeName(player.name);
     byName.set(name, [ ...(byName.get(name) ?? []), index ]);
   });
-  const stackedCard = cards.some(card => card.small) && cards.filter(card => !card.small).length === 1;
+  const upCard = cards.some(card => card.small) && cards.filter(card => !card.small).length === 1;
+  const topBar = cards.length > players.length;
   const taken = new Map<string, number>();
   return cards.map((card) => {
     const name = normalizeName(card.name);
     const seats = byName.get(name) ?? [];
     if (seats.length <= 1) return seats[0] ?? -1;
-    if (!card.small && stackedCard) return seats.includes(up) ? up : -1;
+    if (!card.small && upCard) return seats.includes(up) ? up : -1;
     const key = `${card.small ? "small" : "full"}|${name}`;
     const nth = taken.get(key) ?? 0;
     taken.set(key, nth + 1);
-    const ordered = card.small ? seats : [ ...seats ].sort((a, b) => (players[a].index ?? a) - (players[b].index ?? b));
+    const ordered = card.small && topBar ? seats : [ ...seats ].sort((a, b) => (players[a].index ?? a) - (players[b].index ?? b));
     return ordered[nth] ?? -1;
   });
 }
