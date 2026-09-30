@@ -6,7 +6,7 @@ import { AutodartsToolsLobbyData } from "./lobby-data-storage";
 import type { AdtTeams, LineupStore } from "@/utils/teams";
 
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
-import { lineupOf, normalizeTeams, teamView } from "@/utils/teams";
+import { lineupOf, lineupPartnerRule, normalizeTeams, teamView } from "@/utils/teams";
 
 interface IUserSettings {
   callCheckouts: boolean;
@@ -308,11 +308,13 @@ function loadTeamsContext(): Promise<void> {
  * The match as Teams' rules see it (utils/teams.ts): an own-score team's
  * deciding leg as the match won, a partner-rule checkout as a bust. Every
  * feature reads game data from here, so none of them needs team code. The
- * lineup is the frame's own match's, whatever page this tab is on.
+ * lineup is the frame's own match's, whatever page this tab is on, and so is
+ * its partner rule.
  */
 function asTeamsSee(match: IMatch): IMatch {
   if (!teamsContext) return match;
-  return teamView(match, { enabled: teamsContext.enabled, partnerRule: teamsContext.partnerRule, lineup: lineupOf(teamsContext.lineups, match.id) });
+  const lineup = lineupOf(teamsContext.lineups, match.id);
+  return teamView(match, { enabled: teamsContext.enabled, partnerRule: lineupPartnerRule(lineup, teamsContext.partnerRule), lineup });
 }
 
 export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string) {

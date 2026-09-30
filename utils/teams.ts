@@ -85,6 +85,8 @@ export interface LineupTeam {
 export interface Lineup {
   at: number;
   teams: LineupTeam[];
+  /** The lobby's partner rule, from its card. A lineup written before the card has none, and goes by the setting. */
+  partnerRule?: boolean;
 }
 
 /** Per lobby id, which is also its match's id. */
@@ -492,16 +494,28 @@ function plainLineupTeam(team: LineupTeam): LineupTeam {
 /**
  * A lobby's own-score teams written into the store, as plain data. Teams with
  * no seats are dropped, a lobby with no teams has no lineup, and entries older
- * than a day go.
+ * than a day go. The lobby's partner rule is kept unless a new one is given.
  */
-export function withLineup(store: LineupStore | undefined, lobbyId: string, teams: readonly LineupTeam[], now: number): LineupStore {
+export function withLineup(store: LineupStore | undefined, lobbyId: string, teams: readonly LineupTeam[], now: number, partnerRule?: boolean): LineupStore {
   const next: LineupStore = {};
   for (const [ id, entry ] of Object.entries(store ?? {})) {
     if (id !== lobbyId && entry && now - entry.at < SHIFT_TTL_MS) next[id] = entry;
   }
   const kept = teams.filter(team => team.seatIds.length).map(plainLineupTeam);
-  if (kept.length) next[lobbyId] = { at: now, teams: kept };
+  const rule = partnerRule ?? store?.[lobbyId]?.partnerRule;
+  if (kept.length) next[lobbyId] = rule === undefined ? { at: now, teams: kept } : { at: now, teams: kept, partnerRule: rule };
   return next;
+}
+
+/** The lobby card's partner rule written into the lobby's lineup. A lobby with no lineup yet has nothing to hold it; the setting does. */
+export function withPartnerRule(store: LineupStore | undefined, lobbyId: string, on: boolean, now: number): LineupStore {
+  const lineup = store?.[lobbyId];
+  return lineup ? withLineup(store, lobbyId, lineup.teams, now, on) : { ...store };
+}
+
+/** Whether a match plays the partner rule: its lobby's choice, or for a lineup from before the lobby card, the setting. */
+export function lineupPartnerRule(lineup: Lineup | undefined, fallback: boolean): boolean {
+  return lineup?.partnerRule ?? fallback;
 }
 
 /** A lobby's (or its match's) lineup, by its own id: never the page's, since game data is shared between tabs. */
@@ -845,6 +859,22 @@ export function partnerRuleApplies(match: TeamMatch, lineup: Lineup | undefined)
   if (match.variant !== "X01" || lineup?.teams.length !== 2) return false;
   const players = match.players ?? [];
   return lineupTeams(players, lineup).size === players.length;
+}
+
+/** The lobby's partner-rule card. */
+export interface PartnerCard {
+  /** An X01 lobby playing legs, whose teams, if it has any, keep their own scores. */
+  show: boolean;
+  on: boolean;
+  /** Whether the rule can come in as the lobby stands: two teams, with every seat on one. */
+  applies: boolean;
+}
+
+/** The card as a lobby stands: the rule is the lobby's own, or the one the last lobby left. */
+export function partnerCardState(lobby: { variant?: string | null; sets?: number | null; players?: readonly SeatLike[] | null }, lineup: Lineup | undefined, saved: readonly SavedTeam[], hostId: string | null | undefined, fallback: boolean): PartnerCard {
+  const players = lobby.players ?? [];
+  const show = lobby.variant === "X01" && !lobby.sets && lobbyFormat(players, lineup, saved, hostId) !== "shared";
+  return { show, on: lineupPartnerRule(lineup, fallback), applies: show && partnerRuleApplies({ variant: "X01", players }, lineup) };
 }
 
 /**
