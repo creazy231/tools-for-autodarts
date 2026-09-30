@@ -21,7 +21,7 @@ import AddTeamDrawer from "./AddTeamDrawer.vue";
 
 import type { ILobbies } from "@/utils/websocket-helpers";
 import type { ColorScheme } from "@/utils/storage";
-import type { Lineup, LineupStore, LineupTeam, OwnDraft, SavedTeam, SeatSlot, TeamDraft, TeamFormat } from "@/utils/teams";
+import type { Lineup, LineupStore, LineupTeam, OwnDraft, PartnerCard, SavedTeam, SeatSlot, TeamDraft, TeamFormat } from "@/utils/teams";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SELECTORS, anyOf, qs, qsa } from "@/utils/selectors";
@@ -30,10 +30,13 @@ import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lobbyFormat, memberOf, normalizeName, normalizeTeams, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lineupPartnerRule, lobbyFormat, memberLabel, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
+const PARTNER_CARD_ID = "adt-partner-rule";
+const PARTNER_TEXT = "Own-score teams in X01: nobody may check out while a teammate has more left than both opponents together. A checkout that breaks it is a bust.";
+const PARTNER_PENDING_TEXT = "It counts once there are two own-score teams and everyone is on one.";
 /** A reorder settles within this many moves: one fewer than the seats. */
 const MAX_REORDER_MOVES = 6;
 /** How long a move or an add waits for the lobby update it brings. */
@@ -78,6 +81,25 @@ const LOBBY_CSS = `
   .adt-team-label small { font-size: 11px; font-weight: 700; color: rgb(247 248 250 / 55%); }
   [${ROW_ATTR}] > div:has(> .adt-team-line) { flex-wrap: wrap; }
   #${NOTE_ID} { margin: 4px 0 12px; font-size: 12px; font-weight: 600; color: #a1a1a1; }
+  /* With Add Team there are three buttons: on a narrow screen they wrap rather than clip their labels. */
+  div:has(> #${BUTTON_ID}) { flex-wrap: wrap; }
+  div:has(> #${BUTTON_ID}) > button { min-width: max-content; }
+  /* The partner rule's card goes under Autoscoring, the page's other switch, in the right-hand column. */
+  @media (width >= 48rem) {
+    div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; }
+    div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) > :first-child { grid-row: span 2; }
+  }
+  #${PARTNER_CARD_ID} [data-adt-line][hidden] { display: none; }
+  /* With no Autoscoring card to copy: the same card in the site's measured styles. */
+  #${PARTNER_CARD_ID}[data-adt-fallback] { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 18px; background: rgb(27 31 41); color: #f7f8fa; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] > div:first-child { display: flex; gap: 16px; align-items: flex-start; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] > div:first-child > div { flex: 1; font-family: "Bebas Neue", var(--ad-font-display, sans-serif); font-size: 24px; line-height: 1.2; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] > div:last-child { display: flex; flex-direction: column; gap: 16px; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] > div:last-child > span { font-size: 12px; font-weight: 600; line-height: 16px; color: rgb(184 188 197); }
+  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] { position: relative; flex: none; width: 51px; height: 24px; border-radius: 999px; background: #16181c; box-shadow: inset 0 0 0 1px rgb(55 76 152 / 60%); cursor: pointer; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] { background: #0b55df; box-shadow: none; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] > span { position: absolute; top: 3px; left: 3px; width: 28px; height: 18px; border-radius: 999px; background: #fff; transition: transform 150ms; }
+  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] > span { transform: translateX(17px); }
 `;
 
 /** A seat of the lobby, as Own scores' In this lobby offers it. */
@@ -146,6 +168,10 @@ let lobby: ILobbies | undefined;
 let hostId: string | null = null;
 let saved: SavedTeam[] = [];
 let savedPlayers: string[] = [];
+/** Teams' own switch, followed live: off, nothing of Teams stays in the lobby. */
+let enabled = true;
+/** The partner rule the next lobby starts from: the last one set. */
+let partnerRuleDefault = false;
 let scheduled = false;
 let lineups: LineupStore = {};
 let unwatchLineups: (() => void) | null = null;
@@ -217,17 +243,17 @@ export async function onRemove() {
   unwatchConfig = null;
   unwatchLineups?.();
   unwatchLineups = null;
-  closeDrawer();
-  document.getElementById(BUTTON_ID)?.remove();
-  document.getElementById(NOTE_ID)?.remove();
+  teardown();
   for (const done of lobbyWaiters.splice(0)) done();
-  for (const row of document.querySelectorAll<HTMLElement>(`[${ROW_ATTR}]`)) undress(row);
   removeStyles(STYLE_ID);
   lobby = undefined;
 }
 
 function readConfig(config: any) {
-  saved = normalizeTeams(config?.teams).saved;
+  const teamsConfig = normalizeTeams(config?.teams);
+  enabled = teamsConfig.enabled;
+  saved = teamsConfig.saved;
+  partnerRuleDefault = teamsConfig.partnerRule;
   savedPlayers = Array.isArray(config?.recentLocalPlayers?.players) ? config.recentLocalPlayers.players : [];
 }
 
@@ -255,6 +281,11 @@ function schedule() {
 }
 
 function apply() {
+  // Switched off in the settings: nothing of Teams in the lobby, until it's switched on again.
+  if (!enabled) {
+    teardown();
+    return;
+  }
   syncButton();
   const lineup = currentLineup();
   if (lineup) {
@@ -265,6 +296,16 @@ function apply() {
     dressRows();
   }
   noteUneven(lineup);
+  syncPartnerCard(lineup);
+}
+
+/** Everything Teams draws in the lobby, taken out, and the drawer closed. */
+function teardown() {
+  closeDrawer();
+  document.getElementById(BUTTON_ID)?.remove();
+  document.getElementById(NOTE_ID)?.remove();
+  document.getElementById(PARTNER_CARD_ID)?.remove();
+  for (const row of document.querySelectorAll<HTMLElement>(`[${ROW_ATTR}]`)) undress(row);
 }
 
 /** This lobby's own-score lineup, if it has one. */
@@ -285,7 +326,8 @@ function nextLobbyUpdate(): Promise<void> {
 
 async function writeLineup(teams: readonly LineupTeam[]) {
   if (!lobby) return;
-  lineups = withLineup(lineups, lobby.id, teams, Date.now());
+  // A lobby's first team takes the partner rule the last lobby left; later writes keep its own.
+  lineups = withLineup(lineups, lobby.id, teams, Date.now(), lineupPartnerRule(currentLineup(), partnerRuleDefault));
   await AutodartsToolsTeamLineups.setValue(lineups);
 }
 
@@ -484,10 +526,15 @@ function teamLabel(team: LineupTeam, place: number): HTMLElement {
   label.className = "adt-team-label";
   const swatch = document.createElement("i");
   swatch.setAttribute("aria-hidden", "true");
-  const count = document.createElement("small");
-  count.textContent = `${place} of ${team.seatIds.length}`;
+  const order = memberLabel(place, team.seatIds.length);
   // The space is for screen readers: the flex gap already spaces the parts on screen.
-  label.append(swatch, team.name, " ", count);
+  if (order) {
+    const count = document.createElement("small");
+    count.textContent = order;
+    label.append(swatch, team.name, " ", count);
+  } else {
+    label.append(swatch, team.name);
+  }
   line.append(label);
   return line;
 }
@@ -544,6 +591,103 @@ function orderRow(players: readonly string[]): HTMLElement {
     order.append(chip);
   });
   return order;
+}
+
+// ------------------------------------------------------------ partner rule
+
+/**
+ * The partner rule, as a switch card beside the site's Autoscoring on the
+ * lobby page, where the game is set up. Each lobby keeps its own, and the next
+ * one starts from the last set (utils/teams.ts `partnerCardState`).
+ */
+function syncPartnerCard(lineup: Lineup | undefined) {
+  const existing = document.getElementById(PARTNER_CARD_ID);
+  const state = lobby && isHost() ? partnerCardState(lobby, lineup, saved, hostId, partnerRuleDefault) : undefined;
+  if (!state?.show) {
+    existing?.remove();
+    return;
+  }
+  // After the last switch card, in its row, or failing that, under the game's
+  // own card, in its column; only the first makes the row two columns.
+  const switchCard = qsa<HTMLElement>(SELECTORS.lobby.switchCard).at(-1);
+  const anchor = switchCard ?? qs<HTMLElement>(SELECTORS.lobby.gameCard);
+  if (!anchor) return;
+  const card = existing ?? buildPartnerCard(switchCard ?? null);
+  card.toggleAttribute("data-adt-beside", Boolean(switchCard));
+  if (anchor.nextElementSibling !== card) anchor.after(card);
+  renderPartnerCard(card, state);
+}
+
+/** A shallow copy of one of the site's elements, so it keeps the site's styling; or a plain one when there's nothing to copy. */
+function copyOf<K extends keyof HTMLElementTagNameMap>(source: Element | null | undefined, tag: K): HTMLElementTagNameMap[K] {
+  const copy = (source ? source.cloneNode(false) : document.createElement(tag)) as HTMLElementTagNameMap[K];
+  copy.removeAttribute("id");
+  return copy;
+}
+
+/**
+ * The card, as a copy of the site's Autoscoring card: its card, header, title
+ * and line, and its switch, which Base UI drives there and this drives here.
+ * With no card to copy, the same thing in the site's measured styles (LOBBY_CSS).
+ */
+function buildPartnerCard(template: HTMLElement | null): HTMLElement {
+  const header = template?.querySelector(":scope > [data-slot='card-header']");
+  const siteSwitch = header?.querySelector("[data-slot='switch']");
+  const content = template?.querySelector(":scope > [data-slot='card-content']");
+  const line = content?.querySelector("span");
+
+  const card = copyOf(template, "div");
+  card.id = PARTNER_CARD_ID;
+  if (!template) card.dataset.adtFallback = "";
+  const head = copyOf(header, "div");
+  const title = copyOf(header?.querySelector("[data-slot='card-title']"), "div");
+  title.textContent = "Partner rule";
+  const toggle = copyOf(siteSwitch, "span");
+  toggle.append(copyOf(siteSwitch?.querySelector("[data-slot='switch-thumb']"), "span"));
+  toggle.setAttribute("role", "switch");
+  toggle.setAttribute("aria-label", "Partner rule");
+  toggle.tabIndex = 0;
+  toggle.addEventListener("click", () => {
+    setPartnerRule(toggle.getAttribute("aria-checked") !== "true").catch(e => console.error(e));
+  });
+  toggle.addEventListener("keydown", (event) => {
+    if (event.key !== " " && event.key !== "Enter") return;
+    event.preventDefault();
+    toggle.click();
+  });
+  head.append(title, toggle);
+  const body = copyOf(content, "div");
+  const text = copyOf(line, "span");
+  text.textContent = PARTNER_TEXT;
+  const pending = copyOf(line, "span");
+  pending.dataset.adtLine = "pending";
+  pending.textContent = PARTNER_PENDING_TEXT;
+  body.append(text, pending);
+  card.append(head, body);
+  return card;
+}
+
+/** The switch as the site draws its own: its data attributes pick the colours, and the thumb follows. */
+function renderPartnerCard(card: HTMLElement, state: PartnerCard) {
+  const toggle = card.querySelector<HTMLElement>("[role='switch']");
+  if (!toggle) return;
+  for (const part of [ toggle, toggle.firstElementChild ]) {
+    part?.toggleAttribute("data-checked", state.on);
+    part?.toggleAttribute("data-unchecked", !state.on);
+  }
+  if (toggle.getAttribute("aria-checked") !== String(state.on)) toggle.setAttribute("aria-checked", String(state.on));
+  const pending = card.querySelector<HTMLElement>("[data-adt-line='pending']");
+  if (pending) pending.hidden = !state.on || state.applies;
+}
+
+/** The card's switch: this lobby's rule, and the one the next lobby starts from. */
+async function setPartnerRule(on: boolean) {
+  partnerRuleDefault = on;
+  if (lobby && currentLineup()) lineups = withPartnerRule(lineups, lobby.id, on, Date.now());
+  syncPartnerCard(currentLineup());
+  if (lobby && currentLineup()) await AutodartsToolsTeamLineups.setValue(lineups);
+  const config = await AutodartsToolsConfig.getValue();
+  await AutodartsToolsConfig.setValue({ ...config, teams: { ...normalizeTeams(config.teams), partnerRule: on } });
 }
 
 // ------------------------------------------------------------------ drawer

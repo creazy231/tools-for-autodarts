@@ -373,6 +373,14 @@ export const SELECTORS = {
      * (relative to a row).
      */
     playerNameColumn: [ ":scope > div.flex-col.min-w-0", ":scope > div:has(span.font-display)" ],
+    /**
+     * The lobby page's switch cards: Autoscoring, measured 2026-09-30. A card
+     * whose header holds a Base UI switch. Teams' partner-rule card copies it,
+     * and goes after it.
+     */
+    switchCard: [ "main [data-slot='card']:not(#adt-partner-rule):has(> [data-slot='card-header'] [data-slot='switch'])" ],
+    /** The game's own card, with its Edit settings gear: where the partner-rule card goes when there's no switch card. */
+    gameCard: [ "main [data-slot='card']:has(button [data-icon='gear'])" ],
   },
 
   /**

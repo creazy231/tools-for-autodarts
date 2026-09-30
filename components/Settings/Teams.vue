@@ -5,17 +5,8 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Play in teams two ways. With a shared score, a team is one player on your board and its players take turns on it, like steel-tip doubles. When someone else steps up, tap their name on the team's card. With own scores, everyone keeps their own score and a leg counts for their team. Add teams in a lobby you host with <b class="text-[var(--ad-text-primary)]">Add Team</b>, next to Add Player and Add Bot.
+          Play in teams two ways. With a shared score, a team is one player on your board and its players take turns on it, like steel-tip doubles. When someone else steps up, tap their name on the team's card. With own scores, everyone keeps their own score and a leg counts for their team, and a bot can play on a team. A team can be a single player, for 2 vs 1. Own-score teams in X01 can play the partner rule: switch it on the lobby page, next to Autoscoring. Add teams in a lobby you host with <b class="text-[var(--ad-text-primary)]">Add Team</b>, next to Add Player and Add Bot.
         </p>
-
-        <section class="mb-10">
-          <h3 class="adt-section-title">
-            Options
-          </h3>
-          <OptionRow description="Own scores, X01, two teams: nobody may check out while their partner has more left than both opponents together. A checkout that breaks it counts as a bust." title="Partner rule">
-            <AppToggle v-model="config.teams.partnerRule" size="sm" />
-          </OptionRow>
-        </section>
 
         <!-- Not sortable: the drawer keeps these newest first. -->
         <LibrarySection
@@ -88,7 +79,6 @@ import AppToggle from "../AppToggle.vue";
 
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
-import OptionRow from "./Library/OptionRow.vue";
 
 import type { LibraryEntry } from "@/utils/library-search";
 
