@@ -739,9 +739,18 @@ export function memberLabel(place: number, size: number): string {
   return size > 1 ? `${place} of ${size}` : "";
 }
 
+function german(language: string | null | undefined): boolean {
+  return (language ?? "").toLowerCase().startsWith("de");
+}
+
 /** "TOM to throw", in the site's own words for its language (Killer's `game.killer.toThrow`). */
 export function toThrowText(player: string, language: string | null | undefined): string {
-  return (language ?? "").toLowerCase().startsWith("de") ? `${player} ist dran` : `${player} to throw`;
+  return german(language) ? `${player} ist dran` : `${player} to throw`;
+}
+
+/** The pill while the site's Winner panel is up for a leg: in the site's language, where "ist dran" is. */
+export function legWonText(name: string, language?: string | null): string {
+  return german(language) ? `${name} gewinnt das Leg` : `${name} wins the leg`;
 }
 
 /** The part of a match frame the team rules read: {@link IMatch} fits it. */
@@ -953,9 +962,9 @@ export function assignCards(cards: readonly CardInfo[], players: readonly SeatLi
   });
 }
 
-/** The pill once a team has won. */
-export function decidedText(team: string): string {
-  return `${team} wins the match`;
+/** The pill once a team, or a player, has won the match. */
+export function decidedText(team: string, language?: string | null): string {
+  return german(language) ? `${team} gewinnt das Match` : `${team} wins the match`;
 }
 
 /** The result beside it: the winner's legs first, then the others', in the lineup's order. */
@@ -977,4 +986,25 @@ export function bustText(breach: Breach): string {
 /** The pill's line when autodarts refused to take a rule-breaking checkout back. */
 export function undoFailedText(breach: Breach): string {
   return `${breach.player}'s checkout breaks the partner rule, but autodarts didn't take it back. Undo it yourself.`;
+}
+
+/** A partner-rule line in the pill's two parts: the news, then the reason at lower emphasis. */
+export interface PillNote {
+  primary: string;
+  secondary: string;
+}
+
+/** While the partner rule stops the player up from checking out. */
+export function ruleWarningNote(breach: Breach): PillNote {
+  return { primary: "No checkout this visit", secondary: `${breach.teammate} has ${breach.teammateLeft} left, more than ${joinNames(breach.opponents)} together (${breach.opponentsLeft})` };
+}
+
+/** After a checkout the partner rule turned into a bust. */
+export function ruleBustNote(breach: Breach): PillNote {
+  return { primary: `${breach.player}'s checkout didn't count`, secondary: "partner rule" };
+}
+
+/** When autodarts refused to take a rule-breaking checkout back. */
+export function ruleRefusedNote(breach: Breach): PillNote {
+  return { primary: `Undo ${breach.player}'s checkout yourself`, secondary: "it breaks the partner rule, and autodarts didn't take it back" };
 }
