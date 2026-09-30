@@ -21,18 +21,23 @@ import AddTeamDrawer from "./AddTeamDrawer.vue";
 
 import type { ILobbies } from "@/utils/websocket-helpers";
 import type { ColorScheme } from "@/utils/storage";
-import type { SavedTeam, TeamDraft } from "@/utils/teams";
+import type { Lineup, LineupStore, LineupTeam, SavedTeam, TeamDraft } from "@/utils/teams";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SELECTORS, anyOf, qs, qsa } from "@/utils/selectors";
-import { AutodartsToolsConfig } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
-import { addGuest, lobbyIdFromUrl } from "@/utils/lobby-guests";
-import { checkTeam, colourTaken, findTeam, isHostedGuest, normalizeName, normalizeTeams, rememberTeam, sharedTeams, uniqueNames, withFreeColour } from "@/utils/teams";
+import { addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
+import { checkTeam, colourTaken, findTeam, interleave, isHostedGuest, lineupOf, normalizeName, normalizeTeams, pruneLineup, rememberTeam, seatMoves, sharedTeams, unevenText, uniqueNames, withFreeColour, withLineup } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
+const NOTE_ID = "adt-team-note";
+/** A reorder settles within this many moves: one fewer than the seats. */
+const MAX_REORDER_MOVES = 6;
+/** How long a move or an add waits for the lobby update it brings. */
+const LOBBY_WAIT_MS = 3000;
 const STYLE_ID = "teams-lobby";
 /** On a row we have dressed: the team, its players and colour, so a change redresses it. */
 const ROW_ATTR = "data-adt-team";
@@ -63,6 +68,16 @@ const LOBBY_CSS = `
     font-size: 11px; font-weight: 700; line-height: 1; letter-spacing: .02em;
   }
   .adt-team-arrow { color: #4d525d; font-size: 10px; line-height: 1; }
+  .adt-team-line { display: flex; flex-basis: 100%; padding-left: 40px; margin-top: 4px; }
+  .adt-team-label {
+    display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px 0 8px;
+    border-radius: 999px; background: rgb(255 255 255 / 8%); color: #f7f8fa;
+    font-size: 11px; font-weight: 800; line-height: 1; letter-spacing: .02em;
+  }
+  .adt-team-label i { width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(to right, var(--adt-team-from), var(--adt-team-to)); }
+  .adt-team-label small { font-size: 11px; font-weight: 700; color: rgb(247 248 250 / 55%); }
+  [${ROW_ATTR}] > div:has(> .adt-team-line) { flex-wrap: wrap; }
+  #${NOTE_ID} { margin: 4px 0 12px; font-size: 12px; font-weight: 600; color: #a1a1a1; }
 `;
 
 /** Everything the drawer shows and does; shared with AddTeamDrawer.vue. */
@@ -110,6 +125,12 @@ let hostId: string | null = null;
 let saved: SavedTeam[] = [];
 let savedPlayers: string[] = [];
 let scheduled = false;
+let lineups: LineupStore = {};
+let unwatchLineups: (() => void) | null = null;
+/** One reorder at a time: the moves it makes come back as lobby updates. */
+let reordering = false;
+/** Resolved on the next lobby update: the moves and the adds wait on it. */
+const lobbyWaiters: (() => void)[] = [];
 
 const drawer = reactive<DrawerState>({
   editing: null,
@@ -131,6 +152,7 @@ export async function teams(ctx: any) {
   hostId = await getUserIdFromToken();
   readConfig(await AutodartsToolsConfig.getValue());
   lobby = currentLobby(await AutodartsToolsLobbyData.getValue());
+  lineups = (await AutodartsToolsTeamLineups.getValue()) ?? {};
   addStyles(LOBBY_CSS, STYLE_ID);
 
   // Leaving one lobby for another runs this again without a teardown, so the
@@ -138,6 +160,12 @@ export async function teams(ctx: any) {
   unwatchLobby?.();
   unwatchLobby = AutodartsToolsLobbyData.watch((value?: ILobbies) => {
     lobby = currentLobby(value);
+    for (const done of lobbyWaiters.splice(0)) done();
+    schedule();
+  });
+  unwatchLineups?.();
+  unwatchLineups = AutodartsToolsTeamLineups.watch((value?: LineupStore) => {
+    lineups = value ?? {};
     schedule();
   });
   unwatchConfig?.();
@@ -158,8 +186,12 @@ export async function onRemove() {
   unwatchLobby = null;
   unwatchConfig?.();
   unwatchConfig = null;
+  unwatchLineups?.();
+  unwatchLineups = null;
   closeDrawer();
   document.getElementById(BUTTON_ID)?.remove();
+  document.getElementById(NOTE_ID)?.remove();
+  for (const done of lobbyWaiters.splice(0)) done();
   for (const row of document.querySelectorAll<HTMLElement>(`[${ROW_ATTR}]`)) undress(row);
   removeStyles(STYLE_ID);
   lobby = undefined;
@@ -195,7 +227,73 @@ function schedule() {
 
 function apply() {
   syncButton();
-  dressRows();
+  const lineup = currentLineup();
+  if (lineup) {
+    pruneSeats(lineup);
+    dressOwnRows(lineup);
+    keepOrder(lineup).catch(e => console.error(e));
+  } else {
+    dressRows();
+  }
+  noteUneven(lineup);
+}
+
+/** This lobby's own-score lineup, if it has one. */
+function currentLineup(): Lineup | undefined {
+  return lobby ? lineupOf(lineups, lobby.id) : undefined;
+}
+
+/** The next lobby update, or a few seconds, whichever comes first. */
+function nextLobbyUpdate(): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, LOBBY_WAIT_MS);
+    lobbyWaiters.push(() => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
+}
+
+async function writeLineup(teams: readonly LineupTeam[]) {
+  if (!lobby) return;
+  lineups = withLineup(lineups, lobby.id, teams, Date.now());
+  await AutodartsToolsTeamLineups.setValue(lineups);
+}
+
+/** A seat that left the lobby leaves its team. */
+function pruneSeats(lineup: Lineup) {
+  const ids = (lobby?.players ?? []).map(seat => seat.id).filter((id): id is string => Boolean(id));
+  const pruned = pruneLineup(lineup.teams, ids);
+  if (JSON.stringify(pruned) === JSON.stringify(lineup.teams)) return;
+  writeLineup(pruned).catch(e => console.error(e));
+}
+
+/**
+ * The seats in turn order (utils/teams.ts `interleave`). One move at a time,
+ * each waiting for the lobby update it brings, from the order as it then
+ * stands, so a drag or a Shuffle in between is taken as it is. Bounded, and
+ * it stops at the first move the site refuses. Not while the drawer is open:
+ * the drawer is about to change the teams.
+ */
+async function keepOrder(lineup: Lineup) {
+  if (reordering || drawerUi || opening || !isHost()) return;
+  const teamOf = (id: string) => lineup.teams.find(team => team.seatIds.includes(id))?.name;
+  const order = () => (lobby?.players ?? []).map(seat => seat.id ?? "");
+  if (order().some(id => !id) || interleave(order(), teamOf).join() === order().join()) return;
+
+  reordering = true;
+  try {
+    for (let moves = 0; moves < MAX_REORDER_MOVES; moves++) {
+      const current = order();
+      const [ move ] = seatMoves(current, interleave(current, teamOf));
+      if (!move) break;
+      const updated = nextLobbyUpdate();
+      if (!await moveSeat(move.index, move.toIndex, "Teams")) break;
+      await updated;
+    }
+  } finally {
+    reordering = false;
+  }
 }
 
 // ------------------------------------------------------------------ button
@@ -269,11 +367,16 @@ function dress(row: HTMLElement, team: SavedTeam) {
     row.querySelector(".adt-team-order")?.remove();
     qs<HTMLElement>(SELECTORS.lobby.playerNameColumn, row)?.append(orderRow(team.players));
   }
-  if (!row.querySelector(".adt-team-edit")) addEditButton(row, team);
+  if (!row.querySelector(".adt-team-edit")) {
+    addEditButton(row, team.name, () => {
+      const current = findTeam(sharedTeams(saved), normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent));
+      if (current) openDrawer(current);
+    });
+  }
 }
 
 /** A copy of the row's own ✕, so it sits and hovers like the site's buttons, before the first of them. */
-function addEditButton(row: HTMLElement, team: SavedTeam) {
+function addEditButton(row: HTMLElement, label: string, onEdit: () => void) {
   const remove = qs<HTMLButtonElement>(SELECTORS.lobby.playerRemoveButton, row);
   if (!remove) return;
 
@@ -282,23 +385,83 @@ function addEditButton(row: HTMLElement, team: SavedTeam) {
   edit.type = "button";
   edit.disabled = false;
   edit.title = "Edit team";
-  edit.setAttribute("aria-label", `Edit ${team.name}`);
+  edit.setAttribute("aria-label", `Edit ${label}`);
   edit.innerHTML = ICON_EDIT;
   edit.addEventListener("click", (event) => {
     event.stopPropagation();
-    const name = normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent);
-    const current = findTeam(saved, name);
-    if (current) openDrawer(current);
+    onEdit();
   });
   const firstButton = [ ...row.children ].find(child => child.matches("button[data-slot='button']")) ?? remove;
   firstButton.before(edit);
 }
+
+/** An own-score team's rows: rows come in seat order, so row `i` is `lobby.players[i]`, which tells two bots of one level apart. */
+function dressOwnRows(lineup: Lineup) {
+  const seats = lobby?.players ?? [];
+  qsa<HTMLElement>(SELECTORS.lobby.playerRows).forEach((row, index) => {
+    const seatId = seats[index]?.id;
+    const team = seatId ? lineup.teams.find(candidate => candidate.seatIds.includes(seatId)) : undefined;
+    if (!team || !seatId) {
+      if (row.hasAttribute(ROW_ATTR)) undress(row);
+      return;
+    }
+    const place = team.seatIds.indexOf(seatId) + 1;
+    const key = `own|${team.name}|${place}|${team.seatIds.length}|${team.colour.from}|${team.colour.to}`;
+    if (row.getAttribute(ROW_ATTR) !== key || !row.querySelector(".adt-team-line")) {
+      row.setAttribute(ROW_ATTR, key);
+      row.style.setProperty("--adt-team-from", team.colour.from);
+      row.style.setProperty("--adt-team-to", team.colour.to);
+      row.querySelector(".adt-team-order")?.remove();
+      row.querySelector(".adt-team-line")?.remove();
+      qs<HTMLElement>(SELECTORS.lobby.playerNameColumn, row)?.append(teamLabel(team, place));
+    }
+    if (!row.querySelector(".adt-team-edit")) addEditButton(row, team.name, () => openOwnEditor(team.name));
+  });
+}
+
+/** The team a member plays for, on its own line under the name, as a shared team's order is. */
+function teamLabel(team: LineupTeam, place: number): HTMLElement {
+  const line = document.createElement("div");
+  line.className = "adt-team-line";
+  const label = document.createElement("span");
+  label.className = "adt-team-label";
+  const swatch = document.createElement("i");
+  swatch.setAttribute("aria-hidden", "true");
+  const count = document.createElement("small");
+  count.textContent = `${place} of ${team.seatIds.length}`;
+  // The space is for screen readers: the flex gap already spaces the parts on screen.
+  label.append(swatch, team.name, " ", count);
+  line.append(label);
+  return line;
+}
+
+/** Under the players when the teams aren't the same size: the bigger team throws more often. */
+function noteUneven(lineup: Lineup | undefined) {
+  const text = lineup ? unevenText(lineup.teams) : "";
+  let note = document.getElementById(NOTE_ID);
+  if (!text) {
+    note?.remove();
+    return;
+  }
+  const buttons = qs<HTMLElement>(SELECTORS.lobby.addPlayerButton)?.parentElement;
+  if (!buttons) return;
+  if (!note) {
+    note = document.createElement("p");
+    note.id = NOTE_ID;
+  }
+  if (note.textContent !== text) note.textContent = text;
+  if (buttons.previousElementSibling !== note) buttons.before(note);
+}
+
+// Task 5 opens the drawer on the team's seats.
+function openOwnEditor(_name: string) {}
 
 function undress(row: HTMLElement) {
   row.removeAttribute(ROW_ATTR);
   row.style.removeProperty("--adt-team-from");
   row.style.removeProperty("--adt-team-to");
   row.querySelector(".adt-team-order")?.remove();
+  row.querySelector(".adt-team-line")?.remove();
   row.querySelector(".adt-team-edit")?.remove();
 }
 

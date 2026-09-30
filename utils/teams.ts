@@ -471,11 +471,16 @@ export function lineupOf(store: LineupStore | undefined, id: string | undefined)
   return id ? store?.[id] : undefined;
 }
 
-/** The teams with the seats that left taken out, and the teams with none left dropped. */
+/**
+ * The teams as the lobby stands (`seatIds`, in its order): the seats that left
+ * taken out, each team's seats in the lobby's order, which is its throwing
+ * order once a drag or a Shuffle has changed it, and the teams with none left
+ * dropped.
+ */
 export function pruneLineup(teams: readonly LineupTeam[], seatIds: readonly string[]): LineupTeam[] {
-  const present = new Set(seatIds);
+  const position = new Map(seatIds.map((id, index) => [ id, index ]));
   return teams
-    .map(team => ({ ...team, seatIds: team.seatIds.filter(id => present.has(id)) }))
+    .map(team => ({ ...team, seatIds: team.seatIds.filter(id => position.has(id)).sort((a, b) => position.get(a)! - position.get(b)!) }))
     .filter(team => team.seatIds.length);
 }
 

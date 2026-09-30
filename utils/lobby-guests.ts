@@ -45,3 +45,39 @@ export async function addGuest(name: string, feature: string): Promise<boolean> 
     return false;
   }
 }
+
+/** Add a bot at a level (the site's cpuPPR) to the lobby on screen, with the site's own bot request. */
+export async function addBot(name: string, ppr: number, feature: string): Promise<boolean> {
+  const lobbyId = lobbyIdFromUrl();
+  if (!lobbyId) return false;
+  try {
+    const response = await fetchWithAuth(`https://api.autodarts.com/gs/v0/lobbies/${lobbyId}/players`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, userId: null, cpuPPR: ppr }),
+    });
+    if (!response.ok) console.error(`Autodarts Tools: ${feature} - Failed to add a bot`, response.status, response.statusText);
+    return response.ok;
+  } catch (error) {
+    console.error(`Autodarts Tools: ${feature} - Error adding a bot:`, error);
+    return false;
+  }
+}
+
+/** Move one seat of the lobby on screen, as the site's drag does. */
+export async function moveSeat(index: number, toIndex: number, feature: string): Promise<boolean> {
+  const lobbyId = lobbyIdFromUrl();
+  if (!lobbyId) return false;
+  try {
+    const response = await fetchWithAuth(`https://api.autodarts.com/gs/v0/lobbies/${lobbyId}/players/move/to-index`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ index, toIndex }),
+    });
+    if (!response.ok) console.error(`Autodarts Tools: ${feature} - Failed to move a seat`, response.status, response.statusText);
+    return response.ok;
+  } catch (error) {
+    console.error(`Autodarts Tools: ${feature} - Error moving a seat:`, error);
+    return false;
+  }
+}
