@@ -8,6 +8,15 @@
           Teams share one score and take turns on it, like steel-tip doubles. Add one in a lobby you host with <b class="text-[var(--ad-text-primary)]">Add Team</b>, next to Add Player and Add Bot. In the match, the team that's up takes its colour, and a pill under the turn bar says whose turn it is. When someone else steps up, tap their name on the team's card.
         </p>
 
+        <section class="mb-10">
+          <h3 class="adt-section-title">
+            Options
+          </h3>
+          <OptionRow description="Own scores, X01, two teams: nobody may check out while their partner has more left than both opponents together. A checkout that breaks it counts as a bust." title="Partner rule">
+            <AppToggle v-model="config.teams.partnerRule" size="sm" />
+          </OptionRow>
+        </section>
+
         <!-- Not sortable: the drawer keeps these newest first. -->
         <LibrarySection
           :entries="entries"
@@ -78,6 +87,7 @@ import AppToggle from "../AppToggle.vue";
 
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
+import OptionRow from "./Library/OptionRow.vue";
 
 import type { LibraryEntry } from "@/utils/library-search";
 

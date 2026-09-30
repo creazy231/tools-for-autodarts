@@ -1,3 +1,6 @@
+import { AutodartsToolsGlobalStatus } from "@/utils/storage";
+import { undoVisit } from "@/utils/teams-undo";
+
 console.log("Background script loading...");
 
 export default defineBackground({
@@ -14,6 +17,15 @@ export default defineBackground({
     // Handle messages from content scripts
     browser.runtime.onMessage.addListener(async (message, sender) => {
       console.log("Background: Received message", message.type, "from", sender?.tab?.url || "unknown");
+
+      // Teams' partner rule: a checkout that broke it is undone here, once.
+      if (message.type === "teams:undo-visit") {
+        return undoVisit(String(message.matchId ?? ""), Array.isArray(message.dartIds) ? message.dartIds : [], async (path) => {
+          const token = (await AutodartsToolsGlobalStatus.getValue())?.auth?.token ?? "";
+          const response = await fetch(`https://api.autodarts.com${path}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+          return { ok: response.ok, status: response.status };
+        });
+      }
 
       // Handle fetch requests with chunked download support
       if (message.type === "fetch") {

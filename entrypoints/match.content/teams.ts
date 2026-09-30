@@ -35,7 +35,7 @@ import { SELECTORS, anyOf, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { TEAMS_PILL_TAG, assignCards, decidedTeam, decidedText, lineupOf, lineupTeams, normalizeName, normalizeTeams, partnerRuleApplies, partnerRuleBreach, playerUp, resultText, shiftFor, shiftsOf, teamLegs, teamSeats, toThrowText, warningText, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, bustText, decidedTeam, decidedText, lineupOf, lineupTeams, normalizeName, normalizeTeams, partnerRuleApplies, partnerRuleBreach, playerUp, resultText, shiftFor, shiftsOf, teamLegs, teamSeats, toThrowText, warningText, withShift } from "@/utils/teams";
 
 const STYLE_ID = "teams-match";
 const CARD_ATTR = "data-adt-team";
@@ -133,6 +133,14 @@ let lineupStore: LineupStore = {};
 let unwatchLineups: (() => void) | null = null;
 let partnerRule = false;
 let holding = false;
+/** The partner-rule bust last sent to be undone, by match and darts. */
+let lastUndo = "";
+/**
+ * "ANNA's checkout didn't count": shown from the bust through the visit after
+ * it. `bustTurn` is the busted visit, whose frames go on arriving while the
+ * undo runs; `shownFor` is the first visit after it.
+ */
+let bustNote: { text: string; bustTurn: string; shownFor?: string } | undefined;
 let match: IMatch | undefined;
 let lastStyles = "";
 let lastTurn = "";
@@ -189,6 +197,8 @@ export function onRemove() {
   clear();
   match = undefined;
   lastTurn = "";
+  lastUndo = "";
+  bustNote = undefined;
 }
 
 function readConfig(config: any) {
@@ -262,12 +272,29 @@ function applyOwn(lineup: Lineup) {
   const upTeam = seats.get(up);
   const decided = match!.adtTeams?.decided ?? decidedTeam(match!, lineup);
   const panelUp = (match!.gameWinner ?? -1) >= 0;
+  askUndo();
   writeStyles(decided ? undefined : upTeam);
   dressOwnCards(seats, up, lineup);
   updateOwnPill(lineup, upTeam, up, decided);
   ensurePill();
   holdNextLeg(Boolean(decided && panelUp));
   handover(decided ? undefined : upTeam, up);
+}
+
+/** A visit's key: it changes whenever a new visit (or another player) comes up. */
+function turnKeyOf(up: number): string {
+  return `${match!.set}|${match!.leg}|${match!.round}|${up}|${normalizeName(match!.players?.[up]?.name)}`;
+}
+
+/** A checkout the team view made a bust: the service worker undoes it (utils/teams-undo.ts). */
+function askUndo() {
+  const bust = match?.adtTeams?.bust;
+  if (!bust || !match) return;
+  const key = `${match.id}|${bust.dartIds.join(",")}`;
+  if (key === lastUndo) return;
+  lastUndo = key;
+  bustNote = { text: bustText(bust.breach), bustTurn: turnKeyOf(bust.seat) };
+  browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).catch(e => console.error(e));
 }
 
 function writeStyles(upTeam?: Coloured) {
@@ -441,7 +468,19 @@ function updateOwnPill(lineup: Lineup, upTeam: LineupTeam | undefined, up: numbe
   pill.team = upTeam?.name ?? "";
   pill.from = colour.from;
   pill.to = colour.to;
-  pill.turnKey = `${match!.set}|${match!.leg}|${match!.round}|${up}|${player}`;
+  pill.turnKey = turnKeyOf(up);
+  // The bust's line stays through the busted visit, while the undo runs, and
+  // the visit after it; it goes when the next one comes up.
+  if (bustNote) {
+    const onBustVisit = pill.turnKey === bustNote.bustTurn;
+    if (!onBustVisit) bustNote.shownFor ??= pill.turnKey;
+    if (onBustVisit || bustNote.shownFor === pill.turnKey) {
+      pill.note = bustNote.text;
+      pill.noteKind = "bust";
+      return;
+    }
+    bustNote = undefined;
+  }
   const breach = partnerRule ? partnerRuleBreach(match!, lineup, up) : undefined;
   if (breach) {
     pill.note = warningText(breach);
