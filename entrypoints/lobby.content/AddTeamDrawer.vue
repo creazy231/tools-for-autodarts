@@ -356,14 +356,18 @@ function removePlayer(index: number) {
 }
 
 function pickKey(pick: OwnPick) {
-  return "seatId" in pick ? `seat:${pick.seatId}` : `guest:${pick.guest}`;
+  if ("seatId" in pick) return `seat:${pick.seatId}`;
+  if ("bot" in pick) return `bot:${pick.key}`;
+  return `guest:${pick.guest}`;
 }
 
 function pickName(pick: OwnPick) {
-  return "seatId" in pick ? pick.name : normalizeName(pick.guest);
+  if ("seatId" in pick) return pick.name;
+  return normalizeName("bot" in pick ? pick.name : pick.guest);
 }
 
 function pickKind(pick: OwnPick) {
+  if ("bot" in pick) return `new bot · ${pick.bot}+`;
   if (!("seatId" in pick)) return "new guest";
   const kind = props.state.seats.find(seat => seat.id === pick.seatId)?.kind;
   return kind === "bot" ? "bot" : kind === "account" ? "on their own board" : "guest";

@@ -30,7 +30,7 @@ import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lobbyFormat, memberOf, normalizeName, normalizeTeams, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lobbyFormat, memberOf, normalizeName, normalizeTeams, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
@@ -706,7 +706,7 @@ async function submitOwnTeam(draft: OwnDraft): Promise<string | undefined> {
   if (problem) return problem;
   if (colourTaken(draft.colour, others.map(team => team.colour))) return "Another team in this lobby already has that colour.";
 
-  const slots: SeatSlot[] = draft.picks.map(pick => "seatId" in pick ? { kind: "seat", seatId: pick.seatId } : { kind: "guest", name: normalizeName(pick.guest) });
+  const slots = pickSlots(draft.picks);
   const ids = await seatSlots(slots);
   if (ids.some(id => !id)) return "autodarts didn't add every new player. Try again.";
   const name = editing?.name ?? normalizeName(draft.name);
