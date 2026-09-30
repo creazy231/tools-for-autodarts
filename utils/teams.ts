@@ -626,3 +626,203 @@ export function unevenText(teams: readonly LineupTeam[]): string {
 export function toThrowText(player: string, language: string | null | undefined): string {
   return (language ?? "").toLowerCase().startsWith("de") ? `${player} ist dran` : `${player} to throw`;
 }
+
+/** The part of a match frame the team rules read: {@link IMatch} fits it. */
+export interface TeamMatch extends TurnState {
+  id?: string;
+  /** "First to N legs". */
+  legs?: number | null;
+  sets?: number | null;
+  scores?: readonly { legs: number; sets: number }[] | null;
+  gameScores?: readonly number[];
+  gameWinner?: number;
+  winner?: number;
+  gameFinished?: boolean;
+  turnBusted?: boolean;
+  turns?: readonly { points?: number; busted?: boolean; throws?: readonly { id: string }[] }[];
+  adtTeams?: AdtTeams;
+}
+
+/** A checkout the partner rule stops, with the scores that stop it. */
+export interface Breach {
+  player: string;
+  teammate: string;
+  teammateLeft: number;
+  opponentsLeft: number;
+  opponents: string[];
+}
+
+/** What {@link teamView} adds to a frame it changes. */
+export interface AdtTeams {
+  /** The team this won leg took to its target. */
+  decided?: string;
+  /** Every team's legs, with this leg in. */
+  legs?: Record<string, number>;
+  /** A checkout the partner rule turned into a bust: who threw it, and the visit's darts to undo. */
+  bust?: { seat: number; dartIds: string[]; breach: Breach };
+}
+
+export interface TeamViewContext {
+  enabled: boolean;
+  partnerRule: boolean;
+  /** The frame's own match's lineup, looked up by the frame's id. */
+  lineup: Lineup | undefined;
+}
+
+/** A card as the match screen shows it: its name, and whether it is a top-bar cell. */
+export interface CardInfo {
+  name: string;
+  small: boolean;
+}
+
+/** The own-score team of each seat, by its index in `players`, found by seat id. */
+export function lineupTeams(players: readonly SeatLike[], lineup: Lineup | undefined): Map<number, LineupTeam> {
+  const out = new Map<number, LineupTeam>();
+  if (!lineup) return out;
+  players.forEach((seat, index) => {
+    const team = seat.id ? lineup.teams.find(candidate => candidate.seatIds.includes(seat.id!)) : undefined;
+    if (team) out.set(index, team);
+  });
+  return out;
+}
+
+/** Every team's legs: its members' legs added up. `scores` is in the same order as `players`. */
+export function teamLegs(match: TeamMatch, lineup: Lineup | undefined): Record<string, number> {
+  const legs: Record<string, number> = {};
+  if (!lineup) return legs;
+  for (const team of lineup.teams) legs[team.name] = 0;
+  lineupTeams(match.players ?? [], lineup).forEach((team, index) => {
+    legs[team.name] += match.scores?.[index]?.legs ?? 0;
+  });
+  return legs;
+}
+
+/** The team whose legs have reached the match's "First to N", if any. Legs only: the site counts sets per player. */
+export function decidedTeam(match: TeamMatch, lineup: Lineup | undefined): string | undefined {
+  const target = match.legs ?? 0;
+  if (!lineup || target < 1 || match.sets) return undefined;
+  const legs = teamLegs(match, lineup);
+  return lineup.teams.find(team => (legs[team.name] ?? 0) >= target)?.name;
+}
+
+/**
+ * Whether a checkout by `seat` breaks the e-darts partner rule: in X01, with
+ * exactly two own-score teams and every seat on one of them, a human player
+ * may not check out while a teammate has more left than the other team's
+ * players together. Scores are as they stand: during a visit only the
+ * thrower's changes, so everyone else's are what they were at its start.
+ */
+export function partnerRuleBreach(match: TeamMatch, lineup: Lineup | undefined, seat: number): Breach | undefined {
+  if (match.variant !== "X01" || lineup?.teams.length !== 2) return undefined;
+  const players = match.players ?? [];
+  const seats = lineupTeams(players, lineup);
+  if (seats.size !== players.length) return undefined;
+  const own = seats.get(seat);
+  if (!own || players[seat]?.cpuPPR) return undefined;
+
+  const scores = match.gameScores ?? [];
+  const opponents: string[] = [];
+  let opponentsLeft = 0;
+  let teammate: { index: number; left: number } | undefined;
+  players.forEach((player, index) => {
+    const left = scores[index] ?? 0;
+    if (seats.get(index)?.name !== own.name) {
+      opponentsLeft += left;
+      opponents.push(normalizeName(player.name));
+    } else if (index !== seat && (!teammate || left > teammate.left)) {
+      teammate = { index, left };
+    }
+  });
+  if (!teammate || teammate.left <= opponentsLeft) return undefined;
+  return { player: normalizeName(players[seat]?.name), teammate: normalizeName(players[teammate.index]?.name), teammateLeft: teammate.left, opponentsLeft, opponents };
+}
+
+/**
+ * A frame as the team rules see it, for every feature that reads game data:
+ * a won leg that takes an own-score team to its target reads as the match won,
+ * and a checkout against the partner rule (when it is on) as a bust, with the
+ * visit's points and the leg taken back. Anything else is returned as it came.
+ * The frame itself is never changed.
+ */
+export function teamView<M extends TeamMatch>(match: M, context: TeamViewContext): M {
+  if (!context.enabled || !context.lineup) return match;
+  const winner = match.gameWinner ?? -1;
+  if (winner < 0) return match;
+
+  const breach = context.partnerRule ? partnerRuleBreach(match, context.lineup, winner) : undefined;
+  const visit = match.turns?.[0];
+  if (breach && visit) {
+    const gameScores = [ ...(match.gameScores ?? []) ];
+    gameScores[winner] = (gameScores[winner] ?? 0) + (visit.points ?? 0);
+    const scores = match.scores ? match.scores.map((score, index) => index === winner ? { ...score, legs: Math.max(0, score.legs - 1) } : score) : match.scores;
+    return {
+      ...match,
+      gameWinner: -1,
+      gameFinished: false,
+      turnBusted: true,
+      gameScores,
+      scores,
+      turns: [ { ...visit, busted: true }, ...(match.turns ?? []).slice(1) ],
+      adtTeams: { bust: { seat: winner, dartIds: (visit.throws ?? []).map(dart => dart.id), breach } },
+    } as M;
+  }
+
+  const decided = decidedTeam(match, context.lineup);
+  if (!decided) return match;
+  return {
+    ...match,
+    winner: (match.winner ?? -1) >= 0 ? match.winner : winner,
+    adtTeams: { decided, legs: teamLegs(match, context.lineup) },
+  } as M;
+}
+
+/**
+ * Which seat each card shows, by index into `players`, or -1. Cards carry only
+ * a name ([[match-players-rotates-every-leg]]). Where seats share one (two bots
+ * of one level), the rule depends on the card:
+ *   - the wide and sidebar layouts draw full cards in seat order (`index`)
+ *   - the top bar's small cells come in throwing order, which is `players`'s
+ *   - a single full card among small ones is the stacked layout's card of
+ *     whoever is up
+ */
+export function assignCards(cards: readonly CardInfo[], players: readonly SeatLike[], up: number): number[] {
+  const byName = new Map<string, number[]>();
+  players.forEach((player, index) => {
+    const name = normalizeName(player.name);
+    byName.set(name, [ ...(byName.get(name) ?? []), index ]);
+  });
+  const stackedCard = cards.some(card => card.small) && cards.filter(card => !card.small).length === 1;
+  const taken = new Map<string, number>();
+  return cards.map((card) => {
+    const name = normalizeName(card.name);
+    const seats = byName.get(name) ?? [];
+    if (seats.length <= 1) return seats[0] ?? -1;
+    if (!card.small && stackedCard) return seats.includes(up) ? up : -1;
+    const key = `${card.small ? "small" : "full"}|${name}`;
+    const nth = taken.get(key) ?? 0;
+    taken.set(key, nth + 1);
+    const ordered = card.small ? seats : [ ...seats ].sort((a, b) => (players[a].index ?? a) - (players[b].index ?? b));
+    return ordered[nth] ?? -1;
+  });
+}
+
+/** The pill once a team has won. */
+export function decidedText(team: string): string {
+  return `${team} wins the match`;
+}
+
+/** The result beside it: the winner's legs first, then the others', in the lineup's order. */
+export function resultText(legs: Record<string, number>, decided: string, lineup: Lineup): string {
+  const others = lineup.teams.filter(team => team.name !== decided).map(team => legs[team.name] ?? 0);
+  return [ legs[decided] ?? 0, ...others ].join(" – ");
+}
+
+/** The line under the pill while the partner rule stops the player up from checking out. */
+export function warningText(breach: Breach): string {
+  return `No checkout this visit: ${breach.teammate} has ${breach.teammateLeft} left, more than ${joinNames(breach.opponents)} together (${breach.opponentsLeft})`;
+}
+
+/** The line after a checkout the rule turned into a bust. */
+export function bustText(breach: Breach): string {
+  return `${breach.player}'s checkout didn't count: partner rule.`;
+}
