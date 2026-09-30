@@ -2,6 +2,8 @@
  * WebSocket capture script to be injected into the main world
  */
 
+import { VOID_CHECKOUT_ATTR, siteFrame } from "@/utils/void-checkout";
+
 export default defineUnlistedScript(() => {
   console.log("[WebSocket Capture] Starting initialization");
 
@@ -19,6 +21,9 @@ export default defineUnlistedScript(() => {
 
     const originalGetter = property.get;
 
+    // The visit each match's last state was in, for siteFrame.
+    const visits = new Map<string, string>();
+
     // Create a wrapper function that intercepts the getter
     function interceptMessageData(this: MessageEvent) {
       // Check if this is a WebSocket message
@@ -31,12 +36,18 @@ export default defineUnlistedScript(() => {
       // Get the original message data
       const messageData = originalGetter.call(this);
 
+      // What the site reads: the frame as it came, but for a checkout the
+      // partner rule takes back, which it reads as a bust with no GAME SHOT
+      // (utils/void-checkout.ts). The content script still gets the frame
+      // itself, below.
+      let forSite = messageData;
+
       try {
         // Only dispatch event, no logging here
         if (typeof messageData === "string") {
           try {
-            // Try to parse JSON data to validate it's JSON
-            JSON.parse(messageData);
+            const rewritten = siteFrame(JSON.parse(messageData), document.documentElement.getAttribute(VOID_CHECKOUT_ATTR), visits);
+            if (rewritten) forSite = JSON.stringify(rewritten);
             // No logging here, only in content script
           } catch (e) {
             // Not valid JSON, don't process
@@ -55,8 +66,7 @@ export default defineUnlistedScript(() => {
         console.error("[WebSocket Capture] Error processing message:", error);
       }
 
-      // Return the original message data without trying to modify the property
-      return messageData;
+      return forSite;
     }
 
     // Replace the getter with our interceptor

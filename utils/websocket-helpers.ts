@@ -3,10 +3,11 @@ import { AutodartsToolsBoardImages } from "./board-image-storage";
 import { AutodartsToolsGameData } from "./game-data-storage";
 import { AutodartsToolsLobbyData } from "./lobby-data-storage";
 
-import type { AdtTeams, LineupStore } from "@/utils/teams";
+import type { AdtTeams, LineupStore, TeamViewContext } from "@/utils/teams";
 
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
-import { lineupOf, lineupPartnerRule, normalizeTeams, teamView } from "@/utils/teams";
+import { lineupOf, lineupPartnerRule, normalizeTeams, teamView, voidedVisit } from "@/utils/teams";
+import { VOID_CHECKOUT_ATTR } from "@/utils/void-checkout";
 
 interface IUserSettings {
   callCheckouts: boolean;
@@ -296,25 +297,49 @@ function loadTeamsContext(): Promise<void> {
       if (!teamsContext) return;
       teamsContext.enabled = nextTeams.enabled;
       teamsContext.partnerRule = nextTeams.partnerRule;
+      flagVoidedVisit();
     });
     AutodartsToolsTeamLineups.watch((next) => {
       if (teamsContext) teamsContext.lineups = next ?? {};
+      flagVoidedVisit();
     });
   })();
   return teamsContextLoad;
 }
 
+/** Teams' rules for a frame: the lineup is the frame's own match's, whatever page this tab is on, and so is its partner rule. */
+function teamContext(match: IMatch): TeamViewContext | undefined {
+  if (!teamsContext) return undefined;
+  const lineup = lineupOf(teamsContext.lineups, match.id);
+  return { enabled: teamsContext.enabled, partnerRule: lineupPartnerRule(lineup, teamsContext.partnerRule), lineup };
+}
+
 /**
  * The match as Teams' rules see it (utils/teams.ts): an own-score team's
  * deciding leg as the match won, a partner-rule checkout as a bust. Every
- * feature reads game data from here, so none of them needs team code. The
- * lineup is the frame's own match's, whatever page this tab is on, and so is
- * its partner rule.
+ * feature reads game data from here, so none of them needs team code.
  */
 function asTeamsSee(match: IMatch): IMatch {
-  if (!teamsContext) return match;
-  const lineup = lineupOf(teamsContext.lineups, match.id);
-  return teamView(match, { enabled: teamsContext.enabled, partnerRule: lineupPartnerRule(lineup, teamsContext.partnerRule), lineup });
+  const context = teamContext(match);
+  return context ? teamView(match, context) : match;
+}
+
+/** The last frame as Teams' rules saw it, for when those rules change mid-visit. */
+let lastSeen: IMatch | undefined;
+
+/**
+ * Names the visit up on `<html>` while the partner rule would take its
+ * checkout back, so that the page script shows the site that checkout as the
+ * bust we see, with no GAME SHOT (utils/void-checkout.ts); takes the name down
+ * otherwise. A frame reaches the site before it reaches us, so this is set
+ * from the frames before the checkout's.
+ */
+function flagVoidedVisit(match: IMatch | undefined = lastSeen): void {
+  lastSeen = match;
+  const context = match && teamContext(match);
+  const visit = match && context ? voidedVisit(match, context) : undefined;
+  if (visit) document.documentElement.setAttribute(VOID_CHECKOUT_ATTR, visit);
+  else document.documentElement.removeAttribute(VOID_CHECKOUT_ATTR);
 }
 
 export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string) {
@@ -357,10 +382,12 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
         });
       } else {
         // Replace entire match data
+        const seen = asTeamsSee(data as IMatch);
         AutodartsToolsGameData.setValue({
           ...gameData,
-          match: asTeamsSee(data as IMatch),
+          match: seen,
         });
+        flagVoidedVisit(seen);
       }
 
       break;

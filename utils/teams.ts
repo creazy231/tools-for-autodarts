@@ -20,6 +20,7 @@
 import type { ColorScheme } from "@/utils/storage";
 
 import { CARD_PRESETS, type ColorPreset, SITE_CARD } from "@/utils/colors";
+import { bustView, visitKey } from "@/utils/void-checkout";
 
 export type TeamFormat = "shared" | "own";
 
@@ -931,23 +932,10 @@ export function teamView<M extends TeamMatch>(match: M, context: TeamViewContext
   const breach = context.partnerRule ? partnerRuleBreach(match, context.lineup, winner) : undefined;
   const visit = match.turns?.[0];
   if (breach && visit) {
-    const gameScores = [ ...(match.gameScores ?? []) ];
-    gameScores[winner] = (gameScores[winner] ?? 0) + (visit.points ?? 0);
-    const scores = match.scores ? match.scores.map((score, index) => index === winner ? { ...score, legs: Math.max(0, score.legs - 1) } : score) : match.scores;
-    // A checkout that also ended the site's match (its thrower reached the
-    // target alone) is taken back with the match it won.
-    return {
-      ...match,
-      gameWinner: -1,
-      gameFinished: false,
-      winner: -1,
-      finished: false,
-      turnBusted: true,
-      gameScores,
-      scores,
-      turns: [ { ...visit, busted: true }, ...(match.turns ?? []).slice(1) ],
-      adtTeams: { bust: { seat: winner, dartIds: (visit.throws ?? []).map(dart => dart.id), breach } },
-    } as M;
+    // The site is shown the same bust (utils/void-checkout.ts). A checkout that
+    // also ended the site's match (its thrower reached the target alone) is
+    // taken back with the match it won.
+    return { ...bustView(match, winner), adtTeams: { bust: { seat: winner, dartIds: (visit.throws ?? []).map(dart => dart.id), breach } } };
   }
 
   const decided = decidedTeam(match, context.lineup);
@@ -957,6 +945,19 @@ export function teamView<M extends TeamMatch>(match: M, context: TeamViewContext
     winner: (match.winner ?? -1) >= 0 ? match.winner : winner,
     adtTeams: { decided, legs: teamLegs(match, context.lineup) },
   } as M;
+}
+
+/**
+ * The visit whose checkout {@link teamView} would take back, named for the
+ * site (utils/void-checkout.ts): the one up now, while the partner rule stops
+ * it. That holds through the take-back, which leaves the thrower up, so a
+ * checkout the server sends again is taken back again. Read from the frames
+ * before the checkout, since the site sees a frame before we do.
+ */
+export function voidedVisit(match: TeamMatch, context: TeamViewContext): string | undefined {
+  if (!context.enabled || !context.partnerRule || !context.lineup || (match.gameWinner ?? -1) >= 0) return undefined;
+  const up = match.player ?? 0;
+  return partnerRuleBreach(match, context.lineup, up) ? visitKey(match, up) : undefined;
 }
 
 /**
