@@ -81,7 +81,10 @@ const BASE_CSS = `
   .${LEGS_CLASS} {
     display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 9px 0 7px; margin: 2px auto 0;
     border-radius: 999px; background: rgb(0 0 0 / 28%); color: #f7f8fa; font-size: 10.5px; font-weight: 800; letter-spacing: .02em; white-space: nowrap;
+    box-sizing: border-box; max-width: calc(100% - 16px);
   }
+  .${LEGS_CLASS} span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .${LEGS_CLASS} i, .${LEGS_CLASS} b { flex: none; }
   .${LEGS_CLASS} i { width: 9px; height: 9px; border-radius: 3px; background: linear-gradient(to right, var(--adt-team-from), var(--adt-team-to)); }
   .${LEGS_CLASS} b { font-size: 12px; }
   @media (prefers-reduced-motion: reduce) {
@@ -105,6 +108,8 @@ let unwatchConfig: (() => void) | null = null;
 let unwatchShifts: (() => void) | null = null;
 let hostId: string | null = null;
 let saved: SavedTeam[] = [];
+/** Teams' own switch, followed live: off, nothing of Teams stays on the page. */
+let enabled = true;
 /** The card gradient for seats that are no team: Colors' when it paints one, else the site's. */
 let otherCard: { from: string; to: string } = SITE_CARD;
 let shiftStore: ShiftStore = {};
@@ -161,6 +166,9 @@ export async function teams(ctx: any) {
   // Text too: the phone layout's top bar keeps its cells and writes the next
   // player's name into them, which adds and removes no node at all.
   observer.observe(document.body, { childList: true, characterData: true, subtree: true });
+  // The layout changes with the window, and the legs chip depends on it.
+  window.removeEventListener("resize", schedule);
+  window.addEventListener("resize", schedule);
   apply();
   console.log("Autodarts Tools: Teams - Started (match)");
 }
@@ -168,6 +176,7 @@ export async function teams(ctx: any) {
 export function onRemove() {
   observer?.disconnect();
   observer = null;
+  window.removeEventListener("resize", schedule);
   unwatchGameData?.();
   unwatchGameData = null;
   unwatchConfig?.();
@@ -185,6 +194,7 @@ export function onRemove() {
 
 function readConfig(config: any) {
   const teamsConfig = normalizeTeams(config?.teams);
+  enabled = teamsConfig.enabled;
   saved = teamsConfig.saved;
   partnerRuleDefault = teamsConfig.partnerRule;
   const colors = normalizeColors(config?.colors);
@@ -220,6 +230,11 @@ function clear() {
 }
 
 function apply() {
+  // Switched off in the settings: nothing of Teams on the page, until it's switched on again.
+  if (!enabled) {
+    clear();
+    return;
+  }
   const lineup = match ? lineupOf(lineupStore, match.id) : undefined;
   if (lineup) applyOwn(lineup);
   else applyShared();
@@ -384,8 +399,15 @@ function dressOwnCards(seats: Map<number, LineupTeam>, up: number, lineup: Lineu
 
 /** Under a member's name: the team, and its legs. */
 function renderLegs(card: HTMLElement, team: LineupTeam, legs: number) {
-  const key = `${team.name}|${legs}`;
   const current = card.querySelector<HTMLElement>(`:scope .${LEGS_CLASS}`);
+  // Only on a card beside the board. Above it, in the stacked and phone
+  // layouts, a row more is that much less board, and the pill's tally has
+  // the legs anyway.
+  if (card.matches(anyOf(SELECTORS.match.smallScoreCard)) || aboveBoard(card)) {
+    current?.remove();
+    return;
+  }
+  const key = `${team.name}|${legs}`;
   if (current?.dataset.key === key) return;
   const nameRow = qs<HTMLElement>(SELECTORS.match.nameRow, card);
   current?.remove();
@@ -395,16 +417,31 @@ function renderLegs(card: HTMLElement, team: LineupTeam, legs: number) {
   label.dataset.key = key;
   const swatch = document.createElement("i");
   swatch.setAttribute("aria-hidden", "true");
+  // Its own element, so a long team name ends in an ellipsis inside the card.
+  const name = document.createElement("span");
+  name.textContent = team.name;
   const count = document.createElement("b");
   count.textContent = String(legs);
-  label.append(swatch, `${team.name} `, count);
+  label.append(swatch, name, " ", count);
   nameRow.after(label);
 }
 
+/** Whether a card sits above the board, the turn bar's row being the site's own marker for where the board starts. */
+function aboveBoard(card: HTMLElement): boolean {
+  const bar = qs<HTMLElement>(SELECTORS.match.turnBarRow);
+  return Boolean(bar) && card.getBoundingClientRect().bottom <= bar!.getBoundingClientRect().top + 1;
+}
+
 function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: number, throwing: boolean) {
-  const small = card.matches(anyOf(SELECTORS.match.smallScoreCard)) || card.getBoundingClientRect().width < NARROW_CARD_PX;
-  const key = `${team.players.join(",")}|${index}|${throwing ? 1 : 0}|${small ? 1 : 0}`;
   const current = card.querySelector<HTMLElement>(":scope .adt-team-order");
+  // A top-bar cell takes no chips: it would stand taller than the seats beside
+  // it, with the band's colour showing under those, and the board would shrink.
+  if (card.matches(anyOf(SELECTORS.match.smallScoreCard))) {
+    current?.remove();
+    return;
+  }
+  const small = card.getBoundingClientRect().width < NARROW_CARD_PX;
+  const key = `${team.players.join(",")}|${index}|${throwing ? 1 : 0}|${small ? 1 : 0}`;
   if (current?.dataset.key === key) return;
 
   const nameRow = qs<HTMLElement>(SELECTORS.match.nameRow, card);
