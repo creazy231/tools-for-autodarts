@@ -719,6 +719,36 @@ export function checkOwnTeam(draft: OwnDraft, context: OwnContext): string | und
   return undefined;
 }
 
+/**
+ * The offered names the drawer can delete: all but a saved team's players,
+ * who come back with their team however often they're deleted. Deleting the
+ * team is how those go.
+ */
+export function forgettableNames(offered: readonly string[], saved: readonly SavedTeam[]): string[] {
+  const kept = new Set(saved.flatMap(team => team.players));
+  return uniqueNames(offered).filter(name => !kept.has(name));
+}
+
+/** Who stands in a saved team's way in this lobby, by name. */
+export interface LobbyTeams {
+  /** A shared-score team's player → that team. */
+  playerTeams: Readonly<Record<string, string>>;
+  /** The name of a seat on an own-score team → that team. */
+  seatTeams: Readonly<Record<string, string>>;
+}
+
+/**
+ * Why a saved team can't join this lobby as it stands, or nothing: one of its
+ * players is already on another team here. A bot never is: bots share names,
+ * and another one joins.
+ */
+export function savedTeamProblem(team: SavedTeam, lobby: LobbyTeams): string | undefined {
+  const taken = team.format === "own" ? lobby.seatTeams : lobby.playerTeams;
+  const people = team.members ? team.members.filter(member => member.kind !== "bot").map(member => member.name) : team.players;
+  const player = people.find(name => taken[name] && taken[name] !== team.name);
+  return player ? `${player} is already on ${taken[player]}.` : undefined;
+}
+
 /** "A", "A and B", "A, B and C". */
 export function joinNames(names: readonly string[]): string {
   if (names.length <= 1) return names[0] ?? "";
