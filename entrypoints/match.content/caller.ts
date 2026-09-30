@@ -1,17 +1,22 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { pageVariant, playsIn } from "@/utils/game-modes";
-import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/storage";
-import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
+import { AutodartsToolsConfig, AutodartsToolsTeamShifts, type IConfig, type ISoundTTS } from "@/utils/storage";
+import { getSoundFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { gotchaCheckout } from "@/utils/checkout";
 import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
 import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
 import { DEFAULT_VOLUME, cappedVolume, isLink, planVolume, soundVolume } from "@/utils/sound-volume";
 import { winId } from "@/utils/win";
+import { type ShiftStore, callNames, normalizeTeams, shiftsOf } from "@/utils/teams";
 
 let gameDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
 let config: IConfig;
+/** For Teams: whose guests are teams, and the match's tap-to-corrections (utils/teams.ts). */
+let teamHostId: string | null = null;
+let teamShifts: ShiftStore = {};
+let teamShiftsUnwatch: (() => void) | undefined;
 
 /** A sound waiting its turn, and the volume it plays at (utils/sound-volume.ts). */
 interface QueuedSound { url?: string; base64?: string; name?: string; soundId?: string; tts?: ISoundTTS; volume?: number }
@@ -108,6 +113,12 @@ export async function caller() {
 
   try {
     config = await AutodartsToolsConfig.getValue();
+    teamHostId = await getUserIdFromToken();
+    teamShifts = (await AutodartsToolsTeamShifts.getValue()) ?? {};
+    teamShiftsUnwatch?.();
+    teamShiftsUnwatch = AutodartsToolsTeamShifts.watch((value: ShiftStore) => {
+      teamShifts = value ?? {};
+    });
     const gameData = await AutodartsToolsGameData.getValue();
     console.log("Autodarts Tools: Config loaded", config?.caller?.sounds?.length || 0, "sounds available");
 
@@ -156,6 +167,9 @@ export function callerOnRemove() {
     boardDataWatcherUnwatch();
     boardDataWatcherUnwatch = null;
   }
+
+  teamShiftsUnwatch?.();
+  teamShiftsUnwatch = undefined;
 
   // Drop any update still settling
   settled.cancel();
@@ -530,6 +544,32 @@ function isSoundInQueue(trigger: string): boolean {
  * Process game data to trigger sounds based on game events
  */
 let lastScore: number = 0;
+/**
+ * The names to call when a seat's turn starts: for a team (Teams), the player
+ * whose visit it is and then the team's name; for anyone else, the seat's own.
+ */
+function turnNames(match: IGameData["match"]): string[] {
+  if (!match) return [];
+  const own = match.players?.[match.player]?.name;
+  const team = config.teams?.enabled ? callNames(match, normalizeTeams(config.teams).saved, teamHostId, shiftsOf(teamShifts, match.id)) : [];
+  return team.length ? team : own ? [ own ] : [];
+}
+
+/**
+ * The triggers to play for the first of `names` the Caller has a sound for: the
+ * name in lower case, and with underscores for its spaces, both played, since a
+ * sound can be on either spelling.
+ */
+function nameTriggers(names: readonly string[]): string[] | undefined {
+  const has = (trigger: string) => config.caller.sounds?.some(sound => sound.enabled && sound.triggers?.includes(trigger));
+  for (const name of names) {
+    const lower = name.toLowerCase();
+    const underscored = lower.replace(/\s+/g, "_");
+    if (has(lower) || (underscored !== lower && has(underscored))) return underscored !== lower ? [ lower, underscored ] : [ lower ];
+  }
+  return undefined;
+}
+
 async function processGameData(gameData: IGameData, oldGameData: IGameData, fromWebSocket: boolean = false): Promise<void> {
   if (!gameData.match || !gameData.match.turns?.length) return;
 
@@ -562,26 +602,8 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
     if (isBot) {
       playSound("bot");
     } else if (playerName) {
-      const playerNameLower = playerName.toLowerCase();
-      const playerNameWithUnderscores = playerNameLower.replace(/\s+/g, "_");
-
-      // Check if either version of the name has a sound
-      const hasPlayerNameSound = config.caller.sounds?.some(sound =>
-        sound.enabled && sound.triggers && (
-          sound.triggers.includes(playerNameLower)
-          || (playerNameWithUnderscores !== playerNameLower && sound.triggers.includes(playerNameWithUnderscores))
-        ),
-      );
-
-      if (hasPlayerNameSound) {
-        // Try both versions of the name if they're different
-        if (playerNameWithUnderscores !== playerNameLower) {
-          playSound(playerNameLower);
-          playSound(playerNameWithUnderscores);
-        } else {
-          playSound(playerNameLower);
-        }
-      }
+      // A team's player first, then the team, then the seat's own name
+      for (const trigger of nameTriggers(turnNames(gameData.match)) ?? []) playSound(trigger);
     }
 
     // Play gameon after player name/bot (moved from beginning of block)
@@ -600,25 +622,11 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
       playSound("bot");
     } else if (playerName) {
       console.log("Autodarts Tools: Player changed to", playerName);
-      // Try to play the player name (both regular and underscore version), if no sound found, fall back to next_player
-      const playerNameLower = playerName.toLowerCase();
-      const playerNameWithUnderscores = playerNameLower.replace(/\s+/g, "_");
-      const hasPlayerNameSound = config.caller.sounds?.some(sound =>
-        sound.enabled && sound.triggers && (
-          sound.triggers.includes(playerNameLower)
-          || (playerNameWithUnderscores !== playerNameLower && sound.triggers.includes(playerNameWithUnderscores))
-        ),
-      );
-
-      if (hasPlayerNameSound) {
-        console.log(`Autodarts Tools: Found player name sound for "${playerNameLower}" or "${playerNameWithUnderscores}"`);
-        // Try both versions of the name
-        if (playerNameWithUnderscores !== playerNameLower) {
-          playSound(playerNameLower);
-          playSound(playerNameWithUnderscores);
-        } else {
-          playSound(playerNameLower);
-        }
+      // The name of whoever is up (a team's player first, then the team), and
+      // next_player when the Caller has no sound for any of them
+      const triggers = nameTriggers(turnNames(gameData.match));
+      if (triggers) {
+        for (const trigger of triggers) playSound(trigger);
       } else {
         playSound("next_player");
       }
