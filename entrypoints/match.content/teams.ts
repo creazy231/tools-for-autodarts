@@ -255,7 +255,7 @@ function applyShared() {
   const shifts = shiftsOf(shiftStore, match.id);
   const up = match.player ?? 0;
   const upTeam = seats.get(up);
-  writeStyles(upTeam);
+  writeStyles([ ...new Set(seats.values()) ]);
   dressCards(seats, shifts, up);
   updatePill(upTeam, up, shifts[upTeam?.name ?? ""] ?? 0);
   ensurePill();
@@ -275,7 +275,7 @@ function applyOwn(lineup: Lineup) {
   const decided = match!.adtTeams?.decided ?? decidedTeam(match!, lineup);
   const panelUp = (match!.gameWinner ?? -1) >= 0;
   askUndo();
-  writeStyles(decided ? undefined : upTeam);
+  writeStyles(decided ? undefined : lineup.teams);
   dressOwnCards(seats, up, lineup);
   updateOwnPill(lineup, upTeam, up, decided);
   ensurePill();
@@ -310,14 +310,34 @@ function askUndo() {
   });
 }
 
-function writeStyles(upTeam?: Coloured) {
+/**
+ * The site's highlight on whoever is up, in that player's team colours, read
+ * off the cards rather than off who the game data says is up. The site moves
+ * its highlight a moment before the game data arrives, and a rule keyed on
+ * the team that was up painted the next card in the last team's colours for a
+ * frame or two.
+ *   - A highlighted team card (the wide and sidebar layouts, cricket's cells)
+ *     takes its own colours, which the dressing keeps on every card.
+ *   - The stacked and phone layouts highlight a band round all the cards; it
+ *     takes the team of the one big card in it, whoever is up.
+ * A seat on no team keeps the site's highlight, or Colors'.
+ */
+function writeStyles(teams?: readonly Coloured[]) {
   const rules = [ BASE_CSS ];
-  if (upTeam) {
+  if (teams?.length) {
+    const highlight = `:is(${anyOf(SELECTORS.match.activeHighlight)})`;
     // `html body` outranks Colors' `#root main …` rule, which has the same !important.
     rules.push(`
-      html body #root main ${anyOf(SELECTORS.match.activeHighlight)} {
-        background-image: linear-gradient(to bottom right, ${upTeam.colour.from} 0%, ${upTeam.colour.to} 100%) !important;
+      html body #root main [${CARD_ATTR}]${highlight},
+      html body #root main [${CARD_ATTR}] ${highlight} {
+        background-image: linear-gradient(to bottom right, var(--adt-team-from) 0%, var(--adt-team-to) 100%) !important;
       }`);
+    for (const team of teams) {
+      rules.push(`
+      html body #root main ${highlight}:has(div.\\@container[${CARD_ATTR}="${CSS.escape(team.name)}"]) {
+        background-image: linear-gradient(to bottom right, ${team.colour.from} 0%, ${team.colour.to} 100%) !important;
+      }`);
+    }
   }
   const css = rules.join("\n");
   if (css === lastStyles) return;
@@ -560,7 +580,8 @@ function handover(upTeam: Coloured | undefined, up: number) {
   lastTurn = turn;
   if (!upTeam || first) return;
 
-  for (const card of document.querySelectorAll<HTMLElement>(`[${CARD_ATTR}="${CSS.escape(upTeam.name)}"]`)) {
+  // The cards of whoever is up: with own scores, not their teammates'.
+  for (const card of document.querySelectorAll<HTMLElement>(`[${CARD_ATTR}="${CSS.escape(upTeam.name)}"]:not([${WAITING_ATTR}])`)) {
     card.removeAttribute(ARRIVE_ATTR);
     // a layout read between the two, so the animation starts again
     card.getBoundingClientRect();
