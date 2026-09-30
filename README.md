@@ -75,15 +75,19 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - Your own entry is removed, so the players are the guests you add rather than the account that opened the lobby
   - Anyone who joins on their own board is moved onto yours
   - Only runs in **private lobbies that you host**
-- **Teams**: Two or more players share one score and take turns at your board
+- **Teams**: Play in teams, on a shared score or each on their own
   - **Add Team**, beside *Add Player* and *Add Bot*, opens a drawer like the site's own: the team's name, its colour and its players in throwing order. Pick saved players or type new names, and drag them into order. Teams you have added before are one tap away under **Saved teams**
+  - **Two formats**, chosen in the drawer: *Shared score* makes the team one player on your board, and its players take turns on that score. *Own scores* keeps everyone on their own score, and a leg counts for the team of whoever checks out: the first team to the lobby's "First to N legs" wins the match. The first team in a lobby sets its format
+  - With own scores, a team can mix guests, people playing on their own board and bots (bots in X01 and Cricket). Pick seats already in the lobby or type new names, and the seats are kept in turn order so the teams alternate. Own scores play legs, not sets, and only the browser you host from shows the teams
+  - When an own-score team wins, the pill says so and Next Leg is held back. The site still counts the match per player, so it's only saved to your history when the winning leg also took one player to the target
+  - **Partner rule** (settings, own scores, X01, two teams): nobody may check out while their partner has more left than both opponents together. A checkout that breaks it counts as a bust, and the pill warns before the visit
   - The colours are the card colours from **Colors**: raspberry, its nine pairs, or a pair of your own. A colour another team in the lobby already has is greyed out, and a saved team whose colour is taken joins in the next free one
   - In the lobby, a team's row wears its colour and lists its players in order, and the pencil beside it edits the team
   - In the match, the card of the team that's up is filled with the team's colour instead of raspberry, and a waiting team's name tag carries its colour. Each card lists the team's players, the one throwing filled white. A pill under the turn bar says who's up ("TOM to throw"), and fades to the next team's colour at each handover
   - Every new leg starts with each team's next player. The order is worked out from the site's own set, leg and round, so a reload or an undo doesn't throw it off. **Tap a name** in a team's card to make that player the one who's up (or next), and the order carries on from them
   - The **Caller** calls the player whose turn it is if it has a sound for their name, then the team's name, then `next_player`
   - Teams are remembered by name: any guest of yours with a saved team's name plays as that team, in any lobby
-  - Each team is a guest on your board, so teams play in **lobbies you host**, and only the browser you host from shows them. Bots can play against a team but not in one, since the server throws every visit of a bot's seat
+  - With a shared score, each team is a guest on your board, so teams play in **lobbies you host**, and only the browser you host from shows them. Bots can play against a team but not in one, since the server throws every visit of a bot's seat
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything
   - Autodarts' own QR button occupies the same corner, so it is hidden while the pinned code is up and comes back the moment you close it
   - The ✕ underneath hides the code for the rest of that lobby; from then on the site's own button is there if you want it
@@ -268,7 +272,7 @@ You can assign sounds to be played based on these triggers:
   - `bot`: Plays instead of player name when the player is a CPU/bot player
   - `bulloff`: Once when the bull-off begins, not again as the throw passes between players
   - `playername`: Player name sounds play automatically when it's their turn. Example: If your name is `creazy.eth` on Autodarts, simply use `creazy.eth` (supports spaces or `_` like `player_name` or `player name`)
-    - In a **Teams** match, the name of the team's player whose turn it is works the same way, and the team's name is the fallback
+    - In a **Teams** match, the name of the team's player whose turn it is works the same way, and the team's name is the fallback. With own scores, everyone is called by their own name, and the leg that wins a team the match calls `matchshot` and the team's name
 - **Board Status**:
   - `board_started`: When the board has started
   - `board_stopped`: When the board has stopped or disconnected

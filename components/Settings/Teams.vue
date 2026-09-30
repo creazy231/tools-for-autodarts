@@ -5,7 +5,7 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Teams share one score and take turns on it, like steel-tip doubles. Add one in a lobby you host with <b class="text-[var(--ad-text-primary)]">Add Team</b>, next to Add Player and Add Bot. In the match, the team that's up takes its colour, and a pill under the turn bar says whose turn it is. When someone else steps up, tap their name on the team's card.
+          Play in teams two ways. With a shared score, a team is one player on your board and its players take turns on it, like steel-tip doubles. When someone else steps up, tap their name on the team's card. With own scores, everyone keeps their own score and a leg counts for their team. Add teams in a lobby you host with <b class="text-[var(--ad-text-primary)]">Add Team</b>, next to Add Player and Add Bot.
         </p>
 
         <section class="mb-10">
@@ -42,7 +42,7 @@
                 <span :style="{ backgroundImage: gradient(saved[entry.index].colour) }" class="block h-6 w-9 rounded-[var(--ad-radius-sm)] ring-1 ring-inset ring-white/15" />
               </template>
               <template #meta>
-                {{ saved[entry.index].players.join(" ▸ ") }}
+                <span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide">{{ saved[entry.index].format === "own" ? "OWN SCORES" : "SHARED SCORE" }}</span>{{ saved[entry.index].players.join(" ▸ ") }}
               </template>
             </LibraryItem>
           </template>
@@ -64,7 +64,7 @@
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play in teams that share a score, like steel-tip doubles. Add them in the lobby, and the match shows whose turn it is in each team's colours.
+            Play in teams: on a shared score, or each on their own. Add them in the lobby, and the match shows whose turn it is in each team's colours.
           </p>
         </div>
         <div class="flex">
