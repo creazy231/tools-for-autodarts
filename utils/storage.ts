@@ -3,7 +3,7 @@ import type { BoardStatus } from "@/utils/types";
 import { defaultColors, normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
 import { defaultInstantReplay, normalizeInstantReplay } from "@/utils/instant-replay";
-import { type SavedTeam, type ShiftStore, normalizeTeams } from "@/utils/teams";
+import { type LineupStore, type SavedTeam, type ShiftStore, normalizeTeams } from "@/utils/teams";
 import type { GameMode } from "@/utils/game-modes";
 
 export interface IConfig {
@@ -121,6 +121,8 @@ export interface IConfig {
     enabled: boolean;
     /** Most recently used first. */
     saved: SavedTeam[];
+    /** Own scores' e-darts partner rule; see utils/teams.ts. */
+    partnerRule: boolean;
   };
 
   animations: {
@@ -550,6 +552,7 @@ export const defaultConfig: IConfig = {
   teams: {
     enabled: false,
     saved: [],
+    partnerRule: false,
   },
 
   boardView: {
@@ -1077,6 +1080,18 @@ export const AutodartsToolsStreamingModeStatus: WxtStorageItem<boolean, any> = s
  */
 export const AutodartsToolsTeamShifts: WxtStorageItem<ShiftStore, any> = storage.defineItem(
   "local:teams-shifts",
+  {
+    defaultValue: {},
+  },
+);
+
+/**
+ * Own-score teams: per lobby id (the match's id too), which seats play for
+ * which team (utils/teams.ts). Its own item rather than a setting: it is about
+ * a lobby on this browser, and lives a day.
+ */
+export const AutodartsToolsTeamLineups: WxtStorageItem<LineupStore, any> = storage.defineItem(
+  "local:teams-lineups",
   {
     defaultValue: {},
   },

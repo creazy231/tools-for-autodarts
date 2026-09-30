@@ -2,30 +2,49 @@
  * Teams: which seats of a lobby or match are teams, whose turn it is inside
  * one, and the rules a new team has to meet.
  *
- * A team is one guest seat on the host's board, named after the team, and its
- * players take turns on that seat's score, like steel-tip doubles. The site
- * knows nothing about the players: it scores the seat. Everything here is what
- * the extension adds on top, and all of it is pure (no DOM, no storage, no
+ * Two formats. With a shared score, a team is one guest seat on the host's
+ * board, named after the team, and its players take turns on that seat's score,
+ * like steel-tip doubles. With own scores, every player is a seat of their own
+ * (a guest, someone on their own board, or a bot), and a team is a group of
+ * seats, recorded by seat id in the lobby's lineup: a leg counts for the team of
+ * whoever checks out. The site knows nothing about either: everything here is
+ * what the extension adds on top, and all of it is pure (no DOM, no storage, no
  * extension APIs), so it runs under tsx. The lobby, the match screen, the
  * Caller and the settings all build from here.
  *
- * Saved teams are keyed by name. A guest the host adds under a saved team's
- * name, in any lobby or match, is that team, which is what makes a team
- * outlast a reload, a rematch and a new lobby.
+ * Saved teams are keyed by name. A guest the host adds under a saved shared
+ * team's name, in any lobby or match, is that team; a saved own-score team
+ * remembers how each of its players joined, so the drawer can seat them again.
  */
 
 import type { ColorScheme } from "@/utils/storage";
 
 import { CARD_PRESETS, type ColorPreset, SITE_CARD } from "@/utils/colors";
 
-/** A team as it is saved: its seat's name, its players in throwing order, and its colour. */
+export type TeamFormat = "shared" | "own";
+
+/** How an own-score team's player joined, so a saved team can bring them back. */
+export interface TeamMember {
+  name: string;
+  kind: "guest" | "account" | "bot";
+  /** An account's user id. */
+  userId?: string;
+  /** A bot's level, as the site's cpuPPR. */
+  ppr?: number;
+}
+
+/** A team as it is saved: its name, its players in throwing order, its colour and its format. */
 export interface SavedTeam {
-  /** The guest seat's name, as the site shows it: trimmed and upper case. */
+  /** The team's name, as the site shows a name: trimmed and upper case. For a shared score, its seat's name. */
   name: string;
   /** In throwing order, upper case, each once. */
   players: string[];
-  /** The gradient its card turns while it is up: a Colors scheme. */
+  /** The gradient its cards turn while it is up: a Colors scheme. */
   colour: ColorScheme;
+  /** "shared" for every team saved before own scores existed. */
+  format: TeamFormat;
+  /** Own scores only: one per player, in the same order. */
+  members?: TeamMember[];
 }
 
 /** `IConfig.teams`. */
@@ -33,6 +52,8 @@ export interface TeamsConfig {
   enabled: boolean;
   /** Most recently used first. */
   saved: SavedTeam[];
+  /** Own scores' e-darts partner rule; see {@link partnerRuleBreach}. */
+  partnerRule: boolean;
 }
 
 /** Per team name: how far tap-to-correct has moved its order on. */
@@ -43,10 +64,58 @@ export type ShiftStore = Record<string, { at: number; shifts: TeamShifts }>;
 
 /** The fields of a lobby or match seat that say whose it is. */
 export interface SeatLike {
+  /** The seat's id, the same in the lobby and the match started from it. */
+  id?: string;
+  /** The seat in the lobby's order; `players` itself is put in throwing order every leg. */
+  index?: number;
   name?: string | null;
   userId?: string | null;
   hostId?: string | null;
   cpuPPR?: number | null;
+}
+
+/** An own-score team as a lobby and its match know it: its seats, in throwing order. */
+export interface LineupTeam {
+  name: string;
+  colour: ColorScheme;
+  seatIds: string[];
+}
+
+/** A lobby's own-score teams, in the order they were added. */
+export interface Lineup {
+  at: number;
+  teams: LineupTeam[];
+}
+
+/** Per lobby id, which is also its match's id. */
+export type LineupStore = Record<string, Lineup>;
+
+/** A place in an own-score team, before the lobby has seated everyone. */
+export type SeatSlot =
+  | { kind: "seat"; seatId: string }
+  | { kind: "guest"; name: string }
+  | { kind: "bot"; name: string; ppr: number }
+  | { kind: "missing"; name: string };
+
+/** A player picked in the drawer: a seat already in the lobby, or a name to add as a guest. */
+export type OwnPick = { seatId: string; name: string } | { guest: string };
+
+export interface OwnDraft {
+  name: string;
+  colour: ColorScheme;
+  /** In throwing order. */
+  picks: readonly OwnPick[];
+}
+
+export interface OwnContext {
+  /** Every seat's name in the lobby, which a new guest must not take. */
+  seatNames: readonly string[];
+  /** The seats on the lobby's other own-score teams. */
+  takenSeats: ReadonlySet<string>;
+  /** The lobby's other own-score teams' names. */
+  teamNames: readonly string[];
+  /** Seats the lobby has left. */
+  freeSeats: number;
 }
 
 /** The part of the match the throwing order is worked out from. */
@@ -150,6 +219,28 @@ export function normalizeColour(saved: unknown): ColorScheme {
   return presetScheme(known ?? TEAM_COLOURS[0]);
 }
 
+/** Members that line up with the players one for one, or none: a saved team's record of how each joined. */
+function normalizeMembers(raw: unknown, players: readonly string[]): TeamMember[] | undefined {
+  if (!Array.isArray(raw) || raw.length !== players.length) return undefined;
+  const members: TeamMember[] = [];
+  for (const [ index, entry ] of raw.entries()) {
+    const name = normalizeName(entry?.name);
+    const kind = entry?.kind;
+    if (name !== players[index] || (kind !== "guest" && kind !== "account" && kind !== "bot")) return undefined;
+    if (kind === "account") {
+      if (typeof entry.userId !== "string" || !entry.userId) return undefined;
+      members.push({ name, kind, userId: entry.userId });
+    } else if (kind === "bot") {
+      const ppr = Math.round(Number(entry.ppr));
+      if (!Number.isFinite(ppr) || ppr <= 0) return undefined;
+      members.push({ name, kind, ppr });
+    } else {
+      members.push({ name, kind });
+    }
+  }
+  return members;
+}
+
 /** Settings from anywhere, in the current shape: broken entries dropped, the rest cleaned. */
 export function normalizeTeams(saved: unknown): TeamsConfig {
   const value = (saved && typeof saved === "object" ? saved : {}) as Record<string, any>;
@@ -159,9 +250,18 @@ export function normalizeTeams(saved: unknown): TeamsConfig {
     if (!name || teams.some(team => team.name === name)) continue;
     const players = uniqueNames(Array.isArray(entry?.players) ? entry.players : []).slice(0, MAX_PLAYERS);
     if (players.length < MIN_PLAYERS) continue;
-    teams.push({ name, players, colour: normalizeColour(entry?.colour) });
+    const format: TeamFormat = entry?.format === "own" ? "own" : "shared";
+    const team: SavedTeam = { name, players, colour: normalizeColour(entry?.colour), format };
+    const members = format === "own" ? normalizeMembers(entry?.members, players) : undefined;
+    if (members) team.members = members;
+    teams.push(team);
   }
-  return { enabled: Boolean(value.enabled), saved: teams };
+  return { enabled: Boolean(value.enabled), saved: teams, partnerRule: Boolean(value.partnerRule) };
+}
+
+/** The saved teams that share a score: the ones a guest seat can be. */
+export function sharedTeams(saved: readonly SavedTeam[]): SavedTeam[] {
+  return saved.filter(team => team.format !== "own");
 }
 
 /** The saved team a seat of that name is, if any. */
@@ -179,12 +279,12 @@ export function isHostedGuest(seat: SeatLike, hostId: string | null | undefined)
   return Boolean(hostId) && !seat.userId && !seat.cpuPPR && seat.hostId === hostId;
 }
 
-/** The seats that are teams, by their index in `players`. */
+/** The seats that are shared-score teams, by their index in `players`. */
 export function teamSeats(players: readonly SeatLike[], teams: readonly SavedTeam[], hostId: string | null | undefined): Map<number, SavedTeam> {
   const seats = new Map<number, SavedTeam>();
   players.forEach((seat, index) => {
     if (!isHostedGuest(seat, hostId)) return;
-    const team = findTeam(teams, seat.name);
+    const team = findTeam(sharedTeams(teams), seat.name);
     if (team) seats.set(index, team);
   });
   return seats;
@@ -324,7 +424,16 @@ export function checkTeam(draft: TeamDraft, context: DraftContext): string | und
 /** A team as plain data: its fields copied out of whatever reactive proxy holds them. */
 function plainTeam(team: SavedTeam): SavedTeam {
   const { preset, from, to } = team.colour;
-  return { name: team.name, players: [ ...team.players ], colour: { preset, from, to } };
+  const plain: SavedTeam = { name: team.name, players: [ ...team.players ], colour: { preset, from, to }, format: team.format === "own" ? "own" : "shared" };
+  if (team.members) {
+    plain.members = team.members.map(({ name, kind, userId, ppr }) => {
+      const member: TeamMember = { name, kind };
+      if (userId) member.userId = userId;
+      if (ppr) member.ppr = ppr;
+      return member;
+    });
+  }
+  return plain;
 }
 
 /**
@@ -335,6 +444,182 @@ function plainTeam(team: SavedTeam): SavedTeam {
  */
 export function rememberTeam(saved: readonly SavedTeam[], team: SavedTeam): SavedTeam[] {
   return [ plainTeam(team), ...saved.filter(other => other.name !== team.name).map(plainTeam) ];
+}
+
+function plainLineupTeam(team: LineupTeam): LineupTeam {
+  const { preset, from, to } = team.colour;
+  return { name: team.name, colour: { preset, from, to }, seatIds: [ ...team.seatIds ] };
+}
+
+/**
+ * A lobby's own-score teams written into the store, as plain data. Teams with
+ * no seats are dropped, a lobby with no teams has no lineup, and entries older
+ * than a day go.
+ */
+export function withLineup(store: LineupStore | undefined, lobbyId: string, teams: readonly LineupTeam[], now: number): LineupStore {
+  const next: LineupStore = {};
+  for (const [ id, entry ] of Object.entries(store ?? {})) {
+    if (id !== lobbyId && entry && now - entry.at < SHIFT_TTL_MS) next[id] = entry;
+  }
+  const kept = teams.filter(team => team.seatIds.length).map(plainLineupTeam);
+  if (kept.length) next[lobbyId] = { at: now, teams: kept };
+  return next;
+}
+
+/** A lobby's (or its match's) lineup, by its own id: never the page's, since game data is shared between tabs. */
+export function lineupOf(store: LineupStore | undefined, id: string | undefined): Lineup | undefined {
+  return id ? store?.[id] : undefined;
+}
+
+/** The teams with the seats that left taken out, and the teams with none left dropped. */
+export function pruneLineup(teams: readonly LineupTeam[], seatIds: readonly string[]): LineupTeam[] {
+  const present = new Set(seatIds);
+  return teams
+    .map(team => ({ ...team, seatIds: team.seatIds.filter(id => present.has(id)) }))
+    .filter(team => team.seatIds.length);
+}
+
+/** The format a lobby's teams have, or none while it has no team: the first team sets it. */
+export function lobbyFormat(players: readonly SeatLike[], lineup: Lineup | undefined, saved: readonly SavedTeam[], hostId: string | null | undefined): TeamFormat | undefined {
+  if (lineup?.teams.length) return "own";
+  return teamSeats(players, saved, hostId).size ? "shared" : undefined;
+}
+
+/**
+ * The seats in turn order: grouped by team as they stand, then one of each
+ * team in turn, starting with the first seat's team. A seat on no team is a
+ * team of one, and a team that has run out of seats drops out of the round.
+ */
+export function interleave(seatIds: readonly string[], teamOf: (seatId: string) => string | undefined): string[] {
+  const groups: string[][] = [];
+  const byTeam = new Map<string, string[]>();
+  for (const id of seatIds) {
+    const team = teamOf(id);
+    if (team === undefined) {
+      groups.push([ id ]);
+      continue;
+    }
+    let group = byTeam.get(team);
+    if (!group) {
+      group = [];
+      byTeam.set(team, group);
+      groups.push(group);
+    }
+    group.push(id);
+  }
+  const out: string[] = [];
+  for (let round = 0; out.length < seatIds.length; round++) {
+    for (const group of groups) {
+      if (round < group.length) out.push(group[round]);
+    }
+  }
+  return out;
+}
+
+/** The site's `move/to-index` requests that turn one order into the other, each applied to the order the one before left. */
+export function seatMoves(current: readonly string[], target: readonly string[]): { index: number; toIndex: number }[] {
+  const order = [ ...current ];
+  const moves: { index: number; toIndex: number }[] = [];
+  target.forEach((id, toIndex) => {
+    const index = order.indexOf(id);
+    if (index < 0 || index === toIndex) return;
+    order.splice(toIndex, 0, ...order.splice(index, 1));
+    moves.push({ index, toIndex });
+  });
+  return moves;
+}
+
+/** How a seat joined: a bot (at its level), an account, or a guest. */
+export function memberOf(seat: SeatLike): TeamMember {
+  const name = normalizeName(seat.name);
+  if (seat.cpuPPR) return { name, kind: "bot", ppr: seat.cpuPPR };
+  if (seat.userId) return { name, kind: "account", userId: seat.userId };
+  return { name, kind: "guest" };
+}
+
+/**
+ * How a saved own-score team gets back into a lobby, one slot per player in
+ * throwing order: a seat that is already there (and on no other team, `taken`),
+ * a guest or a bot to add, or a signed-in player who isn't in the lobby, since
+ * they join from their own board.
+ */
+export function rejoinSlots(team: SavedTeam, players: readonly SeatLike[], hostId: string | null | undefined, taken: ReadonlySet<string>): SeatSlot[] {
+  const members = team.members ?? team.players.map((name): TeamMember => ({ name, kind: "guest" }));
+  const used = new Set(taken);
+  const claim = (fits: (seat: SeatLike) => boolean): string | undefined => {
+    const seat = players.find(candidate => candidate.id && !used.has(candidate.id) && fits(candidate));
+    if (seat?.id) used.add(seat.id);
+    return seat?.id;
+  };
+  return members.map((member): SeatSlot => {
+    if (member.kind === "account") {
+      const seatId = claim(seat => Boolean(member.userId) && seat.userId === member.userId);
+      return seatId ? { kind: "seat", seatId } : { kind: "missing", name: member.name };
+    }
+    if (member.kind === "bot") {
+      const seatId = claim(seat => Boolean(seat.cpuPPR) && seat.cpuPPR === member.ppr);
+      return seatId ? { kind: "seat", seatId } : { kind: "bot", name: member.name, ppr: member.ppr ?? 60 };
+    }
+    const seatId = claim(seat => isHostedGuest(seat, hostId) && normalizeName(seat.name) === member.name);
+    return seatId ? { kind: "seat", seatId } : { kind: "guest", name: member.name };
+  });
+}
+
+/**
+ * The seat each slot ended up with once the lobby has seated the new ones, or
+ * `undefined` where nobody was: a guest found by its name, a bot by its level,
+ * each among the seats that weren't there before (`known`) and each once.
+ */
+export function resolveSlots(slots: readonly SeatSlot[], known: ReadonlySet<string>, players: readonly SeatLike[]): (string | undefined)[] {
+  const fresh = players.filter(seat => seat.id && !known.has(seat.id));
+  const used = new Set<string>();
+  const take = (fits: (seat: SeatLike) => boolean): string | undefined => {
+    const seat = fresh.find(candidate => !used.has(candidate.id!) && fits(candidate));
+    if (seat?.id) used.add(seat.id);
+    return seat?.id;
+  };
+  return slots.map((slot) => {
+    if (slot.kind === "seat") return slot.seatId;
+    if (slot.kind === "guest") return take(seat => !seat.userId && !seat.cpuPPR && normalizeName(seat.name) === slot.name);
+    if (slot.kind === "bot") return take(seat => seat.cpuPPR === slot.ppr);
+    return undefined;
+  });
+}
+
+/** What stops an own-score team from being added, in words for the drawer, or nothing. */
+export function checkOwnTeam(draft: OwnDraft, context: OwnContext): string | undefined {
+  const name = normalizeName(draft.name);
+  if (!name) return "Give the team a name.";
+  if (name.length > MAX_NAME_LENGTH) return `A team name can be ${MAX_NAME_LENGTH} characters at most.`;
+  if (uniqueNames(context.teamNames).includes(name)) return `There's already a team called ${name} in this lobby.`;
+  if (draft.picks.length < MIN_PLAYERS) return `A team needs at least ${MIN_PLAYERS} players.`;
+  if (draft.picks.length > MAX_PLAYERS) return `A team can have ${MAX_PLAYERS} players at most.`;
+
+  const seats = draft.picks.filter((pick): pick is { seatId: string; name: string } => "seatId" in pick);
+  const onAnother = seats.find(pick => context.takenSeats.has(pick.seatId));
+  if (onAnother) return `${normalizeName(onAnother.name)} is already on another team.`;
+  const guests = draft.picks.filter((pick): pick is { guest: string } => "guest" in pick).map(pick => normalizeName(pick.guest));
+  if (new Set(guests).size !== guests.length || new Set(seats.map(pick => pick.seatId)).size !== seats.length) return "Each player can only be in the team once.";
+  const seated = new Set(uniqueNames(context.seatNames));
+  const clash = guests.find(guest => seated.has(guest));
+  if (clash) return `There's already a player called ${clash} in this lobby. Pick them under In this lobby.`;
+  if (guests.length > context.freeSeats) return `The lobby has room for ${context.freeSeats} more ${context.freeSeats === 1 ? "player" : "players"}.`;
+  return undefined;
+}
+
+/** "A", "A and B", "A, B and C". */
+export function joinNames(names: readonly string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/** The note under the lobby's players when the teams aren't the same size, or "". */
+export function unevenText(teams: readonly LineupTeam[]): string {
+  const sizes = teams.map(team => team.seatIds.length);
+  if (teams.length < 2 || sizes.every(size => size === sizes[0])) return "";
+  const [ first, ...rest ] = teams;
+  const firstPart = `${first.name} has ${first.seatIds.length} ${first.seatIds.length === 1 ? "player" : "players"}`;
+  return `${joinNames([ firstPart, ...rest.map(team => `${team.name} ${team.seatIds.length}`) ])}: the bigger team throws more often each round.`;
 }
 
 /** "TOM to throw", in the site's own words for its language (Killer's `game.killer.toThrow`). */

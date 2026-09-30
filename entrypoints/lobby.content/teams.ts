@@ -30,7 +30,7 @@ import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
 import { addGuest, lobbyIdFromUrl } from "@/utils/lobby-guests";
-import { checkTeam, colourTaken, findTeam, isHostedGuest, normalizeName, normalizeTeams, rememberTeam, uniqueNames, withFreeColour } from "@/utils/teams";
+import { checkTeam, colourTaken, findTeam, isHostedGuest, normalizeName, normalizeTeams, rememberTeam, sharedTeams, uniqueNames, withFreeColour } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const STYLE_ID = "teams-lobby";
@@ -242,7 +242,7 @@ function teamsInLobby(): Map<string, SavedTeam> {
   const out = new Map<string, SavedTeam>();
   for (const seat of lobby?.players ?? []) {
     if (!isHostedGuest(seat, hostId)) continue;
-    const team = findTeam(saved, seat.name);
+    const team = findTeam(sharedTeams(saved), seat.name);
     if (team) out.set(team.name, team);
   }
   return out;
@@ -391,7 +391,7 @@ function closeDrawer() {
 async function saveTeam(team: SavedTeam) {
   const config = await AutodartsToolsConfig.getValue();
   const current = normalizeTeams(config.teams);
-  await AutodartsToolsConfig.setValue({ ...config, teams: { enabled: current.enabled, saved: rememberTeam(current.saved, team) } });
+  await AutodartsToolsConfig.setValue({ ...config, teams: { ...current, saved: rememberTeam(current.saved, team) } });
 }
 
 async function submitDraft(draft: TeamDraft): Promise<string | undefined> {
@@ -405,7 +405,7 @@ async function submitDraft(draft: TeamDraft): Promise<string | undefined> {
   // The picker greys out the presets other teams have; a custom pair can only be caught here.
   if (colourTaken(draft.colour, drawer.takenColours)) return "Another team in this lobby already has that colour.";
 
-  const team: SavedTeam = { name: editing?.name ?? normalizeName(draft.name), players: uniqueNames(draft.players), colour: { ...draft.colour } };
+  const team: SavedTeam = { name: editing?.name ?? normalizeName(draft.name), players: uniqueNames(draft.players), colour: { ...draft.colour }, format: "shared" };
   await saveTeam(team);
   if (!editing && !await addGuest(team.name, "Teams")) {
     return "The team is saved, but autodarts didn't add it to the lobby. Add it again from Saved teams.";
