@@ -28,9 +28,9 @@ import { SELECTORS, anyOf, qs, qsa } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { GUEST_KEY } from "@/utils/guest-players";
+import { GUEST_KEY, forgetGuestPlayers } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lineupPartnerRule, lobbyFormat, memberLabel, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, isHostedGuest, joinNames, lineupOf, lineupPartnerRule, lobbyFormat, memberLabel, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
@@ -145,9 +145,17 @@ export interface DrawerState {
   seats: SeatChoice[];
   /** The seats of the own-score team being edited, in order. */
   editingSeats: string[];
+  /** The offered names a ✕ can delete: those no saved team has. */
+  forgettable: string[];
+  /** A saved team that can't join as the lobby stands → why. */
+  savedProblems: Record<string, string>;
+  /** Whether this lobby's game has bots. */
+  botsOk: boolean;
   submit: (draft: TeamDraft) => Promise<string | undefined>;
   submitOwn: (draft: OwnDraft) => Promise<string | undefined>;
   addSaved: (team: SavedTeam) => Promise<string | undefined>;
+  forget: (name: string) => Promise<void>;
+  deleteSaved: (team: SavedTeam) => Promise<void>;
   close: () => void;
 }
 
@@ -195,9 +203,14 @@ const drawer = reactive<DrawerState>({
   legs: 0,
   seats: [],
   editingSeats: [],
+  forgettable: [],
+  savedProblems: {},
+  botsOk: true,
   submit: submitDraft,
   submitOwn: submitOwnTeam,
   addSaved: addSavedTeam,
+  forget: forgetName,
+  deleteSaved: deleteSavedTeam,
   close: closeDrawer,
 });
 
@@ -701,7 +714,7 @@ function siteGuests(): string[] {
   }
 }
 
-function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): Omit<DrawerState, "submit" | "addSaved" | "close" | "submitOwn"> {
+function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): Omit<DrawerState, "submit" | "addSaved" | "close" | "submitOwn" | "forget" | "deleteSaved"> {
   const lobbyTeams = [ ...teamsInLobby().values() ].filter(team => team.name !== editing?.name);
   const guests = uniqueNames((lobby?.players ?? []).filter(seat => !seat.userId && !seat.cpuPPR).map(seat => seat.name));
   const playerTeams: Record<string, string> = {};
@@ -712,15 +725,31 @@ function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): 
   const seatTeam = new Map<string, string>();
   for (const team of ownTeams) for (const id of team.seatIds) seatTeam.set(id, team.name);
   const inLobby = (team: SavedTeam) => team.format === "own" ? Boolean(lineup?.teams.some(other => other.name === team.name)) : guests.includes(team.name);
+  const seatNameTeams: Record<string, string> = {};
+  for (const team of ownTeams) {
+    for (const id of team.seatIds) {
+      const seat = lobby?.players?.find(candidate => candidate.id === id);
+      if (seat) seatNameTeams[normalizeName(seat.name)] = team.name;
+    }
+  }
+  const offered = uniqueNames([ ...savedPlayers, ...siteGuests(), ...saved.flatMap(team => team.players) ]);
+  // A lobby with sets offers no own-score team (utils/teams.ts `rejoinProblem`).
+  const savedTeams = editing ? [] : saved.filter(team => (!format || team.format === format) && !(lobby?.sets && team.format === "own") && !inLobby(team));
+  const savedProblems: Record<string, string> = {};
+  for (const team of savedTeams) {
+    const problem = savedTeamProblem(team, { playerTeams, seatTeams: seatNameTeams });
+    if (problem) savedProblems[team.name] = problem;
+  }
   return {
     editing,
     guestNames: guests.filter(name => name !== editing?.name),
     reservedNames: uniqueNames([ ...guests, ...saved.map(team => team.name) ]),
     playerTeams,
     takenColours: format === "own" ? ownTeams.map(team => team.colour) : lobbyTeams.map(team => team.colour),
-    offered: uniqueNames([ ...savedPlayers, ...siteGuests(), ...saved.flatMap(team => team.players) ]),
-    // A lobby with sets offers no own-score team (utils/teams.ts `rejoinProblem`).
-    savedTeams: editing ? [] : saved.filter(team => (!format || team.format === format) && !(lobby?.sets && team.format === "own") && !inLobby(team)),
+    offered,
+    forgettable: forgettableNames(offered, saved),
+    savedTeams,
+    savedProblems,
     full: isFull(),
     lockedFormat: editing ? editing.format : format,
     formatTeam: format === "own" ? (lineup?.teams[0]?.name ?? "") : ([ ...teamsInLobby().keys() ][0] ?? ""),
@@ -728,6 +757,7 @@ function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): 
     legs: lobby?.legs ?? 0,
     seats: (lobby?.players ?? []).filter(seat => seat.id).map(seat => ({ id: seat.id!, name: normalizeName(seat.name), kind: memberOf(seat).kind, team: seatTeam.get(seat.id!) })),
     editingSeats,
+    botsOk: hasBots(lobby?.variant),
   };
 }
 
@@ -768,6 +798,31 @@ function closeDrawer() {
   if (opening) closedWhileOpening = true;
   drawerUi?.remove();
   drawerUi = null;
+}
+
+/** A name out of the drawer's offer: out of Saved players and the site's own recent guests, as the Saved players panel deletes one, so no sync brings it back. */
+async function forgetName(name: string) {
+  const config = await AutodartsToolsConfig.getValue();
+  const players = (config.recentLocalPlayers?.players ?? []).filter(player => normalizeName(player) !== name);
+  await AutodartsToolsConfig.setValue({ ...config, recentLocalPlayers: { ...config.recentLocalPlayers, players } });
+  forgetGuestPlayers([ name ]);
+  savedPlayers = players;
+  refreshDrawer();
+}
+
+/** A saved team deleted from the drawer, as from Teams' settings panel. */
+async function deleteSavedTeam(team: SavedTeam) {
+  const config = await AutodartsToolsConfig.getValue();
+  const current = normalizeTeams(config.teams);
+  const remaining = current.saved.filter(other => other.name !== team.name);
+  await AutodartsToolsConfig.setValue({ ...config, teams: { ...current, saved: remaining } });
+  saved = remaining;
+  refreshDrawer();
+}
+
+/** The open drawer, redrawn from the lobby as it now stands. */
+function refreshDrawer() {
+  if (drawerUi || opening) Object.assign(drawer, drawerContext(drawer.editing, drawer.editingSeats));
 }
 
 async function saveTeam(team: SavedTeam) {

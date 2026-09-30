@@ -46,7 +46,10 @@ export async function addGuest(name: string, feature: string): Promise<boolean> 
   }
 }
 
-/** Add a bot at a level (the site's cpuPPR) to the lobby on screen, with the site's own bot request. */
+/** Where the site's Bot Settings keep the play speed it last used. */
+const BOT_SPEED_KEY = "autodarts-bot-speed";
+
+/** Add a bot at a level (the site's cpuPPR) to the lobby on screen, with the site's own bot request, at the speed its dialog last used. */
 export async function addBot(name: string, ppr: number, feature: string): Promise<boolean> {
   const lobbyId = lobbyIdFromUrl();
   if (!lobbyId) return false;
@@ -54,7 +57,7 @@ export async function addBot(name: string, ppr: number, feature: string): Promis
     const response = await fetchWithAuth(`https://api.autodarts.com/gs/v0/lobbies/${lobbyId}/players`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, userId: null, cpuPPR: ppr }),
+      body: JSON.stringify({ name, userId: null, cpuPPR: ppr, cpuSpeed: localStorage.getItem(BOT_SPEED_KEY) || "realistic" }),
     });
     if (!response.ok) console.error(`Autodarts Tools: ${feature} - Failed to add a bot`, response.status, response.statusText);
     return response.ok;

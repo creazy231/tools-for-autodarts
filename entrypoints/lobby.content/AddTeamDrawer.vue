@@ -43,6 +43,27 @@
       </header>
 
       <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-6 pt-3">
+        <!-- First: re-adding a team that has played before is one tap, as the site's Add Player drawer puts recent players first. -->
+        <section v-if="state.savedTeams.length">
+          <h3 class="mb-2 text-sm font-bold">
+            Saved teams
+          </h3>
+          <div class="flex flex-col gap-2.5">
+            <div v-for="team in state.savedTeams" :key="team.name" class="flex items-center gap-2 rounded-2xl bg-white/10 p-3">
+              <span :style="{ backgroundImage: gradient(team.colour) }" class="mr-1 h-7 w-10 shrink-0 rounded-lg ring-1 ring-inset ring-white/15" />
+              <span class="min-w-0 flex-1">
+                <span class="block truncate font-[family-name:var(--ad-font-display)] text-lg uppercase leading-none">{{ team.name }}</span>
+                <span class="block truncate text-xs text-[var(--ad-text-muted)]"><span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide text-[var(--ad-ink-200)]">{{ team.format === "own" ? "OWN SCORES" : "SHARED SCORE" }}</span>{{ team.players.join(" ▸ ") }}</span>
+                <span v-if="state.savedProblems[team.name]" class="mt-0.5 block truncate text-xs font-semibold text-[var(--ad-text-muted)]">{{ state.savedProblems[team.name] }}</span>
+              </span>
+              <button @click="addSaved(team)" :disabled="pending || Boolean(state.savedProblems[team.name])" class="adt-team-button h-8 min-w-16 px-4 text-sm" type="button">
+                Add
+              </button>
+              <ConfirmDeleteButton @confirm="deleteSaved(team)" :label="team.name" />
+            </div>
+          </div>
+        </section>
+
         <section>
           <label :for="nameId" class="mb-2 block text-sm font-bold">Name</label>
           <input
@@ -84,6 +105,9 @@
                 </button>
               </li>
             </ol>
+            <p v-if="!players.length" class="text-[13px] text-[var(--ad-text-muted)]">
+              Nobody yet: type a name, or tap one below.
+            </p>
             <form @submit.prevent="addTyped" class="relative mt-3">
               <span class="icon-[material-symbols--search-rounded] pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#707580]" aria-hidden="true" />
               <input
@@ -98,18 +122,20 @@
               >
             </form>
             <div v-if="chips.length" class="mt-2.5 flex flex-wrap gap-1.5">
-              <button
-                @click="addPlayer(chip.name)"
+              <TeamNameChip
+                @add="addPlayer(chip.name)"
+                @forget="forget(chip.name)"
                 v-for="chip in chips"
                 :key="chip.name"
                 :disabled="Boolean(chip.team) || players.length >= MAX_PLAYERS"
-                :title="chip.team ? `On ${chip.team}` : `Add ${chip.name}`"
-                class="adt-team-offer"
-                type="button"
-              >
-                {{ chip.name }}<small v-if="chip.team">{{ chip.team }}</small>
-              </button>
+                :forgettable="forgettable.has(chip.name)"
+                :name="chip.name"
+                :team="chip.team"
+              />
             </div>
+            <p class="mt-2.5 text-xs text-[var(--ad-text-muted)]">
+              A bot can't share a score: autodarts throws every visit of a bot's seat. Use Own scores to put one on a team, or Add Bot to play against one.
+            </p>
           </template>
           <template v-else>
             <ol ref="ownList" class="flex flex-col gap-2.5">
@@ -123,6 +149,9 @@
                 </button>
               </li>
             </ol>
+            <p v-if="!picks.length" class="text-[13px] text-[var(--ad-text-muted)]">
+              Nobody yet: tap someone in this lobby, or add a new player or a bot.
+            </p>
           </template>
         </section>
 
@@ -131,17 +160,14 @@
             In this lobby <small class="text-xs font-semibold text-[var(--ad-text-muted)]">tap to add</small>
           </h3>
           <div class="flex flex-wrap gap-1.5">
-            <button
-              @click="pickSeat(seat)"
+            <TeamNameChip
+              @add="pickSeat(seat)"
               v-for="seat in lobbySeats"
               :key="seat.id"
               :disabled="Boolean(seat.team) || picks.length >= MAX_PLAYERS"
-              :title="seat.team ? `On ${seat.team}` : `Add ${seat.name}`"
-              class="adt-team-offer"
-              type="button"
-            >
-              {{ seat.name }}<small v-if="seat.team">{{ seat.team }}</small>
-            </button>
+              :name="seat.name"
+              :team="seat.team"
+            />
           </div>
         </section>
 
@@ -163,28 +189,35 @@
             >
           </form>
           <div v-if="ownChips.length" class="mt-2.5 flex flex-wrap gap-1.5">
-            <button @click="addPlayer(chip)" v-for="chip in ownChips" :key="chip" :disabled="picks.length >= MAX_PLAYERS" class="adt-team-offer" type="button">
-              {{ chip }}
-            </button>
+            <TeamNameChip
+              @add="addPlayer(chip)"
+              @forget="forget(chip)"
+              v-for="chip in ownChips"
+              :key="chip"
+              :disabled="picks.length >= MAX_PLAYERS"
+              :forgettable="forgettable.has(chip)"
+              :name="chip"
+            />
           </div>
         </section>
 
-        <section v-if="state.savedTeams.length">
-          <h3 class="mb-2 text-sm font-bold">
-            Saved teams
+        <section v-if="format === 'own'">
+          <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
+            Bots <small class="text-xs font-semibold text-[var(--ad-text-muted)]">join at the level you pick</small>
           </h3>
-          <div class="flex flex-col gap-2.5">
-            <div v-for="team in state.savedTeams" :key="team.name" class="flex items-center gap-3 rounded-2xl bg-white/10 p-3">
-              <span :style="{ backgroundImage: gradient(team.colour) }" class="h-7 w-10 shrink-0 rounded-lg ring-1 ring-inset ring-white/15" />
-              <span class="min-w-0 flex-1">
-                <span class="block truncate font-[family-name:var(--ad-font-display)] text-lg uppercase leading-none">{{ team.name }}</span>
-                <span class="block truncate text-xs text-[var(--ad-text-muted)]"><span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide text-[var(--ad-ink-200)]">{{ team.format === "own" ? "OWN SCORES" : "SHARED SCORE" }}</span>{{ team.players.join(" ▸ ") }}</span>
-              </span>
-              <button @click="addSaved(team)" :disabled="pending" class="adt-team-button h-8 min-w-16 px-4 text-sm" type="button">
-                Add
-              </button>
-            </div>
+          <div class="flex items-center gap-2">
+            <select v-model.number="botLevel" :disabled="!state.botsOk || picks.length >= MAX_PLAYERS" aria-label="Bot level" class="adt-team-field adt-team-select">
+              <option v-for="level in BOT_LEVELS" :key="level" :value="level">
+                Level {{ level }} · {{ botPpr(level) }}+
+              </option>
+            </select>
+            <button @click="addBotPick" :disabled="!state.botsOk || picks.length >= MAX_PLAYERS" class="adt-team-button h-11 shrink-0 px-5 text-sm" type="button">
+              Add bot
+            </button>
           </div>
+          <p v-if="!state.botsOk" class="mt-1.5 text-xs text-[var(--ad-text-muted)]">
+            {{ BOTS_ONLY_TEXT }}
+          </p>
         </section>
       </div>
 
@@ -203,13 +236,16 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 
+import TeamNameChip from "./TeamNameChip.vue";
+
 import type { DrawerState, SeatChoice } from "./teams";
 import type { OwnPick, SavedTeam } from "@/utils/teams";
 
 import SchemePicker from "@/components/Settings/Colors/SchemePicker.vue";
+import ConfirmDeleteButton from "@/components/Settings/Library/ConfirmDeleteButton.vue";
 import { CARD_PRESETS, SITE_CARD, gradient } from "@/utils/colors";
 import { LAYERS } from "@/utils/layers";
-import { LEGS_ONLY_TEXT, MAX_NAME_LENGTH, MAX_PLAYERS, nextFreeColour, normalizeName, suggestName } from "@/utils/teams";
+import { BOTS_ONLY_TEXT, BOT_LEVELS, LEGS_ONLY_TEXT, MAX_NAME_LENGTH, MAX_PLAYERS, botName, botPpr, nextFreeColour, normalizeName, suggestName } from "@/utils/teams";
 
 const props = defineProps<{ state: DrawerState }>();
 
@@ -230,6 +266,9 @@ const pending = ref(false);
 const format = ref<"shared" | "own">(props.state.lockedFormat ?? "shared");
 const picks = ref<OwnPick[]>(props.state.editingSeats.map(id => ({ seatId: id, name: props.state.seats.find(seat => seat.id === id)?.name ?? "" })));
 const ownList = ref<HTMLElement>();
+const botLevel = ref(5);
+/** Tells two new bots of one level apart in the list. */
+let botCount = 0;
 let sorter: Sortable | undefined;
 let ownSorter: Sortable | undefined;
 
@@ -259,6 +298,8 @@ const ownLine = computed(() => props.state.legs > 0
 /** The lobby's seats not picked yet, the ones on another team greyed. */
 const lobbySeats = computed(() => props.state.seats.filter(seat => !picks.value.some(pick => "seatId" in pick && pick.seatId === seat.id)));
 /** Saved and recent names for new guests, minus anyone in the lobby or picked already. */
+/** The chips a ✕ can delete. */
+const forgettable = computed(() => new Set(props.state.forgettable));
 const ownChips = computed(() => {
   const typed = normalizeName(query.value);
   const seated = new Set(props.state.seats.map(seat => seat.name));
@@ -266,7 +307,13 @@ const ownChips = computed(() => {
   return props.state.offered.filter(name => !seated.has(name) && !picked.has(name) && (!typed || name.includes(typed)));
 });
 
-onMounted(() => nameInput.value?.focus());
+onMounted(() => {
+  // The keyboard comes up only for a mouse and keys, and only when there's no
+  // saved team to tap first: on a phone it covered half the sheet at once.
+  // Focus still moves into the dialog either way.
+  if (!props.state.savedTeams.length && matchMedia("(pointer: fine)").matches) nameInput.value?.focus();
+  else panel.value?.focus();
+});
 
 watch(colour, (value) => {
   if (!nameTouched.value) name.value = suggestName(value, props.state.reservedNames);
@@ -383,6 +430,24 @@ function removePick(index: number) {
   picks.value = picks.value.filter((_, i) => i !== index);
 }
 
+/** A new bot at the picked level, added to the team's list; it joins the lobby with Add Team. */
+function addBotPick() {
+  error.value = "";
+  if (picks.value.length >= MAX_PLAYERS) {
+    error.value = `A team can have ${MAX_PLAYERS} players at most.`;
+    return;
+  }
+  picks.value = [ ...picks.value, { bot: botPpr(botLevel.value), name: botName(botLevel.value), key: `bot-${++botCount}` } ];
+}
+
+function deleteSaved(team: SavedTeam) {
+  props.state.deleteSaved(team).catch(e => console.error(e));
+}
+
+function forget(name: string) {
+  props.state.forget(name).catch(e => console.error(e));
+}
+
 async function run(task: () => Promise<string | undefined>) {
   if (pending.value) return;
   pending.value = true;
@@ -451,15 +516,12 @@ function trapFocus(event: KeyboardEvent) {
   clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
 }
 
-/* the saved-player chips, like the Saved players strip */
-.adt-team-offer {
-  display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
-  border-radius: 10px; background: var(--ad-ink-750); color: var(--ad-text-primary);
-  font-size: 13px; font-weight: 700;
+/* the light field as a picker: the site's own chevron, drawn here */
+.adt-team-select {
+  appearance: none; padding-right: 40px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23707580' d='M12 15.4 6 9.4 7.4 8l4.6 4.6L16.6 8 18 9.4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 18px;
 }
-.adt-team-offer:hover:not(:disabled) { background: var(--ad-ink-700); }
-.adt-team-offer:disabled { opacity: .4; cursor: not-allowed; }
-.adt-team-offer small { font-size: 11px; font-weight: 600; color: var(--ad-text-muted); }
 
 /* the site's pill tabs */
 .adt-team-tab { height: 32px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--ad-text-muted); }
