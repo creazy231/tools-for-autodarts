@@ -89,13 +89,13 @@ const LOBBY_CSS = `
     div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; }
     div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) > :first-child { grid-row: span 2; }
   }
+  #${PARTNER_CARD_ID} [data-adt-line] { display: block; font-size: 12px; font-weight: 600; line-height: 16px; color: rgb(184 188 197); }
   #${PARTNER_CARD_ID} [data-adt-line][hidden] { display: none; }
   /* With no Autoscoring card to copy: the same card in the site's measured styles. */
   #${PARTNER_CARD_ID}[data-adt-fallback] { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 18px; background: rgb(27 31 41); color: #f7f8fa; }
   #${PARTNER_CARD_ID}[data-adt-fallback] > div:first-child { display: flex; gap: 16px; align-items: flex-start; }
   #${PARTNER_CARD_ID}[data-adt-fallback] > div:first-child > div { flex: 1; font-family: "Bebas Neue", var(--ad-font-display, sans-serif); font-size: 24px; line-height: 1.2; }
   #${PARTNER_CARD_ID}[data-adt-fallback] > div:last-child { display: flex; flex-direction: column; gap: 16px; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] > div:last-child > span { font-size: 12px; font-weight: 600; line-height: 16px; color: rgb(184 188 197); }
   #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] { position: relative; flex: none; width: 51px; height: 24px; border-radius: 999px; background: #16181c; box-shadow: inset 0 0 0 1px rgb(55 76 152 / 60%); cursor: pointer; }
   #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] { background: #0b55df; box-shadow: none; }
   #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] > span { position: absolute; top: 3px; left: 3px; width: 28px; height: 18px; border-radius: 999px; background: #fff; transition: transform 150ms; }
@@ -647,7 +647,6 @@ function buildPartnerCard(template: HTMLElement | null): HTMLElement {
   const header = template?.querySelector(":scope > [data-slot='card-header']");
   const siteSwitch = header?.querySelector("[data-slot='switch']");
   const content = template?.querySelector(":scope > [data-slot='card-content']");
-  const line = content?.querySelector("span");
 
   const card = copyOf(template, "div");
   card.id = PARTNER_CARD_ID;
@@ -670,9 +669,13 @@ function buildPartnerCard(template: HTMLElement | null): HTMLElement {
   });
   head.append(title, toggle);
   const body = copyOf(content, "div");
-  const text = copyOf(line, "span");
+  // The lines are our own, in the style of the site's card line ("You'll score
+  // this match yourself", LOBBY_CSS). Copying Autoscoring's first line took the
+  // board picker's text style whenever autoscoring was on.
+  const text = document.createElement("span");
+  text.dataset.adtLine = "text";
   text.textContent = PARTNER_TEXT;
-  const pending = copyOf(line, "span");
+  const pending = document.createElement("span");
   pending.dataset.adtLine = "pending";
   pending.textContent = PARTNER_PENDING_TEXT;
   body.append(text, pending);
