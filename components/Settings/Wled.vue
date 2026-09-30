@@ -261,7 +261,6 @@
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
             WLED
-            <span class="adt-badge adt-badge-practice ml-2">BETA</span>
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">

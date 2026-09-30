@@ -13,9 +13,11 @@ All notable changes to this project will be documented in this file.
   - Every leg starts with each team's next player, and the order is worked out from the site's own set, leg and round numbers, so a reload or an undo never throws it off. When a visit went to the wrong player, tapping a name in the team's card makes that player the one who's up, or next, and the order carries on from them
   - The **Caller** calls the player whose turn it is when it has a sound for the name, the team's name when it hasn't, and `next_player` after that
   - With a shared score, bots can play against a team but not in one, since the server throws every visit of a bot's seat
+  - Its card carries the BETA badge while it settles in
 
 ### Changed
 
+- **WLED** is out of beta: its card no longer carries the BETA badge
 - **Team Lobby is now Local Lobby**, the name the site gives its own local play: in a local tournament "every player will play on boards provided by you", which is what the feature sets a lobby up for. It works as before, and if it was on, it stays on. For team games, there is Teams now
 - **Instant Replay** plays from a set number of seconds before the gameshot to a set number after it. *Duration* is now *Before the gameshot* and keeps its number, and *After the gameshot* is new, starting at your *Start delay*. The replay used to be counted back from the moment it appeared, so it ran on past the winning dart for as long as the start delay, and it played whole stretches of recording that added up to at least *Duration*: at the defaults, anywhere from 7 to 17 seconds of run-up, changing from leg to leg. It now plays what is set, 10 seconds before the dart and 3 after by default. The start delay still holds the replay back for autodarts' own celebration, but never past the seconds after the gameshot, which have to be filmed first
   - The recording is a run of overlapping takes rather than back-to-back segments. Each take starts while the one before is still recording and is kept until the new one holds a whole run-up of its own, so whenever a leg is won, one take goes back far enough. That take records on through the seconds after the gameshot and is played from the second the run-up starts. A replay is one file, with no seam anywhere in it. A second recorder runs only for the overlap: the run-up plus a second, in every 30 seconds or more
