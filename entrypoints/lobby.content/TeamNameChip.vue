@@ -4,13 +4,14 @@
     second on the red "Delete" the chip turns into for four seconds, as the
     settings' deletes do (components/Settings/Library/ConfirmDeleteButton.vue).
     The red button keeps focus where it is: Safari and Firefox on macOS take
-    focus off a clicked button on mousedown, which would disarm it first.
+    focus off a clicked button on mousedown, which would disarm it first. Its
+    Escape stops there, or it would close the drawer and lose the team drafted.
   -->
   <span class="adt-name-chip">
     <button
       @blur="disarm"
       @click="confirm"
-      @keydown.esc="disarm"
+      @keydown.esc.stop="disarm"
       @mousedown.prevent
       v-if="armed"
       ref="confirmButton"

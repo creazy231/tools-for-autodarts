@@ -6,7 +6,8 @@
 
     Pressing the red button keeps focus where it is. Safari and Firefox on
     macOS take focus off a clicked button on mousedown, and that blur would
-    disarm it before the click landed.
+    disarm it before the click landed. Escape disarms it and goes no further:
+    the dialog round it stays open.
   -->
   <span class="relative inline-flex">
     <button
@@ -21,7 +22,7 @@
     <button
       @blur="disarm"
       @click="confirm"
-      @keydown.esc="disarm"
+      @keydown.esc.stop="disarm"
       @mousedown.prevent
       v-if="armed"
       ref="confirmButton"
