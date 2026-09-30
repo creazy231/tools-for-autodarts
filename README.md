@@ -71,8 +71,8 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
   - A **Saved players** strip appears under the lobby's player list — one click adds a player, however long ago you last used them
   - The full list is also written back into the site's own *Add Player* dialog, so it offers everything rather than the last six
   - The number of names kept is configurable, and individual names can be removed from the settings page, which takes them out of autodarts' own *Add Player* list as well, a lobby open under the settings included
-- **Team Lobby Mode**: Sets a lobby up for several people throwing on one dartboard
-  - Your own entry is removed, so the players are the team names you add rather than the account that opened the lobby
+- **Local Lobby**: Sets a private lobby up for everyone to play at your dartboard
+  - Your own entry is removed, so the players are the guests you add rather than the account that opened the lobby
   - Anyone who joins on their own board is moved onto yours
   - Only runs in **private lobbies that you host**
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything

@@ -1,11 +1,11 @@
 /**
- * Team Lobby — set a private lobby up for several people throwing on one board.
+ * Local Lobby — set a private lobby up for everyone to play at your board.
  *
  * Two chores get done for you:
  *
- *   - your own entry is dropped. Opening a lobby adds you to it, but in a team
- *     lobby the players are the team names you type in afterwards, so that row
- *     is one you would delete by hand every single time
+ *   - your own entry is dropped. Opening a lobby adds you to it, but in a local
+ *     lobby the players are the guests you add afterwards, so that row is one
+ *     you would delete by hand every single time
  *   - anyone who joins on their own board is moved onto yours, because the
  *     whole point is that everybody throws at the same dartboard
  *
@@ -29,8 +29,8 @@ let removing = false;
 /** So a public or someone else's lobby explains itself once, not every update. */
 let skipLogged = false;
 
-export async function teamLobby() {
-  console.log("Autodarts Tools: Team Lobby - Starting");
+export async function localLobby() {
+  console.log("Autodarts Tools: Local Lobby - Starting");
 
   selfRemoved = false;
   removing = false;
@@ -80,7 +80,7 @@ async function apply(lobby?: ILobbies) {
   if (!lobby.isPrivate || lobby.host?.id !== userId) {
     if (!skipLogged) {
       skipLogged = true;
-      console.log(`Autodarts Tools: Team Lobby - Skipping, this is ${lobby.isPrivate ? "not your lobby" : "a public lobby"}`);
+      console.log(`Autodarts Tools: Local Lobby - Skipping, this is ${lobby.isPrivate ? "not your lobby" : "a public lobby"}`);
     }
     return;
   }
@@ -115,12 +115,12 @@ async function removeSelf(lobby: ILobbies, userId: string) {
 
     if (response.ok) {
       selfRemoved = true;
-      console.log("Autodarts Tools: Team Lobby - Removed the host from the lobby");
+      console.log("Autodarts Tools: Local Lobby - Removed the host from the lobby");
     } else {
-      console.error("Autodarts Tools: Team Lobby - Could not remove the host", response.status, response.statusText);
+      console.error("Autodarts Tools: Local Lobby - Could not remove the host", response.status, response.statusText);
     }
   } catch (error) {
-    console.error("Autodarts Tools: Team Lobby - Error removing the host:", error);
+    console.error("Autodarts Tools: Local Lobby - Error removing the host:", error);
   } finally {
     removing = false;
   }
@@ -140,6 +140,6 @@ function claimBoards() {
     if (!button || button.disabled) continue;
 
     button.click();
-    console.log("Autodarts Tools: Team Lobby - Moved a player onto this board");
+    console.log("Autodarts Tools: Local Lobby - Moved a player onto this board");
   }
 }

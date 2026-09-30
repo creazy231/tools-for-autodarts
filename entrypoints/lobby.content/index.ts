@@ -3,7 +3,7 @@ import "~/assets/tailwind.css";
 import { soundFx, soundFxOnRemove } from "../match.content/sound-fx";
 import { wledFx, wledFxOnRemove } from "../match.content/wled";
 
-import { onRemove as onTeamLobbyRemove, teamLobby } from "./team-lobby";
+import { localLobby, onRemove as onLocalLobbyRemove } from "./local-lobby";
 
 import type { IConfig } from "@/utils/storage";
 
@@ -41,7 +41,7 @@ const LOBBY_ROUTE = /\/lobby\/([0-9a-f-]+)/i;
  * entrypoints/match.content/index.ts. v1 is being retired, and the unported
  * implementations go with it.
  */
-const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "teamLobby", "qrCode", "soundFx", "wledFx" ]);
+const PORTED_TO_V2 = new Set<keyof IConfig>([ "discord", "autoStart", "recentLocalPlayers", "localLobby", "qrCode", "soundFx", "wledFx" ]);
 
 function isOn(config: IConfig, feature: keyof IConfig): boolean {
   if (!PORTED_TO_V2.has(feature)) return false;
@@ -120,8 +120,8 @@ export default defineContentScript({
           await initScript(() => recentLocalPlayers(ctx), url).catch(e => console.error(e));
         }
 
-        if (isOn(config, "teamLobby")) {
-          await initScript(teamLobby, url).catch(e => console.error(e));
+        if (isOn(config, "localLobby")) {
+          await initScript(localLobby, url).catch(e => console.error(e));
         }
 
         if (isOn(config, "soundFx")) {
@@ -146,7 +146,7 @@ export default defineContentScript({
         await onAutoStartRemove();
         await onQrCodeRemove();
         await onRecentLocalPlayersRemove();
-        await onTeamLobbyRemove();
+        await onLocalLobbyRemove();
         await soundFxOnRemove();
         await wledFxOnRemove();
       }

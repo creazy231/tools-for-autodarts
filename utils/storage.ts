@@ -1,7 +1,9 @@
 import type { BoardStatus } from "@/utils/types";
 
 import { defaultColors, normalizeColors } from "@/utils/colors";
+import { renameSettings } from "@/utils/config-renames";
 import { defaultInstantReplay, normalizeInstantReplay } from "@/utils/instant-replay";
+import { type SavedTeam, type ShiftStore, normalizeTeams } from "@/utils/teams";
 import type { GameMode } from "@/utils/game-modes";
 
 export interface IConfig {
@@ -110,8 +112,15 @@ export interface IConfig {
     enabled: boolean;
     sec: number;
   };
-  teamLobby: {
+  /** Everyone plays at the host's board; see entrypoints/lobby.content/local-lobby.ts. Was `teamLobby`. */
+  localLobby: {
     enabled: boolean;
+  };
+  /** See utils/teams.ts. */
+  teams: {
+    enabled: boolean;
+    /** Most recently used first. */
+    saved: SavedTeam[];
   };
 
   animations: {
@@ -535,8 +544,12 @@ export const defaultConfig: IConfig = {
     enabled: false,
     sec: 10,
   },
-  teamLobby: {
+  localLobby: {
     enabled: false,
+  },
+  teams: {
+    enabled: false,
+    saved: [],
   },
 
   boardView: {
@@ -822,7 +835,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 14;
+const CONFIG_VERSION = 15;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -836,6 +849,12 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * Team Lobby is Local Lobby now, the name the site gives its own local
+       * play, and a Team Lobby that was on stays on. Teams is new.
+       */
+      15: (config: any) => ({ ...renameSettings(config), teams: normalizeTeams(config.teams) }),
+
       /**
        * Instant Replay is cut to the second now, so *Duration* is split into
        * the seconds before the winning dart and the seconds after it. See
@@ -1048,6 +1067,18 @@ export const AutodartsToolsStreamingModeStatus: WxtStorageItem<boolean, any> = s
   "local:streamingmodestatus",
   {
     defaultValue: false,
+  },
+);
+
+/**
+ * Teams' tap-to-corrections: per match, how far each team's order has been
+ * moved on (utils/teams.ts). Its own item rather than a setting: it is about a
+ * match on this browser, and it is not worth exporting.
+ */
+export const AutodartsToolsTeamShifts: WxtStorageItem<ShiftStore, any> = storage.defineItem(
+  "local:teams-shifts",
+  {
+    defaultValue: {},
   },
 );
 

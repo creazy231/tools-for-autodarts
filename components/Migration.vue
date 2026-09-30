@@ -261,7 +261,8 @@ async function migrateSettings() {
     config.winnerAnimation = oldConfig.winnerAnimation;
 
     config.nextPlayerOnTakeOutStuck = oldConfig.nextPlayerOnTakeOutStuck;
-    config.teamLobby = oldConfig.teamLobby;
+    // v1 called Local Lobby "teamLobby".
+    config.localLobby = oldConfig.teamLobby ?? config.localLobby;
 
     await AutodartsToolsConfig.setValue(config);
   } else {

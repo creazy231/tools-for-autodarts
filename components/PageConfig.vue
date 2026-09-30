@@ -232,7 +232,7 @@ import { useStorage } from "@vueuse/core";
 import DiscordWebhooks from "./Settings/DiscordWebhooks.vue";
 import AutoStart from "./Settings/AutoStart.vue";
 import RecentLocalPlayers from "./Settings/RecentLocalPlayers.vue";
-import TeamLobby from "./Settings/TeamLobby.vue";
+import LocalLobby from "./Settings/LocalLobby.vue";
 import QrCode from "./Settings/QrCode.vue";
 import Colors from "./Settings/Colors.vue";
 import TakeoutNotification from "./Settings/TakeoutNotification.vue";
@@ -264,7 +264,9 @@ import type { IConfig, ISound } from "@/utils/storage";
 
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
 import { normalizeColors } from "@/utils/colors";
+import { renameSettings } from "@/utils/config-renames";
 import { normalizeInstantReplay } from "@/utils/instant-replay";
+import { normalizeTeams } from "@/utils/teams";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
 import AppMenu from "@/components/AppMenu.vue";
@@ -325,7 +327,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
       { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false, v2Ready: true },
       { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true, fillSettings: true },
-      { id: "team-lobby", title: "Team Lobby Settings", component: TeamLobby, hasSettings: false, v2Ready: true },
+      { id: "local-lobby", title: "Local Lobby Settings", component: LocalLobby, hasSettings: false, v2Ready: true },
       { id: "qr-code", title: "QR Code Settings", component: QrCode, hasSettings: false, v2Ready: true },
     ],
     settingIds: [ "discord-webhooks", "recent-local-players" ],
@@ -588,13 +590,17 @@ function importSettings() {
           // Update the config
           const newConfig = {
             ...JSON.parse(JSON.stringify(defaultConfig)),
-            ...JSON.parse(JSON.stringify(importedData.config)),
+            ...renameSettings(JSON.parse(JSON.stringify(importedData.config))),
           };
           // An export from before a change of shape is merged as it is, so
-          // Colors and Instant Replay are brought up to date here; see
-          // normalizeColors and normalizeInstantReplay.
+          // Colors, Instant Replay and Teams are brought up to date here, and
+          // a renamed setting (Team Lobby, now Local Lobby) is carried over
+          // before the merge, which would otherwise shadow it with the new
+          // name's default; see renameSettings, normalizeColors,
+          // normalizeInstantReplay and normalizeTeams.
           newConfig.colors = normalizeColors(newConfig.colors);
           newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
+          newConfig.teams = normalizeTeams(newConfig.teams);
 
           // Set the local ref
           config.value = newConfig;
@@ -843,13 +849,17 @@ function pasteFromClipboard() {
         // Update the config
         const newConfig = {
           ...JSON.parse(JSON.stringify(defaultConfig)),
-          ...JSON.parse(JSON.stringify(importedData.config)),
+          ...renameSettings(JSON.parse(JSON.stringify(importedData.config))),
         };
         // An export from before a change of shape is merged as it is, so
-        // Colors and Instant Replay are brought up to date here; see
-        // normalizeColors and normalizeInstantReplay.
+        // Colors, Instant Replay and Teams are brought up to date here, and
+        // a renamed setting (Team Lobby, now Local Lobby) is carried over
+        // before the merge, which would otherwise shadow it with the new
+        // name's default; see renameSettings, normalizeColors,
+        // normalizeInstantReplay and normalizeTeams.
         newConfig.colors = normalizeColors(newConfig.colors);
         newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
+        newConfig.teams = normalizeTeams(newConfig.teams);
 
         // Set the local ref
         config.value = newConfig;
