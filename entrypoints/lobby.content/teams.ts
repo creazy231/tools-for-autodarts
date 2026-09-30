@@ -21,7 +21,7 @@ import AddTeamDrawer from "./AddTeamDrawer.vue";
 
 import type { ILobbies } from "@/utils/websocket-helpers";
 import type { ColorScheme } from "@/utils/storage";
-import type { Lineup, LineupStore, LineupTeam, SavedTeam, TeamDraft } from "@/utils/teams";
+import type { Lineup, LineupStore, LineupTeam, OwnDraft, SavedTeam, SeatSlot, TeamDraft, TeamFormat } from "@/utils/teams";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SELECTORS, anyOf, qs, qsa } from "@/utils/selectors";
@@ -29,8 +29,8 @@ import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY } from "@/utils/guest-players";
-import { addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
-import { checkTeam, colourTaken, findTeam, interleave, isHostedGuest, lineupOf, normalizeName, normalizeTeams, pruneLineup, rememberTeam, seatMoves, sharedTeams, unevenText, uniqueNames, withFreeColour, withLineup } from "@/utils/teams";
+import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, interleave, isHostedGuest, joinNames, lineupOf, lobbyFormat, memberOf, normalizeName, normalizeTeams, pruneLineup, rejoinSlots, rememberTeam, resolveSlots, seatMoves, sharedTeams, unevenText, uniqueNames, withFreeColour, withLineup } from "@/utils/teams";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
@@ -80,6 +80,15 @@ const LOBBY_CSS = `
   #${NOTE_ID} { margin: 4px 0 12px; font-size: 12px; font-weight: 600; color: #a1a1a1; }
 `;
 
+/** A seat of the lobby, as Own scores' In this lobby offers it. */
+export interface SeatChoice {
+  id: string;
+  name: string;
+  kind: "guest" | "account" | "bot";
+  /** The other own-score team this seat is on. */
+  team?: string;
+}
+
 /** Everything the drawer shows and does; shared with AddTeamDrawer.vue. */
 export interface DrawerState {
   /** The team being edited, or null to add one. */
@@ -102,7 +111,20 @@ export interface DrawerState {
   savedTeams: SavedTeam[];
   /** Whether the lobby has no seat left. */
   full: boolean;
+  /** The lobby's format once it has a team; the tabs keep to it. */
+  lockedFormat: TeamFormat | undefined;
+  /** The team that set it, for the tabs' note. */
+  formatTeam: string;
+  /** A lobby playing sets can't have own-score teams. */
+  setsLobby: boolean;
+  /** The lobby's "First to N legs", for the drawer's own-scores line. */
+  legs: number;
+  /** Every seat, for Own scores' In this lobby. */
+  seats: SeatChoice[];
+  /** The seats of the own-score team being edited, in order. */
+  editingSeats: string[];
   submit: (draft: TeamDraft) => Promise<string | undefined>;
+  submitOwn: (draft: OwnDraft) => Promise<string | undefined>;
   addSaved: (team: SavedTeam) => Promise<string | undefined>;
   close: () => void;
 }
@@ -141,7 +163,14 @@ const drawer = reactive<DrawerState>({
   offered: [],
   savedTeams: [],
   full: false,
+  lockedFormat: undefined,
+  formatTeam: "",
+  setsLobby: false,
+  legs: 0,
+  seats: [],
+  editingSeats: [],
   submit: submitDraft,
+  submitOwn: submitOwnTeam,
   addSaved: addSavedTeam,
   close: closeDrawer,
 });
@@ -258,6 +287,15 @@ async function writeLineup(teams: readonly LineupTeam[]) {
   if (!lobby) return;
   lineups = withLineup(lineups, lobby.id, teams, Date.now());
   await AutodartsToolsTeamLineups.setValue(lineups);
+}
+
+/** A team written into this lobby's lineup: an edited team keeps its place, a new one goes last. */
+async function writeLineupTeam(team: LineupTeam) {
+  const teams = [ ...(currentLineup()?.teams ?? []) ];
+  const index = teams.findIndex(other => other.name === team.name);
+  if (index >= 0) teams.splice(index, 1, team);
+  else teams.push(team);
+  await writeLineup(teams);
 }
 
 /** A seat that left the lobby leaves its team. */
@@ -453,8 +491,13 @@ function noteUneven(lineup: Lineup | undefined) {
   if (buttons.previousElementSibling !== note) buttons.before(note);
 }
 
-// Task 5 opens the drawer on the team's seats.
-function openOwnEditor(_name: string) {}
+/** The pencil on a member's row: the drawer on that team's seats. */
+function openOwnEditor(name: string) {
+  const team = currentLineup()?.teams.find(candidate => candidate.name === name);
+  if (!team) return;
+  const players = team.seatIds.map(id => normalizeName(lobby?.players?.find(seat => seat.id === id)?.name));
+  openDrawer({ name: team.name, players, colour: { ...team.colour }, format: "own" }, [ ...team.seatIds ]);
+}
 
 function undress(row: HTMLElement) {
   row.removeAttribute(ROW_ATTR);
@@ -495,26 +538,38 @@ function siteGuests(): string[] {
   }
 }
 
-function drawerContext(editing: SavedTeam | null): Omit<DrawerState, "submit" | "addSaved" | "close"> {
+function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): Omit<DrawerState, "submit" | "addSaved" | "close" | "submitOwn"> {
   const lobbyTeams = [ ...teamsInLobby().values() ].filter(team => team.name !== editing?.name);
   const guests = uniqueNames((lobby?.players ?? []).filter(seat => !seat.userId && !seat.cpuPPR).map(seat => seat.name));
   const playerTeams: Record<string, string> = {};
   for (const team of lobbyTeams) for (const player of team.players) playerTeams[player] = team.name;
+  const lineup = currentLineup();
+  const format = lobbyFormat(lobby?.players ?? [], lineup, saved, hostId);
+  const ownTeams = (lineup?.teams ?? []).filter(team => team.name !== editing?.name);
+  const seatTeam = new Map<string, string>();
+  for (const team of ownTeams) for (const id of team.seatIds) seatTeam.set(id, team.name);
+  const inLobby = (team: SavedTeam) => team.format === "own" ? Boolean(lineup?.teams.some(other => other.name === team.name)) : guests.includes(team.name);
   return {
     editing,
     guestNames: guests.filter(name => name !== editing?.name),
     reservedNames: uniqueNames([ ...guests, ...saved.map(team => team.name) ]),
     playerTeams,
-    takenColours: lobbyTeams.map(team => team.colour),
+    takenColours: format === "own" ? ownTeams.map(team => team.colour) : lobbyTeams.map(team => team.colour),
     offered: uniqueNames([ ...savedPlayers, ...siteGuests(), ...saved.flatMap(team => team.players) ]),
-    savedTeams: editing ? [] : saved.filter(team => !guests.includes(team.name)),
+    savedTeams: editing ? [] : saved.filter(team => (!format || team.format === format) && !inLobby(team)),
     full: isFull(),
+    lockedFormat: editing ? editing.format : format,
+    formatTeam: format === "own" ? (lineup?.teams[0]?.name ?? "") : ([ ...teamsInLobby().keys() ][0] ?? ""),
+    setsLobby: Boolean(lobby?.sets),
+    legs: lobby?.legs ?? 0,
+    seats: (lobby?.players ?? []).filter(seat => seat.id).map(seat => ({ id: seat.id!, name: normalizeName(seat.name), kind: memberOf(seat).kind, team: seatTeam.get(seat.id!) })),
+    editingSeats,
   };
 }
 
-async function openDrawer(editing: SavedTeam | null) {
+async function openDrawer(editing: SavedTeam | null, editingSeats: string[] = []) {
   if (!isHost() || !ctxRef) return;
-  Object.assign(drawer, drawerContext(editing));
+  Object.assign(drawer, drawerContext(editing, editingSeats));
   if (drawerUi || opening) return;
 
   opening = true;
@@ -578,6 +633,7 @@ async function submitDraft(draft: TeamDraft): Promise<string | undefined> {
 }
 
 async function addSavedTeam(savedTeam: SavedTeam): Promise<string | undefined> {
+  if (savedTeam.format === "own") return addSavedOwnTeam(savedTeam);
   if (drawer.full) return "The lobby is full.";
   // Another team here may have its colour by now, say a new team offered the
   // same red; then it plays in the next free one, and keeps that.
@@ -586,6 +642,77 @@ async function addSavedTeam(savedTeam: SavedTeam): Promise<string | undefined> {
   if (problem) return problem;
   await saveTeam(team);
   if (!await addGuest(team.name, "Teams")) return "autodarts didn't add the team. Try again.";
+  closeDrawer();
+  return undefined;
+}
+
+// --------------------------------------------------------------- own scores
+
+/** How long an add waits for the lobby update that seats the new players. */
+const SEAT_WAIT_MS = 5000;
+
+/** Seats the new slots (guests and bots) and waits for the lobby update that holds them. */
+async function seatSlots(slots: readonly SeatSlot[]): Promise<(string | undefined)[]> {
+  const known = new Set((lobby?.players ?? []).map(seat => seat.id).filter((id): id is string => Boolean(id)));
+  for (const slot of slots) {
+    const ok = slot.kind === "guest" ? await addGuest(slot.name, "Teams") : slot.kind === "bot" ? await addBot(slot.name, slot.ppr, "Teams") : true;
+    if (!ok) break;
+  }
+  const deadline = Date.now() + SEAT_WAIT_MS;
+  let ids = resolveSlots(slots, known, lobby?.players ?? []);
+  while (ids.some((id, index) => !id && slots[index].kind !== "missing") && Date.now() < deadline) {
+    await nextLobbyUpdate();
+    ids = resolveSlots(slots, known, lobby?.players ?? []);
+  }
+  return ids;
+}
+
+/** The team as it is saved: its players, and how each of them joined. */
+function ownSavedTeam(name: string, colour: ColorScheme, seatIds: readonly string[]): SavedTeam {
+  const members = seatIds.map(id => memberOf(lobby?.players?.find(seat => seat.id === id) ?? {}));
+  return { name, players: members.map(member => member.name), colour: { ...colour }, format: "own", members };
+}
+
+async function submitOwnTeam(draft: OwnDraft): Promise<string | undefined> {
+  if (!lobby) return "The lobby isn't loaded yet. Try again in a moment.";
+  const editing = drawer.editing;
+  const others = (currentLineup()?.teams ?? []).filter(team => team.name !== editing?.name);
+  const problem = checkOwnTeam(editing ? { ...draft, name: editing.name } : draft, {
+    seatNames: (lobby.players ?? []).map(seat => seat.name ?? ""),
+    takenSeats: new Set(others.flatMap(team => team.seatIds)),
+    teamNames: others.map(team => team.name),
+    freeSeats: Math.max(0, (lobby.maxPlayers || 6) - (lobby.players?.length ?? 0)),
+  });
+  if (problem) return problem;
+  if (colourTaken(draft.colour, others.map(team => team.colour))) return "Another team in this lobby already has that colour.";
+
+  const slots: SeatSlot[] = draft.picks.map(pick => "seatId" in pick ? { kind: "seat", seatId: pick.seatId } : { kind: "guest", name: normalizeName(pick.guest) });
+  const ids = await seatSlots(slots);
+  if (ids.some(id => !id)) return "autodarts didn't add every new player. Try again.";
+  const name = editing?.name ?? normalizeName(draft.name);
+  const seatIds = ids as string[];
+  await writeLineupTeam({ name, colour: { ...draft.colour }, seatIds });
+  await saveTeam(ownSavedTeam(name, draft.colour, seatIds));
+  closeDrawer();
+  return undefined;
+}
+
+async function addSavedOwnTeam(savedTeam: SavedTeam): Promise<string | undefined> {
+  if (!lobby) return "The lobby isn't loaded yet. Try again in a moment.";
+  const others = currentLineup()?.teams ?? [];
+  const team = withFreeColour(savedTeam, others.map(other => other.colour));
+  const slots = rejoinSlots(team, lobby.players ?? [], hostId, new Set(others.flatMap(other => other.seatIds)));
+  const adding = slots.filter(slot => slot.kind === "guest" || slot.kind === "bot").length;
+  const free = Math.max(0, (lobby.maxPlayers || 6) - (lobby.players?.length ?? 0));
+  if (adding > free) return `The lobby has room for ${free} more ${free === 1 ? "player" : "players"}.`;
+
+  const ids = await seatSlots(slots);
+  const seatIds = ids.filter((id): id is string => Boolean(id));
+  if (seatIds.length < 1) return "autodarts didn't add the team. Try again.";
+  await writeLineupTeam({ name: team.name, colour: team.colour, seatIds });
+  await saveTeam({ ...team, members: team.members });
+  const missing = slots.filter(slot => slot.kind === "missing").map(slot => slot.name);
+  if (missing.length) return `Added. ${joinNames(missing)} ${missing.length === 1 ? "isn't" : "aren't"} in the lobby: signed-in players join from their own board.`;
   closeDrawer();
   return undefined;
 }

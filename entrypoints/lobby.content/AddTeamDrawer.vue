@@ -21,7 +21,24 @@
           {{ state.editing ? "Edit Team" : "Add Team" }}
         </h2>
         <p class="mt-0.5 text-[13px] text-[var(--ad-text-muted)]">
-          The team plays as one player on your board, and its players take turns in this order.
+          {{ format === "own" ? ownLine : "The team plays as one player on your board, and its players take turns in this order." }}
+        </p>
+        <div class="mt-3 inline-flex gap-1 rounded-full bg-[#16181c] p-1 ring-1 ring-inset ring-white/10" role="tablist">
+          <button
+            @click="format = option.id"
+            v-for="option in formats"
+            :key="option.id"
+            :aria-selected="format === option.id"
+            :disabled="option.disabled"
+            class="adt-team-tab"
+            role="tab"
+            type="button"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+        <p v-if="formatNote" class="mt-2 text-xs text-[var(--ad-text-muted)]">
+          {{ formatNote }}
         </p>
       </header>
 
@@ -47,7 +64,7 @@
 
         <section>
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
-            Colour <small class="text-xs font-semibold text-[var(--ad-text-muted)]">the card's gradient while this team is up</small>
+            Colour <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ format === "own" ? "their cards' gradient while one of them is up" : "the card's gradient while this team is up" }}</small>
           </h3>
           <SchemePicker v-model="colour" :disabled-presets="takenPresets" :presets="CARD_PRESETS" :site="SITE_CARD" label="Team colour" />
         </section>
@@ -56,21 +73,87 @@
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
             Players <small class="text-xs font-semibold text-[var(--ad-text-muted)]">drag to change the order</small>
           </h3>
-          <ol ref="list" class="flex flex-col gap-2.5">
-            <li v-for="(player, index) in players" :key="player" :data-index="index" class="flex items-center gap-2">
-              <span class="adt-team-handle icon-[material-symbols--drag-indicator] size-5 shrink-0 cursor-grab text-[#4d525d]" aria-hidden="true" />
-              <span class="w-4 shrink-0 text-center text-[13px] font-extrabold text-[#707580]">{{ index + 1 }}</span>
-              <span class="adt-team-tag">{{ player }}</span>
-              <button @click="removePlayer(index)" :aria-label="`Remove ${player}`" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
-                <span class="icon-[material-symbols--close-rounded] size-5" />
+          <template v-if="format === 'shared'">
+            <ol ref="list" class="flex flex-col gap-2.5">
+              <li v-for="(player, index) in players" :key="player" :data-index="index" class="flex items-center gap-2">
+                <span class="adt-team-handle icon-[material-symbols--drag-indicator] size-5 shrink-0 cursor-grab text-[#4d525d]" aria-hidden="true" />
+                <span class="w-4 shrink-0 text-center text-[13px] font-extrabold text-[#707580]">{{ index + 1 }}</span>
+                <span class="adt-team-tag">{{ player }}</span>
+                <button @click="removePlayer(index)" :aria-label="`Remove ${player}`" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
+                  <span class="icon-[material-symbols--close-rounded] size-5" />
+                </button>
+              </li>
+            </ol>
+            <form @submit.prevent="addTyped" class="relative mt-3">
+              <span class="icon-[material-symbols--search-rounded] pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#707580]" aria-hidden="true" />
+              <input
+                v-model="query"
+                :disabled="players.length >= MAX_PLAYERS"
+                aria-label="Search or add a player"
+                autocomplete="off"
+                class="adt-team-field has-icon"
+                placeholder="Search or add a player"
+                spellcheck="false"
+                type="text"
+              >
+            </form>
+            <div v-if="chips.length" class="mt-2.5 flex flex-wrap gap-1.5">
+              <button
+                @click="addPlayer(chip.name)"
+                v-for="chip in chips"
+                :key="chip.name"
+                :disabled="Boolean(chip.team) || players.length >= MAX_PLAYERS"
+                :title="chip.team ? `On ${chip.team}` : `Add ${chip.name}`"
+                class="adt-team-offer"
+                type="button"
+              >
+                {{ chip.name }}<small v-if="chip.team">{{ chip.team }}</small>
               </button>
-            </li>
-          </ol>
-          <form @submit.prevent="addTyped" class="relative mt-3">
+            </div>
+          </template>
+          <template v-else>
+            <ol ref="ownList" class="flex flex-col gap-2.5">
+              <li v-for="(pick, index) in picks" :key="pickKey(pick)" :data-index="index" class="flex items-center gap-2">
+                <span class="adt-team-handle icon-[material-symbols--drag-indicator] size-5 shrink-0 cursor-grab text-[#4d525d]" aria-hidden="true" />
+                <span class="w-4 shrink-0 text-center text-[13px] font-extrabold text-[#707580]">{{ index + 1 }}</span>
+                <span class="adt-team-tag">{{ pickName(pick) }}</span>
+                <span class="text-xs font-bold text-[var(--ad-text-muted)]">{{ pickKind(pick) }}</span>
+                <button @click="removePick(index)" :aria-label="`Remove ${pickName(pick)}`" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
+                  <span class="icon-[material-symbols--close-rounded] size-5" />
+                </button>
+              </li>
+            </ol>
+          </template>
+        </section>
+
+        <section v-if="format === 'own'">
+          <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
+            In this lobby <small class="text-xs font-semibold text-[var(--ad-text-muted)]">tap to add</small>
+          </h3>
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              @click="pickSeat(seat)"
+              v-for="seat in lobbySeats"
+              :key="seat.id"
+              :disabled="Boolean(seat.team) || picks.length >= MAX_PLAYERS"
+              :title="seat.team ? `On ${seat.team}` : `Add ${seat.name}`"
+              class="adt-team-offer"
+              type="button"
+            >
+              {{ seat.name }}<small v-if="seat.team">{{ seat.team }}</small>
+            </button>
+          </div>
+        </section>
+
+        <section v-if="format === 'own'">
+          <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
+            New players <small class="text-xs font-semibold text-[var(--ad-text-muted)]">join as guests on your board</small>
+          </h3>
+          <form @submit.prevent="addTyped" class="relative">
             <span class="icon-[material-symbols--search-rounded] pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#707580]" aria-hidden="true" />
             <input
               v-model="query"
-              :disabled="players.length >= MAX_PLAYERS"
+              :disabled="picks.length >= MAX_PLAYERS"
               aria-label="Search or add a player"
               autocomplete="off"
               class="adt-team-field has-icon"
@@ -79,17 +162,9 @@
               type="text"
             >
           </form>
-          <div v-if="chips.length" class="mt-2.5 flex flex-wrap gap-1.5">
-            <button
-              @click="addPlayer(chip.name)"
-              v-for="chip in chips"
-              :key="chip.name"
-              :disabled="Boolean(chip.team) || players.length >= MAX_PLAYERS"
-              :title="chip.team ? `On ${chip.team}` : `Add ${chip.name}`"
-              class="adt-team-offer"
-              type="button"
-            >
-              {{ chip.name }}<small v-if="chip.team">{{ chip.team }}</small>
+          <div v-if="ownChips.length" class="mt-2.5 flex flex-wrap gap-1.5">
+            <button @click="addPlayer(chip)" v-for="chip in ownChips" :key="chip" :disabled="picks.length >= MAX_PLAYERS" class="adt-team-offer" type="button">
+              {{ chip }}
             </button>
           </div>
         </section>
@@ -103,7 +178,7 @@
               <span :style="{ backgroundImage: gradient(team.colour) }" class="h-7 w-10 shrink-0 rounded-lg ring-1 ring-inset ring-white/15" />
               <span class="min-w-0 flex-1">
                 <span class="block truncate font-[family-name:var(--ad-font-display)] text-lg uppercase leading-none">{{ team.name }}</span>
-                <span class="block truncate text-xs text-[var(--ad-text-muted)]">{{ team.players.join(" ▸ ") }}</span>
+                <span class="block truncate text-xs text-[var(--ad-text-muted)]"><span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide text-[var(--ad-ink-200)]">{{ team.format === "own" ? "OWN SCORES" : "SHARED SCORE" }}</span>{{ team.players.join(" ▸ ") }}</span>
               </span>
               <button @click="addSaved(team)" :disabled="pending" class="adt-team-button h-8 min-w-16 px-4 text-sm" type="button">
                 Add
@@ -128,8 +203,8 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 
-import type { DrawerState } from "./teams";
-import type { SavedTeam } from "@/utils/teams";
+import type { DrawerState, SeatChoice } from "./teams";
+import type { OwnPick, SavedTeam } from "@/utils/teams";
 
 import SchemePicker from "@/components/Settings/Colors/SchemePicker.vue";
 import { CARD_PRESETS, SITE_CARD, gradient } from "@/utils/colors";
@@ -152,7 +227,11 @@ const nameTouched = ref(Boolean(props.state.editing));
 const query = ref("");
 const error = ref("");
 const pending = ref(false);
+const format = ref<"shared" | "own">(props.state.lockedFormat ?? "shared");
+const picks = ref<OwnPick[]>(props.state.editingSeats.map(id => ({ seatId: id, name: props.state.seats.find(seat => seat.id === id)?.name ?? "" })));
+const ownList = ref<HTMLElement>();
 let sorter: Sortable | undefined;
+let ownSorter: Sortable | undefined;
 
 /** Taken presets for the picker; a custom pair is compared by its colours instead, at the check. */
 const takenPresets = computed(() => props.state.takenColours.filter(taken => taken.preset !== "custom").map(taken => taken.preset));
@@ -163,11 +242,66 @@ const chips = computed(() => {
     .filter(offered => !players.value.includes(offered) && (!typed || offered.includes(typed)))
     .map(offered => ({ name: offered, team: props.state.playerTeams[offered] }));
 });
+const formats = computed(() => [
+  { id: "shared" as const, label: "Shared score", disabled: Boolean(props.state.lockedFormat && props.state.lockedFormat !== "shared") },
+  { id: "own" as const, label: "Own scores", disabled: props.state.setsLobby || Boolean(props.state.lockedFormat && props.state.lockedFormat !== "own") },
+]);
+const formatNote = computed(() => {
+  if (props.state.setsLobby && format.value !== "own" && !props.state.lockedFormat) return "Own-score teams play legs. Set the lobby to legs to use them.";
+  if (!props.state.lockedFormat || !props.state.formatTeam || props.state.editing) return "";
+  return props.state.lockedFormat === "own"
+    ? `${props.state.formatTeam} already plays on own scores, so this lobby's teams do too.`
+    : `${props.state.formatTeam} already shares a score, so this lobby's teams do too.`;
+});
+const ownLine = computed(() => props.state.legs > 0
+  ? `Everyone keeps their own score. A leg counts for the team of whoever checks out, and the first team to ${props.state.legs} legs wins the match.`
+  : "Everyone keeps their own score. A leg counts for the team of whoever checks out, and the first team to the lobby's target wins the match.");
+/** The lobby's seats not picked yet, the ones on another team greyed. */
+const lobbySeats = computed(() => props.state.seats.filter(seat => !picks.value.some(pick => "seatId" in pick && pick.seatId === seat.id)));
+/** Saved and recent names for new guests, minus anyone in the lobby or picked already. */
+const ownChips = computed(() => {
+  const typed = normalizeName(query.value);
+  const seated = new Set(props.state.seats.map(seat => seat.name));
+  const picked = new Set(picks.value.map(pickName));
+  return props.state.offered.filter(name => !seated.has(name) && !picked.has(name) && (!typed || name.includes(typed)));
+});
 
-onMounted(() => {
-  nameInput.value?.focus();
-  if (!list.value) return;
-  sorter = Sortable.create(list.value, {
+onMounted(() => nameInput.value?.focus());
+
+watch(colour, (value) => {
+  if (!nameTouched.value) name.value = suggestName(value, props.state.reservedNames);
+});
+
+// Each list gets its Sortable once it is on screen: the tabs show one of them at a time.
+watch(list, (element) => {
+  sorter?.destroy();
+  sorter = element
+    ? sortable(element, (from, to) => {
+      const next = [ ...players.value ];
+      next.splice(to, 0, ...next.splice(from, 1));
+      players.value = next;
+    })
+    : undefined;
+});
+watch(ownList, (element) => {
+  ownSorter?.destroy();
+  ownSorter = element
+    ? sortable(element, (from, to) => {
+      const next = [ ...picks.value ];
+      next.splice(to, 0, ...next.splice(from, 1));
+      picks.value = next;
+    })
+    : undefined;
+});
+
+onBeforeUnmount(() => {
+  sorter?.destroy();
+  ownSorter?.destroy();
+});
+
+/** A list dragged by its handles, handing the move back to be made in the array. */
+function sortable(element: HTMLElement, move: (from: number, to: number) => void): Sortable {
+  return Sortable.create(element, {
     animation: 150,
     handle: ".adt-team-handle",
     draggable: "[data-index]",
@@ -176,21 +310,26 @@ onMounted(() => {
       // Back where Vue left it; Vue moves it once the array changes.
       from.removeChild(item);
       from.insertBefore(item, from.children[oldIndex] ?? null);
-      const next = [ ...players.value ];
-      next.splice(newIndex, 0, ...next.splice(oldIndex, 1));
-      players.value = next;
+      move(oldIndex, newIndex);
     },
   });
-});
-
-watch(colour, (value) => {
-  if (!nameTouched.value) name.value = suggestName(value, props.state.reservedNames);
-});
-
-onBeforeUnmount(() => sorter?.destroy());
+}
 
 /** Puts a player in the team, or says why not. Whether they are in it now. */
 function addPlayer(raw: string): boolean {
+  if (format.value === "own") {
+    const guest = normalizeName(raw);
+    error.value = "";
+    if (!guest) return false;
+    if (picks.value.some(pick => pickName(pick) === guest)) return true;
+    if (picks.value.length >= MAX_PLAYERS) {
+      error.value = `A team can have ${MAX_PLAYERS} players at most.`;
+      return false;
+    }
+    picks.value = [ ...picks.value, { guest } ];
+    query.value = "";
+    return true;
+  }
   const player = normalizeName(raw);
   error.value = "";
   if (!player) return false;
@@ -216,6 +355,30 @@ function removePlayer(index: number) {
   players.value = players.value.filter((_, i) => i !== index);
 }
 
+function pickKey(pick: OwnPick) {
+  return "seatId" in pick ? `seat:${pick.seatId}` : `guest:${pick.guest}`;
+}
+
+function pickName(pick: OwnPick) {
+  return "seatId" in pick ? pick.name : normalizeName(pick.guest);
+}
+
+function pickKind(pick: OwnPick) {
+  if (!("seatId" in pick)) return "new guest";
+  const kind = props.state.seats.find(seat => seat.id === pick.seatId)?.kind;
+  return kind === "bot" ? "bot" : kind === "account" ? "on their own board" : "guest";
+}
+
+function pickSeat(seat: SeatChoice) {
+  error.value = "";
+  if (seat.team || picks.value.length >= MAX_PLAYERS) return;
+  picks.value = [ ...picks.value, { seatId: seat.id, name: seat.name } ];
+}
+
+function removePick(index: number) {
+  picks.value = picks.value.filter((_, i) => i !== index);
+}
+
 async function run(task: () => Promise<string | undefined>) {
   if (pending.value) return;
   pending.value = true;
@@ -232,6 +395,10 @@ function submit() {
   // another team say, stops here with its reason, rather than the team being
   // added without it.
   if (query.value.trim() && !addTyped()) return;
+  if (format.value === "own") {
+    run(() => props.state.submitOwn({ name: name.value, colour: colour.value, picks: picks.value }));
+    return;
+  }
   run(() => props.state.submit({ name: name.value, players: players.value, colour: colour.value }));
 }
 
@@ -289,6 +456,11 @@ function trapFocus(event: KeyboardEvent) {
 .adt-team-offer:hover:not(:disabled) { background: var(--ad-ink-700); }
 .adt-team-offer:disabled { opacity: .4; cursor: not-allowed; }
 .adt-team-offer small { font-size: 11px; font-weight: 600; color: var(--ad-text-muted); }
+
+/* the site's pill tabs */
+.adt-team-tab { height: 32px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--ad-text-muted); }
+.adt-team-tab[aria-selected="true"] { background: var(--ad-ink-100); color: var(--ad-text-on-light); }
+.adt-team-tab:disabled { opacity: .4; cursor: not-allowed; }
 
 /* the site's secondary button: blue-60, bold, 12px radius */
 .adt-team-button {

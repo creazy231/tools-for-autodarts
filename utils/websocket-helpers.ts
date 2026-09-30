@@ -70,6 +70,10 @@ export interface ILobbies {
   id: string;
   isPrivate: boolean;
   maxPlayers: number;
+  /** "First to N legs". */
+  legs?: number | null;
+  /** Sets to win, or null in a legs match. */
+  sets?: number | null;
   players: IPlayer[];
   settings: ILobbySettings;
   variant: "Bull-off" | "X01" | "Cricket" | "Bermuda" | "Shanghai" | "Gotcha" | "ATC" | "RTW" | "Random Checkout" | "CountUp" | "Segment Training" | "Bob's 27";
