@@ -115,6 +115,8 @@ export interface IConfig {
 
   animations: {
     enabled: boolean;
+    /** Optional allowlist. Empty or missing means animations may play for every board. */
+    boardIds?: string[];
     /**
      * The game modes it doesn't play in: see playsIn in utils/game-modes.ts,
      * the only reader. Missing plays everywhere, so every config saved before
@@ -574,6 +576,7 @@ export const defaultConfig: IConfig = {
   },
   animations: {
     enabled: false,
+    boardIds: [],
     duration: 5,
     delayStart: 1,
     objectFit: "cover",
