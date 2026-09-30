@@ -1019,6 +1019,11 @@ export function ruleBustNote(breach: Breach): PillNote {
   return { primary: `${breach.player}'s checkout didn't count`, secondary: "partner rule" };
 }
 
+/** When the checkout was taken back but autodarts wouldn't pass the turn on: the visit is empty, so Next is all that's left. */
+export function ruleNextNote(breach: Breach): PillNote {
+  return { primary: `${breach.player}'s checkout didn't count`, secondary: "press Next to pass the turn" };
+}
+
 /** When autodarts refused to take a rule-breaking checkout back. */
 export function ruleRefusedNote(breach: Breach): PillNote {
   return { primary: `Undo ${breach.player}'s checkout yourself`, secondary: "it breaks the partner rule, and autodarts didn't take it back" };

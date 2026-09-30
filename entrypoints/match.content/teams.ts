@@ -36,7 +36,7 @@ import { SELECTORS, anyOf, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, ruleBustNote, ruleRefusedNote, shiftFor, shiftsOf, teamLegs, teamSeats, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, ruleBustNote, ruleNextNote, ruleRefusedNote, shiftFor, shiftsOf, teamLegs, teamSeats, withShift } from "@/utils/teams";
 import { ownPill, sharedPill } from "@/utils/teams-pill";
 
 const STYLE_ID = "teams-match";
@@ -292,11 +292,12 @@ function askUndo() {
   lastUndo = key;
   const note = { note: ruleBustNote(bust.breach), bustTurn: turnKeyOf(bust.seat) };
   bustNote = note;
-  // When autodarts refuses, the checkout still stands on the site: say so,
-  // rather than that it didn't count.
-  const settle = (result?: { ok?: boolean }) => {
+  // When autodarts refuses the undo, the checkout still stands on the site:
+  // say so, rather than that it didn't count. When it took the darts back but
+  // wouldn't pass the turn, the visit is empty and Next is all that's left.
+  const settle = (result?: { ok?: boolean; stage?: string }) => {
     if (result?.ok !== false || bustNote !== note) return;
-    note.note = ruleRefusedNote(bust.breach);
+    note.note = result.stage === "next" ? ruleNextNote(bust.breach) : ruleRefusedNote(bust.breach);
     apply();
   };
   browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).then(settle, (e) => {
