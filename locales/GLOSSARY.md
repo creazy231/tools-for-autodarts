@@ -182,9 +182,10 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 
 ## 7. Punctuation
 
-- German and Dutch use " – " (an en dash with spaces) where the English has " — ". Where the English has a hyphen, as in "Settings - Darts Zoom", the hyphen stays.
-- Where the English quotes something with "…", German writes „…“ (U+201E opens, U+201C closes) and Dutch writes '…' (a plain apostrophe on both sides, as the site's Dutch has it). Add no quotes where the English has none.
-- Numbers keep their English format: `1.5 s`, `45%`. Not `1,5 s`.
+- **Dashes.** German and Dutch keep the English's spaced em dash " — ", as the site's own German and Dutch do. Measured on 2026-10-01 over the 1601 texts `yarn i18n:site .` prints: 20 English texts have one. 19 of those 20 German texts keep " — " (one has " – "), and 17 of the 19 Dutch texts keep it (two are reworded, with a comma and a colon; the twentieth has no Dutch). Never change " — " to " – " or " - ". Where the English has a spaced hyphen, as in "Settings - Darts Zoom", the hyphen stays.
+- **The en dash "–"** is only for a number range, written as the English writes it, with no spaces: `0–180`, `s1–s20`. The site has no number range in its texts, so this follows Tools' English. A trigger token such as `100-180` is what users type, and its hyphen stays.
+- **Quotes.** The site rarely quotes: 3 of its English texts do, all with a straight "…". Its Dutch writes '…' (a plain apostrophe on both sides) in all 4 of its quoted texts, including all 3 where the English quotes. Its German is mixed: „…“ (U+201E opens, U+201C closes) in 2 texts and a straight "…" in 3 others. We write „…“ in German and '…' in Dutch where the English quotes something, and add no quotes where the English has none.
+- **Numbers** keep their English format: `1.5 s`, `45%`. Not `1,5 s`.
 
 ## 8. What stays literal
 
