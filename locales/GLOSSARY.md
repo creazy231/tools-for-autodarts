@@ -37,6 +37,7 @@ game.nextLeg
 - **Write what a German or Dutch speaker would write.** Read the English sentence first, and never translate word by word. Keep to roughly the English length. Where German runs much longer in a button, a pill or a card title, choose the shorter natural wording; a smaller font is not the fix.
 - **On the site's own pages,** such as the line we add to Settings, a description is a short phrase with no full stop, as the site writes them ("Play animations during gameplay"). Inside Tools' own panels, a sentence stays a sentence.
 - **Case.** No Title Case in either language. German capitalises its nouns. Dutch labels are sentence case, as the site's are: "Volgende leg", "Ongedaan maken", "Willekeurige checkout".
+- **Dutch compounds** that start with *instelling* take the plural, as *instellingenbestand* and *instellingengegevens* do. *Instelling* also means an institution, so *instellingsgegevens* would read as an institution's data. The site's own compounds put *instellingen* last (*Wedstrijdinstellingen*, *Bordinstellingen*).
 
 ## 3. The site's words
 
@@ -71,7 +72,9 @@ When a text names a button, a setting or a darts term, it uses the site's word i
 | Winner | `matches.winner` | Gewinner | Winnaar |
 | Reset | `statistics.filters.reset` | Zurücksetzen | Opnieuw instellen |
 | Delete | `matches.delete` | Löschen | Verwijderen |
+| Clear | `statistics.filters.clear` | Löschen | Wissen |
 | Cancel | `common.cancel` | Abbrechen | Annuleren |
+| Continue | `countrySelect.confirm` and six more buttons (`onboarding.step1.submit` …) | Weiter | Doorgaan |
 | Save | `common.save` | Speichern | Opslaan |
 | Add | `lobby.players.add` | Hinzufügen | Toevoegen |
 | Edit | `lobby.gameSettings.edit` | Bearbeiten | Bewerken |
@@ -85,6 +88,10 @@ When a text names a button, a setting or a darts term, it uses the site's word i
 | Score bar | `game.clippy.undoHintBody` | Punkteleiste | scorebalk |
 
 *Visit*, *Throw* and *Score bar* are words inside longer site texts, and their keys are where to see them in use. Dutch nouns are lower case in the middle of a sentence (*beurt*, *tegenstander*, *legs*).
+
+*Clear* and *Delete* are the same word in the site's German (*Löschen*), so a text that names the clear button says *Löschen* too: "Suche löschen", "Lösche die Suche …". The site's plain *Continue* button is always *Weiter* / *Doorgaan*; *fortfahren* only appears in longer texts ("Mit Apple fortfahren", "um fortzufahren"), so a verb inside a sentence may use it.
+
+*Bust* has no verb on the site. Its German is the noun in "… ist es ein Bust" and its Dutch the adjective in "dan ben je bust" (both `lobby.howToPlay.rules.x01`), so a trigger line says "Bei einem Spieler ist es ein Bust" and "Een speler is bust". Do not write *überworfen*, which the site never does, or *einen Bust*, since nothing there settles the noun's gender.
 
 **German genders,** as the site's own sentences have them: *der Dart* ("einen Dart", "jeden Dart"), *das Leg*, *das Board*, *das Match*, *das Checkout* ("Zufälliges Checkout").
 
@@ -178,7 +185,7 @@ These are the names in every card, dialog heading and sentence that mentions a f
 
 ### Labels quoted in What's New
 
-What's New (`locales/*/whatsNew.ts`) names settings and features that other panels own, and some that are gone. It writes them as below. When you convert the panel that owns one, use the same word, so a label reads the same in What's New and where the player finds it. In a sentence the label keeps its capital, as in the English, and carries no quotes.
+What's New (`locales/*/whatsNew.ts`) names settings and features that other panels own, and some that are gone. It writes them as below. When you convert the panel that owns one, use the same word, so a label reads the same in What's New and where the player finds it. In a sentence the label keeps its capital, as in the English, and carries no quotes. The exception is a site label of three or more words: quoted in the middle of a sentence it takes the site's quotes (German „…“, Dutch '…'), so that it isn't misparsed as part of the sentence, as in "een eigen knop 'Volgorde willekeurig maken'". A label of one or two words stays unquoted ("onder Dart geland").
 
 | English | Where it is from | Deutsch | Nederlands |
 |---|---|---|---|
@@ -191,11 +198,21 @@ What's New (`locales/*/whatsNew.ts`) names settings and features that other pane
 | Quiet Own Darts | the feature's name; its row on the site's sound settings reads "Only on others' turns" | Eigene Darts stummschalten | Eigen darts dempen |
 | Shuffle Players | gone, the lobby has the site's Shuffle | Spieler mischen | Spelers schudden |
 | Hide Menu In Match | gone | Menü im Match ausblenden | Menu in wedstrijd verbergen |
-| Shuffle | the lobby's button, the site's own (`lobby.players.randomizeOrder`) | Shuffle | Volgorde willekeurig maken |
+| Shuffle | the lobby's button, the site's own (`lobby.players.randomizeOrder`) | Shuffle | Volgorde willekeurig maken (three words, so quoted in a sentence) |
 | Scoreboard | Streaming Mode's overlay | Scoreboard | scorebord |
 | Classic | Streaming Mode's first scoreboard, beside Autodarts | Klassisch | Klassiek |
 
 *Dart landed* is the site's own and is in section 3 (*Dart geworfen*, *Dart geland*). The trigger token `bulloff` stays as it is. The site's *score bar* (*Punkteleiste*, *scorebalk*) is the bar that holds the visit's darts, not a scoreboard.
+
+### Words later panels will need
+
+Settled while the trigger hints were written (`locales/*/triggers.ts`), for the panels that name the same things. Use them as they are, so a label reads the same in a hint and where the player finds it.
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| Partner rule | Teams' switch card in the lobby, beside the site's Autoscoring | Partnerregel | partnerregel (as a label, with a capital: Partnerregel) |
+| your Boards list | the list of boards in WLED's settings, headed *Boards*; the trigger hint for throws on a board that is not in it says it | deiner Boards-Liste | je lijst Borden |
+| Mark Ready | the tournament page's own button (`matchMaking.markReady`); the hints for a ready tournament match say it as a verb ("als bereit markiert werden", "gereed worden gemeld") | Als bereit markieren | Gereed melden |
 
 ## 6. Takeout
 
@@ -210,7 +227,7 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 
 ## 8. What stays literal
 
-`locales/untranslated.json` lists the text that is the same in every language and may sit in the code as it is. Only brand and product names, units, notation, format names and the names of games the site does not translate go there. Add an entry only for text that really is identical in all three languages, say why in the commit message, and add its row here.
+`locales/untranslated.json` lists the text that may stay as the English has it: in the code, and in a German or Dutch catalog, where `yarn i18n:check` otherwise reports a sentence of three words or more that is still the English. Only brand and product names, units, notation, format names and the names of games go there, and a game only when the site leaves its name untranslated in German, in Dutch or in both. Add an entry only for text that needs no translation in the language that keeps it (a name, a unit, a notation, a name the site leaves as it is), say why in the commit message, and add its row here.
 
 | Entry | Why it stays |
 |---|---|
