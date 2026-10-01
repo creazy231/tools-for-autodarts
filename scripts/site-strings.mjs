@@ -67,11 +67,13 @@ function toData(node) {
     const key = ts.isIdentifier(property.name) || ts.isStringLiteral(property.name) ? property.name.text : undefined;
     const value = property.initializer;
     if (key === undefined) continue;
-    if (ts.isStringLiteral(value) || ts.isNoSubstitutionTemplateLiteral(value)) out[key] = value.text;
-    else if (ts.isObjectLiteralExpression(value)) out[key] = toData(value);
-    // Vite writes big sub-tables as JSON.parse(`{…}`). JSON.parse runs nothing either.
-    else if (ts.isCallExpression(value) && value.expression.getText(tree) === "JSON.parse" && value.arguments[0]
+    if (ts.isStringLiteral(value) || ts.isNoSubstitutionTemplateLiteral(value)) {
+      out[key] = value.text;
+    } else if (ts.isObjectLiteralExpression(value)) {
+      out[key] = toData(value);
+    } else if (ts.isCallExpression(value) && value.expression.getText(tree) === "JSON.parse" && value.arguments[0]
       && (ts.isStringLiteral(value.arguments[0]) || ts.isNoSubstitutionTemplateLiteral(value.arguments[0]))) {
+      // Vite writes big sub-tables as JSON.parse(`{…}`). JSON.parse runs nothing either.
       const parsed = JSON.parse(value.arguments[0].text);
       if (parsed && typeof parsed === "object") out[key] = parsed;
     }
@@ -88,14 +90,16 @@ function flatten(node, prefix = "", out = {}) {
   return out;
 }
 
-const table = (language) => {
+function table(language) {
   const node = objects.get(tableNames.get(language));
   return node ? flatten(toData(node)) : {};
-};
+}
 const english = { ...table("en-dev"), ...table("en") };
 const german = table("de");
 const dutch = table("nl");
 if (!Object.keys(english).length) throw new Error("Found no English table in the i18n chunk: the site has changed its bundling.");
+if (!Object.keys(german).length) throw new Error("Found no German table in the i18n chunk: the site has changed its bundling.");
+if (!Object.keys(dutch).length) throw new Error("Found no Dutch table in the i18n chunk: the site has changed its bundling.");
 
 const rows = Object.entries(english)
   .filter(([ key, text ]) => key.toLowerCase().includes(search) || text.toLowerCase().includes(search))
