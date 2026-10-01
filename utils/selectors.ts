@@ -841,6 +841,23 @@ export const SELECTORS = {
     switchThumb: [ "[data-slot='switch-thumb']" ],
   },
 
+  /**
+   * /settings/general — the site's Language setting, under which Tools says
+   * that it follows it (utils/language-note.ts).
+   */
+  siteSettings: {
+    /**
+     * The Language select's trigger. The id is written in the site's source,
+     * and the field's label points at it with `for`, so it is stable.
+     */
+    languageSelect: [ "#settings-language" ],
+    /** One setting: its label, its control and its description. */
+    field: [ "[data-slot='field']" ],
+    fieldLabel: [ "[data-slot='field-label']" ],
+    /** A setting's description line, whose classes the note copies. */
+    fieldDescription: [ "[data-slot='field-description']" ],
+  },
+
   /** Boards page — entrypoints/boards.content. Still at /boards on v2. */
   boards: {
     /**

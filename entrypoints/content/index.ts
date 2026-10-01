@@ -12,6 +12,7 @@ import { isiOS } from "@/utils/helpers";
 import Migration from "@/components/Migration.vue";
 import { AUTODARTS_MATCHES } from "@/utils/content-script-matches";
 import { quietOwnDartsSwitch, quietOwnDartsSwitchOnRemove } from "@/utils/quiet-own-darts-switch";
+import { languageNote, languageNoteOnRemove } from "@/utils/language-note";
 import { keepKeystrokesInFields } from "@/utils/keep-keystrokes-in-fields";
 import { pageBackground } from "@/utils/page-background";
 
@@ -47,6 +48,12 @@ export default defineContentScript({
     // See utils/quiet-own-darts-switch.ts.
     await quietOwnDartsSwitch().catch(e => console.error(e));
     ctx.onInvalidated(quietOwnDartsSwitchOnRemove);
+
+    // The note under the site's Language setting: it changes Tools' language
+    // too. This script runs on every page, so it sees /settings/general
+    // whichever way the user got there. See utils/language-note.ts.
+    languageNote();
+    ctx.onInvalidated(languageNoteOnRemove);
 
     // Create a custom event listener for the auth cookie
     ctx.addEventListener(window, "auth-cookie-available", (event: CustomEvent) => {
