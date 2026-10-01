@@ -8,11 +8,18 @@
  *
  * Once announced, the message is edited in place when the game starts, so the
  * channel does not fill up with stale "come and play" posts.
+ *
+ * The post is written in the language autodarts is showing for the host, with
+ * the lobby's settings named as the site names them (utils/discord-announcement.ts).
+ * The edit reuses the post's words, so one message stays in one language even if
+ * the host picks another in between.
  */
 
 import { startGameButton, waitForStartGameButton } from "./start-game";
 
 import { waitForElement } from "@/utils";
+import { settingName, settingValue } from "@/utils/discord-announcement";
+import { onLanguageChange, t } from "@/utils/i18n";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
@@ -31,19 +38,33 @@ const ICON_ALERT = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 2
 /** How long the button stays in its "sent" state before returning to normal. */
 const SENT_FEEDBACK_MS = 5000;
 
+/** The emoji on both sides of the headline. Only its words are translated, so the emoji and the Markdown around them stay here. */
+const TARGET = "🎯";
+
 let autoStartTimer: number | null = null;
 let headerObserver: MutationObserver | null = null;
 let startButtonObserver: MutationObserver | null = null;
+/** Rewrites the button's tooltip when the language changes. */
+let stopLanguageListener: (() => void) | null = null;
 
 /** Set once a message exists, so it can be edited when the game starts. */
 let webhookMessageId: string | null = null;
 let webhookUrl: string | null = null;
 /** The lobby settings as they were announced, reused when editing the message. */
 let announcedFields: EmbedField[] = [];
+/**
+ * The words of the post besides those settings, as they were written. The edit
+ * reuses them rather than asking `t()` again, so a language picked between the
+ * post and the edit does not leave one message half in each.
+ */
+let announcedWords: AnnouncementWords | null = null;
 /** Guards against the timer and a manual click both editing the message. */
 let messageUpdated = false;
 
 interface EmbedField { name: string; value: string; inline: boolean }
+
+/** What the announcement says besides the lobby's settings, in the language of the moment it is written. */
+interface AnnouncementWords { headline: string; embedTitle: string; started: string }
 
 export async function discordWebhooks() {
   console.log("Autodarts Tools: Discord Webhooks - Starting");
@@ -64,6 +85,8 @@ export async function onRemove() {
   headerObserver = null;
   startButtonObserver?.disconnect();
   startButtonObserver = null;
+  stopLanguageListener?.();
+  stopLanguageListener = null;
 
   if (autoStartTimer !== null) {
     clearTimeout(autoStartTimer);
@@ -76,6 +99,7 @@ export async function onRemove() {
   webhookMessageId = null;
   webhookUrl = null;
   announcedFields = [];
+  announcedWords = null;
   messageUpdated = false;
 }
 
@@ -100,6 +124,16 @@ async function mountButton() {
   headerObserver?.disconnect();
   headerObserver = new MutationObserver(() => inject());
   headerObserver.observe(document.body, { childList: true, subtree: true });
+
+  // The button's tooltip is written once, when it is built. One listener for
+  // the lobby, not one per button: the header throws the button away and
+  // `inject` builds another every time it re-renders, and the listener finds
+  // whichever one is there.
+  stopLanguageListener?.();
+  stopLanguageListener = onLanguageChange(() => {
+    const button = document.getElementById(BUTTON_ID);
+    if (button) button.title = t("discordWebhooks.button.title");
+  });
 }
 
 function inject() {
@@ -124,7 +158,7 @@ function buildButton(template: HTMLButtonElement): HTMLButtonElement {
 
   button.id = BUTTON_ID;
   button.type = "button";
-  button.title = "Announce this lobby in Discord";
+  button.title = t("discordWebhooks.button.title");
   setContent(button, ICON_DISCORD, "Discord");
 
   button.addEventListener("click", async () => {
@@ -134,9 +168,17 @@ function buildButton(template: HTMLButtonElement): HTMLButtonElement {
     // Report what actually happened: a missing or rejected webhook URL is
     // otherwise silent, and the host has no way to tell the channel got nothing.
     const sent = await sendWebhook();
-    setContent(button, sent ? ICON_CHECK : ICON_ALERT, sent ? "Sent" : "Failed");
+    const showResult = () => setContent(
+      button,
+      sent ? ICON_CHECK : ICON_ALERT,
+      sent ? t("discordWebhooks.button.sent") : t("discordWebhooks.button.failed"),
+    );
+    showResult();
+    // The word stays for a few seconds: follow a language picked meanwhile.
+    const stopFollowing = onLanguageChange(showResult);
 
     setTimeout(() => {
+      stopFollowing();
       setContent(button, ICON_DISCORD, "Discord");
       button.disabled = false;
     }, SENT_FEEDBACK_MS);
@@ -275,13 +317,14 @@ async function sendWebhook() {
     await rememberMatchId(link);
 
     const fields = await buildLobbyFields();
+    const words = announcementWords();
     const embedFields = [ ...fields ];
 
     if (config.discord.autoStartAfterTimer?.enabled) {
       const startsAt = Math.floor(Date.now() / 1000) + config.discord.autoStartAfterTimer.minutes * 60;
       embedFields.push(spacerField(), {
         name: "",
-        value: `⌛ Game will auto-start: <t:${startsAt}:R>`,
+        value: t("discordWebhooks.message.autoStart", { time: `<t:${startsAt}:R>` }),
         inline: false,
       });
     }
@@ -292,8 +335,8 @@ async function sendWebhook() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        content: `🎯 **NEW GAME ON AUTODARTS** 🎯\n\n${link}\n_ _`,
-        embeds: [ embed(embedFields, 8902706) ],
+        content: `${TARGET} **${words.headline}** ${TARGET}\n\n${link}\n_ _`,
+        embeds: [ embed(words.embedTitle, embedFields, 8902706) ],
         username: "Autodarts Tools",
         avatar_url: "https://lh3.googleusercontent.com/YwAEtrxsMxCS_nQpaTE96s4lBqmcGAI1MyI88-4E1vXK4EFoe3kTInegjd-7P2bRsWFPN1bRW5dVKBTcX8oQbeEg",
         attachments: [],
@@ -306,6 +349,7 @@ async function sendWebhook() {
     webhookMessageId = id;
     webhookUrl = config.discord.url;
     announcedFields = fields;
+    announcedWords = words;
 
     if (config.discord.autoStartAfterTimer?.enabled) {
       startAutoStartTimer(config.discord.autoStartAfterTimer.minutes);
@@ -320,21 +364,22 @@ async function sendWebhook() {
 
 /** Edit the announcement in place: the lobby is no longer open to join. */
 async function markMessageStarted() {
-  if (!webhookMessageId || !webhookUrl) return;
+  const words = announcedWords;
+  if (!webhookMessageId || !webhookUrl || !words) return;
 
   const config = await AutodartsToolsConfig.getValue();
 
   const fields = config.discord.autoStartAfterTimer?.enabled
-    ? [ ...announcedFields, spacerField(), { name: "", value: "🎮 Game has started!", inline: false } ]
+    ? [ ...announcedFields, spacerField(), { name: "", value: words.started, inline: false } ]
     : [];
 
   const response = await fetch(`${webhookUrl}/messages/${webhookMessageId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      content: "🎯 **NEW GAME ON AUTODARTS** 🎯\n\n_ _",
+      content: `${TARGET} **${words.headline}** ${TARGET}\n\n_ _`,
       // Red, so a started game reads differently at a glance in the channel.
-      embeds: [ embed(fields, 15158332) ],
+      embeds: [ embed(words.embedTitle, fields, 15158332) ],
     }),
   });
 
@@ -343,9 +388,18 @@ async function markMessageStarted() {
   console.log("Autodarts Tools: Discord Webhooks - Message updated:", id);
 }
 
-function embed(fields: EmbedField[], color: number) {
+/** The announcement's own words, in the language autodarts is showing now. The edit reuses what the post wrote. */
+function announcementWords(): AnnouncementWords {
   return {
-    title: "Settings",
+    headline: t("discordWebhooks.message.headline"),
+    embedTitle: t("discordWebhooks.message.embedTitle"),
+    started: t("discordWebhooks.message.started"),
+  };
+}
+
+function embed(title: string, fields: EmbedField[], color: number) {
+  return {
+    title,
     color,
     fields,
     image: { url: "https://i.imgur.com/lnkebyw.png" },
@@ -367,27 +421,22 @@ async function buildLobbyFields(): Promise<EmbedField[]> {
   const fields: EmbedField[] = [];
 
   if (lobbyData.host?.name) {
-    fields.push({ name: "Host", value: lobbyData.host.name, inline: true });
+    fields.push({ name: t("discordWebhooks.message.host"), value: lobbyData.host.name, inline: true });
   }
 
   for (const [ key, value ] of Object.entries(lobbyData.settings ?? {})) {
     if (typeof value === "object") continue;
-    fields.push({ name: humanise(key), value: String(value), inline: true });
+    fields.push({ name: settingName(key, t), value: settingValue(key, value, t), inline: true });
   }
 
   // Bookkeeping the channel does not need.
   const skip = new Set([ "host", "settings", "players", "createdAt", "id", "isPrivate" ]);
   for (const [ key, value ] of Object.entries(lobbyData)) {
     if (skip.has(key) || typeof value === "object") continue;
-    fields.push({ name: humanise(key), value: String(value), inline: true });
+    fields.push({ name: settingName(key, t), value: settingValue(key, value, t), inline: true });
   }
 
   return fields;
-}
-
-/** "maxRounds" -> "Max Rounds" */
-function humanise(key: string): string {
-  return key.replace(/([A-Z])/g, " $1").replace(/^./, c => c.toUpperCase());
 }
 
 // ------------------------------------------------------------------ config
