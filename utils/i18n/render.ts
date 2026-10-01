@@ -13,6 +13,10 @@ import type { Params } from "./types";
  * becomes the slot of that name, or the param of that name as text, or stays
  * as written. Params are text children, which Vue escapes, so a name can hold
  * anything.
+ *
+ * Only own slots and params count, and a slot only if it is a function: a
+ * marker such as `{constructor}` must not find what every object inherits,
+ * nor `{_}` the flag Vue keeps on compiled slots.
  */
 export function renderMarkup(nodes: MarkupNode[], slots: Slots, params?: Params): VNodeChild[] {
   // The switch names every kind of node, so none falls through. The linter has
@@ -27,11 +31,15 @@ export function renderMarkup(nodes: MarkupNode[], slots: Slots, params?: Params)
       case "tag":
         return h(node.tag, renderMarkup(node.children, slots, params));
       case "slot": {
-        const slot = slots[node.name];
-        if (slot) return slot();
-        const value = params?.[node.name];
+        const slot = own(slots, node.name) ? slots[node.name] : undefined;
+        if (typeof slot === "function") return slot();
+        const value = params && own(params, node.name) ? params[node.name] : undefined;
         return value === undefined ? `{${node.name}}` : String(value);
       }
     }
   });
+}
+
+function own(object: object, name: string): boolean {
+  return Object.prototype.hasOwnProperty.call(object, name);
 }

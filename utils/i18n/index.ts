@@ -126,7 +126,14 @@ function follow(): void {
   const next = readSiteLanguage();
   if (next === current.value) return;
   current.value = next;
-  for (const listener of [ ...listeners ]) listener(next);
+  for (const listener of [ ...listeners ]) {
+    // One that fails must not leave the ones after it in the old language.
+    try {
+      listener(next);
+    } catch (error) {
+      console.error("Tools for Autodarts: a language change listener failed", error);
+    }
+  }
 }
 
 function afterPickingEvent(): void {
