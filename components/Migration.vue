@@ -1,29 +1,28 @@
 <template>
-  <AppModal @close="closeModal" size="lg" :show="showModal" title="Update Available" :disable-backdrop-click="true" :hide-close-button="true">
+  <AppModal @close="closeModal" size="lg" :show="showModal" :title="t('migration.title')" :disable-backdrop-click="true" :hide-close-button="true">
     <p class="mb-4 text-[var(--adt-text)]">
-      A new version of <b>Tools for Autodarts</b> is available. You can migrate your settings now or continue with default settings.
+      <AppTrans path="migration.intro" />
     </p>
 
     <div class="mb-4 rounded-md border border-yellow-700/50 bg-yellow-800/30 p-3">
       <p class="text-sm text-yellow-200">
-        <b>Note:</b> Sound, caller, and animation features have been reworked, and their settings cannot be migrated automatically.
-        You can download your old settings for reference.
+        <AppTrans path="migration.note" />
       </p>
       <AppButton @click="downloadOldConfig" type="default" auto size="sm" class="mt-2">
-        Download Settings
+        {{ t("migration.download") }}
       </AppButton>
     </div>
 
     <p class="text-sm opacity-60">
-      Continueing without migration will reset your settings to default.
+      {{ t("migration.resetWarning") }}
     </p>
 
     <template #footer>
       <AppButton @click="showConfirmDialog" type="danger">
-        Continue without
+        {{ t("migration.continueWithout") }}
       </AppButton>
       <AppButton @click="migrateSettings" type="success">
-        Migrate now
+        {{ t("migration.migrateNow") }}
       </AppButton>
     </template>
   </AppModal>
@@ -32,16 +31,16 @@
     @confirm="confirmContinueWithout"
     @cancel="cancelContinueWithout"
     :show="showConfirm"
-    title="Continue without migration?"
-    message="This will reset all your settings to default. Any custom configurations will be lost."
-    confirm-text="Continue"
-    cancel-text="Go back"
+    :title="t('migration.confirm.title')"
+    :message="t('migration.confirm.message')"
+    :confirm-text="t('migration.confirm.confirmText')"
+    :cancel-text="t('migration.confirm.cancelText')"
   />
 
   <AppNotification
     @close="showNotification = false"
     :show="showNotification"
-    message="Settings migrated successfully. Page is reloading..."
+    :message="t('migration.migrated')"
     type="success"
     :duration="3000"
   />
@@ -52,6 +51,7 @@ import type { IConfig } from "@/utils/storage";
 
 import AppModal from "@/components/AppModal.vue";
 import AppButton from "@/components/AppButton.vue";
+import AppTrans from "@/components/AppTrans.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import AppNotification from "@/components/AppNotification.vue";
 import { AutodartsToolsConfig } from "@/utils/storage";
@@ -168,6 +168,8 @@ interface OldConfig {
     }>;
   };
 }
+
+const { t } = useI18n();
 
 const showModal = ref(false);
 const showConfirm = ref(false);

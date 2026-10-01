@@ -176,6 +176,27 @@ These are the names in every card, dialog heading and sentence that mentions a f
 
 "Auto Next Player on Takeout" presses the site's Next, so its German and Dutch names say the site's word for Next ("Weiter", "Volgende"). The settings dialog's heading becomes "Einstellungen - …" and "Instellingen - …".
 
+### Labels quoted in What's New
+
+What's New (`locales/*/whatsNew.ts`) names settings and features that other panels own, and some that are gone. It writes them as below. When you convert the panel that owns one, use the same word, so a label reads the same in What's New and where the player finds it. In a sentence the label keeps its capital, as in the English, and carries no quotes.
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| Delay | Instant Replay's old setting, gone | Verzögerung | Vertraging |
+| Start delay | Instant Replay's setting | Startverzögerung | Startvertraging |
+| Center position | Darts Zoom's old *Center* position, gone | Mittelposition | Middenpositie |
+| Bottom, Top | Darts Zoom, *Position* | Unten, Oben | Onderaan, Bovenaan |
+| On Board | Darts Zoom, *Position* (the panel writes "On board") | Auf dem Board | Op het bord |
+| Prefer combined throws | Caller | Kombinierte Würfe bevorzugen | Gecombineerde worpen voorrang geven |
+| Quiet Own Darts | the feature's name; its row on the site's sound settings reads "Only on others' turns" | Eigene Darts stummschalten | Eigen darts dempen |
+| Shuffle Players | gone, the lobby has the site's Shuffle | Spieler mischen | Spelers schudden |
+| Hide Menu In Match | gone | Menü im Match ausblenden | Menu in wedstrijd verbergen |
+| Shuffle | the lobby's button, the site's own (`lobby.players.randomizeOrder`) | Shuffle | Volgorde willekeurig maken |
+| Scoreboard | Streaming Mode's overlay | Scoreboard | scorebord |
+| Classic | Streaming Mode's first scoreboard, beside Autodarts | Klassisch | Klassiek |
+
+*Dart landed* is the site's own and is in section 3 (*Dart geworfen*, *Dart geland*). The trigger token `bulloff` stays as it is. The site's *score bar* (*Punkteleiste*, *scorebalk*) is the bar that holds the visit's darts, not a scoreboard.
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".
