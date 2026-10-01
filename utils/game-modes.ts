@@ -6,7 +6,13 @@
  * is switched off for, `disabledGameModes`: a config saved before there was
  * such a list plays everywhere, and a game the site adds later is on without
  * anyone switching it on. See docs/superpowers/specs/2026-09-27-per-game-mode-design.md.
+ *
+ * The names shown for the modes and their groups are message keys, which the
+ * editor turns into the language shown with `t()`; this module never does.
+ * The `GameMode` values are the site's variant names, and never translated.
  */
+
+import type { MessageKey } from "@/utils/i18n";
 
 export enum GameMode {
   X01 = "X01",
@@ -37,43 +43,43 @@ export interface GameModeSettings {
 }
 
 export interface GameModeGroup {
-  title: string;
-  modes: readonly { mode: GameMode; label: string }[];
+  titleKey: MessageKey;
+  modes: readonly { mode: GameMode; labelKey: MessageKey }[];
 }
 
-/** The site's game picker: its groups, its order and its English names. */
+/** The site's game picker: its groups, its order and its names (locales/en/gameModes.ts and its translations, which use the site's own words). */
 export const GAME_MODE_GROUPS: readonly GameModeGroup[] = [
   {
-    title: "X01 and Cricket",
+    titleKey: "gameModes.groups.x01Cricket",
     modes: [
-      { mode: GameMode.X01, label: "X01" },
-      { mode: GameMode.CRICKET, label: "Cricket / Tactics" },
+      { mode: GameMode.X01, labelKey: "gameModes.modes.x01" },
+      { mode: GameMode.CRICKET, labelKey: "gameModes.modes.cricket" },
     ],
   },
   {
-    title: "Practice",
+    titleKey: "gameModes.groups.practice",
     modes: [
-      { mode: GameMode.COUNT_UP, label: "Count Up" },
-      { mode: GameMode.ATC, label: "Around The Clock" },
-      { mode: GameMode.RANDOM_CHECKOUT, label: "Random Checkout" },
-      { mode: GameMode.RTW, label: "Round the World" },
-      { mode: GameMode.SEGMENT_TRAINING, label: "Segment Training" },
-      { mode: GameMode.BOBS_27, label: "Bob's 27" },
-      { mode: GameMode.TRAINING_121, label: "121" },
+      { mode: GameMode.COUNT_UP, labelKey: "gameModes.modes.countUp" },
+      { mode: GameMode.ATC, labelKey: "gameModes.modes.atc" },
+      { mode: GameMode.RANDOM_CHECKOUT, labelKey: "gameModes.modes.randomCheckout" },
+      { mode: GameMode.RTW, labelKey: "gameModes.modes.rtw" },
+      { mode: GameMode.SEGMENT_TRAINING, labelKey: "gameModes.modes.segmentTraining" },
+      { mode: GameMode.BOBS_27, labelKey: "gameModes.modes.bobs27" },
+      { mode: GameMode.TRAINING_121, labelKey: "gameModes.modes.game121" },
     ],
   },
   {
-    title: "Party",
+    titleKey: "gameModes.groups.party",
     modes: [
-      { mode: GameMode.SHANGHAI, label: "Shanghai" },
-      { mode: GameMode.GOTCHA, label: "Gotcha" },
-      { mode: GameMode.BERMUDA, label: "Bermuda" },
-      { mode: GameMode.KILLER, label: "Killer" },
+      { mode: GameMode.SHANGHAI, labelKey: "gameModes.modes.shanghai" },
+      { mode: GameMode.GOTCHA, labelKey: "gameModes.modes.gotcha" },
+      { mode: GameMode.BERMUDA, labelKey: "gameModes.modes.bermuda" },
+      { mode: GameMode.KILLER, labelKey: "gameModes.modes.killer" },
     ],
   },
   {
-    title: "Before a match",
-    modes: [ { mode: GameMode.BULL_OFF, label: "Bull-off" } ],
+    titleKey: "gameModes.groups.beforeMatch",
+    modes: [ { mode: GameMode.BULL_OFF, labelKey: "gameModes.modes.bullOff" } ],
   },
 ];
 
@@ -135,10 +141,7 @@ export function disabledToStore(shown: readonly GameMode[], enabled: readonly Ga
   return off.length > 0 ? off : undefined;
 }
 
-/** What the Game modes row says: "All games", "None", or "12 of 14". */
-export function gameModesSummary(disabled: readonly string[] | undefined, shown: readonly GameMode[]): string {
-  const on = enabledIn(disabled, shown).length;
-  if (on === shown.length) return "All games";
-  if (on === 0) return "None";
-  return `${on} of ${shown.length}`;
+/** What the Game modes row counts: "12 of 14". The row says "All games" when every one is on and "None" when none is. */
+export function gameModesSummary(disabled: readonly string[] | undefined, shown: readonly GameMode[]): { on: number; total: number } {
+  return { on: enabledIn(disabled, shown).length, total: shown.length };
 }

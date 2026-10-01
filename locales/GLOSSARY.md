@@ -210,7 +210,7 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 
 ## 8. What stays literal
 
-`locales/untranslated.json` lists the text that is the same in every language and may sit in the code as it is. Only brand and product names, units, notation and format names go there. Add an entry only for text that really is identical in all three languages, say why in the commit message, and add its row here.
+`locales/untranslated.json` lists the text that is the same in every language and may sit in the code as it is. Only brand and product names, units, notation, format names and the names of games the site does not translate go there. Add an entry only for text that really is identical in all three languages, say why in the commit message, and add its row here.
 
 | Entry | Why it stays |
 |---|---|
@@ -231,6 +231,8 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 | `px` | Unit: pixels. |
 | `dB` | Unit: decibels. |
 | `×` | The multiplication sign after a speed or zoom number (`1.5×`). |
+| `Around The Clock` | The game's name, which the site's German leaves in English (`lobby.gamePicker.games.atc`). Its Dutch is "Around the Clock", so only the German is identical. |
+| `Round the World` | The game's name, which the site's German and Dutch both leave in English (`lobby.gamePicker.games.rtw`). |
 
 What is never translated beyond this file (what users type or import, trigger tokens such as `gameshot` and `t20`, names that identify something to autodarts, the site-text lists in `utils/selectors.ts`) is in section 5 of `docs/superpowers/specs/2026-10-01-i18n-design.md`.
 

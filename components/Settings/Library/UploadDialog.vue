@@ -55,7 +55,7 @@
           <AppTokenInput
             v-model="shared"
             :placeholder="t('library.triggers.placeholder')"
-            :suggestions="TRIGGER_HINTS[feature]"
+            :suggestions="suggestions"
             :validate="validate"
           />
           <p class="adt-field-hint">
@@ -127,6 +127,8 @@ const MODES = computed(() => [
   { label: t("library.upload.modes.names"), value: "names" },
   { label: t("library.upload.modes.shared"), value: "shared" },
 ]);
+/** The feature's trigger hints with their lines in the language shown, so typing searches the words on screen. */
+const suggestions = computed(() => TRIGGER_HINTS[props.feature].map(hint => ({ trigger: hint.trigger, description: t(hint.descriptionKey) })));
 
 const files = ref<File[]>([]);
 const mode = ref<string>("names");
