@@ -1,0 +1,98 @@
+import type en from "../en/library";
+import type { Translation } from "../../utils/i18n/types";
+
+export default {
+  itemState: "{title}: {state}",
+  state: {
+    on: "an",
+    off: "aus",
+  },
+  editNamed: "{title} bearbeiten",
+  dragToReorder: "Ziehen, um die Reihenfolge zu ändern",
+  deleteNamed: "{name} löschen",
+  playNamed: "{name} abspielen",
+  stopNamed: "{name} stoppen",
+  play: "Abspielen",
+  stop: "Stoppen",
+  // Shorter than "Sound hinzufügen": the text-to-speech dialog's footer holds three buttons, and a phone's row is narrow.
+  addSound: "Hinzufügen",
+  section: {
+    show: "Anzeigen",
+    all: "Alle",
+    shownOf: "{shown} von {total}",
+    nothingMatches: "Keine Treffer",
+    searchPlaceholder: "Nach Name oder Trigger suchen",
+    noMatch: "Kein Eintrag enthält das in seinem Namen, seinen Triggern oder seiner Quelle.",
+    dragHint: {
+      searchAndFilter: "Leere die Suche und wähle Alle, um Einträge in eine neue Reihenfolge zu ziehen.",
+      search: "Leere die Suche, um Einträge in eine neue Reihenfolge zu ziehen.",
+      filter: "Wähle Alle, um Einträge in eine neue Reihenfolge zu ziehen.",
+    },
+  },
+  categories: {
+    scores: "Scores",
+    throws: "Würfe",
+    events: "Events",
+    board: "Board",
+    players: "Spieler",
+  },
+  soundDialog: {
+    editTitle: "Sound bearbeiten",
+    addTitle: "Sound von einem Link hinzufügen",
+    thisSound: "diesen Sound",
+    theLink: "den Link",
+    uploadedHint: "In diesem Browser gespeichert. Name und Trigger lassen sich hier ändern.",
+    linkLabel: "Link zum Sound",
+    linkPlaceholder: "https://example.com/sound.mp3",
+    linkHint: "Eine MP3-, WAV- oder OGG-Datei unter einem Link, der mit https:// beginnt.",
+    volumeHint: "Bei {volume}% bleibt die Datei, wie sie ist. Mit bis zu {max}% wird eine leise Datei lauter.",
+    louderBlocked: "Die Website dieses Links erlaubt der Erweiterung nicht, die Datei zu lesen, deshalb wird sie höchstens mit {volume}% abgespielt. Um sie lauter zu machen, lade stattdessen die Datei hoch.",
+    nameLabel: "Name",
+    namePlaceholder: "Optional: erscheint in der Liste",
+  },
+  tts: {
+    editTitle: "Text-to-Speech-Sound bearbeiten",
+    addTitle: "Sound erzeugen",
+    textLabel: "Text zum Vorlesen",
+    textPlaceholder: "z. B. Einhundertachtzig!",
+    voiceLabel: "Stimme",
+    defaultVoice: "Standardstimme",
+    speed: "Geschwindigkeit",
+    pitch: "Tonhöhe",
+    volumeHint: "Bis {max}%: Eine Stimme lässt sich leiser stellen, aber nicht lauter, als sie spricht.",
+    missingTrigger: "Füge mindestens einen Trigger hinzu, sonst wird der Sound nie abgespielt.",
+    listen: "Anhören",
+  },
+  upload: {
+    dropzone: "Dateien hierher ziehen oder zum Auswählen klicken",
+    formatsLine: "{formats} · beliebig viele",
+    formatsAudio: "MP3, WAV oder OGG",
+    chosen: { one: "{count} Datei ausgewählt", other: "{count} Dateien ausgewählt" },
+    // The count in brackets, not "12 Sounds hinzufügen": next to Abbrechen that would not fit a phone.
+    addSounds: { one: "Hinzufügen ({count})", other: "Hinzufügen ({count})" },
+    addGifs: { one: "Hinzufügen ({count})", other: "Hinzufügen ({count})" },
+    remove: "Entfernen",
+    modes: {
+      names: "Aus Dateinamen",
+      shared: "Für alle gleich",
+    },
+    sharedHint: "Jede Datei bekommt diese. Leer lassen, um die Dateien ohne Trigger hinzuzufügen.",
+  },
+  source: {
+    tts: "Text-to-Speech · {voice}",
+    defaultVoice: "Standardstimme",
+    uploaded: "Hochgeladene Datei",
+    none: "Keine Quelle",
+  },
+  volume: {
+    label: "Lautstärke",
+    playsAt: "Wird mit {volume}% abgespielt",
+    reset: "Zurück auf {volume}%",
+  },
+  triggers: {
+    label: "Trigger",
+    placeholder: "Trigger eingeben und Enter drücken",
+    none: "Kein Trigger",
+    noneTitle: "Ohne Trigger wird es nie abgespielt",
+  },
+} satisfies Translation<typeof en>;

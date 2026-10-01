@@ -1,60 +1,59 @@
 <template>
-  <AppModal @close="emit('close')" :show="show" :title="editing ? 'Edit sound' : 'Add a sound from a link'" ghost-close>
+  <AppModal @close="emit('close')" :show="show" :title="editing ? t('library.soundDialog.editTitle') : t('library.soundDialog.addTitle')" ghost-close>
     <div class="space-y-5">
       <div v-if="hasFile" class="flex items-center gap-3 rounded-[var(--ad-radius-lg)] bg-white/[.04] p-3">
-        <PlayButton @click="emit('play')" :playing="playing" label="this sound" />
+        <PlayButton @click="emit('play')" :label="t('library.soundDialog.thisSound')" :playing="playing" />
         <div class="min-w-0">
           <p class="text-sm font-bold text-white">
-            Uploaded file
+            {{ t("library.source.uploaded") }}
           </p>
           <p class="text-xs text-[var(--ad-text-muted)]">
-            Kept in this browser. Its name and triggers can be changed here.
+            {{ t("library.soundDialog.uploadedHint") }}
           </p>
         </div>
       </div>
       <div v-else>
-        <label class="adt-field-label" for="sound-url">Link to the sound</label>
+        <label class="adt-field-label" for="sound-url">{{ t("library.soundDialog.linkLabel") }}</label>
         <div class="flex items-center gap-2">
           <div class="min-w-0 flex-1">
-            <AppInput id="sound-url" v-model="url" placeholder="https://example.com/sound.mp3" type="url">
+            <AppInput id="sound-url" v-model="url" :placeholder="t('library.soundDialog.linkPlaceholder')" type="url">
               <template #icon>
                 <span class="icon-[material-symbols--link-rounded]" />
               </template>
             </AppInput>
           </div>
-          <PlayButton @click="emit('play')" :disabled="!url" :playing="playing" label="the link" large />
+          <PlayButton @click="emit('play')" :disabled="!url" :label="t('library.soundDialog.theLink')" :playing="playing" large />
         </div>
         <p v-if="urlError" class="adt-field-hint !text-[var(--ad-rose-500)]">
           {{ urlError }}
         </p>
         <p v-else class="adt-field-hint">
-          An MP3, WAV or OGG file, on a link that starts with https://.
+          {{ t("library.soundDialog.linkHint") }}
         </p>
       </div>
 
       <div>
         <VolumeField v-model="volume">
           <template #hint>
-            100% is the file as it is. Up to 200% makes a quiet one louder.
+            {{ t("library.soundDialog.volumeHint", { volume: DEFAULT_VOLUME, max: MAX_VOLUME }) }}
           </template>
         </VolumeField>
         <AppAlert v-if="louderBlocked" class="mt-3" compact variant="warning">
-          This link's site doesn't let the extension read the file, so it plays at 100% at most. To make it louder,
-          upload the file instead.
+          {{ t("library.soundDialog.louderBlocked", { volume: DEFAULT_VOLUME }) }}
         </AppAlert>
       </div>
 
-      <AppInput id="sound-name" v-model="name" label="Name" placeholder="Optional: shown in the list" />
+      <AppInput id="sound-name" v-model="name" :label="t('library.soundDialog.nameLabel')" :placeholder="t('library.soundDialog.namePlaceholder')" />
 
       <TriggerField id="sound-triggers" v-model="triggers" :feature="feature" />
     </div>
 
     <template #footer>
       <AppButton @click="emit('close')" auto>
-        Cancel
+        {{ t("common.cancel") }}
       </AppButton>
       <AppButton @click="emit('save')" auto type="primary">
-        {{ editing ? "Save" : "Add sound" }}
+        {{ editing ? t("common.save") : t("library.addSound") }}
       </AppButton>
     </template>
   </AppModal>
@@ -71,6 +70,7 @@ import AppAlert from "@/components/AppAlert.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppInput from "@/components/AppInput.vue";
 import AppModal from "@/components/AppModal.vue";
+import { DEFAULT_VOLUME, MAX_VOLUME } from "@/utils/sound-volume";
 
 withDefaults(defineProps<{
   show: boolean;
@@ -92,4 +92,6 @@ const name = defineModel<string>("name", { required: true });
 const url = defineModel<string>("url", { required: true });
 const triggers = defineModel<string[]>("triggers", { required: true });
 const volume = defineModel<number>("volume", { required: true });
+
+const { t } = useI18n();
 </script>

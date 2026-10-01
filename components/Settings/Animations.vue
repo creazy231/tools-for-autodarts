@@ -224,12 +224,12 @@
     <UploadDialog
       @close="closeGifUploadModal"
       @save="processGifFiles"
-      :noun="{ one: 'GIF', other: 'GIFs' }"
       :processing="isGifProcessing"
       :show="showGifUploadModal"
       :triggers-from-name="file => extractTriggersFromGifFilename(file.name)"
       :validate="validateAnimationTrigger"
       accept="image/gif"
+      add-key="library.upload.addGifs"
       feature="animations"
       file-icon="icon-[material-symbols--gif-box-outline-rounded]"
       formats="GIF"

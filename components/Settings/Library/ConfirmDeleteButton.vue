@@ -12,9 +12,9 @@
   <span class="relative inline-flex">
     <button
       @click="arm"
-      :aria-label="`Delete ${label}`"
+      :aria-label="t('library.deleteNamed', { name: label })"
       :class="glass ? 'adt-glass-btn' : 'adt-icon-btn is-danger'"
-      title="Delete"
+      :title="t('common.delete')"
       type="button"
     >
       <span class="icon-[material-symbols--delete-outline-rounded]" />
@@ -30,14 +30,14 @@
       :class="[{ '!h-7': glass }]"
       type="button"
     >
-      Delete
+      {{ t("common.delete") }}
     </button>
   </span>
 </template>
 
 <script setup lang="ts">
 withDefaults(defineProps<{
-  /** What is deleted, for screen readers. */
+  /** What is deleted, for screen readers: its name, which "Delete …" is spoken with. */
   label: string;
   /** Over a picture. */
   glass?: boolean;
@@ -46,6 +46,8 @@ withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{ confirm: [] }>();
+
+const { t } = useI18n();
 
 const armed = ref(false);
 const confirmButton = ref<HTMLButtonElement>();

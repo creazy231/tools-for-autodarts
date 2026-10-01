@@ -1,5 +1,6 @@
 import common from "./common";
 import features from "./features";
+import library from "./library";
 import migration from "./migration";
 import settings from "./settings";
 import site from "./site";
@@ -9,6 +10,7 @@ import whatsNew from "./whatsNew";
 export default {
   common,
   features,
+  library,
   migration,
   settings,
   site,

@@ -1,24 +1,24 @@
 <template>
-  <AppModal @close="emit('close')" :show="show" :title="editing ? 'Edit text-to-speech sound' : 'Generate a sound'" ghost-close>
+  <AppModal @close="emit('close')" :show="show" :title="editing ? t('library.tts.editTitle') : t('library.tts.addTitle')" ghost-close>
     <div class="space-y-5">
-      <AppInput id="tts-text" v-model="text" label="Text to speak" placeholder="e.g. One hundred and eighty!">
+      <AppInput id="tts-text" v-model="text" :label="t('library.tts.textLabel')" :placeholder="t('library.tts.textPlaceholder')">
         <template #icon>
           <span class="icon-[material-symbols--record-voice-over-outline-rounded]" />
         </template>
       </AppInput>
 
-      <AppSelect id="tts-voice" v-model="voice" :options="voiceOptions" label="Voice" />
+      <AppSelect id="tts-voice" v-model="voice" :label="t('library.tts.voiceLabel')" :options="voiceOptions" />
 
       <div class="grid gap-x-8 sm:grid-cols-2">
         <div>
           <p class="adt-field-label">
-            Speed <span class="font-medium text-[var(--ad-text-muted)]">{{ rate.toFixed(1) }}×</span>
+            {{ t("library.tts.speed") }} <span class="font-medium text-[var(--ad-text-muted)]">{{ rate.toFixed(1) }}×</span>
           </p>
           <AppSlider v-model="rate" :max="2" :min="0.5" :show-value="false" :step="0.1" />
         </div>
         <div>
           <p class="adt-field-label">
-            Pitch <span class="font-medium text-[var(--ad-text-muted)]">{{ pitch.toFixed(1) }}</span>
+            {{ t("library.tts.pitch") }} <span class="font-medium text-[var(--ad-text-muted)]">{{ pitch.toFixed(1) }}</span>
           </p>
           <AppSlider v-model="pitch" :max="2" :min="0" :show-value="false" :step="0.1" />
         </div>
@@ -26,14 +26,14 @@
 
       <VolumeField v-model="volume" :max="MAX_TTS_VOLUME">
         <template #hint>
-          Up to 100%: a voice can be turned down, but no louder than it speaks.
+          {{ t("library.tts.volumeHint", { max: MAX_TTS_VOLUME }) }}
         </template>
       </VolumeField>
 
       <TriggerField
         id="tts-triggers"
         v-model="triggers"
-        :error="missingTrigger ? 'Add at least one trigger, or the sound never plays.' : ''"
+        :error="missingTrigger ? t('library.tts.missingTrigger') : ''"
         :feature="feature"
       />
     </div>
@@ -42,14 +42,14 @@
       <AppButton @click="emit('prelisten')" :disabled="!text" :loading="speaking" auto class="mr-auto">
         <span class="flex items-center gap-1.5">
           <span class="icon-[material-symbols--play-arrow-rounded] text-lg" />
-          Listen
+          {{ t("library.tts.listen") }}
         </span>
       </AppButton>
       <AppButton @click="emit('close')" auto>
-        Cancel
+        {{ t("common.cancel") }}
       </AppButton>
       <AppButton @click="save" :disabled="!text" auto type="primary">
-        {{ editing ? "Save" : "Add sound" }}
+        {{ editing ? t("common.save") : t("library.addSound") }}
       </AppButton>
     </template>
   </AppModal>
@@ -82,9 +82,12 @@ const rate = defineModel<number>("rate", { required: true });
 const pitch = defineModel<number>("pitch", { required: true });
 const volume = defineModel<number>("volume", { required: true });
 const triggers = defineModel<string[]>("triggers", { required: true });
+
+const { t } = useI18n();
+
 const missingTrigger = ref(false);
 
-const voiceOptions = computed(() => [ { value: "", label: "Default voice" }, ...props.voices ]);
+const voiceOptions = computed(() => [ { value: "", label: t("library.tts.defaultVoice") }, ...props.voices ]);
 
 // Opening the dialog afresh, or adding a trigger, clears the complaint.
 watch(() => props.show, () => {

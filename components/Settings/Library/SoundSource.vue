@@ -11,6 +11,8 @@ const props = defineProps<{
   voices: { value: string; label: string }[];
 }>();
 
+const { t } = useI18n();
+
 const icon = computed(() => {
   if (props.sound.tts) return "icon-[material-symbols--record-voice-over-outline-rounded]";
   if (props.sound.soundId || props.sound.base64) return "icon-[material-symbols--audio-file-outline-rounded]";
@@ -21,9 +23,9 @@ const text = computed(() => {
   const { tts, soundId, base64, url } = props.sound;
   if (tts) {
     const voice = props.voices.find(option => option.value === tts.voiceURI)?.label;
-    return `Text to speech · ${voice ?? "default voice"}`;
+    return t("library.source.tts", { voice: voice ?? t("library.source.defaultVoice") });
   }
-  if (soundId || base64) return "Uploaded file";
-  return url.replace(/^https?:\/\//, "") || "No source";
+  if (soundId || base64) return t("library.source.uploaded");
+  return url.replace(/^https?:\/\//, "") || t("library.source.none");
 });
 </script>

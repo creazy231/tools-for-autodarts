@@ -1,0 +1,98 @@
+import type en from "../en/library";
+import type { Translation } from "../../utils/i18n/types";
+
+export default {
+  itemState: "{title}: {state}",
+  state: {
+    on: "aan",
+    off: "uit",
+  },
+  editNamed: "{title} bewerken",
+  dragToReorder: "Sleep om de volgorde te wijzigen",
+  deleteNamed: "{name} verwijderen",
+  playNamed: "{name} afspelen",
+  stopNamed: "{name} stoppen",
+  play: "Afspelen",
+  stop: "Stoppen",
+  // Shorter than "Geluid toevoegen": the text-to-speech dialog's footer holds three buttons, and a phone's row is narrow.
+  addSound: "Toevoegen",
+  section: {
+    show: "Tonen",
+    all: "Alles",
+    shownOf: "{shown} van {total}",
+    nothingMatches: "Geen resultaten",
+    searchPlaceholder: "Zoeken op naam of trigger",
+    noMatch: "Geen enkel item bevat dat in de naam, de triggers of de bron.",
+    dragHint: {
+      searchAndFilter: "Wis de zoekopdracht en kies Alles om items in een nieuwe volgorde te slepen.",
+      search: "Wis de zoekopdracht om items in een nieuwe volgorde te slepen.",
+      filter: "Kies Alles om items in een nieuwe volgorde te slepen.",
+    },
+  },
+  categories: {
+    scores: "Scores",
+    throws: "Worpen",
+    events: "Events",
+    board: "Bord",
+    players: "Spelers",
+  },
+  soundDialog: {
+    editTitle: "Geluid bewerken",
+    addTitle: "Geluid toevoegen via een link",
+    thisSound: "dit geluid",
+    theLink: "de link",
+    uploadedHint: "Bewaard in deze browser. De naam en triggers kun je hier wijzigen.",
+    linkLabel: "Link naar het geluid",
+    linkPlaceholder: "https://example.com/sound.mp3",
+    linkHint: "Een MP3-, WAV- of OGG-bestand, op een link die met https:// begint.",
+    volumeHint: "Bij {volume}% blijft het bestand zoals het is. Met maximaal {max}% maak je een stil bestand luider.",
+    louderBlocked: "De site van deze link laat de extensie het bestand niet lezen, dus het wordt hooguit met {volume}% afgespeeld. Upload het bestand in plaats daarvan om het luider te maken.",
+    nameLabel: "Naam",
+    namePlaceholder: "Optioneel: getoond in de lijst",
+  },
+  tts: {
+    editTitle: "Geluid met tekst-naar-spraak bewerken",
+    addTitle: "Geluid genereren",
+    textLabel: "Tekst om voor te lezen",
+    textPlaceholder: "bijv. Honderdtachtig!",
+    voiceLabel: "Stem",
+    defaultVoice: "Standaardstem",
+    speed: "Snelheid",
+    pitch: "Toonhoogte",
+    volumeHint: "Tot {max}%: je kunt een stem zachter zetten, maar nooit luider dan de stem zelf spreekt.",
+    missingTrigger: "Voeg minstens één trigger toe, anders wordt het geluid nooit afgespeeld.",
+    listen: "Beluisteren",
+  },
+  upload: {
+    dropzone: "Sleep bestanden hierheen, of klik om te kiezen",
+    formatsLine: "{formats} · zoveel je wilt",
+    formatsAudio: "MP3, WAV of OGG",
+    chosen: { one: "{count} bestand gekozen", other: "{count} bestanden gekozen" },
+    // The count in brackets, not "12 geluiden toevoegen": next to Annuleren that would not fit a phone.
+    addSounds: { one: "Toevoegen ({count})", other: "Toevoegen ({count})" },
+    addGifs: { one: "Toevoegen ({count})", other: "Toevoegen ({count})" },
+    remove: "Verwijderen",
+    modes: {
+      names: "Uit bestandsnaam",
+      shared: "Allemaal gelijk",
+    },
+    sharedHint: "Elk bestand krijgt deze. Laat het leeg om de bestanden zonder triggers toe te voegen.",
+  },
+  source: {
+    tts: "Tekst-naar-spraak · {voice}",
+    defaultVoice: "standaardstem",
+    uploaded: "Geüpload bestand",
+    none: "Geen bron",
+  },
+  volume: {
+    label: "Volume",
+    playsAt: "Wordt met {volume}% afgespeeld",
+    reset: "Terug naar {volume}%",
+  },
+  triggers: {
+    label: "Triggers",
+    placeholder: "Typ een trigger en druk op Enter",
+    none: "Geen trigger",
+    noneTitle: "Zonder trigger wordt het nooit afgespeeld",
+  },
+} satisfies Translation<typeof en>;

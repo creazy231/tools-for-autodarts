@@ -10,7 +10,7 @@
       <span class="truncate">{{ trigger }}</span>
     </span>
     <span v-if="hidden.length" :title="hidden.join(', ')" class="adt-chip is-more">+{{ hidden.length }}</span>
-    <span v-if="!triggers.length" class="adt-chip is-warning" title="Without a trigger it never plays">No trigger</span>
+    <span v-if="!triggers.length" class="adt-chip is-warning" :title="t('library.triggers.noneTitle')">{{ t("library.triggers.none") }}</span>
   </div>
 </template>
 
@@ -28,6 +28,8 @@ const props = withDefaults(defineProps<{
   max: 4,
   wrap: true,
 });
+
+const { t } = useI18n();
 
 /** While searching, what the search found goes first, so it is never folded away. */
 const ordered = computed(() => {

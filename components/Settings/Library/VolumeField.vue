@@ -3,14 +3,14 @@
   <div>
     <div class="flex min-h-8 items-center justify-between gap-3">
       <p class="adt-field-label !mb-0">
-        Volume <span class="font-medium tabular-nums text-[var(--ad-text-muted)]">{{ volume }}%</span>
+        {{ t("library.volume.label") }} <span class="font-medium tabular-nums text-[var(--ad-text-muted)]">{{ volume }}%</span>
       </p>
       <button
         @click="volume = DEFAULT_VOLUME"
         v-if="volume !== DEFAULT_VOLUME"
-        aria-label="Back to 100%"
+        :aria-label="t('library.volume.reset', { volume: DEFAULT_VOLUME })"
         class="adt-icon-btn"
-        title="Back to 100%"
+        :title="t('library.volume.reset', { volume: DEFAULT_VOLUME })"
         type="button"
       >
         <span class="icon-[material-symbols--restart-alt-rounded]" />
@@ -25,7 +25,7 @@
       :show-value="false"
       :step="VOLUME_STEP"
       class="!pb-3"
-      label="Volume"
+      :label="t('library.volume.label')"
     />
     <p v-if="$slots.hint" class="adt-field-hint !mt-0">
       <slot name="hint" />
@@ -45,6 +45,8 @@ withDefaults(defineProps<{
 });
 
 const volume = defineModel<number>({ required: true });
+
+const { t } = useI18n();
 
 function percent(value: number): string {
   return `${value}%`;

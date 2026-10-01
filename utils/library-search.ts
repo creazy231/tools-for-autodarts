@@ -7,6 +7,8 @@
  * each stored item to a flat {@link LibraryEntry} and render what comes back.
  */
 
+import type { MessageKey } from "@/utils/i18n";
+
 /** The kinds of trigger the filter pills offer. */
 export type TriggerCategory = "scores" | "throws" | "events" | "board" | "players";
 
@@ -24,12 +26,17 @@ export interface LibraryEntry {
   enabled: boolean;
 }
 
-export const CATEGORY_LABELS: Record<TriggerCategory, string> = {
-  scores: "Scores",
-  throws: "Throws",
-  events: "Events",
-  board: "Board",
-  players: "Players",
+/**
+ * Where each pill's label is in the catalog, for the component to hand to
+ * `t()`: this module stays free of the i18n runtime, so it still runs under
+ * tsx. The ids stay as they are, since the filter is keyed by them.
+ */
+export const CATEGORY_LABEL_KEYS: Record<TriggerCategory, MessageKey> = {
+  scores: "library.categories.scores",
+  throws: "library.categories.throws",
+  events: "library.categories.events",
+  board: "library.categories.board",
+  players: "library.categories.players",
 };
 
 /** The order the pills come in. */

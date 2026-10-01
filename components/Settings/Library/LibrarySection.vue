@@ -17,11 +17,11 @@
         </div>
       </div>
       <template v-if="entries.length">
-        <AppSearchInput v-model="query" :placeholder="searchPlaceholder" class="mt-3" />
+        <AppSearchInput v-model="query" :placeholder="placeholder" class="mt-3" />
         <div v-if="showPills || filtering" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <AppFilterPills v-if="showPills" v-model="filter" :options="pills" label="Show" />
+          <AppFilterPills v-if="showPills" v-model="filter" :label="t('library.section.show')" :options="pills" />
           <p v-if="filtering" aria-live="polite" class="ml-auto text-sm font-semibold tabular-nums text-[var(--ad-text-muted)]">
-            {{ shown.length }} of {{ entries.length }}
+            {{ t("library.section.shownOf", { shown: shown.length, total: entries.length }) }}
           </p>
         </div>
       </template>
@@ -47,13 +47,13 @@
     <div v-else-if="!shown.length" class="flex flex-col items-center px-6 py-14 text-center">
       <span class="icon-[material-symbols--search-off-rounded] mb-4 text-5xl text-white/25" />
       <p class="text-lg font-bold text-white">
-        Nothing matches
+        {{ t("library.section.nothingMatches") }}
       </p>
       <p class="mt-1 max-w-md text-sm text-[var(--ad-text-muted)]">
-        {{ noMatchText }}
+        {{ noMatch }}
       </p>
       <AppButton @click="reset" auto class="mt-6" size="sm">
-        Clear the search
+        {{ t("common.clearSearch") }}
       </AppButton>
     </div>
 
@@ -71,7 +71,7 @@ import type { LibraryEntry, LibraryFilter, TriggerCategory } from "@/utils/libra
 import AppButton from "@/components/AppButton.vue";
 import AppFilterPills from "@/components/AppFilterPills.vue";
 import AppSearchInput from "@/components/AppSearchInput.vue";
-import { CATEGORY_LABELS, CATEGORY_ORDER, filterCounts, keptFilter, matchesFilter, searchLibrary, showsFilters } from "@/utils/library-search";
+import { CATEGORY_LABEL_KEYS, CATEGORY_ORDER, filterCounts, keptFilter, matchesFilter, searchLibrary, showsFilters } from "@/utils/library-search";
 
 /**
  * A feature's list of items: the heading with its count and actions, the
@@ -88,24 +88,28 @@ const props = withDefaults(defineProps<{
   emptyTitle: string;
   emptyText: string;
   emptyIcon?: string;
+  /** Left out, it says "Search by name or trigger" in the current language. */
   searchPlaceholder?: string;
   /** Layout of the list: rows by default, a grid for pictures. */
   listClass?: string;
+  /** Pill labels that replace the catalog's, as finished text. */
   categoryLabels?: Partial<Record<TriggerCategory, string>>;
   /** Whether items can be dragged into a new order. Not for a list kept in an order of its own, such as the saved players. */
   sortable?: boolean;
-  /** Said when a search finds nothing. */
+  /** Said when a search finds nothing. Left out, the current language's "No item has that in its name, triggers or source." */
   noMatchText?: string;
 }>(), {
   emptyIcon: "icon-[material-symbols--library-music-outline-rounded]",
-  searchPlaceholder: "Search by name or trigger",
+  searchPlaceholder: undefined,
   listClass: "",
   categoryLabels: () => ({}),
   sortable: true,
-  noMatchText: "No item has that in its name, triggers or source.",
+  noMatchText: undefined,
 });
 
 const emit = defineEmits<{ reorder: [ from: number, to: number ] }>();
+
+const { t } = useI18n();
 
 const query = ref("");
 const filter = ref<LibraryFilter>("all");
@@ -120,19 +124,23 @@ const present = computed(() => filterCounts(props.entries));
 /** …and their numbers from what the search leaves. */
 const counts = computed(() => filterCounts(matching.value));
 const showPills = computed(() => showsFilters(present.value));
-/** What dragging needs: the whole list back. */
+const placeholder = computed(() => props.searchPlaceholder ?? t("library.section.searchPlaceholder"));
+const noMatch = computed(() => props.noMatchText ?? t("library.section.noMatch"));
+/** What dragging needs: the whole list back. These name the All pill and the search's clear button. */
 const dragHint = computed(() => {
   const searching = query.value.trim() !== "";
-  if (searching && filter.value !== "all") return "Clear the search and pick All to drag items into a new order.";
-  return searching ? "Clear the search to drag items into a new order." : "Pick All to drag items into a new order.";
+  if (searching && filter.value !== "all") return t("library.section.dragHint.searchAndFilter");
+  return searching ? t("library.section.dragHint.search") : t("library.section.dragHint.filter");
 });
 const pills = computed(() => {
-  const labels = { ...CATEGORY_LABELS, ...props.categoryLabels };
-  const options = [ { value: "all", label: "All", count: counts.value.all } ];
+  const options = [ { value: "all", label: t("library.section.all"), count: counts.value.all } ];
   for (const category of CATEGORY_ORDER) {
-    if (present.value[category]) options.push({ value: category, label: labels[category], count: counts.value[category] });
+    if (present.value[category]) {
+      const label = props.categoryLabels[category] ?? t(CATEGORY_LABEL_KEYS[category]);
+      options.push({ value: category, label, count: counts.value[category] });
+    }
   }
-  if (present.value.off) options.push({ value: "off", label: "Off", count: counts.value.off });
+  if (present.value.off) options.push({ value: "off", label: t("common.off"), count: counts.value.off });
   return options;
 });
 

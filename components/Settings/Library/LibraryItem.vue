@@ -6,7 +6,7 @@
     few letters. A plain row is the name and its delete on one line.
   -->
   <div class="adt-row" :class="[{ 'is-off': !enabled, 'is-plain': plain, 'has-meta': plain && Boolean($slots.meta) }]">
-    <span v-if="!plain" class="adt-drag-handle [grid-area:handle]" :class="[{ invisible: !draggable }]" aria-hidden="true" title="Drag to reorder">
+    <span v-if="!plain" class="adt-drag-handle [grid-area:handle]" :class="[{ invisible: !draggable }]" aria-hidden="true" :title="t('library.dragToReorder')">
       <span class="icon-[material-symbols--drag-indicator]" />
     </span>
     <div class="adt-row-dim [grid-area:lead]">
@@ -27,13 +27,13 @@
       <TriggerChips :query="query" :triggers="triggers" class="adt-row-dim [grid-area:chips]" />
       <AppSwitch
         @update:model-value="emit('toggle', $event)"
-        :label="`${title}: ${enabled ? 'on' : 'off'}`"
+        :label="t('library.itemState', { title, state: t(enabled ? 'library.state.on' : 'library.state.off') })"
         :model-value="enabled"
         class="justify-self-end [grid-area:switch]"
       />
     </template>
     <div class="flex items-center gap-0.5 justify-self-end [grid-area:actions]">
-      <button @click="emit('edit')" v-if="!plain" :aria-label="`Edit ${title}`" class="adt-icon-btn" title="Edit" type="button">
+      <button @click="emit('edit')" v-if="!plain" :aria-label="t('library.editNamed', { title })" class="adt-icon-btn" :title="t('common.edit')" type="button">
         <span class="icon-[material-symbols--edit-outline-rounded]" />
       </button>
       <ConfirmDeleteButton @confirm="emit('delete')" :label="title" />
@@ -70,4 +70,6 @@ withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{ toggle: [ value: boolean ]; edit: []; delete: [] }>();
+
+const { t } = useI18n();
 </script>

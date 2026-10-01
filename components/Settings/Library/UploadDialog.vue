@@ -15,17 +15,17 @@
       >
         <span class="icon-[material-symbols--upload-rounded] mb-1 text-4xl text-white/70" />
         <p class="font-bold text-white">
-          Drop files here, or click to choose
+          {{ t("library.upload.dropzone") }}
         </p>
         <p class="text-xs text-[var(--ad-text-muted)]">
-          {{ formats }} · as many as you like
+          {{ t("library.upload.formatsLine", { formats }) }}
         </p>
         <input @change="onChoose" ref="chooser" :accept="accept" class="hidden" multiple type="file">
       </div>
 
       <div v-if="files.length">
         <p class="adt-field-label">
-          {{ files.length }} {{ files.length === 1 ? "file" : "files" }} chosen
+          {{ t("library.upload.chosen", { count: files.length }) }}
         </p>
         <ul class="max-h-64 overflow-y-auto rounded-[var(--ad-radius-lg)] bg-white/[.03]">
           <li
@@ -36,7 +36,7 @@
             <span class="shrink-0 text-lg text-[var(--ad-text-muted)]" :class="[fileIcon]" />
             <span :title="file.name" class="min-w-0 flex-1 truncate text-sm text-white">{{ file.name }}</span>
             <TriggerChips :max="3" :triggers="triggersOf(file)" class="max-w-[45%] justify-end" />
-            <button @click="remove(index)" :aria-label="`Remove ${file.name}`" class="adt-icon-btn" title="Remove" type="button">
+            <button @click="remove(index)" :aria-label="t('common.remove', { name: file.name })" class="adt-icon-btn" :title="t('library.upload.remove')" type="button">
               <span class="icon-[material-symbols--close-rounded]" />
             </button>
           </li>
@@ -45,7 +45,7 @@
 
       <div>
         <p class="adt-field-label">
-          Triggers
+          {{ t("library.triggers.label") }}
         </p>
         <AppRadioGroup v-model="mode" :options="MODES" button-size="sm" />
         <p v-if="mode === 'names'" class="adt-field-hint">
@@ -54,12 +54,12 @@
         <div v-else class="mt-4">
           <AppTokenInput
             v-model="shared"
+            :placeholder="t('library.triggers.placeholder')"
             :suggestions="TRIGGER_HINTS[feature]"
             :validate="validate"
-            placeholder="Type a trigger and press Enter"
           />
           <p class="adt-field-hint">
-            Every file gets these. Leave it empty to add the files without triggers.
+            {{ t("library.upload.sharedHint") }}
           </p>
         </div>
       </div>
@@ -67,10 +67,10 @@
 
     <template #footer>
       <AppButton @click="emit('close')" auto>
-        Cancel
+        {{ t("common.cancel") }}
       </AppButton>
       <AppButton @click="save" :disabled="!files.length || processing" :loading="processing" auto type="primary">
-        {{ files.length ? `Add ${files.length} ${files.length === 1 ? noun.one : noun.other}` : "Add" }}
+        {{ files.length ? t(addKey, { count: files.length }) : t("common.add") }}
       </AppButton>
     </template>
   </AppModal>
@@ -79,6 +79,7 @@
 <script setup lang="ts">
 import TriggerChips from "./TriggerChips.vue";
 
+import type { MessageKey } from "@/utils/i18n";
 import type { TriggerFeature } from "@/utils/trigger-catalog";
 
 import AppButton from "@/components/AppButton.vue";
@@ -97,9 +98,14 @@ const props = withDefaults(defineProps<{
   feature: TriggerFeature;
   /** `audio/*` or an exact type, `image/gif`. */
   accept: string;
+  /** The formats it takes, as shown: `t("library.upload.formatsAudio")`, or a format's name, such as "GIF". */
   formats: string;
   fileIcon: string;
-  noun: { one: string; other: string };
+  /**
+   * The key of the plural on the Add button once files are chosen, which says
+   * what the files are: `library.upload.addSounds`, `library.upload.addGifs`.
+   */
+  addKey: MessageKey;
   /** The triggers a file's name gives. */
   triggersFromName: (file: File) => string[];
   namesHint: string;
@@ -115,10 +121,12 @@ const emit = defineEmits<{
   save: [ request: { files: File[]; fromNames: boolean; triggers: string[] } ];
 }>();
 
-const MODES = [
-  { label: "From file names", value: "names" },
-  { label: "The same for all", value: "shared" },
-];
+const { t } = useI18n();
+
+const MODES = computed(() => [
+  { label: t("library.upload.modes.names"), value: "names" },
+  { label: t("library.upload.modes.shared"), value: "shared" },
+]);
 
 const files = ref<File[]>([]);
 const mode = ref<string>("names");

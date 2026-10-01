@@ -107,14 +107,14 @@
     <UploadDialog
       @close="closeUploadModal"
       @save="processFiles"
-      :noun="{ one: 'sound', other: 'sounds' }"
+      :formats="t('library.upload.formatsAudio')"
       :processing="isProcessing"
       :show="showUploadModal"
       :triggers-from-name="file => extractTriggerFromFilename(file.name)"
       accept="audio/*"
+      add-key="library.upload.addSounds"
       feature="soundFx"
       file-icon="icon-[material-symbols--audio-file-outline-rounded]"
-      formats="MP3, WAV or OGG"
       names-hint="A file named 180.mp3 plays on 180. Anything after a + is left out, so 180+crowd.mp3 does too."
       title="Upload sounds"
     />
@@ -233,6 +233,7 @@ useStorage("adt:active-settings", "sound-fx");
 /** The playing key of a sound tried out in the add/edit dialog, before it is in the list. */
 const DRAFT_KEY = -1;
 
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/sound-fx.png");
 const showSoundModal = ref(false);
