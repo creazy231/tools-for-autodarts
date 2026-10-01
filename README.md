@@ -397,8 +397,8 @@ Add sound effects for various game events:
   - With ambient prefix: `ambient_gameshot_player_name`
   - In a **Teams** match a team's name works too: the player who checked out first, then their team
 - **Cricket Mode**: Special triggers for Cricket games:
-  - `cricket_hit`: Triggered when hitting Cricket targets (15-20 and Bull) that are still open
-  - `cricket_miss`: Triggered when hitting non-Cricket targets (Miss-14) or hitting targets already closed by all players
+  - `cricket_hit`: Triggered when hitting one of the game's targets that is still open: 15-20 and Bull in Cricket, 10-20 and Bull in Tactics, and in Hidden Cricket its hidden numbers, the dart that reveals one included
+  - `cricket_miss`: Triggered when hitting any other number, missing the board, or hitting a target already closed by all players
 
 #### Volume per Sound
 Every sound has a volume from 0 to 200% in its editor, so each can be tuned on its own. The default Bull, for one, is much quieter than the triples; at 200% it is about as loud as T18. 100% plays the file as it is, 0% silences a sound without taking it out of the list, and the list shows any sound that isn't at 100%. Text-to-speech sounds go up to 100%. A sound on a link can only be turned up when its site lets the extension read the file, which the default *busted* and *gameshot* on myinstants.com do not; the editor says so, and uploading the file works instead

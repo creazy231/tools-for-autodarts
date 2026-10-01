@@ -1,5 +1,5 @@
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
-import { pageVariant, playsIn } from "@/utils/game-modes";
+import { GameMode, pageVariant, playsIn } from "@/utils/game-modes";
 import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from "@/utils/storage";
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { LAYERS } from "@/utils/layers";
@@ -781,10 +781,13 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
         }
       }
 
-      const segmentValues = oldGameData?.match?.state?.segments?.[segmentNumber];
-      if (segmentValues) {
-        // Check if this segment is already closed for all players (value 3)
-        const allPlayersClosed = segmentValues.every(value => value >= 3);
+      // The game's targets are the numbers its state keeps marks for: 15-20 and Bull,
+      // 10-20 and Bull in Tactics, and in Hidden Cricket the ones revealed so far. The
+      // dart that reveals one is only in the state it brought, so that is the one asked.
+      if (gameData.match.state?.segments?.[segmentNumber]) {
+        // Check if this segment was already closed for all players (value 3) before this dart
+        const segmentValues: number[] = oldGameData?.match?.state?.segments?.[segmentNumber] || [];
+        const allPlayersClosed = segmentValues.length > 0 && segmentValues.every(value => value >= 3);
 
         if (allPlayersClosed) {
           // Segment is already closed by all players, play miss sound
@@ -794,7 +797,7 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
           playSound("cricket_hit");
         }
       } else {
-        // Target Miss - Anything Miss-14
+        // Not one of the game's targets
         playSound("cricket_miss");
       }
     }
