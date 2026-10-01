@@ -36,9 +36,9 @@ export function normaliseLanguage(value: string | null | undefined): Language | 
  * The value the site stored, or null when there is none — or when storage
  * cannot be read at all (blocked site data), which the site treats the same.
  */
-export function readStoredLanguage(storage: Pick<Storage, "getItem"> | undefined = globalThis.localStorage): string | null {
+export function readStoredLanguage(storage?: Pick<Storage, "getItem">): string | null {
   try {
-    return storage?.getItem(SITE_LANGUAGE_KEY) ?? null;
+    return (storage ?? globalThis.localStorage)?.getItem(SITE_LANGUAGE_KEY) ?? null;
   } catch {
     return null;
   }
@@ -54,12 +54,13 @@ export function readStoredLanguage(storage: Pick<Storage, "getItem"> | undefined
  * 4. English.
  */
 export function readSiteLanguage(
-  storage: Pick<Storage, "getItem"> | undefined = globalThis.localStorage,
-  browser: Partial<Pick<Navigator, "languages" | "language">> | undefined = globalThis.navigator,
+  storage?: Pick<Storage, "getItem">,
+  nav?: Partial<Pick<Navigator, "languages" | "language">>,
 ): Language {
   const stored = readStoredLanguage(storage);
   const picked = normaliseLanguage(stored);
   if (picked) return picked;
   if (stored && stored !== "system") return "en";
-  return normaliseLanguage(browser?.languages?.[0] ?? browser?.language) ?? "en";
+  const navigator = nav ?? globalThis.navigator;
+  return normaliseLanguage(navigator?.languages?.[0] ?? navigator?.language) ?? "en";
 }
