@@ -65,7 +65,7 @@
               <template #trigger="{ open, toggle }">
                 <AppButton @click="toggle" :aria-expanded="open" class="max-sm:px-3">
                   <span class="icon-[pixelarticons--calendar-export] mr-2 max-sm:hidden" />
-                  <span>Export</span>
+                  <span>{{ t("settings.header.export") }}</span>
                   <span class="icon-[material-symbols--expand-more-rounded] -mr-1 ml-1 text-lg" />
                 </AppButton>
               </template>
@@ -74,7 +74,7 @@
               <template #trigger="{ open, toggle }">
                 <AppButton @click="toggle" :aria-expanded="open" class="max-sm:px-3">
                   <span class="icon-[pixelarticons--calendar-import] mr-2 max-sm:hidden" />
-                  <span>Import</span>
+                  <span>{{ t("settings.header.import") }}</span>
                   <span class="icon-[material-symbols--expand-more-rounded] -mr-1 ml-1 text-lg" />
                 </AppButton>
               </template>
@@ -82,14 +82,14 @@
             <div class="ml-auto flex gap-2">
               <AppButton
                 @click="openKofi"
-                title="Support on Ko-fi"
+                :title="t('settings.header.kofi')"
                 class="aspect-square size-10 p-0"
               >
                 <span class="icon-[material-symbols--coffee-outline-rounded]" />
               </AppButton>
               <AppButton
                 @click="toggleDangerZone"
-                title="Advanced settings"
+                :title="t('settings.header.advanced')"
                 class="aspect-square size-10 p-0"
               >
                 <span class="icon-[material-symbols--settings-suggest-outline]" />
@@ -111,14 +111,14 @@
           <div class="adt-container space-y-4">
             <div class="flex items-center justify-between">
               <h2 class="adt-card-title">
-                Support the Project
+                {{ t("settings.support.title") }}
               </h2>
               <AppButton @click="toggleDangerZone" type="ghost" auto>
                 <span class="icon-[pixelarticons--close]" />
               </AppButton>
             </div>
             <p class="text-white/70">
-              Autodarts Tools is free and open source. If you enjoy using it, consider supporting the development to keep it going!
+              {{ t("settings.support.body") }}
             </p>
             <!--
               The single action in this panel, so it takes the primary variant.
@@ -131,17 +131,17 @@
               auto
             >
               <span class="icon-[pixelarticons--heart] mr-2" />
-              <span>Support on Ko-fi</span>
+              <span>{{ t("settings.header.kofi") }}</span>
             </AppButton>
           </div>
 
           <!-- Release Notes -->
           <div class="adt-container space-y-4">
             <h2 class="adt-card-title">
-              Release Notes
+              {{ t("settings.releaseNotes.title") }}
             </h2>
             <p class="text-white/70">
-              What changed in this release — shown once after an update, and here whenever you want it again.
+              {{ t("settings.releaseNotes.body") }}
             </p>
             <AppButton
               @click="whatsNew?.reopen()"
@@ -149,7 +149,7 @@
               auto
             >
               <span class="icon-[pixelarticons--script-text] mr-2" />
-              <span>What's New</span>
+              <span>{{ t("settings.releaseNotes.button") }}</span>
             </AppButton>
           </div>
 
@@ -158,13 +158,13 @@
             <!-- `!` because .adt-card-title sets its own colour and, being
                  plain CSS after @tailwind utilities, otherwise wins. -->
             <h2 class="adt-card-title !text-[var(--ad-text-destructive)]">
-              Danger Zone
+              {{ t("settings.danger.title") }}
             </h2>
             <p class="text-white/70">
-              These actions are destructive and cannot be undone. Please proceed with caution and may export your settings before proceeding.
+              {{ t("settings.danger.body") }}
             </p>
-            <AppAlert variant="error" title="Reset All Settings">
-              This will reset all settings to their default values. All your customizations will be lost.
+            <AppAlert variant="error" :title="t('settings.danger.resetTitle')">
+              {{ t("settings.danger.resetBody") }}
               <template #action>
                 <AppButton
                   @click="resetAllSettings"
@@ -172,7 +172,7 @@
                   auto
                   type="danger"
                 >
-                  Reset
+                  {{ t("common.reset") }}
                 </AppButton>
               </template>
             </AppAlert>
@@ -190,11 +190,13 @@
             <AppAlert
               v-if="featureGroups[activeTab].id==='sounds-animations'"
               variant="warning"
-              title="Performance Warning"
+              :title="t('settings.performance.title')"
               class="col-span-full"
             >
-              Enabling the <b>Animations</b>, <b>Caller</b>, or <b>Sound FX</b> features may cause performance issues and may require decent hardware.
-              If you experience any lags or errors, try disabling these features.
+              <AppTrans
+                path="settings.performance.body"
+                :params="{ animations: t('features.animations'), caller: t('features.caller'), soundFx: t('features.soundFx') }"
+              />
             </AppAlert>
 
             <!--
@@ -261,6 +263,7 @@ import Gotcha from "./Settings/Gotcha.vue";
 
 import packageConfig from "../package.json";
 
+import type { MessageKey } from "@/utils/i18n";
 import type { IConfig, ISound } from "@/utils/storage";
 
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
@@ -272,6 +275,7 @@ import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCaller
 import AppButton from "@/components/AppButton.vue";
 import AppMenu from "@/components/AppMenu.vue";
 import AppAlert from "@/components/AppAlert.vue";
+import AppTrans from "@/components/AppTrans.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import AppNotification from "@/components/AppNotification.vue";
 import SettingsModal from "@/components/SettingsModal.vue";
@@ -283,7 +287,8 @@ import AppTabs from "@/components/AppTabs.vue";
 // Define feature groups with titles for modals
 interface Feature {
   id: string;
-  title: string;
+  /** The key of its name in features.ts, which its settings dialog's heading is built from. */
+  nameKey: MessageKey;
   component: Component;
   hasSettings: boolean;
   /** Ported to the rebuilt site. Absent means "not yet" — the card renders inert. */
@@ -325,12 +330,12 @@ const featureGroups: FeatureGroup[] = [
     id: "lobbies",
     tab: 0,
     features: [
-      { id: "discord-webhooks", title: "Discord Webhooks Settings", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
-      { id: "auto-start", title: "Auto Start Settings", component: AutoStart, hasSettings: false, v2Ready: true },
-      { id: "recent-local-players", title: "Recent Local Players Settings", component: RecentLocalPlayers, hasSettings: true, v2Ready: true, fillSettings: true },
-      { id: "local-lobby", title: "Local Lobby Settings", component: LocalLobby, hasSettings: false, v2Ready: true },
-      { id: "teams", title: "Teams Settings", component: Teams, hasSettings: true, v2Ready: true, fillSettings: true },
-      { id: "qr-code", title: "QR Code Settings", component: QrCode, hasSettings: false, v2Ready: true },
+      { id: "discord-webhooks", nameKey: "features.discordWebhooks", component: DiscordWebhooks, hasSettings: true, v2Ready: true },
+      { id: "auto-start", nameKey: "features.autoStart", component: AutoStart, hasSettings: false, v2Ready: true },
+      { id: "recent-local-players", nameKey: "features.recentLocalPlayers", component: RecentLocalPlayers, hasSettings: true, v2Ready: true, fillSettings: true },
+      { id: "local-lobby", nameKey: "features.localLobby", component: LocalLobby, hasSettings: false, v2Ready: true },
+      { id: "teams", nameKey: "features.teams", component: Teams, hasSettings: true, v2Ready: true, fillSettings: true },
+      { id: "qr-code", nameKey: "features.qrCode", component: QrCode, hasSettings: false, v2Ready: true },
     ],
     settingIds: [ "discord-webhooks", "recent-local-players", "teams" ],
   },
@@ -339,24 +344,24 @@ const featureGroups: FeatureGroup[] = [
     id: "matches",
     tab: 1,
     features: [
-      { id: "colors", title: "Colors Settings", component: Colors, hasSettings: true, v2Ready: true, wideSettings: true },
-      { id: "takeout-notification", title: "Takeout Notification Settings", component: TakeoutNotification, hasSettings: false, v2Ready: true },
-      { id: "next-player-on-takeout-stuck", title: "Auto Next Player on Takeout Settings", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
-      { id: "automatic-next-leg", title: "Automatic Next Leg Settings", component: AutomaticNextLeg, hasSettings: true, v2Ready: true },
-      { id: "smaller-scores", title: "Smaller Scores Settings", component: SmallerScores, hasSettings: false, v2Ready: true },
-      { id: "streaming-mode", title: "Streaming Mode Settings", component: StreamingMode, hasSettings: true, v2Ready: true },
-      { id: "larger-legs-sets", title: "Larger Legs/Sets Settings", component: LargerLegsSets, hasSettings: true, v2Ready: true },
-      { id: "larger-player-names", title: "Larger Player Names Settings", component: LargerPlayerNames, hasSettings: true, v2Ready: true },
-      { id: "larger-player-match-data", title: "Larger Player Match Data Settings", component: LargerPlayerMatchData, hasSettings: true, v2Ready: true },
-      { id: "winner-animation", title: "Winner Animation Settings", component: WinnerAnimation, hasSettings: false, v2Ready: true },
-      { id: "automatic-fullscreen", title: "Automatic Fullscreen Settings", component: AutomaticFullscreen, hasSettings: false, v2Ready: true },
-      { id: "zoom", title: "Darts Zoom Settings", component: Zoom, hasSettings: true, v2Ready: true },
-      { id: "board-view", title: "Board View Settings", component: BoardView, hasSettings: true, v2Ready: true },
-      { id: "board-skins", title: "Board Skins Settings", component: BoardSkins, hasSettings: true, v2Ready: true },
-      { id: "quick-correction", title: "Quick Correction Settings", component: QuickCorrection, hasSettings: true, v2Ready: true },
-      { id: "enhanced-scoring-display", title: "Enhanced Scoring Display Settings", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
-      { id: "instant-replay", title: "Instant Replay Settings", component: InstantReplay, hasSettings: true, v2Ready: true, wideSettings: true },
-      { id: "gotcha", title: "Gotcha Settings", component: Gotcha, hasSettings: false, v2Ready: true },
+      { id: "colors", nameKey: "features.colors", component: Colors, hasSettings: true, v2Ready: true, wideSettings: true },
+      { id: "takeout-notification", nameKey: "features.takeoutNotification", component: TakeoutNotification, hasSettings: false, v2Ready: true },
+      { id: "next-player-on-takeout-stuck", nameKey: "features.nextPlayerOnTakeoutStuck", component: NextPlayerOnTakeoutStuck, hasSettings: true, v2Ready: true },
+      { id: "automatic-next-leg", nameKey: "features.automaticNextLeg", component: AutomaticNextLeg, hasSettings: true, v2Ready: true },
+      { id: "smaller-scores", nameKey: "features.smallerScores", component: SmallerScores, hasSettings: false, v2Ready: true },
+      { id: "streaming-mode", nameKey: "features.streamingMode", component: StreamingMode, hasSettings: true, v2Ready: true },
+      { id: "larger-legs-sets", nameKey: "features.largerLegsSets", component: LargerLegsSets, hasSettings: true, v2Ready: true },
+      { id: "larger-player-names", nameKey: "features.largerPlayerNames", component: LargerPlayerNames, hasSettings: true, v2Ready: true },
+      { id: "larger-player-match-data", nameKey: "features.largerPlayerMatchData", component: LargerPlayerMatchData, hasSettings: true, v2Ready: true },
+      { id: "winner-animation", nameKey: "features.winnerAnimation", component: WinnerAnimation, hasSettings: false, v2Ready: true },
+      { id: "automatic-fullscreen", nameKey: "features.automaticFullscreen", component: AutomaticFullscreen, hasSettings: false, v2Ready: true },
+      { id: "zoom", nameKey: "features.zoom", component: Zoom, hasSettings: true, v2Ready: true },
+      { id: "board-view", nameKey: "features.boardView", component: BoardView, hasSettings: true, v2Ready: true },
+      { id: "board-skins", nameKey: "features.boardSkins", component: BoardSkins, hasSettings: true, v2Ready: true },
+      { id: "quick-correction", nameKey: "features.quickCorrection", component: QuickCorrection, hasSettings: true, v2Ready: true },
+      { id: "enhanced-scoring-display", nameKey: "features.enhancedScoringDisplay", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
+      { id: "instant-replay", nameKey: "features.instantReplay", component: InstantReplay, hasSettings: true, v2Ready: true, wideSettings: true },
+      { id: "gotcha", nameKey: "features.gotcha", component: Gotcha, hasSettings: false, v2Ready: true },
     ],
     settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "board-view", "board-skins", "quick-correction", "instant-replay" ],
   },
@@ -365,7 +370,7 @@ const featureGroups: FeatureGroup[] = [
     id: "boards",
     tab: 2,
     features: [
-      { id: "external-boards", title: "External Boards Settings", component: ExternalBoards, hasSettings: false, v2Ready: true },
+      { id: "external-boards", nameKey: "features.externalBoards", component: ExternalBoards, hasSettings: false, v2Ready: true },
     ],
     settingIds: [],
   },
@@ -374,30 +379,33 @@ const featureGroups: FeatureGroup[] = [
     id: "sounds-animations",
     tab: 3,
     features: [
-      { id: "animations", title: "Animations Settings", component: Animations, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
-      { id: "caller", title: "Caller Settings", component: Caller, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
-      { id: "sound-fx", title: "Sound FX Settings", component: SoundFx, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
-      { id: "wled-fx", title: "WLED Settings", component: Wled, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "animations", nameKey: "features.animations", component: Animations, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "caller", nameKey: "features.caller", component: Caller, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "sound-fx", nameKey: "features.soundFx", component: SoundFx, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
+      { id: "wled-fx", nameKey: "features.wled", component: Wled, hasSettings: true, v2Ready: true, wideSettings: true, fillSettings: true },
     ],
     settingIds: [ "animations", "caller", "sound-fx", "wled-fx" ],
   },
 ];
 
+const { t } = useI18n();
+
 /**
  * The header's two menus. Either import replaces every setting and reloads the
  * page without asking, so their hints say so.
  */
-const exportActions = [
-  { label: "Download file", hint: "To keep as a backup or import elsewhere", icon: "icon-[material-symbols--download-rounded]", action: exportSettings },
-  { label: "Copy to clipboard", hint: "To share or paste into Import elsewhere", icon: "icon-[material-symbols--content-copy-outline-rounded]", action: copyToClipboard },
-];
-const importActions = [
-  { label: "Upload file", hint: "Replaces your settings with an exported file", icon: "icon-[material-symbols--upload-rounded]", action: importSettings },
-  { label: "Paste from clipboard", hint: "Replaces your settings with copied ones", icon: "icon-[material-symbols--content-paste-rounded]", action: pasteFromClipboard },
-];
+const exportActions = computed(() => [
+  { label: t("settings.exportMenu.download"), hint: t("settings.exportMenu.downloadHint"), icon: "icon-[material-symbols--download-rounded]", action: exportSettings },
+  { label: t("settings.exportMenu.copy"), hint: t("settings.exportMenu.copyHint"), icon: "icon-[material-symbols--content-copy-outline-rounded]", action: copyToClipboard },
+]);
+const importActions = computed(() => [
+  { label: t("settings.importMenu.upload"), hint: t("settings.importMenu.uploadHint"), icon: "icon-[material-symbols--upload-rounded]", action: importSettings },
+  { label: t("settings.importMenu.paste"), hint: t("settings.importMenu.pasteHint"), icon: "icon-[material-symbols--content-paste-rounded]", action: pasteFromClipboard },
+]);
 
-// Tabs component data
-const tabs = ref([ "Lobbies", "Matches", "Boards", "Sounds & Animations" ]);
+// Tabs component data. AppTabs works by index and `adt:active-tab` stores the
+// index, so the order here is what the stored value means.
+const tabs = computed(() => [ t("settings.tabs.lobbies"), t("settings.tabs.matches"), t("settings.tabs.boards"), t("settings.tabs.soundsAnimations") ]);
 const activeSettings = useStorage("adt:active-settings", null);
 const activeTab = useStorage("adt:active-tab", 0);
 const showSettingsModal = ref(false);
@@ -433,17 +441,14 @@ function handleToggle(feature) {
   }
 }
 
-// Function to get the title for a setting
+// Function to get the title for a setting. The template calls it, so the
+// heading follows the language.
 function getSettingTitle(settingId) {
   for (const group of featureGroups) {
     const feature = group.features.find(f => f.id === settingId);
-    if (feature) {
-      // Titles are stored as "<Feature> Settings"; the dialog shows the
-      // "Settings - <Feature>" form, which is the only heading now.
-      return `Settings - ${feature.title.replace(/\s*Settings$/, "")}`;
-    }
+    if (feature) return t("settings.dialogTitle", { feature: t(feature.nameKey) });
   }
-  return "Settings";
+  return t("settings.title");
 }
 
 // Function to get the component for a setting
@@ -548,7 +553,7 @@ async function exportSettings() {
       });
     } catch (error) {
       console.error("Autodarts Tools: Error exporting sounds from IndexedDB", error);
-      showNotification("Error exporting sound files", "error");
+      showNotification(t("settings.notifications.exportSoundsFailed"), "error");
     }
   }
 
@@ -585,7 +590,7 @@ function importSettings() {
           const importedData = JSON.parse(jsonString);
 
           if (!importedData.config) {
-            showNotification("Invalid settings file", "error");
+            showNotification(t("settings.notifications.invalidFile"), "error");
             return;
           }
 
@@ -684,11 +689,11 @@ function importSettings() {
               });
             } catch (error) {
               console.error("Autodarts Tools: Error importing sounds to IndexedDB", error);
-              showNotification("Settings imported, but error importing sounds", "error");
+              showNotification(t("settings.notifications.importSoundsFailed"), "error");
             }
           }
 
-          showNotification("Settings imported successfully. Page will reload to apply changes...");
+          showNotification(t("settings.notifications.imported"));
 
           // Reload the page after a short delay to allow the notification to be seen
           setTimeout(() => {
@@ -696,7 +701,7 @@ function importSettings() {
           }, 1500);
         } catch (error) {
           console.error("Failed to import settings:", error);
-          showNotification("Failed to import settings", "error");
+          showNotification(t("settings.notifications.importFailed"), "error");
         }
       };
       reader.readAsText(file);
@@ -721,8 +726,8 @@ function toggleDangerZone() {
 
 function resetAllSettings() {
   showConfirmDialog(
-    "Reset All Settings",
-    "This will reset all settings to their default values. All your customizations will be lost. Are you sure you want to continue?",
+    t("settings.danger.resetTitle"),
+    t("settings.danger.resetConfirm"),
     async () => {
       // Clear the IndexedDB sound files
       if (isIndexedDBAvailable()) {
@@ -741,7 +746,7 @@ function resetAllSettings() {
       await AutodartsToolsConfig.setValue(defaultConfig);
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      showNotification("All settings have been reset to default. Page will reload to apply changes...");
+      showNotification(t("settings.notifications.resetDone"));
 
       // Close danger zone
       showDangerZone.value = false;
@@ -817,7 +822,7 @@ async function copyToClipboard() {
       });
     } catch (error) {
       console.error("Autodarts Tools: Error copying sounds from IndexedDB", error);
-      showNotification("Settings copied, but error including sounds", "error");
+      showNotification(t("settings.notifications.copySoundsFailed"), "error");
     }
   }
 
@@ -828,11 +833,11 @@ async function copyToClipboard() {
   // Copy to clipboard
   navigator.clipboard.writeText(base64String)
     .then(() => {
-      showNotification("Settings copied to clipboard");
+      showNotification(t("settings.notifications.copied"));
     })
     .catch((err) => {
       console.error("Failed to copy settings to clipboard:", err);
-      showNotification("Failed to copy settings to clipboard", "error");
+      showNotification(t("settings.notifications.copyFailed"), "error");
     });
 }
 
@@ -844,7 +849,7 @@ function pasteFromClipboard() {
         const importedData = JSON.parse(jsonString);
 
         if (!importedData.config) {
-          showNotification("Invalid settings data", "error");
+          showNotification(t("settings.notifications.invalidData"), "error");
           return;
         }
 
@@ -943,11 +948,11 @@ function pasteFromClipboard() {
             });
           } catch (error) {
             console.error("Autodarts Tools: Error importing sounds from clipboard to IndexedDB", error);
-            showNotification("Settings imported, but error importing sounds", "error");
+            showNotification(t("settings.notifications.importSoundsFailed"), "error");
           }
         }
 
-        showNotification("Settings imported successfully. Page will reload to apply changes...");
+        showNotification(t("settings.notifications.imported"));
 
         // Reload the page after a short delay to allow the notification to be seen
         setTimeout(() => {
@@ -955,12 +960,12 @@ function pasteFromClipboard() {
         }, 1500);
       } catch (error) {
         console.error("Failed to import settings from clipboard:", error);
-        showNotification("Failed to import settings from clipboard", "error");
+        showNotification(t("settings.notifications.pasteImportFailed"), "error");
       }
     })
     .catch((err) => {
       console.error("Failed to read from clipboard:", err);
-      showNotification("Failed to read from clipboard", "error");
+      showNotification(t("settings.notifications.pasteReadFailed"), "error");
     });
 }
 </script>
