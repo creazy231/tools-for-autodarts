@@ -278,6 +278,12 @@ const NON_TEXT_PROPS = new Set([
 const OPTION_TOKEN = /^[a-z][a-zA-Z0-9-]*$/;
 
 /**
+ * A prop named for the key it holds (`add-key`, `name-key`): `add-key="library.upload.addSounds"` points at a
+ * message, it is not text. A key prop whose value is no key of the English catalog is still reported.
+ */
+const KEY_PROP = /-key$/;
+
+/**
  * Whether a prop holds text a person reads: on an element, an attribute such
  * as `title` or `aria-label`; on a component, any prop but the ones that never
  * do (`size`, `icon`, `*-class`, `data-*`, …). Written out or bound alike.
@@ -331,7 +337,8 @@ export function scanVue(file: string, source: string, untranslated: Untranslated
         if (prop.type === 6 && prop.value) {
           const name: string = prop.name;
           const value: string = prop.value.content;
-          if (textProp(name, isComponent) && !(isComponent && OPTION_TOKEN.test(value)) && readable(value, untranslated)) {
+          const isKey = isComponent && KEY_PROP.test(name) && english?.has(value);
+          if (textProp(name, isComponent) && !isKey && !(isComponent && OPTION_TOKEN.test(value)) && readable(value, untranslated)) {
             problems.push({ where: at(prop.loc.start.line), what: `${name}="${value}"` });
           }
         }
