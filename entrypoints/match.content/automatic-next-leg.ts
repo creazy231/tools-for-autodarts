@@ -65,16 +65,28 @@ function onBoard(boardData: IBoard): void {
   countdown.stop();
   if (boardData.event !== "Takeout finished" || !legIsWon()) return;
 
-  countdown.start(findNextLegButton, seconds);
+  // The site draws Next Leg only once its GAME SHOT animation is over, about
+  // three seconds after a won leg or set and four after a match, and every
+  // game of Count Up counts as a match. Darts pulled quicker than that left the
+  // countdown no button to start on, so it never ran. The time now runs from
+  // the takeout all the same, and goes on the button when it is drawn.
+  countdown.start(findNextLegButton, seconds, legIsWon);
 }
 
 /**
- * A leg is won, and the match goes on. Teams' team view marks the match won
- * when an own-score team's legs reach the target while the site's own match is
- * still open (utils/teams.ts), and Next Leg must stay unpressed then.
+ * A leg is won, and the match goes on.
+ *
+ * Not `winner < 0`: a match played without legs or sets — Count Up and the
+ * other practice games — is finished after every game, with its winner set,
+ * and the site offers Next Leg all the same. It holds Next Leg back only once
+ * a match played to legs or sets is won. Teams' team view marks the match
+ * decided when an own-score team's legs reach the target while the site's own
+ * match is still open (utils/teams.ts), and Next Leg must stay unpressed then.
  */
 function legIsWon(): boolean {
-  return (gameData?.match?.gameWinner ?? -1) >= 0 && (gameData?.match?.winner ?? -1) < 0;
+  const match = gameData?.match;
+  if (!match || (match.gameWinner ?? -1) < 0 || match.adtTeams?.decided) return false;
+  return !match.finished || (!match.legs && !match.sets);
 }
 
 /**

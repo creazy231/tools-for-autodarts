@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - **WLED**'s `matchshot_<player name>` effects played the player's `gameshot_<player name>` effect instead
+- **Automatic Next Leg** starts the next leg when the darts come out quickly, too. autodarts draws its *Next Leg* button only once its GAME SHOT animation is over, about three seconds after a won leg and four after a match, and in Count Up every game counts as a match. The countdown could only start on a button that was already there, so darts pulled before the animation ended left it nothing to count on, and it never started at all: whether the next leg began by itself came down to how quickly the darts were out, which in Count Up is often quicker than that. The time now counts from the takeout either way, and the countdown appears on *Next Leg* with what is left once autodarts draws it. Checked in Chrome in Count Up and X01 matches of our own, with the board's takeout simulated: with the darts out 2.7 seconds after the last one, Next Leg was pressed 5.0 seconds after the takeout, where before it was never pressed. Thanks to cab1895 on Discord for the report and to [@vesperwatcher](https://github.com/vesperwatcher) for filing it ([#260](https://github.com/creazy231/tools-for-autodarts/issues/260))
 
 ## [3.1.0] - 2026-09-27
 

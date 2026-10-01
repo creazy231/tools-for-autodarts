@@ -14,7 +14,8 @@ import { SELECTORS, qs } from "@/utils/selectors";
  * by which time it is a detached node and the click goes nowhere. So the count
  * is an attribute the stylesheet draws as generated content, and the button is
  * resolved again on every tick: if it moves we follow it, and if it goes away
- * the countdown stops rather than firing into nothing.
+ * the countdown stops rather than firing into nothing — unless the caller says
+ * it is still to come, as Next Leg is while the site plays its GAME SHOT.
  */
 export interface ButtonCountdown {
   /** Install the stylesheet. Call once, when the feature starts. */
@@ -24,8 +25,13 @@ export interface ButtonCountdown {
    *
    * `find` is the whole condition: returning null at any point — the button is
    * gone, or the state that justified the countdown has passed — stops it.
+   *
+   * Unless `pending` says that state still holds: then the button is one the
+   * site has yet to draw, and the time runs on without it. The count goes on
+   * the button once it is there, and a button drawn after the time is up is
+   * pressed as soon as it is.
    */
-  start: (find: () => HTMLElement | null, seconds: number) => void;
+  start: (find: () => HTMLElement | null, seconds: number, pending?: () => boolean) => void;
   /** Call the countdown off and take the number back off the button. */
   stop: () => void;
   /** Stop and remove the stylesheet. */
@@ -36,6 +42,7 @@ export function createButtonCountdown(attribute: string, styleId: string): Butto
   let timer: ReturnType<typeof setInterval> | undefined;
   let observer: MutationObserver | null = null;
   let finder: (() => HTMLElement | null) | null = null;
+  let stillPending: (() => boolean) | null = null;
   let remaining = 0;
   let frame = 0;
 
@@ -61,19 +68,39 @@ export function createButtonCountdown(attribute: string, styleId: string): Butto
     for (const el of document.querySelectorAll(`[${attribute}]`)) el.removeAttribute(attribute);
   }
 
-  function paint(): void {
-    const button = finder?.() ?? null;
-    if (!button) return stop();
-
-    if (button.getAttribute(attribute) !== String(remaining)) {
-      clearAttribute();
-      button.setAttribute(attribute, String(remaining));
+  /**
+   * Look again, on every tick and whenever the page changes: put what is left
+   * on the button, or press it once nothing is.
+   */
+  function update(): void {
+    const button = finder?.() as HTMLButtonElement | null;
+    if (!button) {
+      if (!stillPending?.()) stop();
+      return;
     }
+
+    if (remaining > 0) {
+      if (button.getAttribute(attribute) !== String(remaining)) {
+        clearAttribute();
+        button.setAttribute(attribute, String(remaining));
+      }
+      return;
+    }
+
+    stop();
+
+    // The site disables the button when there is nothing to advance to.
+    // Clicking anyway is silent, so say so instead.
+    if (button.disabled) return console.log(`Autodarts Tools: ${styleId} - the button is disabled, leaving it alone`);
+
+    console.log(`Autodarts Tools: ${styleId} - pressing "${button.textContent?.trim()}"`);
+    button.click();
   }
 
   /**
-   * Put the count back when React rebuilds the bar mid-countdown. Writing an
-   * attribute is not a childList mutation, so this cannot retrigger itself.
+   * Put the count back when React rebuilds the bar mid-countdown, and find a
+   * button that is drawn late. Writing an attribute is not a childList
+   * mutation, so this cannot retrigger itself.
    */
   function watchDom(): void {
     if (observer) return;
@@ -85,37 +112,27 @@ export function createButtonCountdown(attribute: string, styleId: string): Butto
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        if (timer) paint();
+        if (timer) update();
       });
     });
     observer.observe(host, { childList: true, subtree: true });
   }
 
-  function start(find: () => HTMLElement | null, seconds: number): void {
+  function start(find: () => HTMLElement | null, seconds: number, pending?: () => boolean): void {
     stop();
     if (seconds <= 0) return;
 
     finder = find;
+    stillPending = pending ?? null;
     remaining = seconds;
-    if (!finder()) return;
+    if (!finder() && !stillPending?.()) return;
 
-    paint();
+    update();
     watchDom();
 
     timer = setInterval(() => {
-      remaining--;
-      if (remaining > 0) return paint();
-
-      const button = finder?.() as HTMLButtonElement | null;
-      stop();
-      if (!button) return;
-
-      // The site disables the button when there is nothing to advance to.
-      // Clicking anyway is silent, so say so instead.
-      if (button.disabled) return console.log(`Autodarts Tools: ${styleId} - the button is disabled, leaving it alone`);
-
-      console.log(`Autodarts Tools: ${styleId} - pressing "${button.textContent?.trim()}"`);
-      button.click();
+      if (remaining > 0) remaining--;
+      update();
     }, 1000);
   }
 
@@ -131,6 +148,7 @@ export function createButtonCountdown(attribute: string, styleId: string): Butto
     observer?.disconnect();
     observer = null;
     finder = null;
+    stillPending = null;
     clearAttribute();
   }
 

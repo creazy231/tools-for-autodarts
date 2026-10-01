@@ -174,6 +174,8 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - **Automatic Next Leg/Set**: Starts the next leg once the darts are out of the board
   - Counts down on the site's own *Next Leg* button — configurable, 5 seconds by default — and presses it
   - Waits for the board to report the takeout finished, not just for the leg to be won, so the countdown does not run while you are still pulling darts
+  - The time counts from the takeout, even when the darts are out before autodarts has finished its GAME SHOT animation and drawn *Next Leg*: the countdown appears on the button with what is left, and a button drawn after the time is up is pressed straight away
+  - Works in games played without legs or sets, such as Count Up, where *Next Leg* starts the next game. Once a match played to legs or sets is won, there is no next leg and nothing is pressed
 - **Smaller Font for Inactive Players**: Reduces the font size of scores for players not currently throwing
 - **External Boards Support**: Follow a board that is not your own — save any board by name and open its live view in one click
   - Adds an **External Boards** section to the *My Devices* page
