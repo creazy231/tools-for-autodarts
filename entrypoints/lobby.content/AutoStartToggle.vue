@@ -6,8 +6,8 @@
   -->
   <AppToggle
     v-model="armed"
-    off-label="Autostart Off"
-    on-label="Autostart On"
+    :off-label="t('autoStart.toggleOff')"
+    :on-label="t('autoStart.toggleOn')"
     size="lg"
   />
 </template>
@@ -25,6 +25,8 @@ import AppToggle from "@/components/AppToggle.vue";
  * arming decision has to outlive that.
  */
 const props = defineProps<{ armed: Ref<boolean> }>();
+
+const { t } = useI18n();
 
 /** Held separately so writing to it is a write to the ref, not to a prop. */
 const state = props.armed;

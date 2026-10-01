@@ -12,8 +12,8 @@
     <div ref="code" class="overflow-hidden rounded-[var(--ad-radius-md)] leading-none" />
     <AppButton
       @click="props.dismiss"
+      :title="t('qrCode.hide')"
       class="mt-2"
-      title="Hide the QR code"
       size="sm"
       type="ghost"
     >
@@ -36,6 +36,8 @@ const props = defineProps<{
 
 /** Small enough to sit in a corner, large enough for a phone across the room. */
 const SIZE = 160;
+
+const { t } = useI18n();
 
 const code = ref<HTMLElement | null>(null);
 

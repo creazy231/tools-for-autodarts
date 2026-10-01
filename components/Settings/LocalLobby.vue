@@ -5,14 +5,14 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 adt-card-title">
-            Local Lobby
+            {{ t("features.localLobby") }}
           </h3>
           <div class="space-y-3 text-white/70">
-            <p>This feature doesn't have any additional settings.</p>
-            <p>When enabled, your own entry is removed from the lobby, and anyone who joins on their own board is moved onto yours, so everyone throws at your dartboard.</p>
-            <p>To play in teams that share a score, use Teams.</p>
+            <p>{{ t("localLobby.noSettings") }}</p>
+            <p>{{ t("localLobby.intro") }}</p>
+            <p>{{ t("localLobby.teams", { teams: t("features.teams") }) }}</p>
             <p class="italic text-white/50">
-              Only runs in private lobbies that you host.
+              {{ t("localLobby.scope") }}
             </p>
           </div>
         </div>
@@ -29,10 +29,10 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 adt-card-title">
-            Local Lobby
+            {{ t("features.localLobby") }}
           </h3>
           <p class="w-2/3 text-white/70">
-            Removes your own entry and moves everyone who joins onto your board, so everyone plays at your dartboard. Only in <b>private lobbies</b> you host.
+            <AppTrans path="localLobby.card" />
           </p>
         </div>
         <div class="flex">
@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Local Lobby" class="size-full object-cover opacity-70">
+        <img :src="imageUrl" :alt="t('features.localLobby')" class="size-full object-cover opacity-70">
       </div>
     </div>
   </template>
@@ -52,8 +52,10 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/local-lobby.png");
 

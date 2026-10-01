@@ -1,7 +1,7 @@
 <template>
   <div v-if="players.length" class="mt-4 border-t border-white/10 pt-4">
     <p class="mb-2 text-xs font-bold uppercase tracking-wide text-white/50">
-      Saved players
+      {{ t("recentLocalPlayers.stripTitle") }}
     </p>
     <div class="flex flex-wrap gap-2">
       <AppButton
@@ -35,6 +35,8 @@ const props = defineProps<{
   names: Ref<string[]>;
   add: (name: string) => Promise<boolean>;
 }>();
+
+const { t } = useI18n();
 
 const state = props.names;
 const players = computed(() => state.value);

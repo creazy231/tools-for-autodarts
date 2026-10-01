@@ -7,10 +7,10 @@
     <div class="relative z-10 flex h-full flex-col justify-between">
       <div>
         <h3 class="mb-1 adt-card-title">
-          Autostart
+          {{ t("features.autoStart") }}
         </h3>
         <p class="w-2/3 text-white/70">
-          Adds an <b>Autostart</b> toggle beside the lobby's Start Game button. While it is on, the game starts <b>3 seconds</b> after another player joins. Each lobby opens with it off.
+          <AppTrans path="autoStart.card" />
         </p>
       </div>
       <div class="flex">
@@ -22,15 +22,17 @@
       </div>
     </div>
     <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-      <img :src="imageUrl" alt="Auto Start" class="size-full object-cover opacity-70">
+      <img :src="imageUrl" :alt="t('features.autoStart')" class="size-full object-cover opacity-70">
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("images/auto-start.png");
 

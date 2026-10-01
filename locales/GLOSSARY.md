@@ -214,6 +214,17 @@ Settled while the trigger hints were written (`locales/*/triggers.ts`), for the 
 | your Boards list | the list of boards in WLED's settings, headed *Boards*; the trigger hint for throws on a board that is not in it says it | deiner Boards-Liste | je lijst Borden |
 | Mark Ready | the tournament page's own button (`matchMaking.markReady`); the hints for a ready tournament match say it as a verb ("als bereit markiert werden", "gereed worden gemeld") | Als bereit markieren | Gereed melden |
 
+Settled in the lobby panels (`locales/*/{discordWebhooks,autoStart,recentLocalPlayers,localLobby,qrCode}.ts`), for whatever else speaks of a lobby:
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| to join (a lobby) | the site's Join button (`lobby.players.join`, `lobbies.join`: Beitreten, Deelnemen) | beitreten | deelnemen |
+| the host (of a lobby) | the site's own word (`lobby.leaveLobby.description`) | Host (*mit dir als Host*) | host (*waar jij host bent*) |
+| a private lobby | the site's *private* (`subscriptions.features.items.privateTournaments.name`); Dutch joins it to the noun | private Lobby | privélobby |
+| the lobby's QR code | `lobby.qrShare.title` ("Lobby-QR-Code teilen", "QR-code van lobby delen") | Lobby-QR-Code | QR-code van de lobby |
+| a Discord post | Discord's own word for it (the site has none): the noun is the message, the verb is *to post* | Nachricht, posten | bericht, plaatsen |
+| the strip of saved-player buttons under the lobby's list | not the site's; a row of buttons is a *Leiste* in German, and *strook* in Dutch, the word Darts Zoom's strip of tiles uses too | Leiste | strook |
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".
@@ -250,6 +261,7 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 | `×` | The multiplication sign after a speed or zoom number (`1.5×`). |
 | `Around The Clock` | The game's name, which the site's German leaves in English (`lobby.gamePicker.games.atc`). Its Dutch is "Around the Clock", so only the German is identical. |
 | `Round the World` | The game's name, which the site's German and Dutch both leave in English (`lobby.gamePicker.games.rtw`). |
+| `Edit Channel › Integrations › Webhooks` | Where Discord makes a webhook, as Discord's own menus read, and how the Discord Webhooks panel names it in every language (`discordWebhooks.panel.url.path`). |
 
 What is never translated beyond this file (what users type or import, trigger tokens such as `gameshot` and `t20`, names that identify something to autodarts, the site-text lists in `utils/selectors.ts`) is in section 5 of `docs/superpowers/specs/2026-10-01-i18n-design.md`.
 

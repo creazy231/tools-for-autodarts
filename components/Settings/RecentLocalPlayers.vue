@@ -5,19 +5,19 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Keeps the local players you enter, not only the six autodarts remembers, and puts them one click away in a strip under the lobby's player list.
+          {{ t("recentLocalPlayers.intro") }}
         </p>
 
         <section class="mb-10">
           <h3 class="adt-section-title">
-            Options
+            {{ t("recentLocalPlayers.sections.options") }}
           </h3>
           <!-- No ceiling, as the lobby has none: one would trim a longer stored list at the next sync. -->
-          <OptionRow description="Once the list is full, the oldest name makes room for a new one." title="Players to keep">
+          <OptionRow :description="t('recentLocalPlayers.playersToKeep.description')" :title="t('recentLocalPlayers.playersToKeep.title')">
             <AppNumberInput
               v-model="config.recentLocalPlayers.cap"
               :min="1"
-              label="Players to keep"
+              :label="t('recentLocalPlayers.playersToKeep.title')"
             />
           </OptionRow>
         </section>
@@ -29,17 +29,17 @@
         <LibrarySection
           :entries="entries"
           :sortable="false"
+          :empty-text="t('recentLocalPlayers.list.emptyText')"
+          :empty-title="t('recentLocalPlayers.list.emptyTitle')"
+          :no-match-text="t('recentLocalPlayers.list.noMatch')"
+          :search-placeholder="t('recentLocalPlayers.list.searchPlaceholder')"
+          :title="t('recentLocalPlayers.list.title')"
           empty-icon="icon-[material-symbols--group-outline-rounded]"
-          empty-text="Every local player you add to a lobby is saved here, and offered in a strip under the lobby's player list."
-          empty-title="No saved players yet"
-          no-match-text="No saved player has that in their name."
-          search-placeholder="Search players"
-          title="Saved players"
         >
           <template #actions>
             <AppMenu :items="moreActions">
               <template #trigger="{ open, toggle }">
-                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                <button @click="toggle" :aria-expanded="open" :aria-label="t('recentLocalPlayers.moreActions')" class="adt-icon-btn" :title="t('recentLocalPlayers.more')" type="button">
                   <span class="icon-[material-symbols--more-horiz]" />
                 </button>
               </template>
@@ -66,16 +66,16 @@
     </div>
 
     <!-- Delete all -->
-    <AppModal @close="showDeleteAll = false" :show="showDeleteAll" :title="`Delete all ${config?.recentLocalPlayers.players.length ?? 0} saved players?`" ghost-close size="sm">
+    <AppModal @close="showDeleteAll = false" :show="showDeleteAll" :title="t('recentLocalPlayers.deleteAll.title', { count: config?.recentLocalPlayers.players.length ?? 0 })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
-        They go from the lobby's strip and from autodarts' own Add Player list. This can't be undone.
+        {{ t("recentLocalPlayers.deleteAll.body") }}
       </p>
       <template #footer>
         <AppButton @click="showDeleteAll = false" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="deleteAllPlayers" auto type="danger">
-          Delete all
+          {{ t("recentLocalPlayers.deleteAll.confirm") }}
         </AppButton>
       </template>
     </AppModal>
@@ -90,12 +90,12 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Recent Local Players
+            {{ t("features.recentLocalPlayers") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
 
           <p class="w-2/3 text-white/70">
-            Autodarts remembers your last 6 local players and drops the rest for good. This keeps them all and puts them one click away in the lobby.
+            {{ t("recentLocalPlayers.card") }}
           </p>
         </div>
         <div class="flex">
@@ -107,7 +107,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Recent Local Players" class="size-full object-cover opacity-70">
+        <img :src="imageUrl" :alt="t('features.recentLocalPlayers')" class="size-full object-cover opacity-70">
       </div>
     </div>
   </template>
@@ -129,6 +129,7 @@ import type { LibraryEntry } from "@/utils/library-search";
 import { forgetGuestPlayers } from "@/utils/guest-players";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/recent-local-players.png");
 
@@ -140,7 +141,7 @@ const entries = computed<LibraryEntry[]>(() => (config.value?.recentLocalPlayers
 
 const moreActions = computed(() => [
   {
-    label: "Delete all…",
+    label: t("recentLocalPlayers.deleteAll.menu"),
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     disabled: !config.value?.recentLocalPlayers.players.length,

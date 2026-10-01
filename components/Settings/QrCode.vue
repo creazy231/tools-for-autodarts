@@ -7,10 +7,10 @@
     <div class="relative z-10 flex h-full flex-col justify-between">
       <div>
         <h3 class="mb-1 flex items-center adt-card-title">
-          QR Code
+          {{ t("features.qrCode") }}
         </h3>
         <p class="w-2/3 text-white/70">
-          Pins the lobby's join code to the top right corner, in place of Autodarts' own QR button. The ✕ below it hides the code for that lobby and gives the original button back.
+          {{ t("qrCode.card") }}
         </p>
       </div>
       <div class="flex">
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-      <img :src="imageUrl" alt="QR Code" class="size-full object-cover">
+      <img :src="imageUrl" :alt="t('features.qrCode')" class="size-full object-cover">
     </div>
   </div>
 </template>
@@ -31,6 +31,7 @@ import AppToggle from "../AppToggle.vue";
 
 const imageUrl = browser.runtime.getURL("/images/qr-code.png");
 
+const { t } = useI18n();
 const { config } = useConfig();
 
 async function toggleFeature() {
