@@ -1,0 +1,48 @@
+{
+  "captures": {
+    "en": {
+      "file": "capture-teams-match-en.png",
+      "callout": [ 1072, 208, 2020, 320 ]
+    },
+    "de": {
+      "file": "capture-teams-match-de.png",
+      "callout": [ 1078, 208, 2014, 320 ]
+    }
+  },
+  "actionBar": [ 1800, 1936 ],
+  "platforms": "Chrome · Firefox · Safari",
+  "variants": [
+    {
+      "name": "teams-en-new",
+      "lang": "en",
+      "kicker": "New · Beta",
+      "headline": [ "Teams", "are here" ],
+      "sub": "Play autodarts as a team: 2 vs 2, 2 vs 1, with friends or bots",
+      "points": [ "Shared score or own scores", "Team colours and turn order", "Partner rule built in", "Bots on your team" ]
+    },
+    {
+      "name": "teams-en-soon",
+      "lang": "en",
+      "kicker": "Sneak peek",
+      "headline": [ "Teams", "are coming" ],
+      "sub": "Play autodarts as a team: 2 vs 2, 2 vs 1, with friends or bots",
+      "points": [ "Shared score or own scores", "Team colours and turn order", "Partner rule built in", "Bots on your team" ]
+    },
+    {
+      "name": "teams-de-new",
+      "lang": "de",
+      "kicker": "Neu · Beta",
+      "headline": [ "Teams", "sind da" ],
+      "sub": "Spiel autodarts im Team: 2 gegen 2, 2 gegen 1, mit Freunden oder Bots",
+      "points": [ "Gemeinsamer oder eigener Score", "Teamfarben und Wurfreihenfolge", "Partnerregel eingebaut", "Bots im Team" ]
+    },
+    {
+      "name": "teams-de-soon",
+      "lang": "de",
+      "kicker": "Vorschau",
+      "headline": [ "Teams", "kommen bald" ],
+      "sub": "Spiel autodarts im Team: 2 gegen 2, 2 gegen 1, mit Freunden oder Bots",
+      "points": [ "Gemeinsamer oder eigener Score", "Teamfarben und Wurfreihenfolge", "Partnerregel eingebaut", "Bots im Team" ]
+    }
+  ]
+}

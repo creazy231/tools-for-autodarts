@@ -8,7 +8,8 @@ They show the features people use every day rather than the newest ones: the mat
 on autodarts' own board and in its own colours.
 
 The screenshots for the App Store (the iPhone and Mac Safari apps) are in `app-store/`; see
-[App Store](#app-store-iphone-and-mac) below.
+[App Store](#app-store-iphone-and-mac) below. Pictures announcing Teams on Discord are in
+`discord/`; see [Discord: Teams](#discord-teams).
 
 ## What goes where
 
@@ -189,3 +190,46 @@ changing a headline means taking them again as described above.
 
 Traces of the account: its avatar in the site header on iPhone 04 and Mac 05, "CREAZY" on the
 settings cards' pictures, and "Playing with CREAZY" under the guest on both lobby shots.
+
+## Discord: Teams
+
+`discord/` holds one picture announcing Teams, made for a Discord post, in English and German, and
+in two versions of each: one for before the release and one for when it is out. Each is a
+1920×1080 PNG with no transparency and an sRGB profile, under 1 MB, so Discord takes it as it is.
+
+| File | Kicker | Headline |
+|---|---|---|
+| `discord/teams-en-soon.png` | Sneak peek | Teams are coming |
+| `discord/teams-en-new.png` | New · Beta | Teams are here |
+| `discord/teams-de-soon.png` | Vorschau | Teams kommen bald |
+| `discord/teams-de-new.png` | Neu · Beta | Teams sind da |
+
+The rest is the same in every version: "Play autodarts as a team: 2 vs 2, 2 vs 1, with friends or
+bots" ("Spiel autodarts im Team: 2 gegen 2, 2 gegen 1, mit Freunden oder Bots"), then four points:
+shared score or own scores, team colours and turn order, the partner rule, bots on your team.
+
+### How they were made
+
+The picture is a 2 vs 2 own-score match between the guests Anna and Tom (TEAM RED) and Ben and Mia
+(TEAM BLUE): 501, double out, first to 3 legs, with Teams the only feature on and autodarts' own
+board. Anna took leg 1 and Ben leg 2. In leg 3 Tom is up and has thrown T20 T20, so his card is in
+TEAM RED's colour and the pill reads "TOM to throw", with each team's 1 leg either side. The
+German version is the same moment with the site in German, so the pill reads "TOM ist dran". The
+pill's "first to 3" is not translated yet, and the callout stops before it in both languages.
+
+The callout is the capture's pill row at 1.5× its size on the page, laid over the site's action
+bar, which it hides. At Discord's preview width the screenshot itself is too small to read, and
+the pill is what Teams adds.
+
+Both captures are kept in `discord/source/` (1600×1000 at 2×, about 1 MB each). They are untagged
+sRGB: the team gradient reads back as its hex values. So changing the text needs no new capture:
+
+```bash
+python3 marketing/discord/source/make.py prepare <work-dir>
+node marketing/discord/source/render.mjs <work-dir> marketing/discord
+python3 marketing/discord/source/make.py finish marketing/discord
+```
+
+The text is in `discord/source/copy.json`, the layout in `discord/source/template.html`. The
+colour conversion and the headless Chromium are the App Store set's. The page loads Bebas Neue
+and Manrope from Google Fonts, so rendering needs a network connection.
