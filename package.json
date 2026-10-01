@@ -22,6 +22,7 @@
     "zip:devtools": "ADT_DEVTOOLS=1 wxt zip",
     "compile": "vue-tsc --noEmit",
     "i18n:check": "tsx scripts/i18n-check.ts",
+    "i18n:site": "node scripts/site-strings.mjs",
     "picker:index": "node scripts/build-selector-index.mjs",
     "postinstall": "wxt prepare"
   },
