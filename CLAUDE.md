@@ -112,6 +112,7 @@ Template-first SFCs (`<template>`, `<script setup lang="ts">`, `<style>`). Insid
 - Feature card images use `gradient-mask-left` CSS mask
 - Icons: Iconify CSS mode — `<span class="icon-[pixelarticons--name]" />` or `icon-[material-symbols--name]`
 - Reusable UI components use `App` prefix: `AppButton`, `AppInput`, `AppToggle`, `AppModal`, `AppSelect`, `AppRadioGroup`, `AppSlider`, `AppTabs`, `AppNotification`
+- **Text:** never literal. Every string a person reads comes from `t()`. See "Translations".
 
 ### Config Persistence Pattern
 
@@ -155,3 +156,19 @@ When adding, changing, or removing a feature, **always update `README.md`** to r
 - **Changed feature** — Update the existing description, options, or trigger list
 - **Removed feature** — Remove the section entirely
 - **New triggers** — Add them to the trigger list in the relevant feature section
+
+## Translations (English, German, Dutch)
+
+Tools speaks the language picked on autodarts — `localStorage["autodarts.settings.language"]`, set on /settings/general or in the user menu — in English, German and Dutch. It has no language setting of its own. See `utils/i18n/` and `docs/superpowers/specs/2026-10-01-i18n-design.md`.
+
+**Every new or changed text ships in all three languages, in the same change.** New features, settings rows, notifications, tooltips and aria-labels, text drawn into the site's pages, the Discord message and What's New all count.
+
+- No literal text in a template or a DOM write:
+  - In components, `const { t } = useI18n()` and `{{ t("zoom.position.title") }}`.
+  - In scripts, `import { t, onLanguageChange } from "@/utils/i18n"`. Text that is built once is rebuilt through `onLanguageChange`.
+  - A sentence with bold text or a link goes through `<AppTrans path="…">`, with a named slot per `{marker}`.
+- The English goes in `locales/en/<feature>.ts`, and the German and Dutch in the files of the same name in `locales/de/` and `locales/nl/`. A new file is registered in all three `index.ts`. Feature names live in `locales/*/features.ts`.
+- Modules the service worker loads (`utils/storage.ts` and what it imports) hold message keys and never import `@/utils/i18n`.
+- Use the site's own words for its buttons, settings and darts terms. `yarn i18n:site "next leg"` prints them, and `locales/GLOSSARY.md` has the agreed names. German says *du*, Dutch *je*.
+- What may stay literal (brand names, units) is listed in `locales/untranslated.json`, and nothing else may.
+- `yarn i18n:check` must pass. It fails on a missing or extra key, on mismatched placeholders or tags, on an untranslated sentence, and on literal text left in templates and DOM writes. To find text it can't see, set `sessionStorage["autodarts.i18n.debug"] = "true"` and reload. The site and Tools then render keys, so whatever is still in English bypasses the catalogs.
