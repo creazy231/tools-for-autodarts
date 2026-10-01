@@ -442,8 +442,15 @@ export const SELECTORS = {
   nameTag: {
     /** The body that holds the name: the one div with the name as a direct child. */
     body: [ "div:has(> span.font-display)" ],
-    /** The slanted end drawn after the body, in the tag's colour (`currentColor`). */
-    shape: [ "svg[data-slot='nametag-shape']" ],
+    /**
+     * The body's own slanted ends, in its colour (`currentColor`): the one
+     * before it, on a tag drawn without an avatar, and the one after it. A
+     * badge after the body, such as a player's or bot's average ("25+"), ends
+     * in a shape of its own colour, which these leave alone. (`:has()` can't
+     * hold another `:has()`: the browser drops a rule that tries.)
+     */
+    start: [ "svg[data-slot='nametag-shape']:has(+ div > span.font-display)" ],
+    end: [ "div:has(> span.font-display) + svg[data-slot='nametag-shape']" ],
   },
 
   /**

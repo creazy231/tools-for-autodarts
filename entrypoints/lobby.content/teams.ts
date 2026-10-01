@@ -52,14 +52,16 @@ const ICON_EDIT = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24
 
 /** The site's name tag, as utils/selectors.ts names it. */
 const NAME_TAG_BODY = anyOf(SELECTORS.nameTag.body);
-const NAME_TAG_SHAPE = anyOf(SELECTORS.nameTag.shape);
+const NAME_TAG_START = anyOf(SELECTORS.nameTag.start);
+const NAME_TAG_END = anyOf(SELECTORS.nameTag.end);
 
 const LOBBY_CSS = `
   [${ROW_ATTR}] ${NAME_TAG_BODY} {
     background-image: linear-gradient(to right, var(--adt-team-from), var(--adt-team-to)) !important;
   }
   [${ROW_ATTR}] ${NAME_TAG_BODY} > span.font-display { color: #f7f8fa !important; }
-  [${ROW_ATTR}] ${NAME_TAG_SHAPE} { color: var(--adt-team-to) !important; }
+  [${ROW_ATTR}] ${NAME_TAG_START} { color: var(--adt-team-from) !important; }
+  [${ROW_ATTR}] ${NAME_TAG_END} { color: var(--adt-team-to) !important; }
   [${ROW_ATTR}] > div:has(> .adt-team-order) { flex-wrap: wrap; }
   .adt-team-order {
     display: flex; flex-wrap: wrap; align-items: center; gap: 4px;

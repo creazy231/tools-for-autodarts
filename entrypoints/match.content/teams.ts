@@ -52,14 +52,16 @@ const NARROW_CARD_PX = 220;
 
 /** The site's name tag, as utils/selectors.ts names it. */
 const NAME_TAG_BODY = anyOf(SELECTORS.nameTag.body);
-const NAME_TAG_SHAPE = anyOf(SELECTORS.nameTag.shape);
+const NAME_TAG_START = anyOf(SELECTORS.nameTag.start);
+const NAME_TAG_END = anyOf(SELECTORS.nameTag.end);
 
 const BASE_CSS = `
   [${WAITING_ATTR}] ${NAME_TAG_BODY} {
     background-image: linear-gradient(to right, var(--adt-team-from), var(--adt-team-to)) !important;
   }
   [${WAITING_ATTR}] ${NAME_TAG_BODY} > span.font-display { color: #f7f8fa !important; }
-  [${WAITING_ATTR}] ${NAME_TAG_SHAPE} { color: var(--adt-team-to) !important; }
+  [${WAITING_ATTR}] ${NAME_TAG_START} { color: var(--adt-team-from) !important; }
+  [${WAITING_ATTR}] ${NAME_TAG_END} { color: var(--adt-team-to) !important; }
   .adt-team-order { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
   .adt-team-chip {
     all: unset; box-sizing: border-box; display: inline-flex; align-items: center; height: 24px;
