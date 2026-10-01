@@ -55,7 +55,7 @@ export default {
     imported: "Einstellungen erfolgreich importiert. Die Seite wird neu geladen, um die Änderungen anzuwenden...",
     importFailed: "Einstellungen konnten nicht importiert werden",
     resetDone: "Alle Einstellungen wurden auf die Standardwerte zurückgesetzt. Die Seite wird neu geladen, um die Änderungen anzuwenden...",
-    copySoundsFailed: "Einstellungen kopiert, aber Fehler beim Hinzufügen der Sounds",
+    copySoundsFailed: "Einstellungen kopiert, aber Fehler beim Einbinden der Sounds",
     copied: "Einstellungen in die Zwischenablage kopiert",
     copyFailed: "Einstellungen konnten nicht in die Zwischenablage kopiert werden",
     invalidData: "Ungültige Einstellungsdaten",

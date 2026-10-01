@@ -32,8 +32,8 @@ export default {
     bulloff: "Eén keer, wanneer de bull-off begint",
     bull: "Een bullseye",
     outside: "Een dart buiten het scoregebied",
-    double: "Wordt voor een dubbel afgeroepen",
-    triple: "Wordt voor een triple afgeroepen",
+    double: "Wordt vóór een dubbel afgeroepen",
+    triple: "Wordt vóór een triple afgeroepen",
   },
   soundFx: {
     ambientGameon: "Aan het begin van een nieuw spel",

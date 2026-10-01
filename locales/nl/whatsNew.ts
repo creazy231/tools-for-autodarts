@@ -9,7 +9,7 @@ export default {
   headsUp: {
     featuresGone: {
       title: "Twee functies zijn verdwenen",
-      body: "Spelers schudden — de lobby heeft nu een eigen knop Volgorde willekeurig maken — en Menu in wedstrijd verbergen, omdat het opnieuw opgebouwde wedstrijdscherm geen menu heeft dat je kunt verbergen.",
+      body: "Spelers schudden — de lobby heeft nu een eigen knop 'Volgorde willekeurig maken' — en Menu in wedstrijd verbergen, omdat het opnieuw opgebouwde wedstrijdscherm geen menu heeft dat je kunt verbergen.",
     },
     settingsFresh: {
       title: "Een paar instellingen beginnen opnieuw",
