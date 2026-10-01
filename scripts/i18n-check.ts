@@ -16,7 +16,8 @@
  * named on the command line):
  * - text with letters in a template, or in an attribute people read;
  * - a literal with letters handed to textContent, innerHTML, title, an
- *   aria-label, a notification, a confirm dialog, `append()`, or a `label`,
+ *   aria-label, the message of a notification (not its "error" type), the
+ *   title and message of a confirm dialog, `append()`, or a `label`,
  *   `title`, `description`, … property;
  * - a `t("key", …)` call or `<AppTrans path="key">` whose key English doesn't
  *   have, or whose params leave out a `{placeholder}` of its message — or the
@@ -334,8 +335,25 @@ export function scanVue(file: string, source: string, untranslated: Untranslated
 /** DOM properties that put text on screen. */
 const TEXT_DOM_PROPERTIES = new Set([ "textContent", "innerText", "innerHTML", "outerHTML", "title", "placeholder", "alt", "ariaLabel" ]);
 
-/** Calls whose literal arguments are shown. */
-const TEXT_CALLS = new Set([ "showNotification", "showConfirmDialog", "alert", "confirm", "append", "prepend", "before", "after", "createTextNode" ]);
+/**
+ * Calls whose arguments are shown, and which of them, by position. A
+ * notification's message is the first; its second is the type ("error") and its
+ * third a duration. A confirm dialog shows a title and a message, then takes a
+ * callback and options, whose `confirmText` and `cancelText` the
+ * TEXT_PROPERTIES rule below already reads. Insertions into the DOM show every
+ * argument.
+ */
+const TEXT_CALLS = new Map<string, readonly number[] | "every">([
+  [ "showNotification", [ 0 ] ],
+  [ "showConfirmDialog", [ 0, 1 ] ],
+  [ "alert", [ 0 ] ],
+  [ "confirm", [ 0 ] ],
+  [ "createTextNode", [ 0 ] ],
+  [ "append", "every" ],
+  [ "prepend", "every" ],
+  [ "before", "every" ],
+  [ "after", "every" ],
+]);
 
 /** Object properties that hold shown text by this codebase's conventions. */
 const TEXT_PROPERTIES = new Set([
@@ -406,8 +424,10 @@ export function scanScript(file: string, source: string, untranslated: Untransla
           report(node.arguments[1], text, `setAttribute("${attribute}")`);
         }
       }
-      if (TEXT_CALLS.has(name)) {
-        for (const argument of node.arguments) {
+      const shown = TEXT_CALLS.get(name);
+      if (shown) {
+        for (const [ position, argument ] of node.arguments.entries()) {
+          if (shown !== "every" && !shown.includes(position)) continue;
           const text = shownText(argument, false);
           if (text !== undefined && readable(text, untranslated)) report(argument, text, `${name}()`);
         }
