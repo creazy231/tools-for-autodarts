@@ -191,6 +191,7 @@ declare global {
   const useGlobalEvent: typeof import('./composables/useEventBus')['useGlobalEvent']
   const useGlobalListen: typeof import('./composables/useEventBus')['useGlobalListen']
   const useGlobalUnlisten: typeof import('./composables/useEventBus')['useGlobalUnlisten']
+  const useI18n: typeof import('./composables/useI18n')['useI18n']
   const useIdle: typeof import('@vueuse/core')['useIdle']
   const useImage: typeof import('@vueuse/core')['useImage']
   const useInfiniteScroll: typeof import('@vueuse/core')['useInfiniteScroll']
