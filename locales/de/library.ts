@@ -24,8 +24,8 @@ export default {
     searchPlaceholder: "Nach Name oder Trigger suchen",
     noMatch: "Kein Eintrag enthält das in seinem Namen, seinen Triggern oder seiner Quelle.",
     dragHint: {
-      searchAndFilter: "Leere die Suche und wähle Alle, um Einträge in eine neue Reihenfolge zu ziehen.",
-      search: "Leere die Suche, um Einträge in eine neue Reihenfolge zu ziehen.",
+      searchAndFilter: "Lösche die Suche und wähle Alle, um Einträge in eine neue Reihenfolge zu ziehen.",
+      search: "Lösche die Suche, um Einträge in eine neue Reihenfolge zu ziehen.",
       filter: "Wähle Alle, um Einträge in eine neue Reihenfolge zu ziehen.",
     },
   },

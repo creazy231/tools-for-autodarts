@@ -12,7 +12,7 @@ export default {
   confirm: {
     title: "Ohne Migration fortfahren?",
     message: "Dadurch werden alle deine Einstellungen auf die Standardwerte zurückgesetzt. Alle eigenen Konfigurationen gehen verloren.",
-    confirmText: "Fortfahren",
+    confirmText: "Weiter",
     cancelText: "Zurück",
   },
   migrated: "Einstellungen erfolgreich migriert. Die Seite wird neu geladen...",

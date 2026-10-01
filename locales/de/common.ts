@@ -4,8 +4,8 @@ import type { Translation } from "../../utils/i18n/types";
 export default {
   add: "Hinzufügen",
   cancel: "Abbrechen",
-  clear: "Leeren",
-  clearSearch: "Suche leeren",
+  clear: "Löschen",
+  clearSearch: "Suche löschen",
   close: "Schließen",
   confirm: "Bestätigen",
   delete: "Löschen",
