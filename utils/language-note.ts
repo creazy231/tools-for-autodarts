@@ -32,6 +32,12 @@ const FALLBACK_CLASSES = "text-muted-foreground text-left text-sm leading-normal
 
 let observer: MutationObserver | null = null;
 let stopListening: (() => void) | null = null;
+/**
+ * The note once placed. The observer runs on every page, match pages
+ * included, so outside /settings it drops this one rather than search the
+ * whole document for a note on each change.
+ */
+let placed: HTMLElement | null = null;
 
 export function languageNote(): void {
   languageNoteOnRemove();
@@ -67,16 +73,21 @@ export function languageField(root: ParentNode = document): HTMLElement | null {
 
 /**
  * Put the note in the Language field, or take it away when there is none.
- * Runs on every mutation batch; once the note is in place it only checks.
+ * Runs on every mutation batch on /settings; once the note is in place it
+ * only checks. It looks in `root` for a flagged note because an earlier copy
+ * of this script (before an extension update) may have left one: that one is
+ * kept if it sits in the right field, and taken over as ours, else removed.
  */
 export function placeNote(root: ParentNode = document): void {
   const field = languageField(root);
   const existing = root.querySelector<HTMLElement>(`[${NOTE_FLAG}]`);
   if (!field) {
     existing?.remove();
+    placed = null;
     return;
   }
   if (existing?.parentElement === field) {
+    placed = existing;
     paint(existing);
     return;
   }
@@ -86,15 +97,18 @@ export function placeNote(root: ParentNode = document): void {
   note.setAttribute(NOTE_FLAG, "");
   note.className = qs(SELECTORS.siteSettings.fieldDescription, root)?.className || FALLBACK_CLASSES;
   field.append(note);
+  placed = note;
   paint(note);
 }
 
+/** Take away the note we placed. A reference, not a search: this runs on every page. */
 function removeNote(): void {
-  document.querySelector(`[${NOTE_FLAG}]`)?.remove();
+  placed?.remove();
+  placed = null;
 }
 
 /** The note's text in the current language. Writes only when it differs, so it never feeds the observer. */
-function paint(note = document.querySelector<HTMLElement>(`[${NOTE_FLAG}]`)): void {
+function paint(note: HTMLElement | null = placed): void {
   const text = t("site.languageNote");
   if (note && note.textContent !== text) note.textContent = text;
 }
