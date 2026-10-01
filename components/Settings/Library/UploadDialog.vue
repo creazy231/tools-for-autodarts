@@ -86,7 +86,6 @@ import AppButton from "@/components/AppButton.vue";
 import AppModal from "@/components/AppModal.vue";
 import AppRadioGroup from "@/components/AppRadioGroup.vue";
 import AppTokenInput from "@/components/AppTokenInput.vue";
-import { TRIGGER_HINTS } from "@/utils/trigger-catalog";
 
 /**
  * Adding several files at once. Each file shows the trigger its name will give
@@ -127,8 +126,7 @@ const MODES = computed(() => [
   { label: t("library.upload.modes.names"), value: "names" },
   { label: t("library.upload.modes.shared"), value: "shared" },
 ]);
-/** The feature's trigger hints with their lines in the language shown, so typing searches the words on screen. */
-const suggestions = computed(() => TRIGGER_HINTS[props.feature].map(hint => ({ trigger: hint.trigger, description: t(hint.descriptionKey) })));
+const suggestions = useTriggerSuggestions(() => props.feature);
 
 const files = ref<File[]>([]);
 const mode = ref<string>("names");

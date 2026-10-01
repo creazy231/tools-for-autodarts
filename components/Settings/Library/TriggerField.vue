@@ -31,7 +31,7 @@
 import type { TriggerFeature } from "@/utils/trigger-catalog";
 
 import AppTokenInput from "@/components/AppTokenInput.vue";
-import { TRIGGER_DOCS, TRIGGER_HINTS, TRIGGER_PATTERN_KEYS } from "@/utils/trigger-catalog";
+import { TRIGGER_DOCS, TRIGGER_PATTERN_KEYS } from "@/utils/trigger-catalog";
 
 const props = withDefaults(defineProps<{
   feature: TriggerFeature;
@@ -51,7 +51,6 @@ const triggers = defineModel<string[]>({ required: true });
 
 const { t } = useI18n();
 
-/** The feature's trigger hints with their lines in the language shown, so typing searches the words on screen. */
-const suggestions = computed(() => TRIGGER_HINTS[props.feature].map(hint => ({ trigger: hint.trigger, description: t(hint.descriptionKey) })));
+const suggestions = useTriggerSuggestions(() => props.feature);
 const patternLine = computed(() => t(TRIGGER_PATTERN_KEYS[props.feature]));
 </script>

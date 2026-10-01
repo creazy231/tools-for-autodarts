@@ -5,9 +5,9 @@
  * patterns, so they are summed up in one line instead of listed.
  *
  * The lines are message keys (locales/en/triggers.ts and its translations),
- * not text: the field turns them into the language shown with `t()`, so this
- * module never does. The triggers themselves are what is typed, and are the
- * same in every language.
+ * not text: the field turns them into the language shown with `t()`, in
+ * composables/useTriggerSuggestions.ts, so this module never does. The
+ * triggers themselves are what is typed, and are the same in every language.
  */
 
 import type { MessageKey } from "@/utils/i18n";
