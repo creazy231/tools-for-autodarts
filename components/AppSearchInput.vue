@@ -6,8 +6,8 @@
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       @keydown.esc="clear"
       ref="input"
-      :aria-label="placeholder"
-      :placeholder="placeholder"
+      :aria-label="shown"
+      :placeholder="shown"
       :value="modelValue"
       autocapitalize="off"
       autocomplete="off"
@@ -18,9 +18,9 @@
     <button
       @click="clear"
       v-if="modelValue"
-      aria-label="Clear the search"
+      :aria-label="t('common.clearSearch')"
       class="adt-search-clear"
-      title="Clear"
+      :title="t('common.clear')"
       type="button"
     >
       <span class="icon-[material-symbols--close-rounded]" />
@@ -29,16 +29,21 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: string;
+  /** What the field is for. Left out, it says "Search" in the current language. */
   placeholder?: string;
 }>(), {
-  placeholder: "Search",
+  placeholder: undefined,
 });
 
 const emit = defineEmits<{ "update:modelValue": [ value: string ] }>();
 
+const { t } = useI18n();
+
 const input = ref<HTMLInputElement>();
+
+const shown = computed(() => props.placeholder ?? t("common.search"));
 
 function clear() {
   emit("update:modelValue", "");

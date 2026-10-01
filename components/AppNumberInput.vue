@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import type { MessageKey } from "@/utils/i18n";
+
 import AppInput from "@/components/AppInput.vue";
 import { onStep, snapNumber } from "@/utils/number-step";
 
@@ -57,15 +59,21 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{ "update:modelValue": [ value: number ] }>();
 
+const { t } = useI18n();
+
 /** Units a screen reader should say in full. */
-const SPOKEN_UNITS: Record<string, string> = { s: "seconds", min: "minutes", ms: "milliseconds" };
+const SPOKEN_UNITS: Record<string, MessageKey> = { s: "common.units.s", min: "common.units.min", ms: "common.units.ms" };
 
 const draft = ref(String(props.modelValue));
 /** Typed into since the last commit: only then does leaving the field change anything. */
 let edited = false;
 
 const limits = computed(() => ({ min: props.min, max: props.max, step: props.step }));
-const spokenLabel = computed(() => (props.label && props.unit ? `${props.label} in ${SPOKEN_UNITS[props.unit] ?? props.unit}` : props.label));
+const spokenLabel = computed(() => {
+  if (!props.label || !props.unit) return props.label;
+  const unit = SPOKEN_UNITS[props.unit] ? t(SPOKEN_UNITS[props.unit]) : props.unit;
+  return t("common.inUnit", { label: props.label, unit });
+});
 
 watch(() => props.modelValue, (value) => {
   if (Number(draft.value) !== value) draft.value = String(value);

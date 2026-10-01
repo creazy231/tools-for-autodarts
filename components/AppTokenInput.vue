@@ -11,7 +11,7 @@
         <span class="truncate">{{ token }}</span>
         <button
           @click.stop="remove(index)"
-          :aria-label="`Remove ${token}`"
+          :aria-label="t('common.remove', { name: token })"
           class="adt-token-remove"
           type="button"
         >
@@ -25,7 +25,7 @@
         :id="id"
         ref="input"
         v-model="draft"
-        :placeholder="modelValue.length ? '' : placeholder"
+        :placeholder="modelValue.length ? '' : placeholderText"
         autocapitalize="off"
         autocomplete="off"
         spellcheck="false"
@@ -71,6 +71,7 @@
 const props = withDefaults(defineProps<{
   modelValue: string[];
   id?: string;
+  /** Left out, the field says "Type and press Enter" in the current language. */
   placeholder?: string;
   /** Offered as the field is typed into. */
   suggestions?: { trigger: string; description: string }[];
@@ -80,7 +81,7 @@ const props = withDefaults(defineProps<{
   lowercase?: boolean;
 }>(), {
   id: undefined,
-  placeholder: "Type and press Enter",
+  placeholder: undefined,
   suggestions: () => [],
   validate: undefined,
   lowercase: true,
@@ -88,10 +89,13 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{ "update:modelValue": [ value: string[] ] }>();
 
+const { t } = useI18n();
+
 const draft = ref("");
 const active = ref(-1);
 const input = ref<HTMLInputElement>();
 
+const placeholderText = computed(() => props.placeholder ?? t("common.typeAndPressEnter"));
 const errors = computed(() => new Map(props.modelValue.map(token => [ token, props.validate?.(token) ?? "" ])));
 const firstError = computed(() => [ ...errors.value.values() ].find(Boolean) ?? "");
 const suggested = computed(() => {

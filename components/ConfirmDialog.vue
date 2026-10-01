@@ -31,13 +31,13 @@
           <AppButton
             @click="$emit('cancel')"
           >
-            {{ cancelText }}
+            {{ cancelLabel }}
           </AppButton>
           <AppButton
             @click="$emit('confirm')"
             type="success"
           >
-            {{ confirmText }}
+            {{ confirmLabel }}
           </AppButton>
         </div>
       </div>
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import AppButton from "@/components/AppButton.vue";
 
-defineProps({
+const props = defineProps({
   show: {
     type: Boolean,
     default: false,
@@ -61,17 +61,24 @@ defineProps({
     type: String,
     required: true,
   },
+  // Left undefined so the dialog says Confirm and Cancel in the current
+  // language; a caller that passes its own words still wins.
   confirmText: {
     type: String,
-    default: "Confirm",
+    default: undefined,
   },
   cancelText: {
     type: String,
-    default: "Cancel",
+    default: undefined,
   },
 });
 
 defineEmits([ "confirm", "cancel" ]);
+
+const { t } = useI18n();
+
+const confirmLabel = computed(() => props.confirmText ?? t("common.confirm"));
+const cancelLabel = computed(() => props.cancelText ?? t("common.cancel"));
 </script>
 
 <style>

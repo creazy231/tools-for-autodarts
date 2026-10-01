@@ -14,7 +14,7 @@
           @click="$emit('close')"
           class="adt-modal-close"
           type="button"
-          aria-label="Close"
+          :aria-label="t('common.close')"
         >
           <span class="icon-[pixelarticons--close] text-lg" />
         </button>
@@ -68,6 +68,8 @@ defineProps({
 });
 
 defineEmits([ "close" ]);
+
+const { t } = useI18n();
 </script>
 
 <!--

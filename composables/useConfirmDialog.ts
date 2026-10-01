@@ -15,8 +15,10 @@ export function useConfirmDialog() {
     title: "",
     message: "",
     onConfirm: null,
-    confirmText: "Confirm",
-    cancelText: "Cancel",
+    // No words here: ConfirmDialog says Confirm and Cancel in the current
+    // language when it is given none.
+    confirmText: undefined,
+    cancelText: undefined,
   });
 
   function showConfirmDialog(
@@ -30,8 +32,8 @@ export function useConfirmDialog() {
       title,
       message,
       onConfirm,
-      confirmText: options?.confirmText || "Confirm",
-      cancelText: options?.cancelText || "Cancel",
+      confirmText: options?.confirmText,
+      cancelText: options?.cancelText,
     };
   }
 

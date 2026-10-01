@@ -22,7 +22,7 @@
       :aria-pressed="props.modelValue"
       type="button"
     >
-      {{ props.onLabel }}
+      {{ onText }}
     </button>
     <button
       @click="set(false)"
@@ -31,7 +31,7 @@
       :aria-pressed="!props.modelValue"
       type="button"
     >
-      {{ props.offLabel }}
+      {{ offText }}
     </button>
   </div>
 </template>
@@ -45,21 +45,26 @@ const props = withDefaults(defineProps<{
   /**
    * Segment labels. On a settings card the surrounding heading says what is
    * being switched, so plain On/Off is enough; a control injected into the
-   * autodarts page has no such heading and names itself instead.
+   * autodarts page has no such heading and names itself instead. Left out,
+   * they say On and Off in the current language.
    */
   onLabel?: string;
   offLabel?: string;
 }>(), {
   size: "md",
   disabled: false,
-  onLabel: "On",
-  offLabel: "Off",
+  onLabel: undefined,
+  offLabel: undefined,
 });
 
 const emit = defineEmits([ "update:modelValue" ]);
 
+const { t } = useI18n();
+
 /** md is the spec's 44px; the other sizes are for dense rows and page inserts. */
 const sizeClass = computed(() => (props.size === "md" ? "" : `is-${props.size}`));
+const onText = computed(() => props.onLabel ?? t("common.on"));
+const offText = computed(() => props.offLabel ?? t("common.off"));
 
 function set(value: boolean) {
   if (props.disabled || props.modelValue === value) return;

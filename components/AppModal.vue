@@ -34,7 +34,7 @@
           v-if="!hideCloseButton && ghostClose"
           class="adt-modal-close"
           type="button"
-          aria-label="Close"
+          :aria-label="t('common.close')"
         >
           <span class="icon-[pixelarticons--close] text-lg" />
         </button>
@@ -64,7 +64,7 @@
         <div class="flex justify-end gap-3">
           <slot name="footer">
             <AppButton @click="$emit('close')">
-              Cancel
+              {{ t("common.cancel") }}
             </AppButton>
           </slot>
         </div>
@@ -118,6 +118,8 @@ defineProps({
 });
 
 defineEmits([ "close" ]);
+
+const { t } = useI18n();
 </script>
 
 <style>

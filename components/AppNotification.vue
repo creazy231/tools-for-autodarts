@@ -13,7 +13,9 @@
           <span v-if="type === 'success'" class="icon-[pixelarticons--check] text-xl" />
           <span v-else class="icon-[pixelarticons--alert] text-xl" />
         </div>
-        <div class="mr-4 grow" v-html="message" />
+        <div class="mr-4 grow">
+          {{ message }}
+        </div>
         <div class="shrink-0">
           <button @click="$emit('close')" class="text-xl opacity-70 hover:opacity-100">
             <span class="icon-[pixelarticons--close]" />
