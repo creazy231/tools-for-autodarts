@@ -5,20 +5,29 @@
  *
  * The catalogs (always, all of locales/):
  * - a German or Dutch key English doesn't have, or an English key one lacks;
+ * - a string where English has a plural, or a plural where it has a string;
  * - a `{placeholder}` or inline tag (`<b>`, `<i>`, `<code>`, `<br>`) that
- *   differs from the English, form by form for a plural (`{count}` aside);
+ *   differs from the English, form by form for a plural, where only the `one`
+ *   form may leave out `{count}`;
  * - an empty message, or a plural that is not exactly `{ one, other }`;
  * - a German or Dutch sentence of three words or more still word for word the
  *   English;
- * - an English tag that is never closed.
+ * - in any language, a tag that is never closed, closes nothing, or crosses
+ *   another (`<b>a <i>b</b></i>`).
  *
  * The source (every .vue and .ts file the extension ships, or only the files
  * named on the command line):
  * - text with letters in a template, or in an attribute people read;
+ * - a literal with letters that a template expression shows: in `{{ }}`, or
+ *   bound to such an attribute (`:title="editing ? 'Edit sound' : …"`);
  * - a literal with letters handed to textContent, innerHTML, title, an
  *   aria-label, the message of a notification (not its "error" type), the
  *   title and message of a confirm dialog, `append()`, or a `label`,
  *   `title`, `description`, … property;
+ * - in both of these, every literal that can be shown: each branch of `?:`,
+ *   both sides of `||`, `??` and `+`, a template literal's own text — never
+ *   the key handed to `t()`, a comparison, or an option such as
+ *   `:variant="'error'"`;
  * - a `t("key", …)` call or `<AppTrans path="key">` whose key English doesn't
  *   have, or whose params leave out a `{placeholder}` of its message — or the
  *   `count` of a plural — which would show the raw `{name}`;
@@ -77,9 +86,13 @@ function forms(value: unknown): [ string, string ][] {
   return [];
 }
 
-/** What must match across languages: the placeholders and tags, in any order. */
-function signature(text: string, plural: boolean): string {
-  const placeholders = [ ...text.matchAll(PLACEHOLDER) ].map(m => `{${m[1]}}`).filter(p => !(plural && p === "{count}"));
+/**
+ * What must match across languages: the placeholders and tags, in any order.
+ * Only a plural's `one` form may leave out `{count}` ("Eine Datei"): `other`
+ * also covers 0, 2 and up, and decimals, and without it the number is gone.
+ */
+function signature(text: string, countOptional: boolean): string {
+  const placeholders = [ ...text.matchAll(PLACEHOLDER) ].map(m => `{${m[1]}}`).filter(p => !(countOptional && p === "{count}"));
   const tags = (text.match(TAG) ?? []).map(tag => (tag.startsWith("<br") ? "<br>" : tag));
   return [ ...placeholders, ...tags ].sort().join(" ");
 }
@@ -88,14 +101,20 @@ function words(text: string): number {
   return text.replace(TAG, " ").replace(PLACEHOLDER, " ").split(/\s+/).filter(word => /\p{L}/u.test(word)).length;
 }
 
-function unclosedTag(text: string): string | undefined {
+/**
+ * What is wrong with a message's tags, if anything. <AppTrans> shows a closing
+ * tag it cannot pair as characters — one that closes nothing, or one that
+ * crosses another (`<b>a <i>b</b></i>`) — and a tag left open runs to the end
+ * of the message.
+ */
+function tagProblem(text: string): string | undefined {
   const open: string[] = [];
-  for (const [ tag ] of text.matchAll(/<(\/?)(b|i|code)>/g)) {
-    if (!tag.startsWith("</")) open.push(tag);
-    else if (open.at(-1) === tag.replace("/", "")) open.pop();
-    else return tag;
+  for (const [ tag, name ] of text.matchAll(/<\/?(b|i|code)>/g)) {
+    if (!tag.startsWith("</")) open.push(name);
+    else if (open.at(-1) === name) open.pop();
+    else return open.includes(name) ? `${tag} comes before </${open.at(-1)}>: tags must nest` : `${tag} closes no <${name}>`;
   }
-  return open[0];
+  return open.length ? `<${open[0]}> is not closed` : undefined;
 }
 
 export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: Untranslated): Problem[] {
@@ -117,10 +136,8 @@ export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: U
       }
       for (const [ form, text ] of forms(value)) {
         if (!text.trim()) problems.push({ where: where + form, what: "is empty" });
-        if (language === "en") {
-          const tag = unclosedTag(text);
-          if (tag) problems.push({ where: where + form, what: `${tag} is not closed` });
-        }
+        const tag = tagProblem(text);
+        if (tag) problems.push({ where: where + form, what: tag });
       }
     }
 
@@ -135,13 +152,18 @@ export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: U
         problems.push({ where: `locales/${language}: ${key}`, what: "is not in English" });
         continue;
       }
-      const plural = isPluralLike(source);
+      // t() picks a plural's form by `count`, and shows a string as it is: the shapes must match.
+      if (isPluralLike(source) !== isPluralLike(value)) {
+        problems.push({ where: `locales/${language}: ${key}`, what: isPluralLike(source) ? "is a plural in English: it needs { one, other }" : "is a string in English, not a plural" });
+        continue;
+      }
       const theirs = new Map(forms(value));
       for (const [ form, text ] of forms(source)) {
         const translated = theirs.get(form) ?? "";
         const where = `locales/${language}: ${key}${form}`;
-        if (signature(text, plural) !== signature(translated, plural)) {
-          problems.push({ where, what: `placeholders or tags differ: en "${signature(text, plural)}", ${language} "${signature(translated, plural)}"` });
+        const countOptional = form === ".one";
+        if (signature(text, countOptional) !== signature(translated, countOptional)) {
+          problems.push({ where, what: `placeholders or tags differ: en "${signature(text, countOptional)}", ${language} "${signature(translated, countOptional)}"` });
         }
         if (translated === text && words(text) >= 3 && !untranslated.includes(text)) {
           problems.push({ where, what: `is still the English: "${text}"` });
@@ -205,11 +227,20 @@ function checkCalls(file: string, line: (node: ts.Node) => number, tree: ts.Sour
   visit(tree);
 }
 
-/** A template expression, `t("key", { n })` in `{{ }}` or a `:prop`, checked like script code. */
-function checkExpression(file: string, at: number, expression: string, english: English | undefined, problems: Problem[]): void {
-  if (!english || !expression.includes("t(")) return;
-  const tree = ts.createSourceFile(file, `(${expression});`, ts.ScriptTarget.Latest, true);
-  checkCalls(file, () => at, tree, english, problems);
+/**
+ * A template expression — what `{{ }}` or a directive such as `:title` holds —
+ * parsed as script code: the whole tree, and the expression itself.
+ */
+function parseExpression(file: string, code: string): { tree: ts.SourceFile; expression: ts.Expression | undefined } {
+  const tree = ts.createSourceFile(file, `(${code});`, ts.ScriptTarget.Latest, true);
+  const statement = tree.statements[0];
+  const wrapped = statement && ts.isExpressionStatement(statement) ? statement.expression : undefined;
+  return { tree, expression: wrapped && ts.isParenthesizedExpression(wrapped) ? wrapped.expression : wrapped };
+}
+
+/** A finding's text on one line, cut to what a terminal shows. */
+function excerpt(text: string): string {
+  return text.replace(/\s+/g, " ").trim().slice(0, 90);
 }
 
 const phrasePatterns = new WeakMap<Untranslated, RegExp[]>();
@@ -246,25 +277,63 @@ const NON_TEXT_PROPS = new Set([
 /** A single token starting lower-case, like size="sm", variant="error" or feature="soundFx", is an option, not text. */
 const OPTION_TOKEN = /^[a-z][a-zA-Z0-9-]*$/;
 
+/**
+ * Whether a prop holds text a person reads: on an element, an attribute such
+ * as `title` or `aria-label`; on a component, any prop but the ones that never
+ * do (`size`, `icon`, `*-class`, `data-*`, …). Written out or bound alike.
+ */
+function textProp(name: string, isComponent: boolean): boolean {
+  return isComponent
+    ? !NON_TEXT_PROPS.has(name) && !/(class|icon)$/.test(name) && !name.startsWith("data-")
+    : TEXT_ATTRIBUTES.has(name);
+}
+
 export function scanVue(file: string, source: string, untranslated: Untranslated, english?: English): Problem[] {
   const problems: Problem[] = [];
   const { descriptor, errors } = sfc.parse(source, { filename: file });
   const at = (line: number) => `${file}:${line}`;
 
+  /**
+   * A template expression, read as script code: its `t()` calls must give the
+   * values their messages need. Where the expression is itself shown —
+   * `shownAs` names the `{{ }}` or the bound text prop — every literal it
+   * yields is text too, as in a script. On a component, a literal that is one
+   * lower-case token is an option, as written out: `:variant="'error'"`.
+   */
+  const checkExpression = (line: number, code: string, shownAs?: string, isComponent = false) => {
+    if (!shownAs && !code.includes("t(")) return;
+    const { tree, expression } = parseExpression(file, code);
+    checkCalls(file, () => line, tree, english, problems);
+    if (!shownAs || !expression) return;
+    const texts = shownText(expression, false).filter(text => readable(text, untranslated) && !(isComponent && OPTION_TOKEN.test(text)));
+    if (texts.length) problems.push({ where: at(line), what: `${shownAs}: "${excerpt(texts.join(" / "))}"` });
+  };
+
   const walk = (node: any) => {
     if (node.type === 2 && readable(node.content, untranslated)) {
       problems.push({ where: at(node.loc.start.line), what: `text in the template: "${node.content.trim()}"` });
     }
-    // {{ t("key", { … }) }}
-    if (node.type === 5 && node.content?.content) {
-      checkExpression(file, node.loc.start.line, node.content.content, english, problems);
-    }
+    // {{ editing ? "Edit sound" : t("…") }}
+    if (node.type === 5 && node.content?.content) checkExpression(node.loc.start.line, node.content.content, "{{ }}");
     if (node.type === 1) {
+      const isComponent = node.tagType === 1;
       for (const prop of node.props ?? []) {
-        // :title="t('key')"
-        if (prop.type === 7 && prop.exp?.content) checkExpression(file, prop.loc.start.line, prop.exp.content, english, problems);
         if (prop.type === 7 && prop.name === "html") {
           problems.push({ where: at(prop.loc.start.line), what: "v-html renders markup: show text, or a message through <AppTrans>" });
+        }
+        // :title="playing ? 'Pause' : t('…')", @click="…", v-if="…": only a bound text prop is shown.
+        if (prop.type === 7 && prop.exp?.content) {
+          const bound: string | undefined = prop.name === "bind" && prop.arg?.isStatic ? prop.arg.content : undefined;
+          const shown = bound !== undefined && textProp(bound, isComponent);
+          checkExpression(prop.loc.start.line, prop.exp.content, shown ? `:${bound}` : undefined, isComponent);
+        }
+        // title="A title", <OptionRow description="…">
+        if (prop.type === 6 && prop.value) {
+          const name: string = prop.name;
+          const value: string = prop.value.content;
+          if (textProp(name, isComponent) && !(isComponent && OPTION_TOKEN.test(value)) && readable(value, untranslated)) {
+            problems.push({ where: at(prop.loc.start.line), what: `${name}="${value}"` });
+          }
         }
       }
       // <AppTrans path="key" :params="{ … }">, whose markers may also be filled by named slots
@@ -277,28 +346,11 @@ export function scanVue(file: string, source: string, untranslated: Untranslated
         if (path && message === undefined) {
           problems.push({ where: at(node.loc.start.line), what: `<AppTrans path="${path}">: no such key in English` });
         } else if (path) {
-          const tree = params ? ts.createSourceFile(file, `(${params});`, ts.ScriptTarget.Latest, true) : undefined;
-          const statement = tree?.statements[0];
-          const expression = statement && ts.isExpressionStatement(statement) ? statement.expression : undefined;
-          const given = params ? givenNames(expression && ts.isParenthesizedExpression(expression) ? expression.expression : expression) : new Set<string>();
+          const given = params ? givenNames(parseExpression(file, params).expression) : new Set<string>();
           if (given) {
             const missing = [ ...needs(message) ].filter(name => !given.has(name) && !slots.has(name));
             if (missing.length) problems.push({ where: at(node.loc.start.line), what: `<AppTrans path="${path}"> is missing ${missing.map(name => `{${name}}`).join(", ")}` });
           }
-        }
-      }
-    }
-    if (node.type === 1) {
-      const isComponent = node.tagType === 1;
-      for (const prop of node.props ?? []) {
-        if (prop.type !== 6 || !prop.value) continue;
-        const name: string = prop.name;
-        const value: string = prop.value.content;
-        const checked = isComponent
-          ? !NON_TEXT_PROPS.has(name) && !/(class|icon)$/.test(name) && !name.startsWith("data-") && !OPTION_TOKEN.test(value)
-          : TEXT_ATTRIBUTES.has(name);
-        if (checked && readable(value, untranslated)) {
-          problems.push({ where: at(prop.loc.start.line), what: `${name}="${value}"` });
         }
       }
     }
@@ -362,28 +414,32 @@ const TEXT_PROPERTIES = new Set([
   "intro", "subtitle", "caption", "onLabel", "offLabel",
 ]);
 
-/** The visible text of a literal: markup and comments taken out of an HTML string. */
+/** The text of a string or template literal, a template's `${…}` parts left out. */
 function literalText(node: ts.Node): string | undefined {
   if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
   if (ts.isTemplateExpression(node)) return [ node.head.text, ...node.templateSpans.map(span => span.literal.text) ].join(" ");
   return undefined;
 }
 
-function shownText(node: ts.Node, html: boolean): string | undefined {
-  // `on ? "Leave Streaming Mode" : "Streaming Mode"`, `name || "Unnamed board"`: every branch is shown.
+/** Operators whose both sides can end up on screen: `name || "Unnamed board"`, `"Delete " + name`. */
+const SHOWN_OPERATORS = new Set([ ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken, ts.SyntaxKind.PlusToken ]);
+
+/**
+ * The literals an expression can put on screen: a string or template literal,
+ * every branch of `?:`, and both sides of `||`, `??` and `+`. A call —
+ * `t("key")` among them — a comparison or a variable yields none. In an HTML
+ * string, the markup and comments are taken out.
+ */
+function shownText(node: ts.Node, html: boolean): string[] {
   if (ts.isParenthesizedExpression(node)) return shownText(node.expression, html);
-  if (ts.isConditionalExpression(node)) return joined([ shownText(node.whenTrue, html), shownText(node.whenFalse, html) ]);
-  if (ts.isBinaryExpression(node) && [ ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken ].includes(node.operatorToken.kind)) {
-    return joined([ shownText(node.left, html), shownText(node.right, html) ]);
+  // `on ? "Leave Streaming Mode" : "Streaming Mode"`: every branch is shown.
+  if (ts.isConditionalExpression(node)) return [ ...shownText(node.whenTrue, html), ...shownText(node.whenFalse, html) ];
+  if (ts.isBinaryExpression(node) && SHOWN_OPERATORS.has(node.operatorToken.kind)) {
+    return [ ...shownText(node.left, html), ...shownText(node.right, html) ];
   }
   const text = literalText(node);
-  if (text === undefined) return undefined;
-  return html ? text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<[^>]*>/g, " ") : text;
-}
-
-function joined(texts: (string | undefined)[]): string | undefined {
-  const found = texts.filter((text): text is string => text !== undefined);
-  return found.length ? found.join(" / ") : undefined;
+  if (text === undefined) return [];
+  return [ html ? text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<[^>]*>/g, " ") : text ];
 }
 
 export function scanScript(file: string, source: string, untranslated: Untranslated, lineOffset = 0, english?: English): Problem[] {
@@ -392,7 +448,12 @@ export function scanScript(file: string, source: string, untranslated: Untransla
   checkCalls(file, node => tree.getLineAndCharacterOfPosition(node.getStart()).line + 1 + lineOffset, tree, english, problems);
   const report = (node: ts.Node, text: string, how: string) => {
     const line = tree.getLineAndCharacterOfPosition(node.getStart()).line + 1 + lineOffset;
-    problems.push({ where: `${file}:${line}`, what: `${how}: "${text.replace(/\s+/g, " ").trim().slice(0, 90)}"` });
+    problems.push({ where: `${file}:${line}`, what: `${how}: "${excerpt(text)}"` });
+  };
+  /** The literals `node` shows that a person reads, as one finding. */
+  const check = (node: ts.Node, html: boolean, how: string) => {
+    const texts = shownText(node, html).filter(text => readable(text, untranslated));
+    if (texts.length) report(node, texts.join(" / "), how);
   };
   const inConsole = (node: ts.Node): boolean => {
     for (let up = node.parent; up; up = up.parent) {
@@ -407,8 +468,7 @@ export function scanScript(file: string, source: string, untranslated: Untransla
       && ts.isPropertyAccessExpression(node.left) && TEXT_DOM_PROPERTIES.has(node.left.name.text)
       && !/style/i.test(node.left.expression.getText(tree))) {
       const html = node.left.name.text.endsWith("HTML");
-      const text = shownText(node.right, html);
-      if (text !== undefined && readable(text, untranslated)) report(node.right, text, `.${node.left.name.text} =`);
+      check(node.right, html, `.${node.left.name.text} =`);
       // A translated text, or anything with a param in it, must not go through innerHTML.
       if (html && /\bt\(/.test(node.right.getText(tree))) report(node.right, node.right.getText(tree), `translated text through .${node.left.name.text}`);
     }
@@ -419,17 +479,12 @@ export function scanScript(file: string, source: string, untranslated: Untransla
       // element.setAttribute("aria-label", "…")
       if (name === "setAttribute" && node.arguments.length === 2) {
         const attribute = literalText(node.arguments[0]);
-        const text = shownText(node.arguments[1], false);
-        if (attribute && TEXT_ATTRIBUTES.has(attribute) && text !== undefined && readable(text, untranslated)) {
-          report(node.arguments[1], text, `setAttribute("${attribute}")`);
-        }
+        if (attribute && TEXT_ATTRIBUTES.has(attribute)) check(node.arguments[1], false, `setAttribute("${attribute}")`);
       }
       const shown = TEXT_CALLS.get(name);
       if (shown) {
         for (const [ position, argument ] of node.arguments.entries()) {
-          if (shown !== "every" && !shown.includes(position)) continue;
-          const text = shownText(argument, false);
-          if (text !== undefined && readable(text, untranslated)) report(argument, text, `${name}()`);
+          if (shown === "every" || shown.includes(position)) check(argument, false, `${name}()`);
         }
       }
     }
@@ -437,8 +492,7 @@ export function scanScript(file: string, source: string, untranslated: Untransla
     // { label: "…" }
     if (ts.isPropertyAssignment(node) && !inConsole(node)) {
       const key = ts.isIdentifier(node.name) || ts.isStringLiteral(node.name) ? node.name.text : "";
-      const text = TEXT_PROPERTIES.has(key) ? shownText(node.initializer, false) : undefined;
-      if (text !== undefined && readable(text, untranslated)) report(node.initializer, text, `${key}:`);
+      if (TEXT_PROPERTIES.has(key)) check(node.initializer, false, `${key}:`);
     }
 
     ts.forEachChild(node, visit);
