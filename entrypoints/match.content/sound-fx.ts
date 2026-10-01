@@ -759,7 +759,7 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
   }
 
   // For Cricket, trigger appropriate sound based on what was hit
-  if (gameData.match.variant === "Cricket"
+  if (gameData.match.variant === GameMode.CRICKET
       && gameData.match.turns[0].throws.length > 0
       && (!oldGameData?.match?.turns?.[0]?.throws
       || gameData.match.turns[0].throws.length > oldGameData.match.turns[0].throws.length)) {
@@ -781,22 +781,10 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
         }
       }
 
-      const gameMode = gameData.match.settings?.gameMode;
-      const segmentNumberToScore = gameMode === "Tactics" ? 10 : 15;
-
-      // Cricket targets are segmentNumberToScore-20 and Bull (25)
-      if (segmentNumber >= segmentNumberToScore) {
-        // Get the segment number from the latest throw
-        let stateIndex = latestThrow.segment.number;
-
-        // Special case: if it's a double bull (50), use 25 as the index
-        if (stateIndex === 50) {
-          stateIndex = 25;
-        }
-
+      const segmentValues = oldGameData?.match?.state?.segments?.[segmentNumber];
+      if (segmentValues) {
         // Check if this segment is already closed for all players (value 3)
-        const segmentValues = oldGameData?.match?.state?.segments?.[stateIndex] || [];
-        const allPlayersClosed = segmentValues.length > 0 && segmentValues.every(value => value >= 3);
+        const allPlayersClosed = segmentValues.every(value => value >= 3);
 
         if (allPlayersClosed) {
           // Segment is already closed by all players, play miss sound
