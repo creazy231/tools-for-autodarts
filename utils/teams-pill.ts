@@ -8,11 +8,15 @@
  * in it, measuring the pill's row at no width at all. Anything that can wrap
  * then stands many lines tall, which shrank the board and let the side cards
  * over it (spec 2026-09-30-teams-review-and-lobby).
+ *
+ * Its words are utils/teams-text.ts's, in the language of the moment it is
+ * worked out: the match script works it out again when the language changes.
  */
 
 import type { Lineup, PillNote, SavedTeam, TeamMatch } from "@/utils/teams";
 
-import { decidedTeam, decidedText, legWonText, lineupTeams, normalizeName, partnerRuleBreach, playerUp, resultText, ruleWarningNote, teamLegs, toThrowText } from "@/utils/teams";
+import { decidedTeam, lineupTeams, normalizeName, partnerRuleBreach, playerUp, resultText, teamLegs } from "@/utils/teams";
+import { decidedText, legWonText, ruleWarningNote, toThrowText } from "@/utils/teams-text";
 
 /** A team's legs, beside the pill. */
 export interface TallyTeam {
@@ -64,7 +68,7 @@ function visitKey(match: TeamMatch, seat: number): string {
 }
 
 /** A shared score: whose visit it is, or whose leg or match. */
-export function sharedPill(match: TeamMatch, seats: ReadonlyMap<number, SavedTeam>, shifts: Readonly<Record<string, number>>, other: Colours, language: string): PillView {
+export function sharedPill(match: TeamMatch, seats: ReadonlyMap<number, SavedTeam>, shifts: Readonly<Record<string, number>>, other: Colours): PillView {
   const player = (seat: number) => {
     const team = seats.get(seat);
     return team ? team.players[playerUp(match, seat, team, shifts[team.name] ?? 0)] ?? "" : normalizeName(match.players?.[seat]?.name);
@@ -76,7 +80,7 @@ export function sharedPill(match: TeamMatch, seats: ReadonlyMap<number, SavedTea
     const name = team?.name ?? player(won);
     return view({
       turnKey: `won|${visitKey(match, won)}|${matchWon ? "match" : "leg"}`,
-      text: matchWon ? decidedText(name, language) : legWonText(name, language),
+      text: matchWon ? decidedText(name) : legWonText(name),
       detail: team ? player(won) : "",
       colour: team?.colour ?? other,
     });
@@ -84,13 +88,12 @@ export function sharedPill(match: TeamMatch, seats: ReadonlyMap<number, SavedTea
   const up = match.player ?? 0;
   const team = seats.get(up);
   const name = player(up);
-  return view({ turnKey: `${visitKey(match, up)}|${name}`, text: toThrowText(name, language), detail: team?.name ?? "", colour: team?.colour ?? other });
+  return view({ turnKey: `${visitKey(match, up)}|${name}`, text: toThrowText(name), detail: team?.name ?? "", colour: team?.colour ?? other });
 }
 
 export interface OwnPillOptions {
   /** The colours of a seat on no team: Colors' card, or the site's. */
   other: Colours;
-  language: string;
   /** Whether this match plays the partner rule. */
   partnerRule: boolean;
   /** The bust line, while the script shows it: from the bust through the visit after it. */
@@ -110,7 +113,7 @@ export function ownPill(match: TeamMatch, lineup: Lineup, options: OwnPillOption
   const decided = match.adtTeams?.decided ?? decidedTeam(match, lineup);
   if (decided) {
     const team = lineup.teams.find(candidate => candidate.name === decided);
-    return view({ ...base, turnKey: `decided|${decided}`, text: decidedText(decided, options.language), detail: resultText(legs, decided, lineup), colour: team?.colour ?? options.other });
+    return view({ ...base, turnKey: `decided|${decided}`, text: decidedText(decided), detail: resultText(legs, decided, lineup), colour: team?.colour ?? options.other });
   }
   const won = match.gameWinner ?? -1;
   if (won >= 0) {
@@ -120,7 +123,7 @@ export function ownPill(match: TeamMatch, lineup: Lineup, options: OwnPillOption
     return view({
       ...base,
       turnKey: `won|${visitKey(match, won)}|${matchWon ? "match" : "leg"}`,
-      text: matchWon ? decidedText(winner, options.language) : legWonText(winner, options.language),
+      text: matchWon ? decidedText(winner) : legWonText(winner),
       detail: team ? name(won) : "",
       colour: team?.colour ?? options.other,
     });
@@ -137,5 +140,5 @@ export function ownPill(match: TeamMatch, lineup: Lineup, options: OwnPillOption
     const noteKind = options.note ? "bust" : "rule";
     return view({ ...base, turnKey: `${turnKey}|${noteKind}`, text: note.primary, detail: note.secondary, colour, noteKind });
   }
-  return view({ ...base, turnKey, text: toThrowText(name(up), options.language), detail: team?.name ?? "", colour });
+  return view({ ...base, turnKey, text: toThrowText(name(up)), detail: team?.name ?? "", colour });
 }

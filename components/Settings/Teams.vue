@@ -5,19 +5,19 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Play in teams two ways. With a shared score, a team is one player on your board and its players take turns on it, like steel-tip doubles. When someone else steps up, tap their name on the team's card. With own scores, everyone keeps their own score and a leg counts for their team, and a bot can play on a team. A team can be a single player, for 2 vs 1. Own-score teams in X01 can play the partner rule: switch it on the lobby page, next to Autoscoring. Add teams in a lobby you host with <b class="text-[var(--ad-text-primary)]">Add Team</b>, next to Add Player and Add Bot.
+          <AppTrans :params="{ addTeam: t('teams.lobby.addTeam') }" class="adt-teams-intro" path="teams.intro" />
         </p>
 
         <!-- Not sortable: the drawer keeps these newest first. -->
         <LibrarySection
+          :empty-text="t('teams.list.emptyText', { addTeam: t('teams.lobby.addTeam') })"
+          :empty-title="t('teams.list.emptyTitle')"
           :entries="entries"
+          :no-match-text="t('teams.list.noMatch')"
+          :search-placeholder="t('teams.list.searchPlaceholder')"
           :sortable="false"
+          :title="t('teams.savedTeams')"
           empty-icon="icon-[material-symbols--groups-outline-rounded]"
-          empty-text="Teams you add with Add Team in a lobby are kept here, with their players and colour, so a rematch or the next lobby knows them."
-          empty-title="No saved teams yet"
-          no-match-text="No saved team has that in its name or its players."
-          search-placeholder="Search teams"
-          title="Saved teams"
         >
           <template #default="{ entries: shown, query }">
             <LibraryItem
@@ -33,7 +33,7 @@
                 <span :style="{ backgroundImage: gradient(saved[entry.index].colour) }" class="block h-6 w-9 rounded-[var(--ad-radius-sm)] ring-1 ring-inset ring-white/15" />
               </template>
               <template #meta>
-                <span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide">{{ saved[entry.index].format === "own" ? "OWN SCORES" : "SHARED SCORE" }}</span>{{ saved[entry.index].players.join(" ▸ ") }}
+                <span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide">{{ saved[entry.index].format === "own" ? t("teams.formats.own") : t("teams.formats.shared") }}</span>{{ saved[entry.index].players.join(" ▸ ") }}
               </template>
             </LibraryItem>
           </template>
@@ -51,12 +51,12 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Teams
+            {{ t("features.teams") }}
             <span class="adt-badge adt-badge-practice ml-2">BETA</span>
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play in teams: on a shared score, or each on their own. Add them in the lobby, and the match shows whose turn it is in each team's colours.
+            {{ t("teams.card") }}
           </p>
         </div>
         <div class="flex">
@@ -68,7 +68,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Teams" class="size-full object-cover opacity-70">
+        <img :src="imageUrl" :alt="t('features.teams')" class="size-full object-cover opacity-70">
       </div>
     </div>
   </template>
@@ -76,6 +76,7 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
@@ -86,6 +87,7 @@ import { gradient } from "@/utils/colors";
 import { normalizeTeams } from "@/utils/teams";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/teams.png");
 
@@ -113,3 +115,8 @@ async function toggleFeature() {
   }
 }
 </script>
+
+<style scoped>
+/* The intro is in the secondary text colour; the button it names, in bold, in the primary one. */
+.adt-teams-intro :deep(b) { color: var(--ad-text-primary); }
+</style>

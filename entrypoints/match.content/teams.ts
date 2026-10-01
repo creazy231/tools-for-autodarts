@@ -20,6 +20,9 @@
  * throwing order every leg, so no index points at the same card for long.
  * A bust and a won leg are left alone: they are signals, and the site draws
  * them with gradients of their own that the "up" rule does not reach.
+ *
+ * The pill and the chips' tooltips are in the site's language. Both are
+ * worked out again on every pass, which a change of language starts.
  */
 
 import { createApp, reactive } from "vue";
@@ -27,7 +30,7 @@ import { createApp, reactive } from "vue";
 import TeamsPill from "./TeamsPill.vue";
 
 import type { IMatch } from "@/utils/websocket-helpers";
-import type { Lineup, LineupStore, LineupTeam, PillNote, SavedTeam, ShiftStore } from "@/utils/teams";
+import type { Breach, Lineup, LineupStore, LineupTeam, PillNote, SavedTeam, ShiftStore } from "@/utils/teams";
 import type { PillView } from "@/utils/teams-pill";
 
 import { addStyles, removeStyles } from "@/utils";
@@ -36,8 +39,10 @@ import { SELECTORS, anyOf, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
-import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, ruleBustNote, ruleNextNote, ruleRefusedNote, shiftFor, shiftsOf, teamLegs, teamSeats, withShift } from "@/utils/teams";
+import { language, onLanguageChange, t } from "@/utils/i18n";
+import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, teamSeats, withShift } from "@/utils/teams";
 import { ownPill, sharedPill } from "@/utils/teams-pill";
+import { ruleBustNote, ruleNextNote, ruleRefusedNote } from "@/utils/teams-text";
 
 const STYLE_ID = "teams-match";
 const CARD_ATTR = "data-adt-team";
@@ -108,6 +113,7 @@ let observer: MutationObserver | null = null;
 let unwatchGameData: (() => void) | null = null;
 let unwatchConfig: (() => void) | null = null;
 let unwatchShifts: (() => void) | null = null;
+let stopLanguage: (() => void) | null = null;
 let hostId: string | null = null;
 let saved: SavedTeam[] = [];
 /** Teams' own switch, followed live: off, nothing of Teams stays on the page. */
@@ -125,9 +131,11 @@ let lastUndo = "";
 /**
  * "ANNA's checkout didn't count": shown from the bust through the visit after
  * it. `bustTurn` is the busted visit, whose frames go on arriving while the
- * undo runs; `shownFor` is the first visit after it.
+ * undo runs; `shownFor` is the first visit after it. Kept as the line's wording
+ * and the breach it words, not as text: each pass words it (`shownBustNote`),
+ * in the language of the moment.
  */
-let bustNote: { note: PillNote; bustTurn: string; shownFor?: string } | undefined;
+let bustNote: { words: (breach: Breach) => PillNote; breach: Breach; bustTurn: string; shownFor?: string } | undefined;
 let match: IMatch | undefined;
 let lastStyles = "";
 let lastTurn = "";
@@ -171,6 +179,8 @@ export async function teams(ctx: any) {
   // The layout changes with the window, and the legs chip depends on it.
   window.removeEventListener("resize", schedule);
   window.addEventListener("resize", schedule);
+  stopLanguage?.();
+  stopLanguage = onLanguageChange(() => schedule());
   apply();
   console.log("Autodarts Tools: Teams - Started (match)");
 }
@@ -179,6 +189,8 @@ export function onRemove() {
   observer?.disconnect();
   observer = null;
   window.removeEventListener("resize", schedule);
+  stopLanguage?.();
+  stopLanguage = null;
   unwatchGameData?.();
   unwatchGameData = null;
   unwatchConfig?.();
@@ -254,7 +266,7 @@ function applyShared() {
   const upTeam = seats.get(up);
   writeStyles([ ...new Set(seats.values()) ]);
   dressCards(seats, shifts, up);
-  Object.assign(pill, sharedPill(match, seats, shifts, otherCard, siteLanguage()));
+  Object.assign(pill, sharedPill(match, seats, shifts, otherCard));
   ensurePill();
   handover(upTeam, up);
   holdNextLeg(false);
@@ -274,7 +286,7 @@ function applyOwn(lineup: Lineup) {
   askUndo();
   writeStyles(decided ? undefined : lineup.teams);
   dressOwnCards(seats, up, lineup);
-  Object.assign(pill, ownPill(match!, lineup, { other: otherCard, language: siteLanguage(), partnerRule: lineupPartnerRule(lineup, partnerRuleDefault), note: shownBustNote(up) }));
+  Object.assign(pill, ownPill(match!, lineup, { other: otherCard, partnerRule: lineupPartnerRule(lineup, partnerRuleDefault), note: shownBustNote(up) }));
   ensurePill();
   holdNextLeg(Boolean(decided && panelUp));
   handover(decided ? undefined : upTeam, up);
@@ -292,14 +304,14 @@ function askUndo() {
   const key = `${match.id}|${bust.dartIds.join(",")}`;
   if (key === lastUndo) return;
   lastUndo = key;
-  const note = { note: ruleBustNote(bust.breach), bustTurn: turnKeyOf(bust.seat) };
+  const note = { words: ruleBustNote, breach: bust.breach, bustTurn: turnKeyOf(bust.seat) };
   bustNote = note;
   // When autodarts refuses the undo, the checkout still stands on the site:
   // say so, rather than that it didn't count. When it took the darts back but
   // wouldn't pass the turn, the visit is empty and Next is all that's left.
   const settle = (result?: { ok?: boolean; stage?: string }) => {
     if (result?.ok !== false || bustNote !== note) return;
-    note.note = result.stage === "next" ? ruleNextNote(bust.breach) : ruleRefusedNote(bust.breach);
+    note.words = result.stage === "next" ? ruleNextNote : ruleRefusedNote;
     apply();
   };
   browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).then(settle, (e) => {
@@ -444,7 +456,8 @@ function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: nu
     return;
   }
   const small = card.getBoundingClientRect().width < NARROW_CARD_PX;
-  const key = `${team.players.join(",")}|${index}|${throwing ? 1 : 0}|${small ? 1 : 0}`;
+  // The language too: the chips' tooltips are written into them.
+  const key = `${team.players.join(",")}|${index}|${throwing ? 1 : 0}|${small ? 1 : 0}|${language.value}`;
   if (current?.dataset.key === key) return;
 
   const nameRow = qs<HTMLElement>(SELECTORS.match.nameRow, card);
@@ -461,7 +474,7 @@ function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: nu
     if (i === index) chip.classList.add(throwing ? "is-up" : "is-next");
     chip.textContent = team.players[i];
     chip.setAttribute("aria-pressed", String(i === index));
-    chip.title = throwing ? `${team.players[i]} is throwing` : `${team.players[i]} throws next`;
+    chip.title = throwing ? t("teams.match.isThrowing", { name: team.players[i] }) : t("teams.match.throwsNext", { name: team.players[i] });
     chip.addEventListener("click", (event) => {
       event.stopPropagation();
       correct(team, seat, i);
@@ -479,10 +492,6 @@ async function correct(team: SavedTeam, seat: number, wanted: number) {
   await AutodartsToolsTeamShifts.setValue(shiftStore);
 }
 
-function siteLanguage(): string {
-  return localStorage.getItem("autodarts.settings.language") || navigator.language || "en";
-}
-
 /**
  * The bust's line, from the busted visit, whose frames go on arriving while
  * the undo runs, through the visit after it. It goes when the next one comes up.
@@ -492,7 +501,7 @@ function shownBustNote(up: number): PillNote | undefined {
   const turn = turnKeyOf(up);
   const onBustVisit = turn === bustNote.bustTurn;
   if (!onBustVisit) bustNote.shownFor ??= turn;
-  if (onBustVisit || bustNote.shownFor === turn) return bustNote.note;
+  if (onBustVisit || bustNote.shownFor === turn) return bustNote.words(bustNote.breach);
   bustNote = undefined;
   return undefined;
 }

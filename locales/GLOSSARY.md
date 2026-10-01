@@ -225,6 +225,18 @@ Settled in the lobby panels (`locales/*/{discordWebhooks,autoStart,recentLocalPl
 | a Discord post | Discord's own word for it (the site has none): the noun is the message, the verb is *to post* | Nachricht, posten | bericht, plaatsen |
 | the strip of saved-player buttons under the lobby's list | not the site's; a row of buttons is a *Leiste* in German, and *strook* in Dutch, the word Darts Zoom's strip of tiles uses too | Leiste | strook |
 
+Settled in Teams (`locales/*/teams.ts`), for whatever else names its parts:
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| Add Team | Teams' button beside the site's Add Player and Add Bot (`teams.lobby.addTeam`), built like theirs | Team hinzufügen | Team toevoegen |
+| Saved teams | the heading of the saved teams, in the panel and the drawer | Gespeicherte Teams | Opgeslagen teams |
+| Shared score, Own scores | the drawer's two tabs; in capitals on a saved team's chip (SHARED SCORE, OWN SCORES) | Gemeinsamer Score, Eigene Scores | Gedeelde score, Eigen scores |
+| to check out | a verb in the site's own texts ("Darts zum Auschecken", "Gooi … uit"); the noun stays *Checkout* (*das* in German, *de* in Dutch) | auschecken | uitgooien |
+| teammate | not the site's | Teamkollege | teamgenoot |
+| X wins the leg, X wins the match | the pill; the German was the extension's before the catalogs | X gewinnt das Leg, X gewinnt das Match | X wint de leg, X wint de wedstrijd |
+| Bot Level N | the seat name Teams gives its bots (`botName()`), never translated. The site's own Add Bot labels a level "Bot-Level N" and "Botniveau N" (`lobby.addBot.botLevel`), and the drawer's picker says "Level N" and "Niveau N", as `botCard.level` does | Bot Level N (stays) | Bot Level N (stays) |
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".

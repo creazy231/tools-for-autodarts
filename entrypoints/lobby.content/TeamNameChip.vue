@@ -18,13 +18,13 @@
       class="adt-name-chip-confirm"
       type="button"
     >
-      Delete {{ name }}
+      {{ t("teams.chip.delete", { name }) }}
     </button>
     <template v-else>
-      <button @click="emit('add')" :class="[{ 'has-forget': forgettable }]" :disabled="disabled" :title="team ? `On ${team}` : `Add ${name}`" class="adt-name-chip-add" type="button">
+      <button @click="emit('add')" :class="[{ 'has-forget': forgettable }]" :disabled="disabled" :title="team ? t('teams.chip.onTeam', { team }) : t('teams.chip.add', { name })" class="adt-name-chip-add" type="button">
         {{ name }}<small v-if="team">{{ team }}</small>
       </button>
-      <button @click="arm" v-if="forgettable" :aria-label="`Delete ${name}`" class="adt-name-chip-forget" title="Delete this name" type="button">
+      <button @click="arm" v-if="forgettable" :aria-label="t('teams.chip.delete', { name })" :title="t('teams.chip.deleteTitle')" class="adt-name-chip-forget" type="button">
         <span class="icon-[material-symbols--close-rounded] size-4" aria-hidden="true" />
       </button>
     </template>
@@ -46,6 +46,8 @@ withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{ add: []; forget: [] }>();
+
+const { t } = useI18n();
 
 const armed = ref(false);
 const confirmButton = ref<HTMLButtonElement>();

@@ -12,16 +12,16 @@
       tabindex="-1"
     >
       <div class="mx-auto mb-1 mt-3 h-1.5 w-12 shrink-0 rounded-full bg-white/30 sm:hidden" aria-hidden="true" />
-      <button @click="state.close()" class="absolute right-4 top-4 grid size-8 place-items-center rounded-lg text-[var(--ad-text-primary)] hover:bg-white/10" aria-label="Close" type="button">
+      <button @click="state.close()" :aria-label="t('common.close')" class="absolute right-4 top-4 grid size-8 place-items-center rounded-lg text-[var(--ad-text-primary)] hover:bg-white/10" type="button">
         <span class="icon-[material-symbols--close-rounded] size-5" />
       </button>
 
       <header class="px-6 pb-1 pt-5">
         <h2 :id="titleId" class="text-lg font-bold text-white">
-          {{ state.editing ? "Edit Team" : "Add Team" }}
+          {{ state.editing ? t("teams.drawer.editTeam") : t("teams.lobby.addTeam") }}
         </h2>
         <p class="mt-0.5 text-[13px] text-[var(--ad-text-muted)]">
-          {{ format === "own" ? ownLine : "The team plays as one player on your board, and its players take turns in this order." }}
+          {{ format === "own" ? ownLine : t("teams.drawer.sharedLine") }}
         </p>
         <div class="mt-3 inline-flex gap-1 rounded-full bg-[#16181c] p-1 ring-1 ring-inset ring-white/10" role="tablist">
           <button
@@ -46,18 +46,18 @@
         <!-- First: re-adding a team that has played before is one tap, as the site's Add Player drawer puts recent players first. -->
         <section v-if="state.savedTeams.length">
           <h3 class="mb-2 text-sm font-bold">
-            Saved teams
+            {{ t("teams.savedTeams") }}
           </h3>
           <div class="flex flex-col gap-2.5">
             <div v-for="team in state.savedTeams" :key="team.name" class="flex items-center gap-2 rounded-2xl bg-white/10 p-3">
               <span :style="{ backgroundImage: gradient(team.colour) }" class="mr-1 h-7 w-10 shrink-0 rounded-lg ring-1 ring-inset ring-white/15" />
               <span class="min-w-0 flex-1">
                 <span class="block truncate font-[family-name:var(--ad-font-display)] text-lg uppercase leading-none">{{ team.name }}</span>
-                <span class="block truncate text-xs text-[var(--ad-text-muted)]"><span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide text-[var(--ad-ink-200)]">{{ team.format === "own" ? "OWN SCORES" : "SHARED SCORE" }}</span>{{ team.players.join(" ▸ ") }}</span>
-                <span v-if="state.savedProblems[team.name]" class="mt-0.5 block truncate text-xs font-semibold text-[var(--ad-text-muted)]">{{ state.savedProblems[team.name] }}</span>
+                <span class="block truncate text-xs text-[var(--ad-text-muted)]"><span class="mr-1.5 rounded bg-white/10 px-1.5 py-px text-[10.5px] font-extrabold tracking-wide text-[var(--ad-ink-200)]">{{ team.format === "own" ? t("teams.formats.own") : t("teams.formats.shared") }}</span>{{ team.players.join(" ▸ ") }}</span>
+                <span v-if="state.savedProblems[team.name]" class="mt-0.5 block truncate text-xs font-semibold text-[var(--ad-text-muted)]">{{ problemText(state.savedProblems[team.name]) }}</span>
               </span>
               <button @click="addSaved(team)" :disabled="pending || Boolean(state.savedProblems[team.name])" class="adt-team-button h-8 min-w-16 px-4 text-sm" type="button">
-                Add
+                {{ t("common.add") }}
               </button>
               <ConfirmDeleteButton @confirm="deleteSaved(team)" :label="team.name" />
             </div>
@@ -65,7 +65,7 @@
         </section>
 
         <section>
-          <label :for="nameId" class="mb-2 block text-sm font-bold">Name</label>
+          <label :for="nameId" class="mb-2 block text-sm font-bold">{{ t("teams.drawer.sections.name") }}</label>
           <input
             @input="nameTouched = true"
             :id="nameId"
@@ -79,20 +79,20 @@
             type="text"
           >
           <p v-if="state.editing" class="mt-1.5 text-xs text-[var(--ad-text-muted)]">
-            A team keeps its name: autodarts can't rename a player. To rename it, remove the team from the lobby and add it again.
+            {{ t("teams.drawer.keepsName") }}
           </p>
         </section>
 
         <section>
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
-            Colour <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ format === "own" ? "their cards' gradient while one of them is up" : "the card's gradient while this team is up" }}</small>
+            {{ t("teams.drawer.sections.colour") }} <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ format === "own" ? t("teams.drawer.hints.colourOwn") : t("teams.drawer.hints.colourShared") }}</small>
           </h3>
-          <SchemePicker v-model="colour" :disabled-presets="takenPresets" :presets="CARD_PRESETS" :site="SITE_CARD" label="Team colour" />
+          <SchemePicker v-model="colour" :disabled-presets="takenPresets" :label="t('teams.drawer.colour')" :presets="CARD_PRESETS" :site="SITE_CARD" />
         </section>
 
         <section>
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
-            Players <small class="text-xs font-semibold text-[var(--ad-text-muted)]">drag to change the order</small>
+            {{ t("teams.drawer.sections.players") }} <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ t("teams.drawer.hints.dragToReorder") }}</small>
           </h3>
           <template v-if="format === 'shared'">
             <ol ref="list" class="flex flex-col gap-2.5">
@@ -100,23 +100,23 @@
                 <span class="adt-team-handle icon-[material-symbols--drag-indicator] size-5 shrink-0 cursor-grab text-[#4d525d]" aria-hidden="true" />
                 <span class="w-4 shrink-0 text-center text-[13px] font-extrabold text-[#707580]">{{ index + 1 }}</span>
                 <span class="adt-team-tag">{{ player }}</span>
-                <button @click="removePlayer(index)" :aria-label="`Remove ${player}`" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
+                <button @click="removePlayer(index)" :aria-label="t('common.remove', { name: player })" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
                   <span class="icon-[material-symbols--close-rounded] size-5" />
                 </button>
               </li>
             </ol>
             <p v-if="!players.length" class="text-[13px] text-[var(--ad-text-muted)]">
-              Nobody yet: type a name, or tap one below.
+              {{ t("teams.drawer.emptyShared") }}
             </p>
             <form @submit.prevent="addTyped" class="relative mt-3">
               <span class="icon-[material-symbols--search-rounded] pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#707580]" aria-hidden="true" />
               <input
                 v-model="query"
+                :aria-label="t('teams.drawer.searchOrAdd')"
                 :disabled="players.length >= MAX_PLAYERS"
-                aria-label="Search or add a player"
+                :placeholder="t('teams.drawer.searchOrAdd')"
                 autocomplete="off"
                 class="adt-team-field has-icon"
-                placeholder="Search or add a player"
                 spellcheck="false"
                 type="text"
               >
@@ -134,7 +134,7 @@
               />
             </div>
             <p class="mt-2.5 text-xs text-[var(--ad-text-muted)]">
-              A bot can't share a score: autodarts throws every visit of a bot's seat. Use Own scores to put one on a team, or Add Bot to play against one.
+              {{ t("teams.drawer.noBotShared") }}
             </p>
           </template>
           <template v-else>
@@ -144,20 +144,20 @@
                 <span class="w-4 shrink-0 text-center text-[13px] font-extrabold text-[#707580]">{{ index + 1 }}</span>
                 <span class="adt-team-tag">{{ pickName(pick) }}</span>
                 <span class="text-xs font-bold text-[var(--ad-text-muted)]">{{ pickKind(pick) }}</span>
-                <button @click="removePick(index)" :aria-label="`Remove ${pickName(pick)}`" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
+                <button @click="removePick(index)" :aria-label="t('common.remove', { name: pickName(pick) })" class="ml-auto grid size-8 place-items-center rounded-lg text-[#707580] hover:bg-white/10 hover:text-white" type="button">
                   <span class="icon-[material-symbols--close-rounded] size-5" />
                 </button>
               </li>
             </ol>
             <p v-if="!picks.length" class="text-[13px] text-[var(--ad-text-muted)]">
-              Nobody yet: tap someone in this lobby, or add a new player or a bot.
+              {{ t("teams.drawer.emptyOwn") }}
             </p>
           </template>
         </section>
 
         <section v-if="format === 'own'">
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
-            In this lobby <small class="text-xs font-semibold text-[var(--ad-text-muted)]">tap to add</small>
+            {{ t("teams.drawer.sections.inThisLobby") }} <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ t("teams.drawer.hints.tapToAdd") }}</small>
           </h3>
           <div class="flex flex-wrap gap-1.5">
             <TeamNameChip
@@ -173,17 +173,17 @@
 
         <section v-if="format === 'own'">
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
-            New players <small class="text-xs font-semibold text-[var(--ad-text-muted)]">join as guests on your board</small>
+            {{ t("teams.drawer.sections.newPlayers") }} <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ t("teams.drawer.hints.joinAsGuests") }}</small>
           </h3>
           <form @submit.prevent="addTyped" class="relative">
             <span class="icon-[material-symbols--search-rounded] pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#707580]" aria-hidden="true" />
             <input
               v-model="query"
+              :aria-label="t('teams.drawer.searchOrAdd')"
               :disabled="picks.length >= MAX_PLAYERS"
-              aria-label="Search or add a player"
+              :placeholder="t('teams.drawer.searchOrAdd')"
               autocomplete="off"
               class="adt-team-field has-icon"
-              placeholder="Search or add a player"
               spellcheck="false"
               type="text"
             >
@@ -203,30 +203,30 @@
 
         <section v-if="format === 'own'">
           <h3 class="mb-2 flex items-baseline justify-between gap-3 text-sm font-bold">
-            Bots <small class="text-xs font-semibold text-[var(--ad-text-muted)]">join at the level you pick</small>
+            {{ t("teams.drawer.sections.bots") }} <small class="text-xs font-semibold text-[var(--ad-text-muted)]">{{ t("teams.drawer.hints.joinAtLevel") }}</small>
           </h3>
           <div class="flex items-center gap-2">
-            <select v-model.number="botLevel" :disabled="!state.botsOk || picks.length >= MAX_PLAYERS" aria-label="Bot level" class="adt-team-field adt-team-select">
+            <select v-model.number="botLevel" :aria-label="t('teams.drawer.botLevel')" :disabled="!state.botsOk || picks.length >= MAX_PLAYERS" class="adt-team-field adt-team-select">
               <option v-for="level in BOT_LEVELS" :key="level" :value="level">
-                Level {{ level }} · {{ botPpr(level) }}+
+                {{ t("teams.drawer.levelOption", { level, ppr: botPpr(level) }) }}
               </option>
             </select>
             <button @click="addBotPick" :disabled="!state.botsOk || picks.length >= MAX_PLAYERS" class="adt-team-button h-11 shrink-0 px-5 text-sm" type="button">
-              Add bot
+              {{ t("teams.drawer.addBot") }}
             </button>
           </div>
           <p v-if="!state.botsOk" class="mt-1.5 text-xs text-[var(--ad-text-muted)]">
-            {{ BOTS_ONLY_TEXT }}
+            {{ problemText(BOTS_ONLY) }}
           </p>
         </section>
       </div>
 
       <footer class="flex shrink-0 flex-col gap-2 border-t border-white/10 px-6 pb-6 pt-4">
         <p v-if="error" class="text-[13px] font-semibold text-[var(--ad-text-destructive)]" role="alert">
-          {{ error }}
+          {{ problemText(error) }}
         </p>
         <button @click="submit" :disabled="pending" class="adt-team-button h-12 w-full text-[15px]" type="button">
-          {{ state.editing ? "Save" : "Add Team" }}
+          {{ state.editing ? t("common.save") : t("teams.lobby.addTeam") }}
         </button>
       </footer>
     </div>
@@ -239,15 +239,18 @@ import Sortable from "sortablejs";
 import TeamNameChip from "./TeamNameChip.vue";
 
 import type { DrawerState, SeatChoice } from "./teams";
-import type { OwnPick, SavedTeam } from "@/utils/teams";
+import type { OwnPick, SavedTeam, TeamsProblem } from "@/utils/teams";
 
 import SchemePicker from "@/components/Settings/Colors/SchemePicker.vue";
 import ConfirmDeleteButton from "@/components/Settings/Library/ConfirmDeleteButton.vue";
 import { CARD_PRESETS, SITE_CARD, gradient } from "@/utils/colors";
 import { LAYERS } from "@/utils/layers";
-import { BOTS_ONLY_TEXT, BOT_LEVELS, LEGS_ONLY_TEXT, MAX_NAME_LENGTH, MAX_PLAYERS, botName, botPpr, nextFreeColour, normalizeName, suggestName } from "@/utils/teams";
+import { BOTS_ONLY, BOT_LEVELS, LEGS_ONLY, MAX_NAME_LENGTH, MAX_PLAYERS, botName, botPpr, nextFreeColour, normalizeName } from "@/utils/teams";
+import { problemText, suggestName } from "@/utils/teams-text";
 
 const props = defineProps<{ state: DrawerState }>();
+
+const { t } = useI18n();
 
 const titleId = "adt-team-drawer-title";
 const nameId = "adt-team-drawer-name";
@@ -261,7 +264,8 @@ const name = ref(props.state.editing?.name ?? suggestName(colour.value, props.st
 /** Once typed into, the name no longer follows the colour. */
 const nameTouched = ref(Boolean(props.state.editing));
 const query = ref("");
-const error = ref("");
+/** What went wrong, or what to know, as a message: worded when it is shown, so it follows a change of language. */
+const error = ref<TeamsProblem>();
 const pending = ref(false);
 const format = ref<"shared" | "own">(props.state.lockedFormat ?? "shared");
 const picks = ref<OwnPick[]>(props.state.editingSeats.map(id => ({ seatId: id, name: props.state.seats.find(seat => seat.id === id)?.name ?? "" })));
@@ -282,19 +286,19 @@ const chips = computed(() => {
     .map(offered => ({ name: offered, team: props.state.playerTeams[offered] }));
 });
 const formats = computed(() => [
-  { id: "shared" as const, label: "Shared score", disabled: Boolean(props.state.lockedFormat && props.state.lockedFormat !== "shared") },
-  { id: "own" as const, label: "Own scores", disabled: props.state.setsLobby || Boolean(props.state.lockedFormat && props.state.lockedFormat !== "own") },
+  { id: "shared" as const, label: t("teams.drawer.tabs.shared"), disabled: Boolean(props.state.lockedFormat && props.state.lockedFormat !== "shared") },
+  { id: "own" as const, label: t("teams.drawer.tabs.own"), disabled: props.state.setsLobby || Boolean(props.state.lockedFormat && props.state.lockedFormat !== "own") },
 ]);
 const formatNote = computed(() => {
-  if (props.state.setsLobby && format.value !== "own" && !props.state.lockedFormat) return LEGS_ONLY_TEXT;
+  if (props.state.setsLobby && format.value !== "own" && !props.state.lockedFormat) return problemText(LEGS_ONLY);
   if (!props.state.lockedFormat || !props.state.formatTeam || props.state.editing) return "";
   return props.state.lockedFormat === "own"
-    ? `${props.state.formatTeam} already plays on own scores, so this lobby's teams do too.`
-    : `${props.state.formatTeam} already shares a score, so this lobby's teams do too.`;
+    ? t("teams.drawer.formatNote.own", { team: props.state.formatTeam })
+    : t("teams.drawer.formatNote.shared", { team: props.state.formatTeam });
 });
 const ownLine = computed(() => props.state.legs > 0
-  ? `Everyone keeps their own score. A leg counts for the team of whoever checks out, and the first team to ${props.state.legs} legs wins the match.`
-  : "Everyone keeps their own score. A leg counts for the team of whoever checks out, and the first team to the lobby's target wins the match.");
+  ? t("teams.drawer.ownLine.legs", { count: props.state.legs })
+  : t("teams.drawer.ownLine.target"));
 /** The lobby's seats not picked yet, the ones on another team greyed. */
 const lobbySeats = computed(() => props.state.seats.filter(seat => !picks.value.some(pick => "seatId" in pick && pick.seatId === seat.id)));
 /** Saved and recent names for new guests, minus anyone in the lobby or picked already. */
@@ -366,11 +370,11 @@ function sortable(element: HTMLElement, move: (from: number, to: number) => void
 function addPlayer(raw: string): boolean {
   if (format.value === "own") {
     const guest = normalizeName(raw);
-    error.value = "";
+    error.value = undefined;
     if (!guest) return false;
     if (picks.value.some(pick => pickName(pick) === guest)) return true;
     if (picks.value.length >= MAX_PLAYERS) {
-      error.value = `A team can have ${MAX_PLAYERS} players at most.`;
+      error.value = { key: "teams.problems.tooMany", params: { count: MAX_PLAYERS } };
       return false;
     }
     picks.value = [ ...picks.value, { guest } ];
@@ -378,15 +382,15 @@ function addPlayer(raw: string): boolean {
     return true;
   }
   const player = normalizeName(raw);
-  error.value = "";
+  error.value = undefined;
   if (!player) return false;
   if (players.value.includes(player)) return true;
   if (props.state.playerTeams[player]) {
-    error.value = `${player} is already on ${props.state.playerTeams[player]}.`;
+    error.value = { key: "teams.problems.onTeam", params: { name: player, team: props.state.playerTeams[player] } };
     return false;
   }
   if (players.value.length >= MAX_PLAYERS) {
-    error.value = `A team can have ${MAX_PLAYERS} players at most.`;
+    error.value = { key: "teams.problems.tooMany", params: { count: MAX_PLAYERS } };
     return false;
   }
   players.value = [ ...players.value, player ];
@@ -414,14 +418,14 @@ function pickName(pick: OwnPick) {
 }
 
 function pickKind(pick: OwnPick) {
-  if ("bot" in pick) return `new bot · ${pick.bot}+`;
-  if (!("seatId" in pick)) return "new guest";
+  if ("bot" in pick) return t("teams.drawer.kinds.newBot", { ppr: pick.bot });
+  if (!("seatId" in pick)) return t("teams.drawer.kinds.newGuest");
   const kind = props.state.seats.find(seat => seat.id === pick.seatId)?.kind;
-  return kind === "bot" ? "bot" : kind === "account" ? "on their own board" : "guest";
+  return kind === "bot" ? t("teams.drawer.kinds.bot") : kind === "account" ? t("teams.drawer.kinds.ownBoard") : t("teams.drawer.kinds.guest");
 }
 
 function pickSeat(seat: SeatChoice) {
-  error.value = "";
+  error.value = undefined;
   if (seat.team || picks.value.length >= MAX_PLAYERS) return;
   picks.value = [ ...picks.value, { seatId: seat.id, name: seat.name } ];
 }
@@ -432,9 +436,9 @@ function removePick(index: number) {
 
 /** A new bot at the picked level, added to the team's list; it joins the lobby with Add Team. */
 function addBotPick() {
-  error.value = "";
+  error.value = undefined;
   if (picks.value.length >= MAX_PLAYERS) {
-    error.value = `A team can have ${MAX_PLAYERS} players at most.`;
+    error.value = { key: "teams.problems.tooMany", params: { count: MAX_PLAYERS } };
     return;
   }
   picks.value = [ ...picks.value, { bot: botPpr(botLevel.value), name: botName(botLevel.value), key: `bot-${++botCount}` } ];
@@ -448,12 +452,12 @@ function forget(name: string) {
   props.state.forget(name).catch(e => console.error(e));
 }
 
-async function run(task: () => Promise<string | undefined>) {
+async function run(task: () => Promise<TeamsProblem>) {
   if (pending.value) return;
   pending.value = true;
-  error.value = "";
+  error.value = undefined;
   try {
-    error.value = (await task()) ?? "";
+    error.value = await task();
   } finally {
     pending.value = false;
   }

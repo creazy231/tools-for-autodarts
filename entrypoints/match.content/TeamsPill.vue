@@ -23,7 +23,7 @@
       <span v-for="team in view.right" :key="team.name" :aria-label="legsLabel(team)" class="adt-teams-tally-team" role="img">
         <i :style="{ backgroundImage: swatch(team) }" /><span class="adt-teams-tally-name">{{ team.name }}</span><b>{{ team.legs }}</b>
       </span>
-      <em v-if="view.target && view.left.length" class="adt-teams-target">first to {{ view.target }}</em>
+      <em v-if="view.target && view.left.length" class="adt-teams-target">{{ t("teams.pill.firstTo", { count: view.target }) }}</em>
       <span class="adt-teams-line" aria-hidden="true" />
     </div>
   </div>
@@ -33,6 +33,8 @@
 import type { PillView, TallyTeam } from "@/utils/teams-pill";
 
 const props = defineProps<{ view: PillView }>();
+
+const { t } = useI18n();
 
 /** One layer per gradient; a new one fades in over the one leaving. */
 const layers = computed(() => [ {
@@ -45,7 +47,7 @@ function swatch(team: TallyTeam) {
 }
 
 function legsLabel(team: TallyTeam) {
-  return `${team.name}, ${team.legs} ${team.legs === 1 ? "leg" : "legs"}`;
+  return t("teams.pill.legs", { name: team.name, count: team.legs });
 }
 </script>
 

@@ -10,6 +10,7 @@ import qrCode from "./qrCode";
 import recentLocalPlayers from "./recentLocalPlayers";
 import settings from "./settings";
 import site from "./site";
+import teams from "./teams";
 import triggers from "./triggers";
 import whatsNew from "./whatsNew";
 
@@ -29,6 +30,7 @@ export default {
   recentLocalPlayers,
   settings,
   site,
+  teams,
   triggers,
   whatsNew,
 } satisfies Translation<typeof en>;

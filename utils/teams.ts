@@ -15,12 +15,34 @@
  * Saved teams are keyed by name. A guest the host adds under a saved shared
  * team's name, in any lobby or match, is that team; a saved own-score team
  * remembers how each of its players joined, so the drawer can seat them again.
+ *
+ * No text either: the service worker loads this through utils/storage.ts, and
+ * the catalogs must not come with it. A problem is a message key and its values
+ * (`TeamsProblem`), and the sentences are put together in utils/teams-text.ts,
+ * in the language of the moment they are shown. So i18n is imported here for
+ * its types only.
  */
 
+import type { MessageKey, Params } from "@/utils/i18n";
 import type { ColorScheme } from "@/utils/storage";
 
 import { CARD_PRESETS, type ColorPreset, SITE_CARD } from "@/utils/colors";
 import { bustView, visitKey } from "@/utils/void-checkout";
+
+/**
+ * A sentence for the drawer as a message key and its values, which
+ * utils/teams-text.ts `problemText` puts in words when it is shown. `lists` are
+ * names, joined then as the language joins a list: `Params` holds only strings
+ * and numbers.
+ */
+export interface TeamsMessage {
+  key: MessageKey;
+  params?: Params;
+  lists?: Readonly<Record<string, readonly string[]>>;
+}
+
+/** What stops a team, or nothing. A problem is an object, so `if (problem)` reads as it did. */
+export type TeamsProblem = TeamsMessage | undefined;
 
 export type TeamFormat = "shared" | "own";
 
@@ -164,20 +186,6 @@ export const TEAM_COLOURS: readonly ColorPreset[] = [
 
 /** The order new teams take their colour in: red against blue first. */
 const COLOUR_ORDER = [ "crimson", "ocean", "lime", "orange", "blueberry", "gold", "petrol", "slate", "qwellcode", "default" ] as const;
-
-/** The word a colour gives a team's suggested name. */
-const COLOUR_WORDS: Record<string, string> = {
-  default: "RASPBERRY",
-  blueberry: "PURPLE",
-  ocean: "BLUE",
-  lime: "GREEN",
-  petrol: "TEAL",
-  orange: "ORANGE",
-  crimson: "RED",
-  gold: "GOLD",
-  slate: "SLATE",
-  qwellcode: "QWELLCODE",
-};
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -424,41 +432,21 @@ export function withFreeColour(team: SavedTeam, taken: readonly ColorScheme[]): 
   return colourTaken(team.colour, taken) ? { ...team, colour: nextFreeColour(taken) } : team;
 }
 
-/**
- * The name a new team is offered: TEAM and its colour's word, numbered when
- * that is taken ("TEAM RED 2"). A custom pair has no word, so it is TEAM 1,
- * TEAM 2 and so on.
- */
-export function suggestName(colour: ColorScheme, takenNames: readonly string[]): string {
-  const taken = new Set(takenNames.map(normalizeName));
-  const word = COLOUR_WORDS[colour.preset];
-  if (word) {
-    const base = `TEAM ${word}`;
-    if (!taken.has(base)) return base;
-    for (let n = 2; ; n++) {
-      if (!taken.has(`${base} ${n}`)) return `${base} ${n}`;
-    }
-  }
-  for (let n = 1; ; n++) {
-    if (!taken.has(`TEAM ${n}`)) return `TEAM ${n}`;
-  }
-}
-
-/** What stops a draft from being added, in words for the drawer, or nothing. */
-export function checkTeam(draft: TeamDraft, context: DraftContext): string | undefined {
+/** What stops a draft from being added, as a message for the drawer, or nothing. The name a new team is offered is utils/teams-text.ts `suggestName`. */
+export function checkTeam(draft: TeamDraft, context: DraftContext): TeamsProblem {
   const name = normalizeName(draft.name);
-  if (!name) return "Give the team a name.";
-  if (name.length > MAX_NAME_LENGTH) return `A team name can be ${MAX_NAME_LENGTH} characters at most.`;
-  if (uniqueNames(context.guestNames).includes(name)) return `There's already a player called ${name} in this lobby.`;
+  if (!name) return { key: "teams.problems.noName" };
+  if (name.length > MAX_NAME_LENGTH) return { key: "teams.problems.nameTooLong", params: { max: MAX_NAME_LENGTH } };
+  if (uniqueNames(context.guestNames).includes(name)) return { key: "teams.problems.playerExists", params: { name } };
 
   const players = draft.players.map(normalizeName).filter(Boolean);
-  if (new Set(players).size !== players.length) return "Each player can only be in the team once.";
-  if (players.length < MIN_PLAYERS) return "Add at least one player.";
-  if (players.length > MAX_PLAYERS) return `A team can have ${MAX_PLAYERS} players at most.`;
+  if (new Set(players).size !== players.length) return { key: "teams.problems.duplicate" };
+  if (players.length < MIN_PLAYERS) return { key: "teams.problems.noPlayers" };
+  if (players.length > MAX_PLAYERS) return { key: "teams.problems.tooMany", params: { count: MAX_PLAYERS } };
 
   const others = new Set(uniqueNames(context.otherTeamPlayers));
   const clash = players.find(player => others.has(player));
-  if (clash) return `${clash} is already on another team.`;
+  if (clash) return { key: "teams.problems.onAnotherTeam", params: { name: clash } };
   return undefined;
 }
 
@@ -665,11 +653,11 @@ export function hasBots(variant: string | null | undefined): boolean {
   return !variant || BOT_VARIANTS.includes(variant);
 }
 
-/** Why the drawer's bots are off. */
-export const BOTS_ONLY_TEXT = "Bots only play X01 and Cricket.";
+/** Why the drawer's bots are off. The games are named as autodarts names them, in every language. */
+export const BOTS_ONLY: TeamsMessage = { key: "teams.problems.botsOnly", lists: { variants: BOT_VARIANTS } };
 
 /** Why a lobby with sets has no own scores: a team result is counted in legs. */
-export const LEGS_ONLY_TEXT = "Own-score teams play legs. Set the lobby to legs to use them.";
+export const LEGS_ONLY: TeamsMessage = { key: "teams.problems.legsOnly" };
 
 /**
  * What stops a saved own-score team from rejoining this lobby before anyone is
@@ -677,10 +665,10 @@ export const LEGS_ONLY_TEXT = "Own-score teams play legs. Set the lobby to legs 
  * bot to add in a game without bots, which would leave the team short of
  * whoever comes after it.
  */
-export function rejoinProblem(team: SavedTeam, slots: readonly SeatSlot[], game: { variant?: string | null; sets?: number | null }): string | undefined {
-  if (game.sets) return LEGS_ONLY_TEXT;
+export function rejoinProblem(team: SavedTeam, slots: readonly SeatSlot[], game: { variant?: string | null; sets?: number | null }): TeamsProblem {
+  if (game.sets) return LEGS_ONLY;
   if (hasBots(game.variant) || !slots.some(slot => slot.kind === "bot")) return undefined;
-  return `${team.name} has a bot, and bots only play ${joinNames(BOT_VARIANTS)}.`;
+  return { key: "teams.problems.hasBot", params: { name: team.name }, lists: { variants: BOT_VARIANTS } };
 }
 
 /** The guests and bots that were to be added and have no seat: the lobby didn't take them. */
@@ -697,26 +685,26 @@ export function pickSlots(picks: readonly OwnPick[]): SeatSlot[] {
   });
 }
 
-/** What stops an own-score team from being added, in words for the drawer, or nothing. */
-export function checkOwnTeam(draft: OwnDraft, context: OwnContext): string | undefined {
+/** What stops an own-score team from being added, as a message for the drawer, or nothing. */
+export function checkOwnTeam(draft: OwnDraft, context: OwnContext): TeamsProblem {
   const name = normalizeName(draft.name);
-  if (!name) return "Give the team a name.";
-  if (name.length > MAX_NAME_LENGTH) return `A team name can be ${MAX_NAME_LENGTH} characters at most.`;
-  if (uniqueNames(context.teamNames).includes(name)) return `There's already a team called ${name} in this lobby.`;
-  if (draft.picks.length < MIN_PLAYERS) return "Add at least one player.";
-  if (draft.picks.length > MAX_PLAYERS) return `A team can have ${MAX_PLAYERS} players at most.`;
+  if (!name) return { key: "teams.problems.noName" };
+  if (name.length > MAX_NAME_LENGTH) return { key: "teams.problems.nameTooLong", params: { max: MAX_NAME_LENGTH } };
+  if (uniqueNames(context.teamNames).includes(name)) return { key: "teams.problems.teamExists", params: { name } };
+  if (draft.picks.length < MIN_PLAYERS) return { key: "teams.problems.noPlayers" };
+  if (draft.picks.length > MAX_PLAYERS) return { key: "teams.problems.tooMany", params: { count: MAX_PLAYERS } };
 
   const seats = draft.picks.filter((pick): pick is { seatId: string; name: string } => "seatId" in pick);
   const onAnother = seats.find(pick => context.takenSeats.has(pick.seatId));
-  if (onAnother) return `${normalizeName(onAnother.name)} is already on another team.`;
+  if (onAnother) return { key: "teams.problems.onAnotherTeam", params: { name: normalizeName(onAnother.name) } };
   const guests = draft.picks.filter((pick): pick is { guest: string } => "guest" in pick).map(pick => normalizeName(pick.guest));
-  if (new Set(guests).size !== guests.length || new Set(seats.map(pick => pick.seatId)).size !== seats.length) return "Each player can only be in the team once.";
+  if (new Set(guests).size !== guests.length || new Set(seats.map(pick => pick.seatId)).size !== seats.length) return { key: "teams.problems.duplicate" };
   const seated = new Set(uniqueNames(context.seatNames));
   const clash = guests.find(guest => seated.has(guest));
-  if (clash) return `There's already a player called ${clash} in this lobby. Pick them under In this lobby.`;
+  if (clash) return { key: "teams.problems.playerInLobby", params: { name: clash } };
   // Bots join as seats of their own, as new guests do; bots may share a name.
   const joining = guests.length + draft.picks.filter(pick => "bot" in pick).length;
-  if (joining > context.freeSeats) return `The lobby has room for ${context.freeSeats} more ${context.freeSeats === 1 ? "player" : "players"}.`;
+  if (joining > context.freeSeats) return { key: "teams.problems.roomFor", params: { count: context.freeSeats } };
   return undefined;
 }
 
@@ -743,45 +731,11 @@ export interface LobbyTeams {
  * players is already on another team here. A bot never is: bots share names,
  * and another one joins.
  */
-export function savedTeamProblem(team: SavedTeam, lobby: LobbyTeams): string | undefined {
+export function savedTeamProblem(team: SavedTeam, lobby: LobbyTeams): TeamsProblem {
   const taken = team.format === "own" ? lobby.seatTeams : lobby.playerTeams;
   const people = team.members ? team.members.filter(member => member.kind !== "bot").map(member => member.name) : team.players;
   const player = people.find(name => taken[name] && taken[name] !== team.name);
-  return player ? `${player} is already on ${taken[player]}.` : undefined;
-}
-
-/** "A", "A and B", "A, B and C". */
-export function joinNames(names: readonly string[]): string {
-  if (names.length <= 1) return names[0] ?? "";
-  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-}
-
-/** The note under the lobby's players when the teams aren't the same size, or "". */
-export function unevenText(teams: readonly LineupTeam[]): string {
-  const sizes = teams.map(team => team.seatIds.length);
-  if (teams.length < 2 || sizes.every(size => size === sizes[0])) return "";
-  const [ first, ...rest ] = teams;
-  const firstPart = `${first.name} has ${first.seatIds.length} ${first.seatIds.length === 1 ? "player" : "players"}`;
-  return `${joinNames([ firstPart, ...rest.map(team => `${team.name} ${team.seatIds.length}`) ])}: the bigger team throws more often each round.`;
-}
-
-/** A member's place in its own-score team, for the lobby row: "1 of 2", or nothing in a team of one. */
-export function memberLabel(place: number, size: number): string {
-  return size > 1 ? `${place} of ${size}` : "";
-}
-
-function german(language: string | null | undefined): boolean {
-  return (language ?? "").toLowerCase().startsWith("de");
-}
-
-/** "TOM to throw", in the site's own words for its language (Killer's `game.killer.toThrow`). */
-export function toThrowText(player: string, language: string | null | undefined): string {
-  return german(language) ? `${player} ist dran` : `${player} to throw`;
-}
-
-/** The pill while the site's Winner panel is up for a leg: in the site's language, where "ist dran" is. */
-export function legWonText(name: string, language?: string | null): string {
-  return german(language) ? `${name} gewinnt das Leg` : `${name} wins the leg`;
+  return player ? { key: "teams.problems.onTeam", params: { name: player, team: taken[player] } } : undefined;
 }
 
 /** The part of a match frame the team rules read: {@link IMatch} fits it. */
@@ -993,39 +947,17 @@ export function assignCards(cards: readonly CardInfo[], players: readonly SeatLi
   });
 }
 
-/** The pill once a team, or a player, has won the match. */
-export function decidedText(team: string, language?: string | null): string {
-  return german(language) ? `${team} gewinnt das Match` : `${team} wins the match`;
-}
-
-/** The result beside it: the winner's legs first, then the others', in the lineup's order. */
+/**
+ * The result beside the pill once a team has won (utils/teams-text.ts words
+ * the win): the winner's legs first, then the others', in the lineup's order.
+ */
 export function resultText(legs: Record<string, number>, decided: string, lineup: Lineup): string {
   const others = lineup.teams.filter(team => team.name !== decided).map(team => legs[team.name] ?? 0);
   return [ legs[decided] ?? 0, ...others ].join(" – ");
 }
 
-/** A partner-rule line in the pill's two parts: the news, then the reason at lower emphasis. */
+/** A partner-rule line in the pill's two parts: the news, then the reason at lower emphasis. utils/teams-text.ts writes them. */
 export interface PillNote {
   primary: string;
   secondary: string;
-}
-
-/** While the partner rule stops the player up from checking out. */
-export function ruleWarningNote(breach: Breach): PillNote {
-  return { primary: "No checkout this visit", secondary: `${breach.teammate} has ${breach.teammateLeft} left, more than ${joinNames(breach.opponents)} together (${breach.opponentsLeft})` };
-}
-
-/** After a checkout the partner rule turned into a bust. */
-export function ruleBustNote(breach: Breach): PillNote {
-  return { primary: `${breach.player}'s checkout didn't count`, secondary: "partner rule" };
-}
-
-/** When the checkout was taken back but autodarts wouldn't pass the turn on: the visit is empty, so Next is all that's left. */
-export function ruleNextNote(breach: Breach): PillNote {
-  return { primary: `${breach.player}'s checkout didn't count`, secondary: "press Next to pass the turn" };
-}
-
-/** When autodarts refused to take a rule-breaking checkout back. */
-export function ruleRefusedNote(breach: Breach): PillNote {
-  return { primary: `Undo ${breach.player}'s checkout yourself`, secondary: "it breaks the partner rule, and autodarts didn't take it back" };
 }

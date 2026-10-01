@@ -13,6 +13,11 @@
  * the drawer again to change the players or the colour.
  *
  * Only in a lobby the user hosts: nobody else can add players there.
+ *
+ * Its words follow the site's language. What is redrawn on every pass (the
+ * note on uneven teams, a row's "1 of 2") picks the new one up there; what is
+ * written once (Add Team, the pencils, the partner rule's card) is rewritten
+ * when the language changes.
  */
 
 import { createApp, reactive } from "vue";
@@ -21,7 +26,7 @@ import AddTeamDrawer from "./AddTeamDrawer.vue";
 
 import type { ILobbies } from "@/utils/websocket-helpers";
 import type { ColorScheme } from "@/utils/storage";
-import type { Lineup, LineupStore, LineupTeam, OwnDraft, PartnerCard, SavedTeam, SeatSlot, TeamDraft, TeamFormat } from "@/utils/teams";
+import type { Lineup, LineupStore, LineupTeam, OwnDraft, PartnerCard, SavedTeam, SeatSlot, TeamDraft, TeamFormat, TeamsMessage, TeamsProblem } from "@/utils/teams";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SELECTORS, anyOf, qs, qsa } from "@/utils/selectors";
@@ -30,13 +35,13 @@ import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY, forgetGuestPlayers } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, isHostedGuest, joinNames, lineupOf, lineupPartnerRule, lobbyFormat, memberLabel, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedTeams, unevenText, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
+import { language, onLanguageChange, t } from "@/utils/i18n";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, isHostedGuest, lineupOf, lineupPartnerRule, lobbyFormat, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
+import { memberLabel, unevenText } from "@/utils/teams-text";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
 const PARTNER_CARD_ID = "adt-partner-rule";
-const PARTNER_TEXT = "Own-score teams in X01: nobody may check out while a teammate has more left than both opponents together. A checkout that breaks it is a bust.";
-const PARTNER_PENDING_TEXT = "It counts once there are two own-score teams and everyone is on one.";
 /** A reorder settles within this many moves: one fewer than the seats. */
 const MAX_REORDER_MOVES = 6;
 /** How long a move or an add waits for the lobby update it brings. */
@@ -44,6 +49,8 @@ const LOBBY_WAIT_MS = 3000;
 const STYLE_ID = "teams-lobby";
 /** On a row we have dressed: the team, its players and colour, so a change redresses it. */
 const ROW_ATTR = "data-adt-team";
+/** On a row's pencil: the team's name, for its spoken name in the language of the moment. */
+const EDIT_ATTR = "data-adt-team-edit";
 
 /** Material Symbols "group" (Apache 2.0), sized by the site's `[&_svg:not([class*='size-'])]:size-4`. */
 const ICON_TEAM = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M1 17.2q0-.85.438-1.562T2.6 14.55q1.55-.775 3.15-1.162T9 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T17 17.2v.8q0 .825-.587 1.413T15 20H3q-.825 0-1.412-.587T1 18zM18.45 20q.275-.45.413-.962T19 18v-1q0-1.1-.612-2.113T16.65 13.15q1.275.15 2.4.513t2.1.887q.9.5 1.375 1.112T23 17v1q0 .825-.587 1.413T21 20zM6.175 10.825Q5 9.65 5 8t1.175-2.825T9 4t2.825 1.175T13 8t-1.175 2.825T9 12t-2.825-1.175m11.65 0Q16.65 12 15 12q-.275 0-.7-.062t-.7-.138q.675-.8 1.038-1.775T15 8t-.362-2.025T13.6 4.2q.35-.125.7-.163T15 4q1.65 0 2.825 1.175T19 8t-1.175 2.825\"/></svg>";
@@ -149,13 +156,14 @@ export interface DrawerState {
   editingSeats: string[];
   /** The offered names a ✕ can delete: those no saved team has. */
   forgettable: string[];
-  /** A saved team that can't join as the lobby stands → why. */
-  savedProblems: Record<string, string>;
+  /** A saved team that can't join as the lobby stands → why, as a message the drawer words when it shows it. */
+  savedProblems: Record<string, TeamsMessage>;
   /** Whether this lobby's game has bots. */
   botsOk: boolean;
-  submit: (draft: TeamDraft) => Promise<string | undefined>;
-  submitOwn: (draft: OwnDraft) => Promise<string | undefined>;
-  addSaved: (team: SavedTeam) => Promise<string | undefined>;
+  /** Each resolves to what went wrong, or what to know, as a message the drawer words when it shows it; or to nothing, once it has closed the drawer. */
+  submit: (draft: TeamDraft) => Promise<TeamsProblem>;
+  submitOwn: (draft: OwnDraft) => Promise<TeamsProblem>;
+  addSaved: (team: SavedTeam) => Promise<TeamsProblem>;
   forget: (name: string) => Promise<void>;
   deleteSaved: (team: SavedTeam) => Promise<void>;
   close: () => void;
@@ -174,6 +182,9 @@ let closedWhileOpening = false;
 let observer: MutationObserver | null = null;
 let unwatchLobby: (() => void) | null = null;
 let unwatchConfig: (() => void) | null = null;
+let stopLanguage: (() => void) | null = null;
+/** Add Team's label, which a change of language rewrites in place. */
+let addTeamLabel: Text | null = null;
 let lobby: ILobbies | undefined;
 let hostId: string | null = null;
 let saved: SavedTeam[] = [];
@@ -246,12 +257,16 @@ export async function teams(ctx: any) {
   observer?.disconnect();
   observer = new MutationObserver(() => schedule());
   observer.observe(document.body, { childList: true, subtree: true });
+  stopLanguage?.();
+  stopLanguage = onLanguageChange(relabel);
   apply();
 }
 
 export async function onRemove() {
   observer?.disconnect();
   observer = null;
+  stopLanguage?.();
+  stopLanguage = null;
   unwatchLobby?.();
   unwatchLobby = null;
   unwatchConfig?.();
@@ -312,6 +327,18 @@ function apply() {
   }
   noteUneven(lineup);
   syncPartnerCard(lineup);
+}
+
+/**
+ * What Teams wrote into the lobby once, in the language now picked; the rest
+ * picks it up on the pass this schedules. The drawer follows by itself.
+ */
+function relabel() {
+  if (addTeamLabel) addTeamLabel.textContent = t("teams.lobby.addTeam");
+  for (const edit of document.querySelectorAll<HTMLElement>(`[${EDIT_ATTR}]`)) labelPencil(edit);
+  const card = document.getElementById(PARTNER_CARD_ID);
+  if (card) labelPartnerCard(card);
+  schedule();
 }
 
 /** Everything Teams draws in the lobby, taken out, and the drawer closed. */
@@ -437,7 +464,8 @@ function syncButton() {
     button.id = BUTTON_ID;
     button.type = "button";
     button.innerHTML = ICON_TEAM;
-    button.append("Add Team");
+    addTeamLabel = document.createTextNode(t("teams.lobby.addTeam"));
+    button.append(addTeamLabel);
     button.addEventListener("click", () => {
       openDrawer(null);
     });
@@ -498,8 +526,8 @@ function addEditButton(row: HTMLElement, label: string, onEdit: () => void) {
   edit.classList.add("adt-team-edit");
   edit.type = "button";
   edit.disabled = false;
-  edit.title = "Edit team";
-  edit.setAttribute("aria-label", `Edit ${label}`);
+  edit.setAttribute(EDIT_ATTR, label);
+  labelPencil(edit);
   edit.innerHTML = ICON_EDIT;
   edit.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -507,6 +535,12 @@ function addEditButton(row: HTMLElement, label: string, onEdit: () => void) {
   });
   const firstButton = [ ...row.children ].find(child => child.matches("button[data-slot='button']")) ?? remove;
   firstButton.before(edit);
+}
+
+/** A pencil's tooltip and spoken name, in the language of the moment: when it is made, and again on a change. */
+function labelPencil(edit: HTMLElement) {
+  edit.title = t("teams.lobby.edit.title");
+  edit.setAttribute("aria-label", t("teams.lobby.edit.label", { name: edit.getAttribute(EDIT_ATTR) ?? "" }));
 }
 
 /** An own-score team's rows: rows come in seat order, so row `i` is `lobby.players[i]`, which tells two bots of one level apart. */
@@ -520,7 +554,8 @@ function dressOwnRows(lineup: Lineup) {
       return;
     }
     const place = team.seatIds.indexOf(seatId) + 1;
-    const key = `own|${team.name}|${place}|${team.seatIds.length}|${team.colour.from}|${team.colour.to}`;
+    // The language too: its "1 of 2" is written into the row.
+    const key = `own|${team.name}|${place}|${team.seatIds.length}|${team.colour.from}|${team.colour.to}|${language.value}`;
     if (row.getAttribute(ROW_ATTR) !== key || !row.querySelector(".adt-team-line")) {
       row.setAttribute(ROW_ATTR, key);
       row.style.setProperty("--adt-team-from", team.colour.from);
@@ -655,11 +690,10 @@ function buildPartnerCard(template: HTMLElement | null): HTMLElement {
   if (!template) card.dataset.adtFallback = "";
   const head = copyOf(header, "div");
   const title = copyOf(header?.querySelector("[data-slot='card-title']"), "div");
-  title.textContent = "Partner rule";
+  title.setAttribute("data-adt-partner-title", "");
   const toggle = copyOf(siteSwitch, "span");
   toggle.append(copyOf(siteSwitch?.querySelector("[data-slot='switch-thumb']"), "span"));
   toggle.setAttribute("role", "switch");
-  toggle.setAttribute("aria-label", "Partner rule");
   toggle.tabIndex = 0;
   toggle.addEventListener("click", () => {
     setPartnerRule(toggle.getAttribute("aria-checked") !== "true").catch(e => console.error(e));
@@ -676,13 +710,23 @@ function buildPartnerCard(template: HTMLElement | null): HTMLElement {
   // board picker's text style whenever autoscoring was on.
   const text = document.createElement("span");
   text.dataset.adtLine = "text";
-  text.textContent = PARTNER_TEXT;
   const pending = document.createElement("span");
   pending.dataset.adtLine = "pending";
-  pending.textContent = PARTNER_PENDING_TEXT;
   body.append(text, pending);
   card.append(head, body);
+  labelPartnerCard(card);
   return card;
+}
+
+/** The card's title, its switch's spoken name and its two lines, in the language of the moment: when it is built, and again on a change. */
+function labelPartnerCard(card: HTMLElement) {
+  const title = card.querySelector<HTMLElement>("[data-adt-partner-title]");
+  if (title) title.textContent = t("teams.lobby.partnerRule.title");
+  card.querySelector("[role='switch']")?.setAttribute("aria-label", t("teams.lobby.partnerRule.title"));
+  const text = card.querySelector<HTMLElement>("[data-adt-line='text']");
+  if (text) text.textContent = t("teams.lobby.partnerRule.text");
+  const pending = card.querySelector<HTMLElement>("[data-adt-line='pending']");
+  if (pending) pending.textContent = t("teams.lobby.partnerRule.pending");
 }
 
 /** The switch as the site draws its own: its data attributes pick the colours, and the thumb follows. */
@@ -740,7 +784,7 @@ function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): 
   const offered = uniqueNames([ ...savedPlayers, ...siteGuests(), ...saved.flatMap(team => team.players) ]);
   // A lobby with sets offers no own-score team (utils/teams.ts `rejoinProblem`).
   const savedTeams = editing ? [] : saved.filter(team => (!format || team.format === format) && !(lobby?.sets && team.format === "own") && !inLobby(team));
-  const savedProblems: Record<string, string> = {};
+  const savedProblems: Record<string, TeamsMessage> = {};
   for (const team of savedTeams) {
     const problem = savedTeamProblem(team, { playerTeams, seatTeams: seatNameTeams });
     if (problem) savedProblems[team.name] = problem;
@@ -836,36 +880,36 @@ async function saveTeam(team: SavedTeam) {
   await AutodartsToolsConfig.setValue({ ...config, teams: { ...current, saved: rememberTeam(current.saved, team) } });
 }
 
-async function submitDraft(draft: TeamDraft): Promise<string | undefined> {
+async function submitDraft(draft: TeamDraft): Promise<TeamsProblem> {
   const editing = drawer.editing;
-  if (!editing && drawer.full) return "The lobby is full.";
+  if (!editing && drawer.full) return { key: "teams.problems.lobbyFull" };
   const problem = checkTeam(editing ? { ...draft, name: editing.name } : draft, {
     guestNames: drawer.guestNames,
     otherTeamPlayers: Object.keys(drawer.playerTeams),
   });
   if (problem) return problem;
   // The picker greys out the presets other teams have; a custom pair can only be caught here.
-  if (colourTaken(draft.colour, drawer.takenColours)) return "Another team in this lobby already has that colour.";
+  if (colourTaken(draft.colour, drawer.takenColours)) return { key: "teams.problems.colourTaken" };
 
   const team: SavedTeam = { name: editing?.name ?? normalizeName(draft.name), players: uniqueNames(draft.players), colour: { ...draft.colour }, format: "shared" };
   await saveTeam(team);
   if (!editing && !await addGuest(team.name, "Teams")) {
-    return "The team is saved, but autodarts didn't add it to the lobby. Add it again from Saved teams.";
+    return { key: "teams.problems.savedNotAdded" };
   }
   closeDrawer();
   return undefined;
 }
 
-async function addSavedTeam(savedTeam: SavedTeam): Promise<string | undefined> {
+async function addSavedTeam(savedTeam: SavedTeam): Promise<TeamsProblem> {
   if (savedTeam.format === "own") return addSavedOwnTeam(savedTeam);
-  if (drawer.full) return "The lobby is full.";
+  if (drawer.full) return { key: "teams.problems.lobbyFull" };
   // Another team here may have its colour by now, say a new team offered the
   // same red; then it plays in the next free one, and keeps that.
   const team = withFreeColour(savedTeam, drawer.takenColours);
   const problem = checkTeam(team, { guestNames: drawer.guestNames, otherTeamPlayers: Object.keys(drawer.playerTeams) });
   if (problem) return problem;
   await saveTeam(team);
-  if (!await addGuest(team.name, "Teams")) return "autodarts didn't add the team. Try again.";
+  if (!await addGuest(team.name, "Teams")) return { key: "teams.problems.teamNotAdded" };
   closeDrawer();
   return undefined;
 }
@@ -897,8 +941,8 @@ function ownSavedTeam(name: string, colour: ColorScheme, seatIds: readonly strin
   return { name, players: members.map(member => member.name), colour: { ...colour }, format: "own", members };
 }
 
-async function submitOwnTeam(draft: OwnDraft): Promise<string | undefined> {
-  if (!lobby) return "The lobby isn't loaded yet. Try again in a moment.";
+async function submitOwnTeam(draft: OwnDraft): Promise<TeamsProblem> {
+  if (!lobby) return { key: "teams.problems.notLoaded" };
   const editing = drawer.editing;
   const others = (currentLineup()?.teams ?? []).filter(team => team.name !== editing?.name);
   const problem = checkOwnTeam(editing ? { ...draft, name: editing.name } : draft, {
@@ -908,11 +952,11 @@ async function submitOwnTeam(draft: OwnDraft): Promise<string | undefined> {
     freeSeats: Math.max(0, (lobby.maxPlayers || 6) - (lobby.players?.length ?? 0)),
   });
   if (problem) return problem;
-  if (colourTaken(draft.colour, others.map(team => team.colour))) return "Another team in this lobby already has that colour.";
+  if (colourTaken(draft.colour, others.map(team => team.colour))) return { key: "teams.problems.colourTaken" };
 
   const slots = pickSlots(draft.picks);
   const ids = await seatSlots(slots);
-  if (ids.some(id => !id)) return "autodarts didn't add every new player. Try again.";
+  if (ids.some(id => !id)) return { key: "teams.problems.playersNotAdded" };
   const name = editing?.name ?? normalizeName(draft.name);
   const seatIds = ids as string[];
   await writeLineupTeam({ name, colour: { ...draft.colour }, seatIds });
@@ -921,8 +965,8 @@ async function submitOwnTeam(draft: OwnDraft): Promise<string | undefined> {
   return undefined;
 }
 
-async function addSavedOwnTeam(savedTeam: SavedTeam): Promise<string | undefined> {
-  if (!lobby) return "The lobby isn't loaded yet. Try again in a moment.";
+async function addSavedOwnTeam(savedTeam: SavedTeam): Promise<TeamsProblem> {
+  if (!lobby) return { key: "teams.problems.notLoaded" };
   const others = currentLineup()?.teams ?? [];
   const team = withFreeColour(savedTeam, others.map(other => other.colour));
   const slots = rejoinSlots(team, lobby.players ?? [], hostId, new Set(others.flatMap(other => other.seatIds)));
@@ -930,19 +974,19 @@ async function addSavedOwnTeam(savedTeam: SavedTeam): Promise<string | undefined
   if (problem) return problem;
   const adding = slots.filter(slot => slot.kind === "guest" || slot.kind === "bot").length;
   const free = Math.max(0, (lobby.maxPlayers || 6) - (lobby.players?.length ?? 0));
-  if (adding > free) return `The lobby has room for ${free} more ${free === 1 ? "player" : "players"}.`;
+  if (adding > free) return { key: "teams.problems.roomFor", params: { count: free } };
 
   const ids = await seatSlots(slots);
   // Half a team is not written: whoever did join stays as a plain seat, and
   // is picked up again when the team is added once more.
   const left = unseated(slots, ids);
-  if (left.length) return `autodarts didn't add ${joinNames(left)}. Try again.`;
+  if (left.length) return { key: "teams.problems.namesNotAdded", lists: { names: left } };
   const seatIds = ids.filter((id): id is string => Boolean(id));
-  if (seatIds.length < 1) return "autodarts didn't add the team. Try again.";
+  if (seatIds.length < 1) return { key: "teams.problems.teamNotAdded" };
   await writeLineupTeam({ name: team.name, colour: team.colour, seatIds });
   await saveTeam({ ...team, members: team.members });
   const missing = slots.filter(slot => slot.kind === "missing").map(slot => slot.name);
-  if (missing.length) return `Added. ${joinNames(missing)} ${missing.length === 1 ? "isn't" : "aren't"} in the lobby: signed-in players join from their own board.`;
+  if (missing.length) return { key: "teams.problems.notInLobby", params: { count: missing.length }, lists: { names: missing } };
   closeDrawer();
   return undefined;
 }
