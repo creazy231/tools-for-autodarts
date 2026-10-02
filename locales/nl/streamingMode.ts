@@ -78,7 +78,7 @@ export default {
     scoreScale: "Scorebordgrootte: ({percent} %)",
     volume: "Volume",
     dartboard: "Dartbord",
-    settings: "Instellingen voor streamingmodus",
+    settings: "Instellingen voor Streamingmodus",
     leave: "Streamingmodus verlaten",
   },
   title: {
