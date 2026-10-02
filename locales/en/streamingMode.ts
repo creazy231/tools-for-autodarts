@@ -101,8 +101,10 @@ export default {
     firstToLegs: { one: "First to {count} Leg", other: "First to {count} Legs" },
     /**
      * The game, by the variant autodarts sends. English keeps that variant as the title always showed it
-     * ("CountUp", "ATC"); German and Dutch use the site's game names (gameModes.modes.*). A game that is not
-     * here is shown as autodarts sent it.
+     * ("CountUp", "ATC"); German and Dutch use the site's game names. Where the site's statistics page has a
+     * short name (statistics.overviewPage.modes.*: X01, Cricket, Count Up, Random Checkout, Bob's 27, Killer)
+     * the title takes it, since the Autodarts scoreboard's title cell truncates; the rest are the game picker's
+     * names (gameModes.modes.*). A game that is not here is shown as autodarts sent it.
      */
     variant: {
       x01: "X01",

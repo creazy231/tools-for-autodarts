@@ -86,10 +86,10 @@ export default {
     firstToLegs: { one: "Erster bis {count} Leg", other: "Erster bis {count} Legs" },
     variant: {
       x01: "X01",
-      cricket: "Cricket / Taktik",
+      cricket: "Cricket",
       countUp: "Count Up",
       atc: "Around The Clock",
-      randomCheckout: "Zufälliges Checkout",
+      randomCheckout: "Random Checkout",
       rtw: "Round the World",
       segmentTraining: "Segmenttraining",
       bobs27: "Bob's 27",

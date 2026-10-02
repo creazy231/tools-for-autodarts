@@ -289,7 +289,7 @@ Settled in Colors (`locales/*/colors.ts`), for whatever else names a colour pair
 | autodarts' mark | the faint logo on the page behind the match | Logo | logo |
 | the sample match screen | it imitates the site, so a player and a bot's seat are named as the site names them (*You* is not a site text; `lobby.addBot.botLevel` is *Bot-Level N*, *Botniveau N*), and the averages read *Leg* and *Match* (`matchStats.breakdown.leg`, `pages.match`) | Du, Bot-Level 3, Leg, Match | Jij, Botniveau 3, Leg, Wedstrijd |
 
-Settled in Streaming Mode (`locales/*/streamingMode.ts`), for whatever else names the overlay or what it draws. The words the overlay prints about the game are the site's: the race is its lobby pill, the games are its game picker's names, and the short word for average is the one its own tables use.
+Settled in Streaming Mode (`locales/*/streamingMode.ts`), for whatever else names the overlay or what it draws. The words the overlay prints about the game are the site's: the race is its lobby pill, the games are the short names of its statistics page where it has one and its game picker's names for the rest, and the short word for average is the one its own tables use.
 
 | English | Where it is from | Deutsch | Nederlands |
 |---|---|---|---|
@@ -299,6 +299,7 @@ Settled in Streaming Mode (`locales/*/streamingMode.ts`), for whatever else name
 | the match header | not the site's: the bar along the top of the match screen, with Exit on the left and the icons on the right | Kopfzeile des Matches | koptekst van het wedstrijdscherm |
 | the footer | not the site's: the line along the bottom of the overlay | Fußzeile | voettekst |
 | First to 3 Legs, First to 3 Sets | the site's lobby pill: *First to* (`lobby.gameSettings.matchMode.firstTo`) and the count (`legsLabel_one` and `_other`, `setsLabel_one` and `_other`), so a count of one is singular | Erster bis 3 Legs, Erster bis 1 Leg | Eerste tot 3 legs, Eerste tot 1 leg |
+| a game's name in the title | the site's short name where its statistics page has one (`statistics.overviewPage.modes.*`: X01, Cricket, Count Up, Random Checkout, Bob's 27, Killer), because the Autodarts scoreboard's title cell truncates and the picker's *Cricket / Taktik* and *Cricket / Tactics* do not fit it. Every other game keeps the game picker's name (§ 4), and English is the variant as sent | Cricket, Random Checkout | Cricket, Willekeurige checkout |
 | Avg | the short word for average, as the site's own tables write it (`advancedStatistics.activity.avg`, `tournaments.status.avgMin`). The Autodarts scoreboard sets it in capitals | Ø | Gem. |
 | Board Scale, Score Scale | not the site's: the two sliders behind the gear in the overlay's footer, which size the board and the scoreboard; the label says the percent of the slider's range | Board-Größe, Scoreboard-Größe | Bordgrootte, Scorebordgrootte |
 | Drawn board (an option) | as in Darts Zoom, but a button label: German keeps the adjective alone, since *Gezeichnetes Board* made the option group wider than a 320 px window | Gezeichnet | Getekend bord |
