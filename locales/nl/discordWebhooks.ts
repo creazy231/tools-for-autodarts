@@ -39,7 +39,7 @@ export default {
   },
   button: {
     title: "Deze lobby in Discord aankondigen",
-    sent: "Verstuurd",
+    sent: "Verzonden",
     failed: "Mislukt",
   },
   message: {
