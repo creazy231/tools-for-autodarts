@@ -1,3 +1,4 @@
+import animations from "./animations";
 import autoStart from "./autoStart";
 import automaticFullscreen from "./automaticFullscreen";
 import automaticNextLeg from "./automaticNextLeg";
@@ -37,6 +38,7 @@ import type en from "../en";
 import type { Translation } from "../../utils/i18n/types";
 
 export default {
+  animations,
   autoStart,
   automaticFullscreen,
   automaticNextLeg,

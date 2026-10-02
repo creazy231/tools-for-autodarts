@@ -5,14 +5,14 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Shows a GIF over the board at the moments you pick: a 180, a bull, a bust, a won leg. A click puts it away early.
+          {{ t("animations.intro") }}
         </p>
 
         <section class="mb-10">
           <h3 class="adt-section-title">
-            Options
+            {{ t("animations.sections.options") }}
           </h3>
-          <OptionRow description="Seconds between the dart and the animation." title="Start delay">
+          <OptionRow :description="t('animations.startDelay.description')" :title="t('animations.startDelay.title')">
             <div class="flex items-center gap-2">
               <div class="w-24">
                 <AppInput
@@ -28,7 +28,7 @@
               <span class="text-sm">s</span>
             </div>
           </OptionRow>
-          <OptionRow description="Seconds an animation stays up." title="Show for">
+          <OptionRow :description="t('animations.showFor.description')" :title="t('animations.showFor.title')">
             <div class="flex items-center gap-2">
               <div class="w-24">
                 <AppInput
@@ -44,32 +44,32 @@
               <span class="text-sm">s</span>
             </div>
           </OptionRow>
-          <OptionRow description="Cover fills the space and may crop the GIF. Contain shows all of it." title="Fit">
+          <OptionRow :description="t('animations.fit.description')" :title="t('animations.fit.title')">
             <AppRadioGroup v-model="objectFit" :options="FITS" button-size="sm" />
           </OptionRow>
-          <OptionRow description="Just the board, or the whole page over a blurred background." title="Covers">
+          <OptionRow :description="t('animations.covers.description')" :title="t('animations.covers.title')">
             <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" button-size="sm" />
           </OptionRow>
-          <OptionRow description="The games it shows GIFs in." title="Game modes">
-            <GameModesField v-model="config.animations.disabledGameModes" feature="animations" intro="Animations only show in the games switched on here." />
+          <OptionRow :description="t('animations.gameModes.description')" :title="t('gameModes.title')">
+            <GameModesField v-model="config.animations.disabledGameModes" :intro="t('animations.gameModes.intro')" feature="animations" />
           </OptionRow>
         </section>
 
         <LibrarySection
           @reorder="moveAnimation"
-          :category-labels="{ players: 'Other' }"
+          :category-labels="{ players: t('animations.categoryOther') }"
+          :empty-text="t('animations.list.emptyText')"
+          :empty-title="t('animations.list.emptyTitle')"
           :entries="entries"
+          :search-placeholder="t('animations.list.searchPlaceholder')"
+          :title="t('features.animations')"
           empty-icon="icon-[material-symbols--animated-images-outline-rounded]"
-          empty-text="Upload GIFs from your computer, or add one from a link. Links from Tenor and Giphy work."
-          empty-title="No animations yet"
           list-class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-          search-placeholder="Search animations by trigger or link"
-          title="Animations"
         >
           <template #actions>
             <AppMenu :items="moreActions">
               <template #trigger="{ open, toggle }">
-                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                <button @click="toggle" :aria-expanded="open" :aria-label="t('library.moreActions')" class="adt-icon-btn" :title="t('library.more')" type="button">
                   <span class="icon-[material-symbols--more-horiz]" />
                 </button>
               </template>
@@ -79,7 +79,7 @@
                 <AppButton @click="toggle" :aria-expanded="open" auto size="sm" type="primary">
                   <span class="flex items-center gap-1">
                     <span class="icon-[material-symbols--add-rounded] text-lg" />
-                    Add
+                    {{ t("common.add") }}
                     <span class="icon-[material-symbols--expand-more-rounded] -mr-1 text-lg" />
                   </span>
                 </AppButton>
@@ -97,29 +97,29 @@
             >
               <div class="relative aspect-video overflow-hidden bg-black/40">
                 <img
-                  :alt="`Animation on ${entry.triggers.join(', ') || 'no trigger'}`"
+                  :alt="t('animations.tile.alt', { triggers: entry.triggers.join(', ') || t('animations.tile.noTrigger') })"
                   class="size-full object-cover transition"
                   :class="[{ 'opacity-30 grayscale': !entry.enabled }]"
                   :src="getAnimationSource(config.animations.data[entry.index])"
                   loading="lazy"
                 >
-                <span v-if="!filtering" class="adt-drag-handle is-glass absolute left-2 top-2" title="Drag to reorder">
+                <span v-if="!filtering" class="adt-drag-handle is-glass absolute left-2 top-2" :title="t('library.dragToReorder')">
                   <span class="icon-[material-symbols--drag-indicator]" />
                 </span>
                 <div class="absolute right-2 top-2 flex gap-1">
-                  <button @click="editAnimation(entry.index)" aria-label="Edit animation" class="adt-glass-btn" title="Edit" type="button">
+                  <button @click="editAnimation(entry.index)" :aria-label="t('library.editNamed', { title: t('animations.noun') })" class="adt-glass-btn" :title="t('common.edit')" type="button">
                     <span class="icon-[material-symbols--edit-outline-rounded]" />
                   </button>
-                  <ConfirmDeleteButton @confirm="removeAnimation(entry.index)" glass label="animation" />
+                  <ConfirmDeleteButton @confirm="removeAnimation(entry.index)" :label="t('animations.noun')" glass />
                 </div>
-                <span v-if="!entry.enabled" class="adt-chip absolute bottom-2 left-2 !bg-black/70">Off</span>
+                <span v-if="!entry.enabled" class="adt-chip absolute bottom-2 left-2 !bg-black/70">{{ t("common.off") }}</span>
                 <span
                   v-if="ownLengthLabels[entry.index]"
-                  :title="`Stays up for ${ownLengthLabels[entry.index]}`"
+                  :title="t('animations.tile.lengthTitle', { duration: ownLengthLabels[entry.index] ?? '' })"
                   class="adt-chip absolute bottom-2 right-2 gap-1 !bg-black/70"
                 >
                   <span aria-hidden="true" class="icon-[material-symbols--timer-outline-rounded]" />
-                  <span class="sr-only">Stays up for</span>
+                  <span class="sr-only">{{ t("animations.tile.lengthSpoken") }}</span>
                   {{ ownLengthLabels[entry.index] }}
                 </span>
               </div>
@@ -127,7 +127,7 @@
                 <TriggerChips :max="2" :query="query" :triggers="entry.triggers" :wrap="false" class="flex-1" />
                 <AppSwitch
                   @update:model-value="config.animations.data[entry.index].enabled = $event"
-                  :label="`Animation on ${entry.name}: ${entry.enabled ? 'on' : 'off'}`"
+                  :label="t('animations.tile.switchLabel', { name: entry.name, state: t(entry.enabled ? 'library.state.on' : 'library.state.off') })"
                   :model-value="entry.enabled"
                 />
               </div>
@@ -136,10 +136,10 @@
 
           <template #empty>
             <AppButton @click="openGifUploadModal" auto type="primary">
-              Upload GIFs
+              {{ t("animations.add.upload.label") }}
             </AppButton>
             <AppButton @click="openAddAnimationModal" auto>
-              Add from a link
+              {{ t("animations.add.link.label") }}
             </AppButton>
           </template>
         </LibrarySection>
@@ -147,18 +147,18 @@
     </div>
 
     <!-- Animation (add / edit) -->
-    <AppModal @close="closeAnimationModal" :show="showAnimationModal" :title="isEditMode ? 'Edit animation' : 'Add an animation from a link'" ghost-close>
+    <AppModal @close="closeAnimationModal" :show="showAnimationModal" :title="isEditMode ? t('animations.dialog.editTitle') : t('animations.dialog.addTitle')" ghost-close>
       <div class="space-y-5">
         <div v-if="previewSrc" class="overflow-hidden rounded-[var(--ad-radius-lg)] bg-black/40">
-          <img :src="previewSrc" alt="Preview" class="mx-auto max-h-48 object-contain">
+          <img :src="previewSrc" :alt="t('animations.dialog.previewAlt')" class="mx-auto max-h-48 object-contain">
         </div>
         <div>
           <AppInput
             id="animation-url"
             v-model="newAnimation.url"
             :disabled="isUploadedGif"
-            :label="isUploadedGif ? 'Uploaded GIF' : 'Link to a GIF'"
-            :placeholder="isUploadedGif ? uploadedGifFilename : 'https://example.com/animation.gif'"
+            :label="isUploadedGif ? t('animations.dialog.uploadedLabel') : t('animations.dialog.linkLabel')"
+            :placeholder="isUploadedGif ? uploadedGifName : t('animations.dialog.linkPlaceholder')"
             type="url"
           >
             <template #icon>
@@ -166,23 +166,23 @@
             </template>
           </AppInput>
           <p v-if="isUploadedGif" class="adt-field-hint">
-            Kept in this browser as {{ uploadedGifFilename }}. Its triggers and how long it stays up can be changed.
+            {{ t("animations.dialog.uploadedHint", { filename: uploadedGifName }) }}
           </p>
         </div>
         <div>
           <!-- Reading the GIF's length sits on the label row, as All triggers does on the triggers' -->
           <div class="adt-field-label justify-between">
-            <label for="animation-duration">Show for</label>
+            <label for="animation-duration">{{ t("animations.showFor.title") }}</label>
             <button
               @click="readGifLength"
               :aria-busy="readingLength"
               :disabled="!previewSrc || readingLength"
-              :title="previewSrc ? 'Fill in how long one run of this GIF takes' : 'Add a link to a GIF first'"
+              :title="previewSrc ? t('animations.dialog.useLengthTitle') : t('animations.dialog.useLengthNeedsLink')"
               class="flex items-center gap-1 text-xs font-semibold text-[var(--ad-blue-300)] enabled:hover:text-white disabled:cursor-not-allowed disabled:text-[var(--ad-text-disabled)]"
               type="button"
             >
               <span class="text-sm" :class="readingLength ? 'icon-[pixelarticons--loader] animate-spin' : 'icon-[material-symbols--timer-outline-rounded]'" />
-              Use the GIF's length
+              {{ t("animations.dialog.useLength") }}
             </button>
           </div>
           <div class="flex items-center gap-2">
@@ -202,20 +202,20 @@
             <span class="text-sm">s</span>
           </div>
           <p v-if="lengthError" class="adt-field-hint !text-[var(--ad-rose-500)]">
-            {{ lengthError }}
+            {{ t(lengthError) }}
           </p>
           <p v-else class="adt-field-hint">
-            Leave it empty to use the Show for option ({{ showForText }} s).
+            {{ t("animations.dialog.showForHint", { option: t("animations.showFor.title"), seconds: showForText }) }}
           </p>
         </div>
         <TriggerField id="animation-triggers" v-model="animationTriggers" :validate="validateAnimationTrigger" feature="animations" />
       </div>
       <template #footer>
         <AppButton @click="closeAnimationModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="saveAnimation" auto type="primary">
-          {{ isEditMode ? "Save" : "Add animation" }}
+          {{ isEditMode ? t("common.save") : t("animations.dialog.addButton") }}
         </AppButton>
       </template>
       <AppNotification @close="hideNotification" :message="notification.message" :show="notification.show" :type="notification.type" />
@@ -233,20 +233,20 @@
       feature="animations"
       file-icon="icon-[material-symbols--gif-box-outline-rounded]"
       formats="GIF"
-      names-hint="A file named 180.gif plays on 180. Join several with a +, as in 180+t20.gif. A name that isn't a trigger gives none."
-      title="Upload GIFs"
+      :names-hint="t('animations.upload.namesHint')"
+      :title="t('animations.add.upload.label')"
     />
 
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="`Delete all ${config?.animations.data.length ?? 0} animations?`" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('animations.deleteAll.title', { count: config?.animations.data.length ?? 0 })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
-        They're removed for good, uploaded GIFs included. This can't be undone.
+        {{ t("animations.deleteAll.body") }}
       </p>
       <template #footer>
         <AppButton @click="closeDeleteAllModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="deleteAllAnimations" auto type="danger">
-          Delete all
+          {{ t("library.deleteAll") }}
         </AppButton>
       </template>
     </AppModal>
@@ -263,11 +263,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
-            Animations
+            {{ t("features.animations") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Displays animations for special events like 180s, bulls, busts, and leg wins during gameplay.
+            {{ t("animations.card") }}
           </p>
         </div>
         <div class="flex">
@@ -279,7 +279,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Animations" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.animations')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -307,6 +307,7 @@ import UploadDialog from "./Library/UploadDialog.vue";
 import { stableKey } from "./Library/stable-key";
 
 import type { ComponentPublicInstance } from "vue";
+import type { MessageKey } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
 
 import { useNotification } from "@/composables/useNotification";
@@ -315,18 +316,29 @@ import { backgroundFetch, deleteAnimationFromOPFS, getAnimationFromOPFS, getAnim
 import { type IAnimation } from "@/utils/storage";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { notification, showNotification, hideNotification } = useNotification();
 useStorage("adt:active-settings", "animations");
 
-const FITS = [ { label: "Cover", value: "cover" }, { label: "Contain", value: "contain" } ];
-const VIEW_MODES = [ { label: "Board only", value: "board-only" }, { label: "Full page", value: "full-page" } ];
+const FITS = computed(() => [
+  { label: t("animations.fit.options.cover"), value: "cover" },
+  { label: t("animations.fit.options.contain"), value: "contain" },
+]);
+const VIEW_MODES = computed(() => [
+  { label: t("animations.covers.options.boardOnly"), value: "board-only" },
+  { label: t("animations.covers.options.fullPage"), value: "full-page" },
+]);
 /** Drawn until a GIF comes near the view. */
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
-/** Why "Use the GIF's length" found none, said under the field. */
-const LENGTH_ERRORS = {
-  link: "This link's site doesn't let the extension read the file, so its length can't be read.",
-  upload: "The uploaded GIF couldn't be read.",
-  notAnimated: "This isn't an animated GIF, so it has no length to read.",
+/**
+ * Why "Use the GIF's length" found none, as the key of the line said under the
+ * field. The field keeps the key, not the sentence, so it follows a language
+ * picked while it is on screen.
+ */
+const LENGTH_ERRORS: Record<"link" | "upload" | "notAnimated", MessageKey> = {
+  link: "animations.lengthErrors.link",
+  upload: "animations.lengthErrors.upload",
+  notAnimated: "animations.lengthErrors.notAnimated",
 };
 
 const { config } = useConfig();
@@ -341,7 +353,7 @@ const animationTriggers = ref<string[]>([]);
 /** The dialog's Show for, as typed: empty for the option's. */
 const durationText = ref("");
 const readingLength = ref(false);
-const lengthError = ref("");
+const lengthError = ref<MessageKey | "">("");
 const editingIndex = ref<number | null>(null);
 
 // Which animations have come near the view
@@ -355,6 +367,7 @@ const isGifProcessing = ref(false);
 const showDeleteAllModal = ref(false);
 
 const isUploadedGif = ref(false);
+/** The uploaded GIF's file name, as stored: empty when none was. */
 const uploadedGifFilename = ref("");
 
 /** Object URLs of uploaded GIFs, by animationId. */
@@ -396,7 +409,7 @@ const entries = computed<LibraryEntry[]>(() => (config.value?.animations.data ??
   const triggers = Array.isArray(animation.triggers) ? animation.triggers : [];
   return {
     index,
-    name: triggers.join(", ") || "animation",
+    name: triggers.join(", ") || t("animations.untitled"),
     triggers,
     source: animation.animationId ? "uploaded" : animation.url,
     enabled: animation.enabled,
@@ -412,27 +425,30 @@ const previewSrc = computed(() => {
 
 const showForText = computed(() => formatSeconds(config.value?.animations.duration ?? 5));
 
+/** What the dialog calls the uploaded GIF: its file name, or "unknown" for one stored without. */
+const uploadedGifName = computed(() => uploadedGifFilename.value || t("animations.dialog.unknownFile"));
+
 /** "2.37 s" for each animation with a length of its own, for its tile. */
 const ownLengthLabels = computed(() => (config.value?.animations.data ?? []).map((animation) => {
   const seconds = ownDuration(animation);
   return seconds === undefined ? undefined : `${formatSeconds(seconds)} s`;
 }));
 
-const addActions = [
-  { label: "Upload GIFs", hint: "From your computer, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openGifUploadModal },
-  { label: "Add from a link", hint: "A GIF on the web, e.g. from Tenor or Giphy", icon: "icon-[material-symbols--link-rounded]", action: openAddAnimationModal },
-];
+const addActions = computed(() => [
+  { label: t("animations.add.upload.label"), hint: t("animations.add.upload.hint"), icon: "icon-[material-symbols--upload-rounded]", action: openGifUploadModal },
+  { label: t("animations.add.link.label"), hint: t("animations.add.link.hint"), icon: "icon-[material-symbols--link-rounded]", action: openAddAnimationModal },
+]);
 
 const moreActions = computed(() => [
   {
-    label: "Sort by trigger",
-    hint: "Puts the grid in trigger order",
+    label: t("animations.menu.sort.label"),
+    hint: t("animations.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
     disabled: (config.value?.animations.data.length ?? 0) < 2,
     action: sortAnimationsByTriggers,
   },
   {
-    label: "Delete all…",
+    label: t("library.deleteAllMenu"),
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
@@ -472,7 +488,7 @@ function setSeconds(key: "delayStart" | "duration", value: string, min: number) 
 }
 
 function validateAnimationTrigger(trigger: string): string {
-  return validateAnimationTriggers([ trigger ]).invalidTriggers.length ? "Animations don't know this trigger." : "";
+  return validateAnimationTriggers([ trigger ]).invalidTriggers.length ? t("animations.triggerUnknown") : "";
 }
 
 function moveAnimation(from: number, to: number) {
@@ -557,7 +573,7 @@ async function editAnimation(index: number) {
   // Try to extract a friendly filename from the animationId if possible
   if (animation.animationId) {
     const name = await getAnimationNameFromOPFS(animation.animationId);
-    uploadedGifFilename.value = name || "unknown";
+    uploadedGifFilename.value = name || "";
     // The dialog previews it; tiles out of view have not read it yet.
     loadAnimationSource(animation);
   }
@@ -580,7 +596,7 @@ function saveAnimation() {
 
   // Either url (remote gif) or animationId (uploaded gif) is required
   if (!newAnimation.value.url && !newAnimation.value.animationId) {
-    showNotification("Add a link to a GIF first.", "error");
+    showNotification(t("animations.notifications.needsLink"), "error");
     return;
   }
 
@@ -590,12 +606,12 @@ function saveAnimation() {
   // If there are invalid triggers, drop them and say which
   if (invalidTriggers.length > 0) {
     animationTriggers.value = validTriggers;
-    showNotification(`Some triggers were invalid and removed: ${invalidTriggers.join(", ")}`, "error");
+    showNotification(t("animations.notifications.invalidTriggers", { triggers: invalidTriggers.join(", ") }), "error");
     return;
   }
 
   if (validTriggers.length === 0) {
-    showNotification("No valid triggers found. Please check the documentation for supported trigger formats.", "error");
+    showNotification(t("animations.notifications.noValidTriggers"), "error");
     return;
   }
 
@@ -699,7 +715,7 @@ async function processGifFiles({ files, fromNames, triggers: shared }: { files: 
   isGifProcessing.value = true;
 
   if (!isOPFSAvailable()) {
-    showNotification("Your browser doesn't support file storage. Try a different browser.", "error");
+    showNotification(t("animations.notifications.noStorage"), "error");
     isGifProcessing.value = false;
     return;
   }
@@ -733,16 +749,16 @@ async function processGifFiles({ files, fromNames, triggers: shared }: { files: 
         successCount++;
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
-        showNotification(`Failed to process ${file.name}`, "error");
+        showNotification(t("animations.notifications.failedToProcess", { name: file.name }), "error");
       }
     }
 
     // Close modal and update UI
     closeGifUploadModal();
-    showNotification(`Added ${successCount} GIFs`, "success");
+    showNotification(t("animations.notifications.added", { count: successCount }), "success");
   } catch (error) {
     console.error("Error processing files:", error);
-    showNotification("Error processing files", "error");
+    showNotification(t("animations.notifications.processingError"), "error");
   } finally {
     isGifProcessing.value = false;
   }
@@ -774,7 +790,7 @@ async function deleteAllAnimations() {
 
   // Close modal and show notification
   closeDeleteAllModal();
-  showNotification("All animations have been deleted", "error");
+  showNotification(t("animations.notifications.allDeleted"), "error");
 
   // Reset animations cache
   for (const url of Object.values(animationSources.value)) {
@@ -804,6 +820,6 @@ function sortAnimationsByTriggers() {
   });
 
   // Show notification
-  showNotification("Animations have been sorted by their triggers");
+  showNotification(t("animations.notifications.sorted"));
 }
 </script>

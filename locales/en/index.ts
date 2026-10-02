@@ -1,3 +1,4 @@
+import animations from "./animations";
 import autoStart from "./autoStart";
 import automaticFullscreen from "./automaticFullscreen";
 import automaticNextLeg from "./automaticNextLeg";
@@ -35,6 +36,7 @@ import zoom from "./zoom";
 
 /** Every English file, under the first part of its keys: `t("site.languageNote")`. Alphabetical. */
 export default {
+  animations,
   autoStart,
   automaticFullscreen,
   automaticNextLeg,

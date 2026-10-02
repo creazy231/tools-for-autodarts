@@ -11,6 +11,13 @@ export default {
   dragToReorder: "Drag to reorder",
   /** The bin on a row, spoken: "Delete 180". `name` is the thing's name. */
   deleteNamed: "Delete {name}",
+  /** The button with the three dots at the head of a list: its spoken name, and its tooltip. */
+  moreActions: "More actions",
+  more: "More",
+  /** The list menu's item that opens the delete-all dialog. Each panel words that dialog's counted heading and its body itself. */
+  deleteAllMenu: "Delete all…",
+  /** The delete-all dialog's confirm button. */
+  deleteAll: "Delete all",
   /** A play button, spoken: "Play 180". `name` is what plays, or a phrase such as soundDialog.thisSound. */
   playNamed: "Play {name}",
   stopNamed: "Stop {name}",
