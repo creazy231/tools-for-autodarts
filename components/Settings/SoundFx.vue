@@ -5,32 +5,31 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Plays sound effects on game events, such as a crowd on a 180 or a groan on a bust. Each sound plays on the
-          triggers you give it. Start them with <code class="adt-code">ambient_</code> to keep them apart from the Caller's.
+          <AppTrans class="adt-sound-fx-code" :params="{ prefix: 'ambient_' }" path="soundFx.intro" />
         </p>
 
         <section class="mb-10">
           <h3 class="adt-section-title">
-            Options
+            {{ t("soundFx.sections.options") }}
           </h3>
-          <OptionRow description="The games it plays in. Lobby and tournament sounds play in any game." title="Game modes">
-            <GameModesField v-model="config.soundFx.disabledGameModes" feature="soundFx" intro="Sound FX only plays in the games switched on here." />
+          <OptionRow :description="t('soundFx.gameModes.description')" :title="t('gameModes.title')">
+            <GameModesField v-model="config.soundFx.disabledGameModes" :intro="t('soundFx.gameModes.intro')" feature="soundFx" />
           </OptionRow>
         </section>
 
         <LibrarySection
           @reorder="moveSound"
+          :empty-text="t('soundFx.list.emptyText')"
+          :empty-title="t('library.sounds.emptyTitle')"
           :entries="entries"
+          :search-placeholder="t('library.sounds.searchPlaceholder')"
+          :title="t('library.sounds.title')"
           empty-icon="icon-[material-symbols--graphic-eq-rounded]"
-          empty-text="Upload sounds of your own, add one from a link, or generate one from text."
-          empty-title="No sounds yet"
-          search-placeholder="Search sounds by name or trigger"
-          title="Sounds"
         >
           <template #actions>
             <AppMenu :items="moreActions">
               <template #trigger="{ open, toggle }">
-                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                <button @click="toggle" :aria-expanded="open" :aria-label="t('library.moreActions')" class="adt-icon-btn" :title="t('library.more')" type="button">
                   <span class="icon-[material-symbols--more-horiz]" />
                 </button>
               </template>
@@ -40,7 +39,7 @@
                 <AppButton @click="toggle" :aria-expanded="open" auto size="sm" type="primary">
                   <span class="flex items-center gap-1">
                     <span class="icon-[material-symbols--add-rounded] text-lg" />
-                    Add
+                    {{ t("common.add") }}
                     <span class="icon-[material-symbols--expand-more-rounded] -mr-1 text-lg" />
                   </span>
                 </AppButton>
@@ -74,13 +73,13 @@
 
           <template #empty>
             <AppButton @click="openUploadModal" auto type="primary">
-              Upload files
+              {{ t("library.sounds.add.upload.label") }}
             </AppButton>
             <AppButton @click="openTTSModal()" :disabled="!isTTSAvailable" auto>
-              Generate a sound
+              {{ t("library.sounds.add.generate.label") }}
             </AppButton>
             <AppButton @click="openAddSoundModal" auto>
-              Add from a link
+              {{ t("library.sounds.add.link.label") }}
             </AppButton>
           </template>
         </LibrarySection>
@@ -100,7 +99,7 @@
       :louder-blocked="louderBlocked"
       :playing="playingKey === DRAFT_KEY"
       :show="showSoundModal"
-      :url-error="urlError"
+      :url-error="urlErrorText"
       feature="soundFx"
     />
 
@@ -108,15 +107,15 @@
       @close="closeUploadModal"
       @save="processFiles"
       :formats="t('library.upload.formatsAudio')"
+      :names-hint="t('library.sounds.upload.namesHint')"
       :processing="isProcessing"
       :show="showUploadModal"
+      :title="t('library.sounds.upload.title')"
       :triggers-from-name="file => extractTriggerFromFilename(file.name)"
       accept="audio/*"
       add-key="library.upload.addSounds"
       feature="soundFx"
       file-icon="icon-[material-symbols--audio-file-outline-rounded]"
-      names-hint="A file named 180.mp3 plays on 180. Anything after a + is left out, so 180+crowd.mp3 does too."
-      title="Upload sounds"
     />
 
     <TtsDialog
@@ -136,16 +135,16 @@
       feature="soundFx"
     />
 
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="`Delete all ${config?.soundFx.sounds.length ?? 0} sounds?`" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('library.sounds.deleteAll.title', { count: config?.soundFx.sounds.length ?? 0 })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
-        They're removed for good, stored files included. This can't be undone.
+        {{ t("library.sounds.deleteAll.body") }}
       </p>
       <template #footer>
         <AppButton @click="closeDeleteAllModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="deleteAllSounds" auto type="danger">
-          Delete all
+          {{ t("library.deleteAll") }}
         </AppButton>
       </template>
     </AppModal>
@@ -167,11 +166,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
-            Sound FX
+            {{ t("features.soundFx") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play sound effects for special events like 180s, checkouts, and match wins.
+            {{ t("soundFx.card") }}
           </p>
         </div>
         <div class="flex">
@@ -183,7 +182,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Sound FX" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.soundFx')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -197,6 +196,7 @@ import AppMenu from "../AppMenu.vue";
 import AppModal from "../AppModal.vue";
 import AppNotification from "../AppNotification.vue";
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 import GameModesField from "./Library/GameModesField.vue";
 import LibraryItem from "./Library/LibraryItem.vue";
@@ -210,6 +210,7 @@ import UploadDialog from "./Library/UploadDialog.vue";
 import VolumeBadge from "./Library/VolumeBadge.vue";
 import { stableKey } from "./Library/stable-key";
 
+import type { MessageKey } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
 
 import { useLouderCheck } from "@/composables/useLouderCheck";
@@ -240,7 +241,8 @@ const showSoundModal = ref(false);
 const isEditMode = ref(false);
 const newSound = ref({ url: "", name: "", base64: "", triggers: [] as string[], volume: DEFAULT_VOLUME });
 const editingIndex = ref<number | null>(null);
-const urlError = ref("");
+/** Why the link in the dialog open is refused, as the key of the line said under it: it follows a language picked meanwhile. */
+const urlError = ref<MessageKey | "">("");
 
 // File upload
 const showUploadModal = ref(false);
@@ -281,12 +283,15 @@ const entries = computed<LibraryEntry[]>(() => (config.value?.soundFx.sounds ?? 
   const triggers = Array.isArray(sound.triggers) ? sound.triggers : [];
   return {
     index,
-    name: sound.name || sound.tts?.text || triggers[0] || "Untitled sound",
+    name: sound.name || sound.tts?.text || triggers[0] || t("library.sounds.untitled"),
     triggers,
     source: sound.tts ? `tts ${sound.tts.text}` : sound.url || "uploaded",
     enabled: sound.enabled,
   };
 }));
+
+/** The line under the link in the add dialog: the key in urlError, said in the current language. */
+const urlErrorText = computed(() => (urlError.value ? t(urlError.value) : ""));
 
 /** An uploaded sound being edited: its file loads a moment after the dialog opens. */
 const draftHasFile = computed(() => {
@@ -304,27 +309,27 @@ const louderBlocked = useLouderCheck(copies, () => ({
 }));
 
 const addActions = computed(() => [
-  { label: "Upload files", hint: "MP3, WAV or OGG, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openUploadModal },
+  { label: t("library.sounds.add.upload.label"), hint: t("library.sounds.add.upload.hint"), icon: "icon-[material-symbols--upload-rounded]", action: openUploadModal },
   {
-    label: "Generate a sound",
-    hint: isTTSAvailable.value ? "Text to speech, in a voice on this device" : "This device has no text-to-speech voices",
+    label: t("library.sounds.add.generate.label"),
+    hint: t(isTTSAvailable.value ? "library.sounds.add.generate.hint" : "library.sounds.add.generate.hintUnavailable"),
     icon: "icon-[material-symbols--record-voice-over-outline-rounded]",
     disabled: !isTTSAvailable.value,
     action: () => openTTSModal(),
   },
-  { label: "Add from a link", hint: "A sound file on the web", icon: "icon-[material-symbols--link-rounded]", action: openAddSoundModal },
+  { label: t("library.sounds.add.link.label"), hint: t("library.sounds.add.link.hint"), icon: "icon-[material-symbols--link-rounded]", action: openAddSoundModal },
 ]);
 
 const moreActions = computed(() => [
   {
-    label: "Sort by trigger",
-    hint: "Puts the list in trigger order",
+    label: t("library.sounds.menu.sort.label"),
+    hint: t("library.sounds.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
     disabled: (config.value?.soundFx.sounds.length ?? 0) < 2,
     action: sortSoundsByTriggers,
   },
   {
-    label: "Delete all…",
+    label: t("library.deleteAllMenu"),
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
@@ -449,25 +454,25 @@ function editSound(index: number) {
 
 async function saveSound() {
   if (!config.value) {
-    showNotification("Configuration not loaded", "error");
+    showNotification(t("soundFx.notifications.configNotLoaded"), "error");
     return;
   }
 
   // Check if we have either a URL or base64 data
   if (!newSound.value.url && !newSound.value.base64) {
-    showNotification("Please provide either a sound URL or upload a file", "error");
+    showNotification(t("library.sounds.notifications.needsSource"), "error");
     return;
   }
 
   // Check if we have triggers
   if (!newSound.value.triggers.length) {
-    showNotification("Please provide at least one trigger", "error");
+    showNotification(t("library.sounds.notifications.needsTrigger"), "error");
     return;
   }
 
   // Check if URL starts with https://
   if (newSound.value.url && !newSound.value.url.startsWith("https://")) {
-    urlError.value = "The link has to start with https://, for security.";
+    urlError.value = "library.sounds.linkNotHttps";
     return;
   }
 
@@ -480,7 +485,7 @@ async function saveSound() {
   let soundId: string | null = null;
   if (newSound.value.base64 && isIndexedDBAvailable()) {
     soundId = await saveSoundFxToIndexedDB(
-      newSound.value.name.trim() || "Unnamed sound",
+      newSound.value.name.trim() || t("library.sounds.unnamed"),
       newSound.value.base64,
     );
 
@@ -576,7 +581,7 @@ async function playSound(sound: ISound, key: number) {
   if (!source) source = sound.base64 || sound.url;
   if (!source) {
     // No audio source available
-    showNotification("No audio source available for this sound", "error");
+    showNotification(t("library.sounds.notifications.noSource"), "error");
     finish();
     return;
   }
@@ -617,7 +622,7 @@ async function playSound(sound: ISound, key: number) {
     if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
       console.error("Error playing audio");
-      showNotification("Failed to play sound", "error");
+      showNotification(t("library.sounds.notifications.playFailed"), "error");
 
       // Fallback: try direct source if blob approach failed
       if (sound.base64 && source !== sound.base64) {
@@ -635,7 +640,7 @@ async function playSound(sound: ISound, key: number) {
   // Play the audio
   audio.play().catch((error) => {
     console.error("Error playing sound:", error);
-    showNotification("Failed to play sound", "error");
+    showNotification(t("library.sounds.notifications.playFailed"), "error");
 
     // Revoke blob URL if there was an error
     if (blobUrl) {
@@ -725,10 +730,10 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
       }
     }
 
-    showNotification(`Added ${added} ${added === 1 ? "sound" : "sounds"}`);
+    showNotification(t("library.sounds.notifications.added", { count: added }));
   } catch (error) {
     console.error("Error processing files:", error);
-    showNotification("Error processing files", "error");
+    showNotification(t("library.sounds.notifications.processingError"), "error");
   } finally {
     isProcessing.value = false;
     closeUploadModal();
@@ -756,7 +761,7 @@ function sortSoundsByTriggers() {
   });
 
   // Show notification
-  showNotification("Sound FX sounds have been sorted by their triggers");
+  showNotification(t("soundFx.notifications.sorted"));
 }
 
 function openDeleteAllModal() {
@@ -786,7 +791,7 @@ async function deleteAllSounds() {
 
   // Close modal and show notification
   closeDeleteAllModal();
-  showNotification("All sound effects have been deleted", "error");
+  showNotification(t("soundFx.notifications.allDeleted"), "error");
 }
 
 // TTS functions
@@ -873,6 +878,18 @@ function saveTTSSound() {
   }
 
   closeTTSModal();
-  showNotification(editing !== null ? "TTS sound updated" : "TTS sound added");
+  showNotification(t(editing !== null ? "library.sounds.notifications.ttsUpdated" : "library.sounds.notifications.ttsAdded"));
 }
 </script>
+
+<style scoped>
+/* The token in the intro is a plain <code> in the message; it is set as .adt-code is (assets/tailwind.css). */
+.adt-sound-fx-code :deep(code) {
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  color: var(--ad-text-secondary);
+  background: rgb(255 255 255 / 8%);
+  border-radius: var(--ad-radius-xs);
+}
+</style>
