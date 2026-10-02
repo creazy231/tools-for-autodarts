@@ -70,6 +70,14 @@ let reapplyObserver: MutationObserver | null = null;
 let resizeHandler: (() => void) | undefined;
 let stopLanguageListener: (() => void) | undefined;
 
+/**
+ * Moves on whenever the feature starts and whenever it is switched off. A run
+ * that waits on storage across either one compares it with the value it began
+ * under, and ends instead of drawing a ring and registering an observer, a
+ * resize handler and a language listener that no teardown is left to release.
+ */
+let generation = 0;
+
 const STYLES = `
   [${WINNER_FLAG}] {
     position: relative;
@@ -150,16 +158,22 @@ const STYLES = `
 export async function winnerAnimation() {
   console.log("Autodarts Tools: Winner Animation");
 
+  const life = ++generation;
   addStyles(STYLES, STYLE_ID);
 
+  // Both reads below take a moment, and the match can end meanwhile: the
+  // teardown has run by then, so what is left to do must not be done.
   const gameData = await AutodartsToolsGameData.getValue();
+  if (life !== generation) return;
   await apply(gameData);
+  if (life !== generation) return;
 
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = AutodartsToolsGameData.watch(apply);
 }
 
 export async function winnerAnimationOnRemove() {
+  generation++;
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = undefined;
   clear();
@@ -176,7 +190,13 @@ async function apply(gameData: IGameData): Promise<void> {
   const winner = match.gameWinner ?? -1;
   if (editing || winner < 0) return clear();
 
+  // The config comes from storage, which takes a moment. If the feature was
+  // switched off, or started over, in that time, this run belongs to a life that
+  // is over: the teardown has already cleared everything, and what follows would
+  // draw a ring and register an observer nothing releases.
+  const life = generation;
   const config: IConfig = await AutodartsToolsConfig.getValue();
+  if (life !== generation) return;
   if (!config.winnerAnimation.enabled) return clear();
 
   // The dart count, not the caption: the words are made each time they are put
