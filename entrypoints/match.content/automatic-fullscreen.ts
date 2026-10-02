@@ -1,5 +1,6 @@
 import { SELECTORS, qs } from "@/utils/selectors";
 import { waitForElement } from "@/utils";
+import { onLanguageChange, t } from "@/utils/i18n";
 
 /**
  * Automatic Fullscreen — a fullscreen toggle in the match header.
@@ -20,6 +21,7 @@ const ENTER_PATH = "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM
 const EXIT_PATH = "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z";
 
 let onFullscreenChange: (() => void) | null = null;
+let stopLanguageListener: (() => void) | null = null;
 
 export async function automaticFullscreen() {
   if (document.getElementById(BUTTON_ID)) return;
@@ -36,9 +38,23 @@ export async function automaticFullscreen() {
   const button = document.createElement("button");
   button.id = BUTTON_ID;
   button.type = "button";
-  button.title = "Toggle fullscreen";
-  button.setAttribute("aria-label", "Toggle fullscreen");
   button.className = sibling?.className ?? "";
+
+  // The icon has no text, so the tooltip and the spoken name are all the
+  // button says: one text for both.
+  const paintLabel = () => {
+    const label = t("automaticFullscreen.toggle");
+    button.title = label;
+    button.setAttribute("aria-label", label);
+  };
+  paintLabel();
+
+  // Written once, and the button then stays in the header for the whole match:
+  // a language picked meanwhile has to reach it. A run after the match screen
+  // re-rendered the old button away replaces a listener that holds a node
+  // nobody can see.
+  stopLanguageListener?.();
+  stopLanguageListener = onLanguageChange(paintLabel);
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 24 24");
@@ -101,6 +117,8 @@ export async function automaticFullscreenOnRemove() {
   console.log("Autodarts Tools: Cleaning up automatic fullscreen");
 
   document.getElementById(BUTTON_ID)?.remove();
+  stopLanguageListener?.();
+  stopLanguageListener = null;
   if (onFullscreenChange) {
     document.removeEventListener("fullscreenchange", onFullscreenChange);
     onFullscreenChange = null;

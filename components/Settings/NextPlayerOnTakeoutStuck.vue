@@ -4,19 +4,19 @@
     <div v-if="config" class="adt-container">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Presses Next for you when a takeout never finishes. A countdown starts on the site's own Next button as soon as the takeout does, and a click anywhere calls it off.
+          {{ t("nextPlayerOnTakeoutStuck.intro") }}
         </p>
 
         <section>
           <h3 class="adt-section-title">
-            Options
+            {{ t("nextPlayerOnTakeoutStuck.sections.options") }}
           </h3>
-          <OptionRow description="From the start of the takeout to the press, unless the board comes back first." title="Countdown">
+          <OptionRow :description="t('nextPlayerOnTakeoutStuck.countdown.description')" :title="t('nextPlayerOnTakeoutStuck.countdown.title')">
             <AppNumberInput
               v-model="config.nextPlayerOnTakeOutStuck.sec"
               :max="120"
               :min="1"
-              label="Countdown"
+              :label="t('nextPlayerOnTakeoutStuck.countdown.title')"
               unit="s"
             />
           </OptionRow>
@@ -34,12 +34,12 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Auto Next Player on Takeout
+            {{ t("features.nextPlayerOnTakeoutStuck") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
 
           <p class="w-2/3 text-white/70">
-            Automatically reset board and switch to next player if takeout stucks for {{ config?.nextPlayerOnTakeOutStuck?.sec || '5' }} seconds.
+            {{ t("nextPlayerOnTakeoutStuck.card", { count: config?.nextPlayerOnTakeOutStuck?.sec || 5 }) }}
           </p>
         </div>
         <div class="flex">
@@ -51,7 +51,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Auto Next Player on Takeout" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.nextPlayerOnTakeoutStuck')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -64,6 +64,7 @@ import AppToggle from "../AppToggle.vue";
 import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/next-player-on-takeout-stuck.png");
 

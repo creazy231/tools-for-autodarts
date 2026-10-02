@@ -8,12 +8,12 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div class="space-y-3 text-white/70">
-            <p>Configure the winner animation settings.</p>
+            <p>{{ t("winnerAnimation.intro") }}</p>
 
             <div class="mt-4 space-y-4">
               <!-- No additional settings needed for this feature -->
-              <p>This feature shows an animation around the player card when a player wins a leg.</p>
-              <p>You can customize the animations in the Animations section of the settings page.</p>
+              <p>{{ t("winnerAnimation.effect") }}</p>
+              <p>{{ t("winnerAnimation.customise", { animations: t("features.animations") }) }}</p>
             </div>
           </div>
         </div>
@@ -30,10 +30,10 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 adt-card-title">
-            Winner Animation
+            {{ t("features.winnerAnimation") }}
           </h3>
           <p class="w-2/3 text-white/70">
-            Shows an animation around the player card when a player wins a leg, adding visual excitement to the game.
+            {{ t("winnerAnimation.card") }}
           </p>
         </div>
         <div class="flex">
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Winner Animation" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.winnerAnimation')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -56,6 +56,7 @@ import { useStorage } from "@vueuse/core";
 import AppToggle from "../AppToggle.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 useStorage("adt:active-settings", "winner-animation");
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/winner-animation.png");

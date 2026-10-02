@@ -4,20 +4,20 @@
     <div v-if="config" class="adt-container">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Starts the next leg once the darts are out of the board, after a countdown on the site's own Next Leg button.
+          {{ t("automaticNextLeg.intro") }}
         </p>
 
         <section>
           <h3 class="adt-section-title">
-            Options
+            {{ t("automaticNextLeg.sections.options") }}
           </h3>
           <!-- At least a second: a countdown of 0 is never started (button-countdown.ts), which would switch this off. -->
-          <OptionRow description="From the end of the takeout to the next leg." title="Countdown">
+          <OptionRow :description="t('automaticNextLeg.countdown.description')" :title="t('automaticNextLeg.countdown.title')">
             <AppNumberInput
               v-model="config.automaticNextLeg.sec"
               :max="120"
               :min="1"
-              label="Countdown"
+              :label="t('automaticNextLeg.countdown.title')"
               unit="s"
             />
           </OptionRow>
@@ -35,12 +35,12 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Automatic Next Leg
+            {{ t("features.automaticNextLeg") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
 
           <p class="w-2/3 text-white/70">
-            Automatically starts the next leg {{ config?.automaticNextLeg?.sec || '5' }} seconds after takeout.
+            {{ t("automaticNextLeg.card", { count: config?.automaticNextLeg?.sec || 5 }) }}
           </p>
         </div>
         <div class="flex">
@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Automatic Next Leg" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.automaticNextLeg')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -65,6 +65,7 @@ import AppToggle from "../AppToggle.vue";
 import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/automatic-next-leg.png");
 

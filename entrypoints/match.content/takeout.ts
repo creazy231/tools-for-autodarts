@@ -2,6 +2,7 @@ import type { IBoard } from "@/utils/board-data-storage";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
+import { onLanguageChange, t } from "@/utils/i18n";
 import { SELECTORS, qsText } from "@/utils/selectors";
 import { LAYERS } from "@/utils/layers";
 
@@ -87,6 +88,7 @@ const STYLES = `
 `;
 
 let boardDataWatcherUnwatch: (() => void) | undefined;
+let stopLanguageListener: (() => void) | undefined;
 let host: HTMLElement | null = null;
 
 /**
@@ -121,6 +123,8 @@ export function takeoutOnRemove() {
 
   boardDataWatcherUnwatch?.();
   boardDataWatcherUnwatch = undefined;
+  stopLanguageListener?.();
+  stopLanguageListener = undefined;
   host?.remove();
   host = null;
   dismissed = false;
@@ -129,14 +133,25 @@ export function takeoutOnRemove() {
 
 function mount(): void {
   document.getElementById(HOST_ID)?.remove();
+  // A run without a teardown in between replaces a panel that is still
+  // listening, and its listener would hold a node nobody can see.
+  stopLanguageListener?.();
 
   host = document.createElement("div");
   host.id = HOST_ID;
 
   const panel = document.createElement("div");
   panel.className = PANEL_CLASS;
-  panel.textContent = "Removing Darts";
+  panel.textContent = t("takeoutNotification.panel");
   host.appendChild(panel);
+
+  // The words are written once, here, and the panel then waits out of sight
+  // for a takeout, which can be minutes away: a language picked meanwhile has
+  // to reach it, or the next takeout would still say it in the old one. The
+  // dots after it are CSS, so only the text is rewritten.
+  stopLanguageListener = onLanguageChange(() => {
+    panel.textContent = t("takeoutNotification.panel");
+  });
 
   host.addEventListener("click", dismiss);
   document.body.appendChild(host);

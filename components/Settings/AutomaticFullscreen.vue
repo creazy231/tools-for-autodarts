@@ -8,11 +8,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div class="space-y-3 text-white/70">
-            <p>Configure how fullscreen mode is activated during matches.</p>
+            <p>{{ t("automaticFullscreen.intro") }}</p>
 
             <div class="mt-4 space-y-4">
               <!-- No additional settings needed for this feature -->
-              <p>This feature automatically enables fullscreen mode during matches for a more immersive experience.</p>
+              <p>{{ t("automaticFullscreen.effect") }}</p>
             </div>
           </div>
         </div>
@@ -29,11 +29,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 adt-card-title">
-            Automatic Fullscreen
+            {{ t("features.automaticFullscreen") }}
           </h3>
 
           <p class="w-2/3 text-white/70">
-            Automatically enables fullscreen mode during matches for an immersive playing experience.
+            {{ t("automaticFullscreen.card") }}
           </p>
         </div>
         <div class="flex">
@@ -52,6 +52,7 @@
 import AppToggle from "../AppToggle.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 
 async function toggleFeature() {

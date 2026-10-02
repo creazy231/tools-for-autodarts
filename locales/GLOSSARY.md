@@ -242,6 +242,24 @@ Settled in Teams (`locales/*/teams.ts`), for whatever else names its parts:
 | X wins the leg, X wins the match | the pill; the German was the extension's before the catalogs | X gewinnt das Leg, X gewinnt das Match | X wint de leg, X wint de wedstrijd |
 | Bot Level N | the seat name Teams gives its bots (`botName()`), never translated. The site's own Add Bot labels a level "Bot-Level N" in German and "Botniveau N" in Dutch (`lobby.addBot.botLevel`), and the drawer's picker says "Level N" and "Niveau N", as `botCard.level` does. Teams matches its bots by level (`cpuPPR`), not by name, so a bot the site named "Bot-Level 3" beside one Teams named "Bot Level 3" splits nothing, and the seat name stays as saved teams have it | Bot Level N (stays) | Bot Level N (stays) |
 
+Settled in the small match features (`locales/*/{takeoutNotification,nextPlayerOnTakeoutStuck,automaticNextLeg,smallerScores,largerLegsSets,largerPlayerNames,largerPlayerMatchData,winnerAnimation,automaticFullscreen,enhancedScoringDisplay,gotcha}.ts`), for whatever else speaks of the match screen:
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| the match screen, the match page | the site's *Match* and *Wedstrijd* (`pages.match`); What's New already says *Match-Bildschirm* and *wedstrijdscherm* for the screen | Match-Bildschirm, Match-Seite | wedstrijdscherm, wedstrijdpagina |
+| the oche | the darts word for the throwing line; the site has no text for it. German players say *Oche* too; Dutch has the plain *werplijn*, which needs no explaining (a Dutch reader may prefer *oche*: § 9) | Oche | werplijn |
+| layout | not the site's | Layout | lay-out (the Woordenlijst's spelling) |
+| sidebar | the site's own (`a11y.toggleSidebar`) | Seitenleiste | zijbalk |
+| font size | not the site's | Schriftgröße | lettergrootte |
+| a player's card | not the site's; the box that holds a player's name and score | Spielerkarte | spelerskaart |
+| fullscreen | not the site's. The feature's name says *Vollbildmodus* and *volledig scherm*, and a sentence does too | Vollbildmodus | volledig scherm |
+| leg average, match average | the site's own (`inGameSettings.matchSettings.showLegAverage`, `.showMatchAverage`) | Leg-Durchschnitt, Match-Durchschnitt | leggemiddelde, wedstrijdgemiddelde |
+| a nine-darter, Perfect Leg | darts jargon, not the site's. The number takes a hyphen in front of *Darter* / *darter*; the caption over the winning card is set in capitals by CSS | 9-Darter, Perfektes Leg | 9-darter, Perfecte leg |
+| Countdown | one word in both: the Discord Webhooks panel and the two Next features write it the same | Countdown | Countdown (*countdown* in a sentence) |
+| to press Next | the site's Next as a label of one word, unquoted: "Drückt für dich Weiter", "Drukt voor je op Volgende" | Weiter drücken | op Volgende drukken |
+
+A card's description sits in a column two thirds of the card's width, in a card of fixed height, so on a phone a long German or Dutch sentence cuts off the toggle under it. Aim for about the English length: the Auto Next Player card's "if takeout stucks" sentence was written as "wenn das Abziehen … hängt" and "als de darts … niet zijn verwijderd", and its "automatically" left out, since the card's name says it.
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".

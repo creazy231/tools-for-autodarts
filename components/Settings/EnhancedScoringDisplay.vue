@@ -8,11 +8,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div class="space-y-3 text-white/70">
-            <p>Configure how the scoring is displayed during matches.</p>
+            <p>{{ t("enhancedScoringDisplay.intro") }}</p>
 
             <div class="mt-4 space-y-4">
               <!-- No additional settings needed for this feature -->
-              <p>This feature enhances the scoring display by showing larger point values, dart notation (S/D/T, BULL), and adding smooth animations when scores update during matches.</p>
+              <p>{{ t("enhancedScoringDisplay.effect") }}</p>
             </div>
           </div>
         </div>
@@ -29,11 +29,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 adt-card-title">
-            Enhanced Scoring Display
+            {{ t("features.enhancedScoringDisplay") }}
           </h3>
 
           <p class="w-2/3 text-white/70">
-            Enhances dart throw displays with larger numbers and scoring notation during matches.
+            {{ t("enhancedScoringDisplay.card") }}
           </p>
         </div>
         <div class="flex items-center justify-between">
@@ -45,12 +45,12 @@
             />
           </div>
           <div class="self-end text-xs text-white/50">
-            <i>Originally by @LeSiiN</i>
+            <AppTrans path="enhancedScoringDisplay.credit" />
           </div>
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="External Boards" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.externalBoards')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -58,8 +58,10 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/enhanced-scoring-display.png");
 

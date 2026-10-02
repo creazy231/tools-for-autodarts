@@ -4,20 +4,20 @@
     <div v-if="config" class="adt-container">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Draws the legs and sets on the match screen larger, so they read from the oche. The box round each number grows with it.
+          {{ t("largerLegsSets.intro") }}
         </p>
 
         <section>
           <h3 class="adt-section-title">
-            Options
+            {{ t("largerLegsSets.sections.options") }}
           </h3>
-          <OptionRow description="In rem: 1 is the browser's base size, 16 pixels by default. autodarts draws them at 1.5." title="Size">
+          <OptionRow :description="t('largerLegsSets.size.description')" :title="t('largerLegsSets.size.title')">
             <AppNumberInput
               v-model="config.largerLegsSets.value"
               :max="10"
               :min="0.5"
               :step="0.1"
-              label="Size"
+              :label="t('largerLegsSets.size.title')"
               unit="rem"
             />
           </OptionRow>
@@ -35,11 +35,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Larger Legs/Sets
+            {{ t("features.largerLegsSets") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Increases the font-size of the legs and sets on the match page for better visibility.
+            {{ t("largerLegsSets.card") }}
           </p>
         </div>
         <div class="flex">
@@ -51,7 +51,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Larger Legs & Sets" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('largerLegsSets.imageAlt')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -64,6 +64,7 @@ import AppToggle from "../AppToggle.vue";
 import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/larger-legs-sets.png");
 

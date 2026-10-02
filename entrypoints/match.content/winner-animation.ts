@@ -3,6 +3,7 @@ import type { IGameData } from "@/utils/game-data-storage";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { onLanguageChange, t } from "@/utils/i18n";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { SELECTORS, qs, qsaCount } from "@/utils/selectors";
 
@@ -67,6 +68,7 @@ const SITE_PANEL_LAYER = 10;
 let gameDataWatcherUnwatch: (() => void) | undefined;
 let reapplyObserver: MutationObserver | null = null;
 let resizeHandler: (() => void) | undefined;
+let stopLanguageListener: (() => void) | undefined;
 
 const STYLES = `
   [${WINNER_FLAG}] {
@@ -177,11 +179,13 @@ async function apply(gameData: IGameData): Promise<void> {
   const config: IConfig = await AutodartsToolsConfig.getValue();
   if (!config.winnerAnimation.enabled) return clear();
 
-  const text = message(gameData);
+  // The dart count, not the caption: the words are made each time they are put
+  // on a card, so they follow a language picked while the ring is up.
+  const worth = legWorth(gameData);
   const who = identify(match, winner);
   clear();
 
-  const refresh = () => put(who, text);
+  const refresh = () => put(who, worth);
   refresh();
 
   /*
@@ -200,6 +204,11 @@ async function apply(gameData: IGameData): Promise<void> {
 
   resizeHandler = refresh;
   window.addEventListener("resize", resizeHandler);
+
+  // A language picked while the ring is up: putting the caption again writes
+  // it in the new one, since `put` compares what is on the card with what it
+  // would write now. Released with the observer in {@link clear}.
+  stopLanguageListener = onLanguageChange(refresh);
 }
 
 /**
@@ -244,11 +253,11 @@ interface WinnerId { name?: string; seat: number; score?: string; players: numbe
  * two attributes when nothing has moved, and only measures the card on the wide
  * layout — the compact one draws no caption and so needs no measurement.
  */
-function put(who: WinnerId, text: string): void {
+function put(who: WinnerId, worth: LegWorth | null): void {
   const target = winnerTarget(who);
   if (!target) return;
 
-  const caption = target.mode === "wide" && hasHeadroom(target.el, target.cards) ? text : "";
+  const caption = target.mode === "wide" && hasHeadroom(target.el, target.cards) ? captionFor(worth) : "";
   if (target.el.getAttribute(WINNER_FLAG) === target.mode
     && (target.el.getAttribute(MESSAGE_ATTR) ?? "") === caption) return;
 
@@ -394,8 +403,15 @@ function mark(target: WinnerTarget, text: string): void {
   else target.el.removeAttribute(MESSAGE_ATTR);
 }
 
+/**
+ * What a leg was worth, as numbers. The words are made from it by {@link captionFor}
+ * each time they are put on a card, so one game-data event can be shown in
+ * whichever language is picked later.
+ */
+interface LegWorth { darts: number; perfect: boolean }
+
 /** What the leg was worth, or nothing when there is nothing to add. */
-function message(gameData: IGameData): string {
+function legWorth(gameData: IGameData): LegWorth | null {
   const match = gameData.match!;
   const darts = match.stats?.[match.gameWinner]?.matchStats?.dartsThrown;
 
@@ -404,15 +420,22 @@ function message(gameData: IGameData): string {
   // does not say is how many darts it took.
   //
   // `match.variant` is the site's own name for the game, from the match data.
-  if (match.variant !== "X01" || !darts) return "";
+  if (match.variant !== "X01" || !darts) return null;
 
   const settings = match.settings as { baseScore?: number };
   const base = settings?.baseScore;
   // A 501 leg in nine darts is the perfect leg; 301 in six is its equivalent.
   const perfect = (base === 501 && darts === 9) || (base === 301 && darts === 6);
 
-  if (perfect) return `${darts} Darter — Perfect Leg!`;
-  return `${darts} Darts`;
+  return { darts, perfect };
+}
+
+/** The caption for a leg's worth, in the language on screen now. Empty when there is nothing to say. */
+function captionFor(worth: LegWorth | null): string {
+  if (!worth) return "";
+  return worth.perfect
+    ? t("winnerAnimation.perfectLeg", { count: worth.darts })
+    : t("winnerAnimation.darts", { count: worth.darts });
 }
 
 /**
@@ -434,5 +457,7 @@ function clear() {
   reapplyObserver = null;
   if (resizeHandler) window.removeEventListener("resize", resizeHandler);
   resizeHandler = undefined;
+  stopLanguageListener?.();
+  stopLanguageListener = undefined;
   clearMarks();
 }

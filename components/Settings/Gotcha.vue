@@ -5,7 +5,7 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div class="space-y-3 text-white/70">
-            <p>Shows how many points the other players are ahead.</p>
+            <p>{{ t("gotcha.intro") }}</p>
           </div>
         </div>
       </div>
@@ -17,9 +17,9 @@
     <div v-if="config" class="adt-container adt-interactive h-56">
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
-          <h3 class="mb-1 adt-card-title">Gotcha Helper</h3>
+          <h3 class="mb-1 adt-card-title">{{ t("features.gotcha") }}</h3>
           <p class="w-2/3 text-white/70">
-            Shows how many points the other players are ahead.
+            {{ t("gotcha.card") }}
           </p>
         </div>
         <div class="flex items-center justify-between">
@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Gotcha Helper feature preview" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('gotcha.imageAlt')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -41,6 +41,7 @@
 import AppToggle from "../AppToggle.vue";
 
 const emit = defineEmits(["toggle"]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/gotcha.png");
 
