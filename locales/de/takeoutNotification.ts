@@ -5,5 +5,5 @@ export default {
   card: "Zeigt einen Hinweis an, solange die Darts abgezogen werden.",
   noSettings: "Diese Funktion hat keine zusätzlichen Einstellungen.",
   intro: "Wenn aktiviert, wird ein Hinweis angezeigt, solange die Darts abgezogen werden.",
-  panel: "Darts werden abgezogen",
+  panel: "Darts abziehen",
 } satisfies Translation<typeof en>;
