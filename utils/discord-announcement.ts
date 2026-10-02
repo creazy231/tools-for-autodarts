@@ -70,9 +70,18 @@ export function humanise(key: string): string {
   return key.replace(/([A-Z])/g, " $1").replace(/^./, c => c.toUpperCase());
 }
 
+/**
+ * The message a table has for a key of its own. autodarts sends the keys and
+ * values, so "constructor" or "toString" can come in as either: they are no
+ * entry, and the table's prototype would hand back a function for t() to throw on.
+ */
+function entry(table: Record<string, MessageKey> | undefined, key: string): MessageKey | undefined {
+  return table && Object.prototype.hasOwnProperty.call(table, key) ? table[key] : undefined;
+}
+
 /** The name of a lobby setting: the site's word for it, or the humanised key when the site has none. */
 export function settingName(key: string, translate: Translate): string {
-  const known = SETTING_KEYS[key];
+  const known = entry(SETTING_KEYS, key);
   return known ? translate(known) : humanise(key);
 }
 
@@ -86,6 +95,6 @@ export function settingValue(key: string, value: unknown, translate: Translate):
       : key === "variant"
         ? VARIANT_VALUES
         : undefined;
-  const known = table?.[text];
+  const known = entry(table, text);
   return known ? translate(known) : text;
 }
