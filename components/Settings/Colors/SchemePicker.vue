@@ -19,7 +19,7 @@
       :aria-disabled="isDisabled(option)"
       :aria-pressed="modelValue.preset === option.id"
       :disabled="isDisabled(option)"
-      :title="option.label"
+      :title="t(option.labelKey)"
       class="flex w-16 flex-col items-center gap-1.5 rounded-[var(--ad-radius-sm)] py-1 text-[length:var(--ad-text-xs)] transition-colors focus-visible:shadow-[var(--ad-focus-ring)] focus-visible:outline-none"
       :class="[modelValue.preset === option.id ? 'font-semibold text-white' : 'text-white/60 hover:text-white', { 'cursor-not-allowed opacity-[.35]': isDisabled(option) }]"
       type="button"
@@ -30,7 +30,7 @@
         class="block h-9 w-14 rounded-[var(--ad-radius-sm)]"
         :class="modelValue.preset === option.id ? 'ring-2 ring-white' : 'ring-1 ring-inset ring-white/15'"
       />
-      <span class="w-full truncate text-center">{{ option.label }}</span>
+      <span class="w-full truncate text-center">{{ t(option.labelKey) }}</span>
     </button>
 
     <div
@@ -44,21 +44,21 @@
         <input
           @input="edit('from', $event)"
           :value="modelValue.from"
-          :aria-label="`${label}: top left colour`"
+          :aria-label="t('colors.scheme.topLeft.ariaLabel', { label })"
+          :title="t('colors.scheme.topLeft.title')"
           class="adt-color-input h-7 w-8"
-          title="Top left"
           type="color"
         >
         <input
           @input="edit('to', $event)"
           :value="modelValue.to"
-          :aria-label="`${label}: bottom right colour`"
+          :aria-label="t('colors.scheme.bottomRight.ariaLabel', { label })"
+          :title="t('colors.scheme.bottomRight.title')"
           class="adt-color-input h-7 w-8"
-          title="Bottom right"
           type="color"
         >
       </span>
-      <span>Custom</span>
+      <span>{{ t("colors.scheme.custom") }}</span>
     </div>
   </div>
 </template>
@@ -88,7 +88,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{ "update:modelValue": [ value: ColorScheme ] }>();
 
-const options = computed<ColorPreset[]>(() => [ { id: "default", label: "Default", ...props.site }, ...props.presets ]);
+const { t } = useI18n();
+
+const options = computed<ColorPreset[]>(() => [ { id: "default", labelKey: "colors.presets.default", ...props.site }, ...props.presets ]);
 const custom = computed(() => props.modelValue.preset === "custom");
 
 function swatch(option: ColorPreset) {

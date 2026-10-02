@@ -101,9 +101,9 @@
         :style="{ color: tint('#ffffff') }"
         class="flex items-center gap-[0.5cqw] font-[family-name:var(--ad-font-body)] text-[length:1.375cqw] font-medium leading-none"
       >
-        <span>Leg <b class="font-bold">{{ player.leg }}</b></span>
+        <span>{{ t("colors.preview.leg") }} <b class="font-bold">{{ player.leg }}</b></span>
         <span class="text-[0.9em]">/</span>
-        <span>Match <b class="font-bold">{{ player.match }}</b></span>
+        <span>{{ t("colors.preview.match") }} <b class="font-bold">{{ player.match }}</b></span>
       </div>
 
       <!-- darts thrown -->
@@ -136,10 +136,11 @@
         :style="{ borderColor: bar.button }"
         class="h-[2.5cqw] w-[3.375cqw] rounded-[0.75cqw] border-[0.125cqw]"
       />
+      <!-- 4cqw wide, and wider for a longer word: the site's Dutch Next, "Volgende", is 4.6em of bold type -->
       <span
         :style="{ backgroundColor: bar.button }"
-        class="flex h-[2.5cqw] w-[4cqw] items-center justify-center rounded-[0.75cqw] font-[family-name:var(--ad-font-body)] text-[length:1cqw] font-bold leading-none text-[#f0f5fd]"
-      >Next</span>
+        class="flex h-[2.5cqw] min-w-[4cqw] items-center justify-center rounded-[0.75cqw] px-[0.5cqw] font-[family-name:var(--ad-font-body)] text-[length:1cqw] font-bold leading-none text-[#f0f5fd]"
+      >{{ t("colors.preview.next") }}</span>
     </div>
   </div>
 </template>
@@ -157,6 +158,8 @@ const props = defineProps<{
   texture?: string;
 }>();
 
+const { t } = useI18n();
+
 /** The site's number face, which it ships and the settings page can use. */
 const NUMBER_FACE = "\"League Spartan Variable\", var(--ad-font-body)";
 /** The dart autodarts draws beside the count of darts thrown. */
@@ -164,10 +167,12 @@ const DART = "M3.59665 0H11.1107L11.1303 0.0173403L18.9427 7.1111L24.8531 7.1000
 /** A visit under way: the player on the left threw these, the one on the right waits. */
 const THROWS = [ "T20", "S20", "T5" ];
 const TOTAL = 95;
-const PLAYERS = [
-  { name: "You", avatar: "icon-[material-symbols--person]", score: 406, legs: 1, leg: "95.0", match: "71.4", darts: 3, active: true },
-  { name: "Bot Level 3", avatar: "icon-[material-symbols--smart-toy-outline]", score: 441, legs: 0, leg: "60.0", match: "64.2", darts: 3, active: false },
-];
+
+/** The two sample players, named in the site's own words, as it names a player and a bot's seat. */
+const PLAYERS = computed(() => [
+  { name: t("colors.preview.you"), avatar: "icon-[material-symbols--person]", score: 406, legs: 1, leg: "95.0", match: "71.4", darts: 3, active: true },
+  { name: t("colors.preview.botName", { level: 3 }), avatar: "icon-[material-symbols--smart-toy-outline]", score: 441, legs: 0, leg: "60.0", match: "64.2", darts: 3, active: false },
+]);
 
 /** The bottom bar and its buttons, as the match screen draws them: autodarts' own until something is picked. */
 const bar = computed(() => barPalette(props.colors) ?? { bar: SITE_ACTION_BAR, button: SITE_BUTTON });

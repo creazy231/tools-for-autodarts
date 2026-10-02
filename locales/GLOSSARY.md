@@ -274,6 +274,21 @@ Settled in Darts Zoom, Board View, Board Skins and Quick Correction (`locales/*/
 | to correct a dart | the site's own verb (`game.clippy.undoHintBody`), and its words for a dart read wrong (`subscriptions.features.items.referee.description`) | korrigieren, falsch erkannt | corrigeren, verkeerd herkend |
 | to stand aside | one feature keeping out of another's way, as Board View does while Board Skins is on; not the site's | sich heraushalten | zich afzijdig houden |
 
+Settled in Colors (`locales/*/colors.ts`), for whatever else names a colour pair or a part of what Colors paints. The words a suggested team name is made of (`teams.colourWords`: ROT, BLAU) are a different list and stay as Teams has them.
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| the card pairs | the names under the player card's colour buttons; not the site's. A button is 64 px wide and cuts a longer name off (the widest, Dutch *Standaard*, is 60 px in bold at 12 px), so the names stay short | Blaubeere, Ozean, Limette, Petrol, Orange, Karmin, Gold, Schiefer, qwellcode | Bosbes, Oceaan, Limoen, Petrol, Oranje, Karmijn, Goud, Leisteen, qwellcode |
+| the page pairs | the names under the background's colour buttons, on the same terms | Royal, Wald, Petrol, Wein, Pflaume, Glut, Graphit, qwellcode | Royaal, Bos, Petrol, Wijn, Pruim, Gloed, Grafiet, qwellcode |
+| Default (a pair) | as Board Skins' Default | Standard | Standaard |
+| Custom (a pair of your own) | not the site's: its *Custom Darts* is *Personalisierte Darts* / *Aangepaste darts*, too long for the label under the two pickers. *Own* is the site's (*Eigene Turniere*, *Eigen toernooien*) | Eigene | Eigen |
+| Top left, Bottom right | the two ends of a pair, as the pickers' tooltips name them; not the site's | Oben links, Unten rechts | Linksboven, Rechtsonder |
+| the throw bar | the site's *score bar* (section 3): the bar that holds the visit's darts | Punkteleiste | scorebalk |
+| the bottom bar | not the site's: the bar along the foot of the match screen with undo and Next. A bar is a *Leiste* and a *balk*, as in Darts Zoom's *Position der Leiste* | untere Leiste | balk onderaan |
+| the home page | the site's *Home* (`pages.home`); its *Zurück zur Startseite* and *Terug naar home* say the page too | Startseite | homepage |
+| autodarts' mark | the faint logo on the page behind the match | Logo | logo |
+| the sample match screen | it imitates the site, so a player and a bot's seat are named as the site names them (*You* is not a site text; `lobby.addBot.botLevel` is *Bot-Level N*, *Botniveau N*), and the averages read *Leg* and *Match* (`matchStats.breakdown.leg`, `pages.match`) | Du, Bot-Level 3, Leg, Match | Jij, Botniveau 3, Leg, Wedstrijd |
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".

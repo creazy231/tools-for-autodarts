@@ -178,9 +178,10 @@ export const TEAMS_PILL_TAG = "autodarts-tools-teams-pill";
 /**
  * The colours a team can take: autodarts' own raspberry, then Colors' pairs
  * for the active card, which keep its white type readable (utils/colors.ts).
+ * Each names itself by a message key, raspberry by Colors' own "Default".
  */
 export const TEAM_COLOURS: readonly ColorPreset[] = [
-  { id: "default", label: "Default", ...SITE_CARD },
+  { id: "default", labelKey: "colors.presets.default", ...SITE_CARD },
   ...CARD_PRESETS,
 ];
 

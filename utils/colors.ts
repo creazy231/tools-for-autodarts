@@ -1,3 +1,4 @@
+import type { MessageKey } from "@/utils/i18n";
 import type { ColorScheme, IConfig } from "@/utils/storage";
 
 import { SELECTORS, anyOf } from "@/utils/selectors";
@@ -9,6 +10,11 @@ import { SELECTORS, anyOf } from "@/utils/selectors";
  * background and storage's migration all build from here, so nothing in it may
  * touch the DOM or the extension APIs. Reading autodarts' own page texture has
  * to, so that part is in utils/page-background.ts.
+ *
+ * No text either: the service worker loads this through utils/storage.ts, and
+ * the catalogs must not come with it. A pair's name is a message key
+ * (`labelKey`), which the settings and Teams' drawer put in words when they draw
+ * it, in the language of the moment. So i18n is imported here for its types only.
  */
 
 export type ColorsConfig = IConfig["colors"];
@@ -16,7 +22,8 @@ export type ColorsConfig = IConfig["colors"];
 /** A colour pair on offer. */
 export interface ColorPreset {
   id: string;
-  label: string;
+  /** Where the pair's name is in the catalog (`colors.presets`): a key, not text, for the components to call `t()` on. */
+  labelKey: MessageKey;
   from: string;
   to: string;
 }
@@ -56,15 +63,15 @@ export const SITE_BUTTON = "#0b55df";
  * a lime that dark would be olive.
  */
 export const CARD_PRESETS: readonly ColorPreset[] = [
-  { id: "blueberry", label: "Blueberry", from: "#002a77", to: "#6d28de" },
-  { id: "ocean", label: "Ocean", from: "#374c98", to: "#0b55df" },
-  { id: "lime", label: "Lime", from: "#00653b", to: "#0a8a78" },
-  { id: "petrol", label: "Petrol", from: "#134c57", to: "#0e7c86" },
-  { id: "orange", label: "Orange", from: "#6f3f20", to: "#c5561c" },
-  { id: "crimson", label: "Crimson", from: "#6a1624", to: "#b8323f" },
-  { id: "gold", label: "Gold", from: "#5c4a12", to: "#8e7328" },
-  { id: "slate", label: "Slate", from: "#253247", to: "#497097" },
-  { id: "qwellcode", label: "qwellcode", from: "#125b2c", to: "#558413" },
+  { id: "blueberry", labelKey: "colors.presets.card.blueberry", from: "#002a77", to: "#6d28de" },
+  { id: "ocean", labelKey: "colors.presets.card.ocean", from: "#374c98", to: "#0b55df" },
+  { id: "lime", labelKey: "colors.presets.card.lime", from: "#00653b", to: "#0a8a78" },
+  { id: "petrol", labelKey: "colors.presets.card.petrol", from: "#134c57", to: "#0e7c86" },
+  { id: "orange", labelKey: "colors.presets.card.orange", from: "#6f3f20", to: "#c5561c" },
+  { id: "crimson", labelKey: "colors.presets.card.crimson", from: "#6a1624", to: "#b8323f" },
+  { id: "gold", labelKey: "colors.presets.card.gold", from: "#5c4a12", to: "#8e7328" },
+  { id: "slate", labelKey: "colors.presets.card.slate", from: "#253247", to: "#497097" },
+  { id: "qwellcode", labelKey: "colors.presets.card.qwellcode", from: "#125b2c", to: "#558413" },
 ];
 
 /**
@@ -74,14 +81,14 @@ export const CARD_PRESETS: readonly ColorPreset[] = [
  * at Forest's depth.
  */
 export const PAGE_PRESETS: readonly ColorPreset[] = [
-  { id: "royal", label: "Royal", from: "#01040b", to: "#002a77" },
-  { id: "forest", label: "Forest", from: "#01040b", to: "#003a22" },
-  { id: "petrol", label: "Petrol", from: "#01040b", to: "#0b3f4a" },
-  { id: "wine", label: "Wine", from: "#01040b", to: "#4a0e1c" },
-  { id: "plum", label: "Plum", from: "#01040b", to: "#3d0c4d" },
-  { id: "ember", label: "Ember", from: "#01040b", to: "#4a1f08" },
-  { id: "graphite", label: "Graphite", from: "#01040b", to: "#262626" },
-  { id: "qwellcode", label: "qwellcode", from: "#01040b", to: "#0b391c" },
+  { id: "royal", labelKey: "colors.presets.page.royal", from: "#01040b", to: "#002a77" },
+  { id: "forest", labelKey: "colors.presets.page.forest", from: "#01040b", to: "#003a22" },
+  { id: "petrol", labelKey: "colors.presets.page.petrol", from: "#01040b", to: "#0b3f4a" },
+  { id: "wine", labelKey: "colors.presets.page.wine", from: "#01040b", to: "#4a0e1c" },
+  { id: "plum", labelKey: "colors.presets.page.plum", from: "#01040b", to: "#3d0c4d" },
+  { id: "ember", labelKey: "colors.presets.page.ember", from: "#01040b", to: "#4a1f08" },
+  { id: "graphite", labelKey: "colors.presets.page.graphite", from: "#01040b", to: "#262626" },
+  { id: "qwellcode", labelKey: "colors.presets.page.qwellcode", from: "#01040b", to: "#0b391c" },
 ];
 
 /** What Colors starts from: autodarts' own, all of it. A fresh object every call. */

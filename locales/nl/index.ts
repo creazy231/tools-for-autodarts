@@ -3,6 +3,7 @@ import automaticFullscreen from "./automaticFullscreen";
 import automaticNextLeg from "./automaticNextLeg";
 import boardSkins from "./boardSkins";
 import boardView from "./boardView";
+import colors from "./colors";
 import common from "./common";
 import discordWebhooks from "./discordWebhooks";
 import enhancedScoringDisplay from "./enhancedScoringDisplay";
@@ -38,6 +39,7 @@ export default {
   automaticNextLeg,
   boardSkins,
   boardView,
+  colors,
   common,
   discordWebhooks,
   enhancedScoringDisplay,

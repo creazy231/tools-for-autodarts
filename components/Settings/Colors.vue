@@ -12,8 +12,7 @@
     >
       <div class="relative z-10 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Recolours the match screen: the card of the player whose turn it is, the page behind it, and the
-          colours around them. Everything starts at autodarts' own, so nothing changes until you pick something.
+          {{ t("colors.intro") }}
         </p>
 
         <!-- Side by side where there is room, the preview above the controls where there is not. -->
@@ -37,48 +36,46 @@
           <div class="space-y-8 pt-2 lg:pt-0">
             <section>
               <h3 class="adt-section-title">
-                Player card
+                {{ t("colors.sections.playerCard.title") }}
               </h3>
               <p class="mb-4 mt-2 text-sm text-[var(--ad-text-muted)]">
-                The card of the player whose turn it is, in every layout. A bust and a won leg keep autodarts' own
-                colours, and so does the winner's pattern.
+                {{ t("colors.sections.playerCard.description") }}
               </p>
               <SchemePicker
                 v-model="config.colors.card"
+                :label="t('colors.sections.playerCard.title')"
                 :presets="CARD_PRESETS"
                 :site="SITE_CARD"
-                label="Player card"
               />
             </section>
 
             <section>
               <h3 class="adt-section-title">
-                Background
+                {{ t("colors.sections.background.title") }}
               </h3>
               <p class="mb-4 mt-2 text-sm text-[var(--ad-text-muted)]">
-                The page behind the match, and the bottom bar and its buttons with it. autodarts' mark stays on the
-                page, tinted to go with the colours you pick.
+                {{ t("colors.sections.background.description") }}
               </p>
               <SchemePicker
                 v-model="config.colors.page"
+                :label="t('colors.sections.background.title')"
                 :presets="PAGE_PRESETS"
                 :site="SITE_PAGE"
                 :texture="texture"
-                label="Background"
               />
               <div class="mt-2">
                 <OptionRow
-                  description="Puts the background on the lobby, the home page and the settings as well, not only on the match screen."
-                  title="On every autodarts page"
+                  :description="t('colors.everywhere.description')"
+                  :title="t('colors.everywhere.title')"
                 >
-                  <AppToggle v-model="config.colors.everywhere" aria-label="On every autodarts page" size="sm" />
+                  <AppToggle v-model="config.colors.everywhere" :aria-label="t('colors.everywhere.title')" size="sm" />
                 </OptionRow>
               </div>
             </section>
 
             <section>
               <h3 class="adt-section-title">
-                More colours
+                {{ t("colors.sections.moreColours") }}
               </h3>
               <OptionRow v-for="flat in FLAT" :key="flat.key" :title="flat.label">
                 <template #description>
@@ -120,11 +117,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
-            Colors
+            {{ t("features.colors") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Recolour the active player's card, the page behind the match and more, in colour pairs or your own.
+            {{ t("colors.card") }}
           </p>
         </div>
         <div class="flex">
@@ -136,7 +133,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Colors" class="size-full object-cover opacity-70">
+        <img :src="imageUrl" :alt="t('features.colors')" class="size-full object-cover opacity-70">
       </div>
     </div>
   </template>
@@ -155,18 +152,20 @@ import { siteTexture } from "@/utils/page-background";
 
 const emit = defineEmits([ "toggle" ]);
 
-/** The flat colours, each "" while it is autodarts' own. */
-const FLAT = [
-  { key: "cards", label: "Other cards", hint: "Every card but the active one, and the throw bar", site: SITE_CARDS },
-  { key: "text", label: "Text", hint: "On the cards and in the throw bar", site: SITE_TEXT },
-  { key: "actionBar", label: "Bottom bar", hint: "The bar that holds undo and Next, and its buttons with it", site: SITE_ACTION_BAR },
-] as const;
-
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/colors.png");
 
 /** autodarts' page texture, read once: the site's stylesheet does not change under a page. */
 const texture = ref<string>();
+
+/** The flat colours, each "" while it is autodarts' own. */
+const FLAT = computed(() => [
+  { key: "cards", label: t("colors.flat.cards.title"), hint: t("colors.flat.cards.hint"), site: SITE_CARDS },
+  { key: "text", label: t("colors.flat.text.title"), hint: t("colors.flat.text.hint"), site: SITE_TEXT },
+  { key: "actionBar", label: t("colors.flat.actionBar.title"), hint: t("colors.flat.actionBar.hint"), site: SITE_ACTION_BAR },
+] as const);
+type Flat = typeof FLAT.value[number];
 
 /** The board in the preview is the one the match would draw: the Board Skins skin, when that is on. */
 const board = computed(() => boardSkin(config.value?.boardSkins?.enabled ? config.value.boardSkins.skin : "default").preview);
@@ -179,26 +178,28 @@ onMounted(() => {
  * The colour a flat picker shows. The bottom bar follows the background until
  * a colour of its own is picked, so it shows the one the match screen draws.
  */
-function shown(key: typeof FLAT[number]["key"]): string {
+function shown(key: Flat["key"]): string {
   const colors = config.value!.colors;
   if (key === "actionBar" && !colors.actionBar) return barPalette(colors)?.bar ?? SITE_ACTION_BAR;
-  return colors[key] || FLAT.find(flat => flat.key === key)!.site;
+  return colors[key] || FLAT.value.find(flat => flat.key === key)!.site;
 }
 
-/** What a flat colour is while none is picked: autodarts' own, or for the bottom bar the background's. */
-function state(flat: typeof FLAT[number]): string {
+/** What a flat colour is while none is picked: autodarts' own, or for the bottom bar the background's. Nothing once one is. */
+function state(flat: Flat): string {
   const colors = config.value!.colors;
   if (colors[flat.key]) return "";
-  if (flat.key === "actionBar" && barPalette(colors)) return "Follows the background until you pick one.";
-  return "autodarts' own until you pick one.";
+  if (flat.key === "actionBar" && barPalette(colors)) return t("colors.state.followsBackground");
+  return t("colors.state.siteOwn");
 }
 
-function resetTitle(flat: typeof FLAT[number]): string {
+function resetTitle(flat: Flat): string {
   const following = flat.key === "actionBar" && config.value!.colors.page.preset !== "default";
-  return following ? `${flat.label}: follow the background again` : `${flat.label}: back to autodarts' own`;
+  return following
+    ? t("colors.reset.followBackground", { label: flat.label })
+    : t("colors.reset.siteOwn", { label: flat.label });
 }
 
-function setFlat(key: typeof FLAT[number]["key"], event: Event) {
+function setFlat(key: Flat["key"], event: Event) {
   if (!config.value) return;
   config.value.colors[key] = (event.target as HTMLInputElement).value;
 }
