@@ -257,9 +257,13 @@ function allowedPhrases(untranslated: Untranslated): RegExp[] {
   return patterns;
 }
 
+/** A CSS colour such as `#ffffff` has letters in it, but nobody reads it. */
+const CSS_COLOUR = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
 /** Has letters a person reads, once the names and units allowed to stay are taken out: "· WLED" has none. */
 function readable(text: string, untranslated: Untranslated): boolean {
   let rest = text.replace(/\s+/g, " ");
+  if (CSS_COLOUR.test(rest.trim())) return false;
   for (const pattern of allowedPhrases(untranslated)) rest = rest.replace(pattern, " ");
   return /\p{L}/u.test(rest);
 }
