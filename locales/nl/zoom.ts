@@ -21,7 +21,7 @@ export default {
   barPosition: {
     title: "Positie van de balk",
     description: "Zet Ongedaan maken en Volgende van autodarts terug in de rechterbovenhoek.",
-    reset: "Positie herstellen",
+    reset: "Balkpositie opnieuw instellen",
   },
   holdFor: {
     title: "Duur",
