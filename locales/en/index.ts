@@ -23,6 +23,7 @@ import recentLocalPlayers from "./recentLocalPlayers";
 import settings from "./settings";
 import site from "./site";
 import smallerScores from "./smallerScores";
+import streamingMode from "./streamingMode";
 import takeoutNotification from "./takeoutNotification";
 import teams from "./teams";
 import triggers from "./triggers";
@@ -57,6 +58,7 @@ export default {
   settings,
   site,
   smallerScores,
+  streamingMode,
   takeoutNotification,
   teams,
   triggers,

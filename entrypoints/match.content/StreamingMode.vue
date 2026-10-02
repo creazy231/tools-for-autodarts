@@ -25,7 +25,7 @@
         <div class="space-y-8">
           <div v-if="config.streamingMode.board" class="space-y-2">
             <p class="font-semibold">
-              Board Scale: ({{ 100 / 5 * coordsElementScale }} %)
+              {{ t("streamingMode.overlay.boardScale", { percent: 100 / 5 * coordsElementScale }) }}
             </p>
             <SliderRoot
               @update:model-value="handleSliderUpdate('coords', $event || [coordsElementScale])"
@@ -39,15 +39,15 @@
                 <SliderRange :class="twMerge('absolute h-full rounded-full', !isV2 && 'bg-white')" :style="isV2 ? { backgroundColor: 'var(--ad-action-primary)' } : undefined" />
               </SliderTrack>
               <SliderThumb
+                :aria-label="t('streamingMode.overlay.volume')"
                 :class="twMerge('block size-5 rounded-[10px] shadow-[0_2px_10px] focus:outline-none', !isV2 && 'bg-white')"
                 :style="isV2 ? { backgroundColor: 'var(--ad-action-primary)' } : undefined"
-                aria-label="Volume"
               />
             </SliderRoot>
           </div>
           <div class="space-y-2">
             <p class="font-semibold">
-              Score Scale: ({{ 100 / 5 * scoreBoardScale }} %)
+              {{ t("streamingMode.overlay.scoreScale", { percent: 100 / 5 * scoreBoardScale }) }}
             </p>
             <SliderRoot
               @update:model-value="handleSliderUpdate('score', $event || [scoreBoardScale])"
@@ -61,25 +61,30 @@
                 <SliderRange :class="twMerge('absolute h-full rounded-full', !isV2 && 'bg-white')" :style="isV2 ? { backgroundColor: 'var(--ad-action-primary)' } : undefined" />
               </SliderTrack>
               <SliderThumb
+                :aria-label="t('streamingMode.overlay.volume')"
                 :class="twMerge('block size-5 rounded-[10px] shadow-[0_2px_10px] focus:outline-none', !isV2 && 'bg-white')"
                 :style="isV2 ? { backgroundColor: 'var(--ad-action-primary)' } : undefined"
-                aria-label="Volume"
               />
             </SliderRoot>
           </div>
+          <!--
+            The two buttons share the row, so each is as wide as half of it whatever its label
+            says. Their padding is small because it only ever took room from the label, which
+            is centred and truncates: Dutch "Opnieuw instellen" does not fit beside 16px of it.
+          -->
           <div class="flex justify-end gap-3">
             <AppButton
               @click="handleResetSettings"
-              class="rounded-md border border-white/10 bg-transparent px-4 py-2 hover:bg-white/10"
+              class="rounded-md border border-white/10 bg-transparent p-2 hover:bg-white/10"
             >
-              Reset
+              {{ t("common.reset") }}
             </AppButton>
             <AppButton
               @click="handleCloseSettings"
-              :class="twMerge('rounded-md px-4 py-2', !isV2 && 'bg-cyan-600 hover:bg-cyan-700')"
+              :class="twMerge('rounded-md p-2', !isV2 && 'bg-cyan-600 hover:bg-cyan-700')"
               :style="isV2 ? { backgroundColor: 'var(--ad-action-primary)', borderRadius: 'var(--ad-radius-md)' } : undefined"
             >
-              Save
+              {{ t("common.save") }}
             </AppButton>
           </div>
         </div>
@@ -120,7 +125,7 @@
         and pushing them. Drawn board: a copy of the site's own, filled in by
         `paintBoard` — see there for why this is not an image.
       -->
-      <img v-if="liveFrame" :src="liveFrame" class="pointer-events-none size-full" alt="Dartboard">
+      <img v-if="liveFrame" :alt="t('streamingMode.overlay.dartboard')" :src="liveFrame" class="pointer-events-none size-full">
       <div v-else ref="boardMount" class="pointer-events-none relative size-full" />
     </div>
     <div
@@ -179,6 +184,7 @@ import type {
 import type { IGameData } from "@/utils/game-data-storage";
 import type { IBoardImages } from "@/utils/board-image-storage";
 import type { IThrow } from "@/utils/websocket-helpers";
+import type { MessageKey } from "@/utils/i18n";
 import type { IStreamingRow } from "./streaming-board";
 
 import { waitForElement } from "@/utils";
@@ -189,6 +195,8 @@ import {
 import AppButton from "@/components/AppButton.vue";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsBoardImages } from "@/utils/board-image-storage";
+import { GameMode } from "@/utils/game-modes";
+import { onLanguageChange } from "@/utils/i18n";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { setBoardView, viewOwner } from "./board-view";
 import { dressBoardCopy } from "./board-skins";
@@ -211,6 +219,31 @@ const SCOREBOARD_GUTTER_PX = 24 * 4 + 8;
  * so a tall scoreboard does not run flush into the top of the window.
  */
 const SCOREBOARD_GUTTER_Y_PX = 8 * 4 + 8;
+
+/**
+ * The games' names in the title, by the variant autodarts sends. English keeps
+ * the variant as the title always showed it ("CountUp", "ATC"); German and
+ * Dutch use the site's own names for the games, as its game picker shows them
+ * (gameModes.modes.*). A game that is not here is shown as autodarts sent it.
+ */
+const VARIANT_TITLES: Record<string, MessageKey> = {
+  [GameMode.X01]: "streamingMode.title.variant.x01",
+  [GameMode.CRICKET]: "streamingMode.title.variant.cricket",
+  [GameMode.COUNT_UP]: "streamingMode.title.variant.countUp",
+  [GameMode.ATC]: "streamingMode.title.variant.atc",
+  [GameMode.RANDOM_CHECKOUT]: "streamingMode.title.variant.randomCheckout",
+  [GameMode.RTW]: "streamingMode.title.variant.rtw",
+  [GameMode.SEGMENT_TRAINING]: "streamingMode.title.variant.segmentTraining",
+  [GameMode.BOBS_27]: "streamingMode.title.variant.bobs27",
+  [GameMode.TRAINING_121]: "streamingMode.title.variant.game121",
+  [GameMode.SHANGHAI]: "streamingMode.title.variant.shanghai",
+  [GameMode.GOTCHA]: "streamingMode.title.variant.gotcha",
+  [GameMode.BERMUDA]: "streamingMode.title.variant.bermuda",
+  [GameMode.KILLER]: "streamingMode.title.variant.killer",
+  [GameMode.BULL_OFF]: "streamingMode.title.variant.bullOff",
+};
+
+const { t, language } = useI18n();
 
 const enabled = ref(false);
 const settings = ref(false);
@@ -245,6 +278,8 @@ let gameDataUnwatch: (() => void) | null = null;
 let boardImagesUnwatch: (() => void) | null = null;
 let statusUnwatch: (() => void) | null = null;
 let configUnwatch: (() => void) | null = null;
+/** Follows the language for the header button, whose text is written once. */
+let stopLanguageListener: (() => void) | null = null;
 let onResize: (() => void) | null = null;
 let scoreBoardResize: ResizeObserver | null = null;
 let headerObserver: MutationObserver | null = null;
@@ -266,7 +301,7 @@ const isV2 = computed(() => config.value?.streamingMode.design === "v2");
 const metrics = computed(() => metricsFor(config.value?.streamingMode.design));
 
 /** The line along the bottom of the overlay, which the user can replace. */
-const footer = computed(() => config.value?.streamingMode.footerText || "Game provided by Autodarts.com");
+const footer = computed(() => config.value?.streamingMode.footerText || t("streamingMode.footerDefault"));
 
 /**
  * The scoreboard's rows, in a fixed order.
@@ -343,9 +378,11 @@ const liveFrame = computed(() =>
  * wrong moment was a third of a title and stayed that way until the next dart.
  *
  * The data says all of it at every window size and never half-way through a
- * render. What it does not do is say it in the user's language, as the pills
- * did; the rest of this extension's own text is English throughout, so that is
- * the side to come down on.
+ * render. It says it in the language autodarts is showing, as the pills did,
+ * like the rest of this extension's text: the race is the site's own "First to"
+ * with its count (a plural, so "1 Leg"), and the game is named as the site
+ * names it (see {@link VARIANT_TITLES}). The code for the in and out modes
+ * stays as the site abbreviates it.
  *
  * Handed over in pieces rather than as a sentence: the two skins punctuate it
  * differently, and joining it here would make one of them take the other's
@@ -358,8 +395,8 @@ const title = computed<string[]>(() => {
   const settings = match.settings as { baseScore?: number; inMode?: string; outMode?: string } | undefined;
 
   const race = match.sets
-    ? `First to ${match.sets} Sets`
-    : (match.legs ? `First to ${match.legs} Legs` : "");
+    ? t("streamingMode.title.firstToSets", { count: match.sets })
+    : (match.legs ? t("streamingMode.title.firstToLegs", { count: match.legs }) : "");
 
   // The site abbreviates the in and out modes to their initial plus I or O.
   // Only X01 and its relatives have them; the rest are named by variant.
@@ -367,9 +404,20 @@ const title = computed<string[]>(() => {
     ? `${settings.inMode[0].toUpperCase()}I-${settings.outMode[0].toUpperCase()}O`
     : "";
 
-  return [ settings?.baseScore ? String(settings.baseScore) : match.variant, race, modes ]
+  return [ settings?.baseScore ? String(settings.baseScore) : variantName(match.variant), race, modes ]
     .filter(Boolean) as string[];
 });
+
+/**
+ * The title's name for a game: the site's word for it where the catalogs have
+ * one, else the variant as autodarts sent it. Own entries only — autodarts
+ * sends the variant, and "constructor" is no game for the table's prototype to
+ * hand a function back for.
+ */
+function variantName(variant: string | undefined): string | undefined {
+  if (variant === undefined || !Object.prototype.hasOwnProperty.call(VARIANT_TITLES, variant)) return variant;
+  return t(VARIANT_TITLES[variant]);
+}
 
 /** Kept in step with the window, since `fitScale` is measured against it. */
 const viewportWidth = ref(window.innerWidth);
@@ -678,7 +726,7 @@ function paintBoard(): void {
     if (mount.firstElementChild?.tagName !== "IMG") {
       const image = document.createElement("img");
       image.src = defaultBoardImage;
-      image.alt = "Dartboard";
+      image.alt = t("streamingMode.overlay.dartboard");
       image.style.width = "100%";
       image.style.height = "100%";
       mount.replaceChildren(image);
@@ -714,6 +762,13 @@ watch([ coordsElement, scoreBoardElement ], () => {
 // The mount point comes and goes with the overlay and with the board switch, so
 // a copy has to be put into whichever one is on screen now.
 watch(boardMount, () => nextTick(paintBoard));
+
+// The stand-in picture is built by hand and stays until the site draws a board,
+// so a language picked meanwhile has to reach its alt text.
+watch(language, () => {
+  const picture = boardMount.value?.firstElementChild;
+  if (picture?.tagName === "IMG") (picture as HTMLImageElement).alt = t("streamingMode.overlay.dartboard");
+});
 
 /**
  * Follow the scoreboard's height for {@link fitScale}.
@@ -767,6 +822,9 @@ onUnmounted(() => {
 
   configUnwatch?.();
   configUnwatch = null;
+
+  stopLanguageListener?.();
+  stopLanguageListener = null;
 
   if (onResize) window.removeEventListener("resize", onResize);
   onResize = null;
@@ -829,7 +887,7 @@ function syncButton(): void {
   // The header's icon buttons carry no active state of their own, so this is
   // the extension's: the site's blue for on, its own muted grey for off.
   button.style.color = enabled.value ? "var(--color-blue-40, #63b3ed)" : "";
-  button.title = enabled.value ? "Leave Streaming Mode" : "Streaming Mode";
+  button.title = enabled.value ? t("streamingMode.overlay.leave") : t("features.streamingMode");
 }
 
 /**
@@ -864,7 +922,7 @@ async function initStreamModeButton() {
     const button = document.createElement("button");
     button.id = BUTTON_ID;
     button.type = "button";
-    button.setAttribute("aria-label", "Streaming Mode");
+    button.setAttribute("aria-label", t("features.streamingMode"));
     button.className = sibling?.className ?? "";
     button.style.cursor = "pointer";
     button.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M7 9h.01m9.74 3H22l-3.5 7l-3.09-4.32\"/><path d=\"m18 9.5l-4 8l-10.39-5.2a2.92 2.92 0 0 1-1.3-3.91L3.69 5.6a2.92 2.92 0 0 1 3.92-1.3ZM2 19h3.76a2 2 0 0 0 1.8-1.1L9 15m-7 6v-4\"/></g></svg>";
@@ -873,6 +931,18 @@ async function initStreamModeButton() {
     iconGroup.appendChild(button);
     streamingModeButton.value = button;
     syncButton();
+
+    // The button's name is written once and the button then stays in the header
+    // for the whole match, so a language picked meanwhile has to reach it, and
+    // its tooltip, which `syncButton` words for the state it is in. A run after
+    // the header re-rendered the old button away replaces a listener that holds
+    // a node nobody can see.
+    stopLanguageListener?.();
+    stopLanguageListener = onLanguageChange(() => {
+      button.setAttribute("aria-label", t("features.streamingMode"));
+      syncButton();
+    });
+
     watchHeader(iconGroup);
   } finally {
     building = false;

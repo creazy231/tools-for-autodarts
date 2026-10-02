@@ -21,7 +21,7 @@
       >
         <div class="grid grid-cols-4 divide-x-2 divide-black text-center text-5xl font-bold">
           <div class="relative flex items-center justify-center p-2 uppercase">
-            {{ busted ? "Bust" : visitPoints }}
+            {{ busted ? t("streamingMode.board.bust") : visitPoints }}
           </div>
           <div
             v-for="n in 3"
@@ -51,10 +51,10 @@
         {{ title.join(" - ") }}
       </div>
       <div v-if="hasSets" class="px-4 py-2 text-center">
-        Sets
+        {{ t("streamingMode.board.sets") }}
       </div>
       <div class="px-4 py-2 text-center">
-        Legs
+        {{ t("streamingMode.board.legs") }}
       </div>
       <div />
       <template v-for="(row, index) in rows" :key="row.player.id || row.player.name">
@@ -111,7 +111,7 @@
       >
         <div class="grid grid-cols-[auto_2rem_2rem]">
           <div>{{ footer }}</div>
-          <div @click="emit('settings')" title="Streaming Mode settings" class="flex cursor-pointer items-center justify-end opacity-20 hover:opacity-50">
+          <div @click="emit('settings')" :title="t('streamingMode.overlay.settings')" class="flex cursor-pointer items-center justify-end opacity-20 hover:opacity-50">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20H4q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v5h-2V6H4v12h8zm-2.5-3.5v-9l7 4.5zm8.35 6.5l-.3-1.5q-.3-.125-.562-.262t-.538-.338l-1.45.45l-1-1.7l1.15-1q-.05-.35-.05-.65t.05-.65l-1.15-1l1-1.7l1.45.45q.275-.2.538-.337t.562-.263l.3-1.5h2l.3 1.5q.3.125.563.275t.537.375l1.45-.5l1 1.75l-1.15 1q.05.3.05.625t-.05.625l1.15 1l-1 1.7l-1.45-.45q-.275.2-.537.338t-.563.262l-.3 1.5zm1-3q.825 0 1.413-.587T20.85 18q0-.825-.587-1.412T18.85 16q-.825 0-1.412.588T16.85 18q0 .825.588 1.413T18.85 20" /></svg>
           </div>
           <!--
@@ -119,7 +119,7 @@
             The header button is underneath the overlay while it is up, and the
             backdrop is a large target to have to guess at.
           -->
-          <div @click="emit('exit')" title="Leave Streaming Mode" class="flex cursor-pointer items-center justify-end opacity-20 hover:opacity-50">
+          <div @click="emit('exit')" :title="t('streamingMode.overlay.leave')" class="flex cursor-pointer items-center justify-end opacity-20 hover:opacity-50">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z" /></svg>
           </div>
         </div>
@@ -148,4 +148,6 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{ settings: []; exit: [] }>();
+
+const { t } = useI18n();
 </script>

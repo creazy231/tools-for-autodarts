@@ -52,10 +52,10 @@
         {{ title.join(" • ") }}
       </div>
       <div v-if="hasSets" class="text-center" :style="{ ...LABEL, width: CELL.count }">
-        Sets
+        {{ t("streamingMode.board.sets") }}
       </div>
       <div class="text-center" :style="{ ...LABEL, width: CELL.count }">
-        Legs
+        {{ t("streamingMode.board.legs") }}
       </div>
       <div :style="{ width: CELL.score }" />
     </div>
@@ -79,11 +79,11 @@
           transition: 'var(--ad-transition-interactive)',
         }"
       >
-        <!-- A bust is a status, and this system says a status is one word in a badge. -->
+        <!-- A bust is a status, and this system says a status is one word in a badge, in capitals. -->
         <span
           v-if="busted"
           :style="{ fontSize: '26px', fontWeight: 'var(--ad-weight-extrabold)', letterSpacing: 'var(--ad-tracking-caps)' }"
-        >BUST</span>
+        >{{ t("streamingMode.board.bust").toUpperCase() }}</span>
         <span v-else :style="{ fontSize: '34px', fontWeight: 'var(--ad-weight-extrabold)', letterSpacing: '-.01em' }">{{ visitPoints }}</span>
       </div>
       <div
@@ -151,7 +151,7 @@
           :style="{ color: 'var(--ad-text-muted)' }"
         >
           <span :style="{ fontSize: '17px', fontWeight: 'var(--ad-weight-bold)', letterSpacing: '-.01em' }">{{ average(row) }}</span>
-          <span :style="LABEL">Avg</span>
+          <span :style="LABEL">{{ t("streamingMode.board.avg") }}</span>
         </div>
       </div>
       <div v-if="hasSets" class="text-center" :style="{ ...COUNT, width: CELL.count, color: row.throwing ? 'var(--ad-text-primary)' : 'var(--ad-text-secondary)' }">
@@ -184,12 +184,12 @@
       </div>
       <button
         @click="emit('settings')"
-        type="button"
-        title="Streaming Mode settings"
-        class="flex cursor-pointer items-center justify-center"
-        :style="{ color: 'var(--ad-text-disabled)', transition: 'var(--ad-transition-interactive)' }"
         @mouseenter="hover($event, true)"
         @mouseleave="hover($event, false)"
+        :style="{ color: 'var(--ad-text-disabled)', transition: 'var(--ad-transition-interactive)' }"
+        :title="t('streamingMode.overlay.settings')"
+        class="flex cursor-pointer items-center justify-center"
+        type="button"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20H4q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v5h-2V6H4v12h8zm-2.5-3.5v-9l7 4.5zm8.35 6.5l-.3-1.5q-.3-.125-.562-.262t-.538-.338l-1.45.45l-1-1.7l1.15-1q-.05-.35-.05-.65t.05-.65l-1.15-1l1-1.7l1.45.45q.275-.2.538-.337t.562-.263l.3-1.5h2l.3 1.5q.3.125.563.275t.537.375l1.45-.5l1 1.75l-1.15 1q.05.3.05.625t-.05.625l1.15 1l-1 1.7l-1.45-.45q-.275.2-.537.338t-.563.262l-.3 1.5z" /></svg>
       </button>
@@ -200,12 +200,12 @@
       -->
       <button
         @click="emit('exit')"
-        type="button"
-        title="Leave Streaming Mode"
-        class="flex cursor-pointer items-center justify-center"
-        :style="{ color: 'var(--ad-text-disabled)', transition: 'var(--ad-transition-interactive)' }"
         @mouseenter="hover($event, true)"
         @mouseleave="hover($event, false)"
+        :style="{ color: 'var(--ad-text-disabled)', transition: 'var(--ad-transition-interactive)' }"
+        :title="t('streamingMode.overlay.leave')"
+        class="flex cursor-pointer items-center justify-center"
+        type="button"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z" /></svg>
       </button>
@@ -255,6 +255,8 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{ settings: []; exit: [] }>();
+
+const { t } = useI18n();
 
 /**
  * The one average worth the space.
