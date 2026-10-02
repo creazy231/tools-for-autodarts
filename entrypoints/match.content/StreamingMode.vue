@@ -223,8 +223,10 @@ const SCOREBOARD_GUTTER_Y_PX = 8 * 4 + 8;
 /**
  * The games' names in the title, by the variant autodarts sends. English keeps
  * the variant as the title always showed it ("CountUp", "ATC"); German and
- * Dutch use the site's own names for the games, as its game picker shows them
- * (gameModes.modes.*). A game that is not here is shown as autodarts sent it.
+ * Dutch use the site's own names for the games: the short ones of its
+ * statistics page where it has one (Cricket, Random Checkout, …), since the
+ * Autodarts scoreboard's title cell truncates, and its game picker's for the
+ * rest (gameModes.modes.*). A game that is not here is shown as autodarts sent it.
  */
 const VARIANT_TITLES: Record<string, MessageKey> = {
   [GameMode.X01]: "streamingMode.title.variant.x01",

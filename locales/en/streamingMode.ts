@@ -4,7 +4,8 @@
  * (StreamingBoardClassic.vue and StreamingBoardV2.vue). Its name is features.streamingMode.
  * What the overlay prints about the game uses the site's own words in German and Dutch: the race
  * ("First to 3 Legs") is the site's "First to" with its count, the game is named as the site's
- * game picker names it, and the short form of "average" is the one the site's own tables use.
+ * statistics page names it where that has a short name and as its game picker does otherwise, and
+ * the short form of "average" is the one the site's own tables use.
  */
 export default {
   card: "Optimizes the interface for streaming with custom backgrounds and layouts.",
