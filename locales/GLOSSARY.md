@@ -139,7 +139,7 @@ Modes and their groups use the site's labels (`lobby.gamePicker.games.*`, `lobby
 | group *Practice* | Practice | Training | Oefenen |
 | group *Party* | Party | Party | Party |
 | our group *X01 and Cricket* | X01 and Cricket | X01 und Cricket | X01 en Cricket |
-| our group *Before a match* | Before a match | Vor dem Match | Voor de wedstrijd |
+| our group *Before a match* | Before a match | Vor dem Match | Vóór de wedstrijd |
 
 ## 5. Feature names
 
@@ -185,7 +185,7 @@ These are the names in every card, dialog heading and sentence that mentions a f
 
 ### Labels quoted in What's New
 
-What's New (`locales/*/whatsNew.ts`) names settings and features that other panels own, and some that are gone. It writes them as below. When you convert the panel that owns one, use the same word, so a label reads the same in What's New and where the player finds it. In a sentence the label keeps its capital, as in the English, and carries no quotes. The exception is a site label of three or more words: quoted in the middle of a sentence it takes the site's quotes (German „…“, Dutch '…'), so that it isn't misparsed as part of the sentence, as in "een eigen knop 'Volgorde willekeurig maken'". A label of one or two words stays unquoted ("onder Dart geland").
+What's New (`locales/*/whatsNew.ts`) names settings and features that other panels own, and some that are gone. It writes them as below. When you convert the panel that owns one, use the same word, so a label reads the same in What's New and where the player finds it. In a sentence the label keeps its capital, as in the English, and carries no quotes. The exception is a label of three or more words, the site's or Tools' own: in the middle of a sentence it takes the site's quotes (German „…“, Dutch '…'), so that it isn't misparsed as part of the sentence, as in "een eigen knop 'Volgorde willekeurig maken'" (the site's) and „In dieser Lobby“ / 'In deze lobby' (Teams' own section). A label of one or two words stays unquoted ("onder Dart geland"). §7 says the same rule for every text.
 
 | English | Where it is from | Deutsch | Nederlands |
 |---|---|---|---|
@@ -223,6 +223,11 @@ Settled in the lobby panels (`locales/*/{discordWebhooks,autoStart,recentLocalPl
 | a private lobby | the site's *private* (`subscriptions.features.items.privateTournaments.name`); Dutch joins it to the noun | private Lobby | privélobby |
 | the lobby's QR code | `lobby.qrShare.title` ("Lobby-QR-Code teilen", "QR-code van lobby delen") | Lobby-QR-Code | QR-code van de lobby |
 | a Discord post | Discord's own word for it (the site has none): the noun is the message, the verb is *to post* | Nachricht, posten | bericht, plaatsen |
+| to announce a lobby in Discord | the Discord button's tooltip, "Announce this lobby in Discord". The site's *Announce* is the Caller's spoken one (*ansagen*, *omroepen*, `settings.caller.callScoresDescription`), which a written post is not, so it follows the site's noun *Ankündigungen* / *aankondigingen* (`account.marketing.fields.autodarts.description`) | ankündigen | aankondigen |
+| Sent | the button's state once the post is out. German is the site's `friends.sections.sent`; Dutch uses the site's verb *versturen* (`onboarding.step5.features.takeout`, "Verstuurt de score"), where `friends.sections.sent` itself says *Verzonden*, for friend requests | Gesendet | Verstuurd |
+| Failed | the button's state when the post did not go through. The site's German for failed is *fehlgeschlagen* (14 letters, too wide for a button in the lobby's header, `myDevices.link.wifiFailed`), so the button says *Fehler*, the site's word for an error (`appError.subtitle`). *Mislukt* is the site's own Dutch (`myDevices.link.wifiFailed`) | Fehler | Mislukt |
+| NEW GAME ON AUTODARTS | the post's headline, in capitals as the English is; the site has no text for it | NEUES SPIEL AUF AUTODARTS | NIEUW SPEL OP AUTODARTS |
+| Game has started! | the line the post gets once the game starts; the site's own sentence for a started tournament (`tournaments.detail.toast.alreadyStarted`) | Das Spiel hat begonnen! | Het spel is begonnen! |
 | the strip of saved-player buttons under the lobby's list | not the site's; a row of buttons is a *Leiste* in German, and *strook* in Dutch, the word Darts Zoom's strip of tiles uses too | Leiste | strook |
 
 Settled in Teams (`locales/*/teams.ts`), for whatever else names its parts:
@@ -235,7 +240,7 @@ Settled in Teams (`locales/*/teams.ts`), for whatever else names its parts:
 | to check out | a verb in the site's own texts ("Darts zum Auschecken", "Gooi … uit"); the noun stays *Checkout* (*das* in German, *de* in Dutch) | auschecken | uitgooien |
 | teammate | not the site's | Teamkollege | teamgenoot |
 | X wins the leg, X wins the match | the pill; the German was the extension's before the catalogs | X gewinnt das Leg, X gewinnt das Match | X wint de leg, X wint de wedstrijd |
-| Bot Level N | the seat name Teams gives its bots (`botName()`), never translated. The site's own Add Bot labels a level "Bot-Level N" and "Botniveau N" (`lobby.addBot.botLevel`), and the drawer's picker says "Level N" and "Niveau N", as `botCard.level` does | Bot Level N (stays) | Bot Level N (stays) |
+| Bot Level N | the seat name Teams gives its bots (`botName()`), never translated. The site's own Add Bot labels a level "Bot-Level N" in German and "Botniveau N" in Dutch (`lobby.addBot.botLevel`), and the drawer's picker says "Level N" and "Niveau N", as `botCard.level` does. Teams matches its bots by level (`cpuPPR`), not by name, so a bot the site named "Bot-Level 3" beside one Teams named "Bot Level 3" splits nothing, and the seat name stays as saved teams have it | Bot Level N (stays) | Bot Level N (stays) |
 
 ## 6. Takeout
 
@@ -245,7 +250,7 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 
 - **Dashes.** German and Dutch keep the English's spaced em dash " — ", as the site's own German and Dutch do. Measured on 2026-10-01 over the 1601 texts `yarn i18n:site .` prints: 20 English texts have one. 19 of those 20 German texts keep " — " (one has " – "), and 17 of the 19 Dutch texts keep it (two are reworded, with a comma and a colon; the twentieth has no Dutch). Never change " — " to " – " or " - ". Where the English has a spaced hyphen, as in "Settings - Darts Zoom", the hyphen stays.
 - **The en dash "–"** is only for a number range, written as the English writes it, with no spaces: `0–180`, `s1–s20`. The site has no number range in its texts, so this follows Tools' English. A trigger token such as `100-180` is what users type, and its hyphen stays.
-- **Quotes.** The site rarely quotes: 3 of its English texts do, all with a straight "…". Its Dutch writes '…' (a plain apostrophe on both sides) in all 4 of its quoted texts, including all 3 where the English quotes. Its German is mixed: „…“ (U+201E opens, U+201C closes) in 2 texts and a straight "…" in 3 others. We write „…“ in German and '…' in Dutch where the English quotes something, and add no quotes where the English has none.
+- **Quotes.** The site rarely quotes: 3 of its English texts do, all with a straight "…". Its Dutch writes '…' (a plain apostrophe on both sides) in all 4 of its quoted texts, including all 3 where the English quotes. Its German is mixed: „…“ (U+201E opens, U+201C closes) in 2 texts and a straight "…" in 3 others. We write „…“ in German and '…' in Dutch where the English quotes something. Where the English has no quotes, a label of three or more words in the middle of a sentence takes them too, whether it is the site's label or Tools' own („In dieser Lobby“, 'In deze lobby', 'Volgorde willekeurig maken'), so that it isn't misparsed as part of the sentence. A label of one or two words stays unquoted.
 - **Numbers** keep their English format: `1.5 s`, `45%`. Not `1,5 s`.
 
 ## 8. What stays literal
