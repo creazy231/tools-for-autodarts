@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-      <img :src="imageUrl" :alt="t('features.autoStart')" class="size-full object-cover opacity-70">
+      <img :src="imageUrl" :alt="t('autoStart.imageAlt')" class="size-full object-cover opacity-70">
     </div>
   </div>
 </template>
