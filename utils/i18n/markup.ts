@@ -24,7 +24,7 @@ const TOKEN = /<(\/?)(b|i|code)>|<br\s*\/?>|\{(\w+)\}/g;
 export function parseMarkup(source: string): MarkupNode[] {
   const root: MarkupNode[] = [];
   const open: TagNode[] = [];
-  const into = (): MarkupNode[] => open.at(-1)?.children ?? root;
+  const into = (): MarkupNode[] => open[open.length - 1]?.children ?? root;
   const text = (value: string) => {
     if (value) into().push({ kind: "text", text: value });
   };
@@ -43,7 +43,7 @@ export function parseMarkup(source: string): MarkupNode[] {
       const node: TagNode = { kind: "tag", tag: tag as MarkupTag, children: [] };
       into().push(node);
       open.push(node);
-    } else if (open.at(-1)?.tag === tag) {
+    } else if (open[open.length - 1]?.tag === tag) {
       open.pop();
     } else {
       text(token);
