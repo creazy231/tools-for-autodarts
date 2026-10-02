@@ -23,7 +23,7 @@ export default {
   },
   checkout: {
     title: "Checkout-suggesties",
-    description: "De resterende route voor de speler aan de werplijn, die met elke dart opschuift.",
+    description: "De resterende route voor de speler aan de werplijn, bijgewerkt met elke dart.",
   },
   averages: {
     title: "Gemiddelden",

@@ -23,7 +23,7 @@ export default {
   },
   checkout: {
     title: "Checkout-Vorschläge",
-    description: "Der verbleibende Weg für den Spieler an der Oche, der mit jedem Dart weiterrückt.",
+    description: "Der verbleibende Weg für den Spieler am Oche, mit jedem Dart weitergeführt.",
   },
   averages: {
     title: "Durchschnitte",

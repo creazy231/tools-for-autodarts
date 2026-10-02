@@ -247,7 +247,7 @@ Settled in the small match features (`locales/*/{takeoutNotification,nextPlayerO
 | English | Where it is from | Deutsch | Nederlands |
 |---|---|---|---|
 | the match screen, the match page | the site's *Match* and *Wedstrijd* (`pages.match`); What's New already says *Match-Bildschirm* and *wedstrijdscherm* for the screen | Match-Bildschirm, Match-Seite | wedstrijdscherm, wedstrijdpagina |
-| the oche | the darts word for the throwing line; the site has no text for it. German players say *Oche* too; Dutch has the plain *werplijn*, which needs no explaining (a Dutch reader may prefer *oche*: § 9) | Oche | werplijn |
+| the oche | the darts word for the throwing line; the site has no text for it. German players say *Oche* too, and in darts usage it is neuter: *das Oche*, "am Oche", "vom Oche aus". Dutch has the plain *werplijn*, which needs no explaining (a Dutch reader may prefer *oche*: § 9) | das Oche | werplijn |
 | layout | not the site's | Layout | lay-out (the Woordenlijst's spelling) |
 | sidebar | the site's own (`a11y.toggleSidebar`) | Seitenleiste | zijbalk |
 | font size | not the site's | Schriftgröße | lettergrootte |
