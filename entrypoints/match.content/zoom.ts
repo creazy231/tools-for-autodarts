@@ -1,8 +1,10 @@
+import type { IBoard } from "@/utils/board-data-storage";
 import type { IGameData } from "@/utils/game-data-storage";
 import type { IThrow } from "@/utils/websocket-helpers";
 import type { IConfig } from "@/utils/storage";
 
 import { addStyles, removeStyles } from "@/utils";
+import { AutodartsToolsBoardData } from "@/utils/board-data-storage";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
@@ -27,9 +29,10 @@ import { TEAMS_PILL_TAG } from "@/utils/teams";
  * picture onto it a moment after each dart is scored. Those pictures are the
  * camera modes, and they are the one part of this that needs real hardware.
  * The picture that follows a dart is copied and kept against that dart's id —
- * see {@link frames} — so a tile can only ever show the frame taken as its own
- * dart landed. When there is no such frame, or the mode is "image", the cloned
- * board stands in; if even that is gone, the extension's own board.png does.
+ * see {@link frames} — and the dart's tile waits for it, so a tile can only ever
+ * show a picture taken after its own dart landed. When none comes, or the mode
+ * is "image", the cloned board stands in; if even that is gone, the extension's
+ * own board.png does.
  *
  * The mode is the same choice Board View offers — camera 1, 2, 3 or the drawn
  * board — because it decides what the board itself shows: the frames are taken
@@ -92,17 +95,37 @@ const FRAME_SCALE = RING_FRACTION / FRAME_RING_FRACTION;
 const POSITION_ZOOM = { top: 1, bottom: 0.5, board: 1 } as const;
 
 /**
- * How long a picture that arrived before its dart is kept waiting for it.
+ * How long a tile waits for the picture of its dart before it makes do with the
+ * board as it is.
  *
- * The site swaps the picture onto its board some 70ms after the match state
- * that scores the dart, and that state reaches this script through extension
- * storage, which is a few milliseconds more on a quiet machine and could be
- * longer on a busy one. Should the picture win that race it is held here until
- * the dart shows up. The window is deliberately short: a board is reset, and
- * sends a picture of its empty face, a second or more before the first dart of
- * the visit is scored, and that picture must not be taken for the dart's.
+ * When a dart is scored, the board on screen still shows the picture taken
+ * before it landed. The site puts up the new one 65 to 630ms later, about a
+ * fifth of a second as a rule (552 darts on a followed board, 2026-10-02), and
+ * later still on a slow connection. A
+ * copy of the board taken in between is a close-up of the right spot with no
+ * dart in it, so in a camera mode the tile keeps its place but stays hidden
+ * until its dart's picture is up. Should none come, from a camera that has
+ * stopped sending say, it shows the board after this long, which is all the
+ * site has either.
  */
-const ORPHAN_TTL = 500;
+const PICTURE_WAIT = 1500;
+/** Marks a tile held back for its dart's picture — see {@link PICTURE_WAIT}. */
+const WAITING_ATTRIBUTE = "data-adt-waiting";
+
+/**
+ * The board events that each send one picture of the board that belongs to no
+ * dart: the darts are out, and the board has reset. On a followed board on
+ * 2026-10-02 every one of 399 such events was followed by a picture, as was
+ * every one of 558 "Throw detected"s.
+ */
+const EMPTY_BOARD_EVENTS = new Set([ "Takeout finished", "Manual reset" ]);
+/**
+ * How long a picture announced by one of those events is expected. Normally it
+ * is up within half a second. One that never comes, as when the site moves on
+ * to another player's board first, must not take a dart's picture for its own
+ * long after.
+ */
+const EMPTY_BOARD_TTL = 3000;
 
 /**
  * The board position moves the board with the `scale` and `translate`
@@ -203,6 +226,16 @@ const STYLES = `
   /* the bottom strip rises into place from off the foot of the window */
   #${HOST_ID}[data-position="bottom"] .adt-zoom-tile {
     animation: adt-zoom-rise 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /*
+   * A tile waiting for its dart's picture keeps its place and shows nothing. Its
+   * entrance plays when it has something to show. This comes after the two rules
+   * above, which it has to beat.
+   */
+  #${HOST_ID} .adt-zoom-tile[${WAITING_ATTRIBUTE}] {
+    visibility: hidden;
+    animation: none;
   }
 
   /*
@@ -364,6 +397,7 @@ let stopKeepingBoardView: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let layoutObserver: MutationObserver | undefined;
 let pictureObserver: MutationObserver | undefined;
+let boardDataWatcherUnwatch: (() => void) | undefined;
 let settle: ReturnType<typeof setTimeout> | undefined;
 let host: HTMLElement | null = null;
 let stopBarWatchers: (() => void) | undefined;
@@ -398,12 +432,13 @@ const zoomed = new Set<string>();
  * keyed on the throw's id.
  *
  * The site subscribes to pictures of the board being thrown at and swaps each
- * one onto its board as it comes — one per dart, some 70ms after the match
- * state that scores it, plus the odd one when a board is reset. That swap is
- * the signal: the picture that appears after a dart is the picture of it, and
- * it is copied here against the dart's id the moment it does. Only the darts of
- * the visit in progress are kept, and only an id can be looked up, so a tile
- * shows the frame of its own dart or nothing at all.
+ * one onto its board as it comes: one per dart, a fraction of a second after
+ * the match state that scores it, and two more once the darts are out. That
+ * swap is the signal. The picture that appears after a dart is the picture of
+ * it, and it is copied here against the dart's id the moment it does — see
+ * {@link owed} for which dart that is. Only the darts of the visit in progress
+ * are kept, and only an id can be looked up, so a tile shows the frame of its
+ * own dart or nothing at all.
  *
  * This replaced a shared, positional list of the last six pictures that the
  * WebSocket handler had been filling on a timer after every board event, from
@@ -417,15 +452,40 @@ const zoomed = new Set<string>();
  */
 const frames = new Map<string, string>();
 /**
- * A picture that arrived with no unclaimed dart to belong to, kept for
- * {@link ORPHAN_TTL} in case its dart is still on the way — see there.
+ * The darts still owed a picture, oldest first.
+ *
+ * Every dart that lands while the board shows a camera is followed by one
+ * picture of it, in the order the darts landed. So the next picture to go up
+ * belongs to the oldest dart still owed one. A dart is owed a picture from the
+ * moment it is drawn here, and only from then, since anything already up was
+ * taken before it.
+ *
+ * The exceptions are the board's pictures of itself, once the darts are out
+ * and again as it resets. They come as the next player steps up, and on a
+ * slow connection after that player's first dart, so the board's word that one
+ * is coming is kept in {@link emptyBoards}, and the picture that answers it is
+ * passed over.
+ *
+ * The version before this kept a picture that came with no dart to claim it
+ * for half a second, in case its dart was still on its way here. The board's
+ * picture of itself was such a picture. A first dart thrown inside that half
+ * second took it: a close-up of the spot with no dart in it. Its own picture
+ * came a moment later, found the dart already served and was dropped. A slower
+ * connection made it common, and passed the mistake on to the darts after it.
  */
-let orphan: { picture: string; at: number } | null = null;
+const owed = new Set<string>();
+/**
+ * When each picture of the board, rather than of a dart, was announced, oldest
+ * first, until it is up — see {@link EMPTY_BOARD_EVENTS}.
+ */
+let emptyBoards: number[] = [];
+/** Tiles held back for their dart's picture, with the timer that stops waiting — see {@link PICTURE_WAIT}. */
+const waiting = new Map<string, ReturnType<typeof setTimeout>>();
+/** Every dart drawn so far, so that each is owed a picture once. */
+const seen = new Set<string>();
 /** The `src` of the board's picture as last seen, so only a change is copied. */
 let lastPicture: string | null = null;
-/** Copies started so far; a copy overtaken by a newer picture is dropped. */
-let copies = 0;
-/** The match state most recently drawn, which is what a new picture is matched against. */
+/** The match state most recently drawn. */
 let latest: IGameData | null = null;
 let boardInset = 0;
 let config: IConfig["zoom"] | null = null;
@@ -487,8 +547,7 @@ async function start() {
   boardInset = 0;
   barPoint = null;
   zoomed.clear();
-  frames.clear();
-  orphan = null;
+  forgetPictures();
   latest = null;
   addStyles(config.position === "board" ? `${STYLES}\n${BOARD_STYLES}` : STYLES, STYLE_ID);
   mount();
@@ -510,9 +569,17 @@ async function start() {
   // so neither has any use for them.
   pictureObserver?.disconnect();
   pictureObserver = undefined;
-  if (config.mode !== "image" && config.position !== "board") watchPictures(root ?? document.body);
+  boardDataWatcherUnwatch?.();
+  boardDataWatcherUnwatch = undefined;
+  if (config.mode !== "image" && config.position !== "board") {
+    watchPictures(root ?? document.body);
+    boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(noteEmptyBoard);
+  }
 
-  render(await AutodartsToolsGameData.getValue());
+  // Darts already on the board have had their pictures, and get the board as it is.
+  const current = await AutodartsToolsGameData.getValue();
+  for (const thrown of visitInProgress(current) ?? []) seen.add(thrown.id);
+  render(current);
 
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = AutodartsToolsGameData.watch(render);
@@ -565,6 +632,8 @@ export function zoomOnRemove() {
   layoutObserver = undefined;
   pictureObserver?.disconnect();
   pictureObserver = undefined;
+  boardDataWatcherUnwatch?.();
+  boardDataWatcherUnwatch = undefined;
   if (settle) clearTimeout(settle);
   settle = undefined;
   stopKeepingBoardView?.();
@@ -576,8 +645,7 @@ export function zoomOnRemove() {
   host?.remove();
   host = null;
   config = null;
-  frames.clear();
-  orphan = null;
+  forgetPictures();
   lastPicture = null;
   latest = null;
   zoomed.clear();
@@ -645,12 +713,13 @@ function render(gameData: IGameData): void {
     const stamp = stampOf(thrown);
     if (existing?.dataset.adtThrow === stamp) return;
 
-    // The same dart, handed its picture or moved by a correction: only what the
-    // tile shows changes. The tile itself stays, so a picture landing a tenth
-    // of a second after the dart does not run its entrance a second time.
+    // The same dart, handed its picture, done waiting for it, or moved by a
+    // correction: only what the tile shows changes. The tile itself stays, so
+    // its entrance runs once, when it first has something to show.
     if (existing?.dataset.adtId === thrown.id) {
       existing.querySelector(".adt-zoom-view")?.replaceWith(view(thrown, board));
       existing.dataset.adtThrow = stamp;
+      existing.toggleAttribute(WAITING_ATTRIBUTE, waiting.has(thrown.id));
       return;
     }
 
@@ -675,8 +744,7 @@ function render(gameData: IGameData): void {
 function sleep(): void {
   host?.replaceChildren();
   releaseBoard();
-  frames.clear();
-  orphan = null;
+  forgetPictures();
   boardInset = -1;
   removeStyles(LAYOUT_STYLE_ID);
 }
@@ -733,11 +801,11 @@ function releaseBoard(): void {
 }
 
 /**
- * What makes a tile out of date: the dart moving, or its camera frame arriving
- * after the tile was already built from the board instead.
+ * What makes a tile out of date: the dart moving, its camera frame arriving, or
+ * the tile giving up on the frame and taking the board instead.
  */
 function stampOf(thrown: IThrow): string {
-  const source = config?.mode !== "image" && frames.has(thrown.id) ? "frame" : "board";
+  const source = config?.mode !== "image" && frames.has(thrown.id) ? "frame" : waiting.has(thrown.id) ? "waiting" : "board";
   return `${thrown.segment?.name ?? ""}:${thrown.coords?.x ?? 0}:${thrown.coords?.y ?? 0}:${source}`;
 }
 
@@ -771,13 +839,21 @@ function boardPicture(): HTMLImageElement | null {
 }
 
 /**
- * Copy each new picture the site puts on its board, as it does so.
+ * Copy each new picture the site puts on its board, as it does so, for the dart
+ * it is of.
  *
  * The site replaces the picture's `src` rather than the element, and does so
  * inside the app root along with every other redraw, so one observer there
  * sees it; anything that is not a change of picture costs a `querySelector`.
  * The picture up when this starts is not copied: nothing has landed since it
  * was taken, and a dart already on the board gets the clone of that board.
+ *
+ * Which dart a picture is of is settled as it goes up — the oldest one still
+ * {@link owed} a picture — rather than once the copy is done, by when another
+ * dart could have landed. A picture the board announced as one of itself goes
+ * to no dart, and nor does one no dart is owed. Now and then that is a dart's
+ * own picture, come before the dart did; the dart then waits out
+ * {@link PICTURE_WAIT} and gets the board, which shows the same picture.
  */
 function watchPictures(root: Node): void {
   lastPicture = boardPicture()?.src ?? null;
@@ -785,42 +861,52 @@ function watchPictures(root: Node): void {
     const src = boardPicture()?.src ?? null;
     if (src === lastPicture) return;
     lastPicture = src;
-    if (src) void keepPicture(src);
+    if (!src) return;
+
+    const now = Date.now();
+    emptyBoards = emptyBoards.filter(at => now - at < EMPTY_BOARD_TTL);
+    if (emptyBoards.length) {
+      emptyBoards.shift();
+      return;
+    }
+
+    const [ dart ] = owed;
+    if (!dart) return;
+    owed.delete(dart);
+    void keepPicture(src, dart);
   });
   pictureObserver.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: [ "src" ] });
 }
 
 /**
- * Copy a picture and give it to the dart it followed.
- *
- * The dart is the newest of the visit in progress that has no picture yet: the
- * site swaps the picture in after the match state that scores the dart, so by
- * the time it does the dart is normally already in {@link latest}. Should the
- * picture come first — see {@link ORPHAN_TTL} — it waits for the dart there;
- * and a picture with no dart to claim it, such as a reset board's, is dropped
- * once that has passed. Copying is asynchronous, so a copy the next picture has
- * already overtaken is dropped too: the dart is in the newer one.
+ * Note a picture of the board on its way, as the board announces it — see
+ * {@link EMPTY_BOARD_EVENTS}. A record that changes without a new event is the
+ * board updating its status, which sends nothing.
  */
-async function keepPicture(src: string): Promise<void> {
-  const copy = ++copies;
-  let picture: string;
+function noteEmptyBoard(board: IBoard, previous: IBoard | null): void {
+  if (!EMPTY_BOARD_EVENTS.has(board?.event) || board.event === previous?.event) return;
+  emptyBoards.push(Date.now());
+}
+
+/**
+ * Copy a picture for the dart it follows, and show it.
+ *
+ * A dart gone by the time the copy is done, its visit over or the dart taken
+ * back, gets nothing. A copy that fails leaves the dart the board instead,
+ * which by now shows the picture.
+ */
+async function keepPicture(src: string, id: string): Promise<void> {
+  let picture: string | null = null;
   try {
     picture = await encode(src);
   } catch (error) {
     console.warn("Autodarts Tools: Darts Zoom - could not copy the board's picture", error);
-    return;
   }
-  if (copy !== copies) return;
+  if (!(visitInProgress(latest) ?? []).some(thrown => thrown.id === id)) return;
 
-  const throws = visitInProgress(latest) ?? [];
-  const newest = throws[throws.length - 1];
-  if (newest && !frames.has(newest.id)) {
-    frames.set(newest.id, picture);
-    orphan = null;
-    if (latest) render(latest);
-  } else {
-    orphan = { picture, at: Date.now() };
-  }
+  if (picture) frames.set(id, picture);
+  stopWaiting(id);
+  if (latest) render(latest);
 }
 
 /** The bytes behind a blob URL as a data URL, which nothing can revoke. */
@@ -835,26 +921,49 @@ async function encode(src: string): Promise<string> {
 }
 
 /**
- * Keep only the frames of the darts on screen, and give a waiting picture to
- * the dart that has just arrived for it, if one has and it is still fresh.
+ * Keep the pictures of the darts on screen only, and set a new dart waiting
+ * for its own, if one is coming. A dart entered by hand gets no picture, and
+ * neither does one thrown while the board shows no camera, such as a bot's.
  */
 function reconcileFrames(throws: IThrow[]): void {
   const ids = new Set(throws.map(thrown => thrown.id));
   for (const id of frames.keys()) if (!ids.has(id)) frames.delete(id);
+  for (const id of owed) if (!ids.has(id)) owed.delete(id);
+  for (const id of waiting.keys()) if (!ids.has(id)) stopWaiting(id);
 
-  if (!orphan) return;
-  const newest = throws[throws.length - 1];
-  const fresh = Date.now() - orphan.at <= ORPHAN_TTL;
-  if (newest && !frames.has(newest.id) && fresh) frames.set(newest.id, orphan.picture);
-  // Claimed, stale, or beaten to its dart by a picture that came the right way
-  // round — whichever it was, it is nobody's now.
-  if (!fresh || (newest && frames.has(newest.id))) orphan = null;
+  for (const thrown of throws) {
+    if (seen.has(thrown.id)) continue;
+    seen.add(thrown.id);
+    if (!pictureObserver || !wasThrown(thrown) || !boardPicture()) continue;
+
+    owed.add(thrown.id);
+    waiting.set(thrown.id, setTimeout(() => {
+      waiting.delete(thrown.id);
+      if (latest) render(latest);
+    }, PICTURE_WAIT));
+  }
+}
+
+function stopWaiting(id: string): void {
+  clearTimeout(waiting.get(id));
+  waiting.delete(id);
+}
+
+/** Every picture let go of, and every dart waiting for one. */
+function forgetPictures(): void {
+  for (const timer of waiting.values()) clearTimeout(timer);
+  waiting.clear();
+  owed.clear();
+  seen.clear();
+  frames.clear();
+  emptyBoards = [];
 }
 
 /** One close-up: a board that has been slid so the dart is dead centre. */
 function tile(thrown: IThrow, board: HTMLElement | null): HTMLElement {
   const element = document.createElement("div");
   element.className = "adt-zoom-tile";
+  element.toggleAttribute(WAITING_ATTRIBUTE, waiting.has(thrown.id));
   element.appendChild(view(thrown, board));
   if (config?.showMarker) {
     const marker = document.createElement("div");
@@ -874,6 +983,9 @@ function view(thrown: IThrow, board: HTMLElement | null): HTMLElement {
     const image = document.createElement("img");
     image.src = frame;
     box.appendChild(image);
+  } else if (waiting.has(thrown.id)) {
+    // Nothing yet. The tile is hidden, and the board would show the picture
+    // from before the dart.
   } else if (board) {
     // The site's own board, hit highlight and all. Its children are absolutely
     // positioned against it, so the copy needs its own size back — and the
