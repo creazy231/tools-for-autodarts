@@ -3,6 +3,7 @@ import type { InstantReplayConfig } from "@/utils/instant-replay";
 
 import { addStyles, removeStyles } from "@/utils";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { onLanguageChange, t } from "@/utils/i18n";
 import { normalizeInstantReplay } from "@/utils/instant-replay";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { SELECTORS, qs } from "@/utils/selectors";
@@ -112,9 +113,12 @@ const STYLES = `
     transform-origin: center;
   }
 
-  /* so a delayed picture of the board is never mistaken for the live one */
+  /*
+   * so a delayed picture of the board is never mistaken for the live one; the
+   * word is the host's attribute, which is set in the language on screen
+   */
   #${HOST_ID}::after {
-    content: "Replay";
+    content: attr(data-adt-replay-label);
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
@@ -139,6 +143,7 @@ interface Take {
 }
 
 let gameDataWatcherUnwatch: (() => void) | undefined;
+let stopLanguageListener: (() => void) | undefined;
 let onReposition: (() => void) | null = null;
 let host: HTMLElement | null = null;
 let video: HTMLVideoElement | null = null;
@@ -189,6 +194,8 @@ export function instantReplayOnRemove() {
 
   gameDataWatcherUnwatch?.();
   gameDataWatcherUnwatch = undefined;
+  stopLanguageListener?.();
+  stopLanguageListener = undefined;
 
   if (onReposition) {
     window.removeEventListener("resize", onReposition);
@@ -384,10 +391,22 @@ function stopRecording(): void {
 
 function mount(): void {
   document.getElementById(HOST_ID)?.remove();
+  // A run without a teardown in between replaces a host that is still
+  // listening, and its listener would hold a node nobody can see.
+  stopLanguageListener?.();
 
   host = document.createElement("div");
   host.id = HOST_ID;
   host.setAttribute("data-mode", config?.viewMode === "full-page" ? "full-page" : "board-only");
+
+  // The badge is CSS content, read from this attribute, and the host then waits
+  // for a won leg, which can be a whole match away: a language picked meanwhile
+  // has to reach it, or the next replay would still say it in the old one.
+  const badged = host;
+  const paintBadge = () => badged.setAttribute("data-adt-replay-label", t("instantReplay.badge"));
+  paintBadge();
+  stopLanguageListener = onLanguageChange(paintBadge);
+
   // Anywhere on it, not just on the picture: the replay is in the way by
   // design, so it should be easy to get rid of.
   host.addEventListener("click", hide);

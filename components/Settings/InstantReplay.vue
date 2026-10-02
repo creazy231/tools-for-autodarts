@@ -5,20 +5,18 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="max-w-3xl">
-          Point a webcam at your board, and the winning dart is played back over the screen whenever a leg is won, from
-          a few seconds before it to a few after. A click on the replay puts it away early.
+          {{ t("instantReplay.intro") }}
         </p>
         <p class="mb-6 mt-2 max-w-3xl text-sm text-[var(--ad-text-muted)]">
-          It records only while you are in a match, and nothing leaves your computer. This is your own webcam, not the
-          board's camera, which the browser cannot reach.
+          {{ t("instantReplay.note") }}
         </p>
 
-        <AppAlert v-if="cameraError" class="mb-6" :title="hasCameraPermission ? 'Camera unavailable' : 'No camera access'" variant="error">
-          {{ cameraError }}
+        <AppAlert v-if="cameraError" class="mb-6" :title="hasCameraPermission ? t('instantReplay.alert.unavailable') : t('instantReplay.alert.noAccess')" variant="error">
+          {{ t(cameraError) }}
           <template #action>
             <!-- With access already given, only the cameras need looking at again, not the permission. -->
             <AppButton @click="hasCameraPermission ? loadCameraDevices() : requestCameraAccess()" auto size="sm">
-              Try again
+              {{ t("instantReplay.alert.tryAgain") }}
             </AppButton>
           </template>
         </AppAlert>
@@ -30,13 +28,13 @@
         >
           <span class="icon-[material-symbols--videocam-outline-rounded] mb-4 text-5xl text-white/25" />
           <p class="text-lg font-bold text-white">
-            Camera access needed
+            {{ t("instantReplay.access.title") }}
           </p>
           <p class="mt-1 max-w-md text-sm text-[var(--ad-text-muted)]">
-            The replay is recorded from your webcam, so the browser asks you first. Allow it in the prompt, or ask again.
+            {{ t("instantReplay.access.description") }}
           </p>
           <AppButton @click="requestCameraAccess" auto class="mt-6" type="primary">
-            Allow camera access
+            {{ t("instantReplay.access.allow") }}
           </AppButton>
         </div>
 
@@ -44,7 +42,7 @@
         <div v-if="hasCameraPermission" class="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] lg:items-start lg:gap-8">
           <div class="mb-8 lg:sticky lg:top-0 lg:order-2 lg:mb-0">
             <h3 class="adt-section-title mb-3">
-              Preview
+              {{ t("instantReplay.preview.title") }}
             </h3>
             <div class="relative overflow-hidden rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)]">
               <video
@@ -55,10 +53,10 @@
                 playsinline
                 :style="{ transform: `scale(${zoomLevel}) translate(${positionX}%, ${positionY}%)` }"
               />
-              <span v-if="currentFps && cameraDevices.length" class="adt-chip absolute bottom-2 right-2 !bg-black/70 !text-white">{{ currentFps }} FPS</span>
+              <span v-if="currentFps && cameraDevices.length" class="adt-chip absolute bottom-2 right-2 !bg-black/70 !text-white">{{ t("instantReplay.preview.fps", { fps: currentFps }) }}</span>
               <div v-if="!cameraDevices.length" class="absolute inset-0 flex flex-col items-center justify-center text-sm text-[var(--ad-text-muted)]">
                 <span class="icon-[material-symbols--videocam-off-outline-rounded] mb-2 text-4xl text-white/25" />
-                No camera to show
+                {{ t("instantReplay.preview.noCamera") }}
               </div>
             </div>
           </div>
@@ -66,9 +64,9 @@
           <div>
             <section class="mb-10">
               <h3 class="adt-section-title">
-                Camera
+                {{ t("instantReplay.sections.camera") }}
               </h3>
-              <OptionRow :description="cameraHint" title="Camera">
+              <OptionRow :description="cameraHint" :title="t('instantReplay.camera.title')">
                 <div class="flex items-center gap-1">
                   <!-- The width on a wrapper: .adt-input's own 100% comes after the utilities and beats one on the field. -->
                   <div class="w-56">
@@ -76,16 +74,16 @@
                       v-model="selectedDeviceId"
                       :disabled="!cameraDevices.length"
                       :options="cameraOptions"
-                      aria-label="Camera"
+                      :aria-label="t('instantReplay.camera.title')"
                     />
                   </div>
                   <button
                     @click="loadCameraDevices"
                     :aria-busy="isLoadingDevices"
-                    :aria-label="isLoadingDevices ? 'Looking for cameras' : 'Look for cameras again'"
+                    :aria-label="isLoadingDevices ? t('instantReplay.camera.refresh.busyLabel') : t('instantReplay.camera.refresh.idleLabel')"
                     :disabled="isLoadingDevices"
                     class="adt-icon-btn"
-                    :title="isLoadingDevices ? 'Looking…' : 'Look again'"
+                    :title="isLoadingDevices ? t('instantReplay.camera.refresh.busyTitle') : t('instantReplay.camera.refresh.idleTitle')"
                     type="button"
                   >
                     <span :class="isLoadingDevices ? 'icon-[material-symbols--progress-activity] animate-spin' : 'icon-[material-symbols--refresh-rounded]'" />
@@ -96,45 +94,45 @@
 
             <section class="mb-10">
               <h3 class="adt-section-title">
-                Replay
+                {{ t("instantReplay.sections.replay") }}
               </h3>
-              <OptionRow description="How much of the run-up to the winning dart the replay shows." title="Before the gameshot">
+              <OptionRow :description="t('instantReplay.before.description')" :title="t('instantReplay.before.title')">
                 <AppNumberInput
                   v-model="config.instantReplay.before"
                   :max="30"
                   :min="1"
-                  label="Before the gameshot"
+                  :label="t('instantReplay.before.title')"
                   unit="s"
                 />
               </OptionRow>
-              <OptionRow description="And how much of what follows it." title="After the gameshot">
+              <OptionRow :description="t('instantReplay.after.description')" :title="t('instantReplay.after.title')">
                 <AppNumberInput
                   v-model="config.instantReplay.after"
                   :max="10"
                   :min="0"
-                  label="After the gameshot"
+                  :label="t('instantReplay.after.title')"
                   unit="s"
                 />
               </OptionRow>
-              <OptionRow :description="startDelayHint" title="Start delay">
+              <OptionRow :description="startDelayHint" :title="t('instantReplay.startDelay.title')">
                 <AppNumberInput
                   v-model="config.instantReplay.startDelay"
                   :max="10"
                   :min="0"
-                  label="Start delay"
+                  :label="t('instantReplay.startDelay.title')"
                   unit="s"
                 />
               </OptionRow>
-              <OptionRow description="Just the board, or the whole page." title="Covers">
-                <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" aria-label="Covers" button-size="sm" />
+              <OptionRow :description="t('instantReplay.covers.description')" :title="t('instantReplay.covers.title')">
+                <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" :aria-label="t('instantReplay.covers.title')" button-size="sm" />
               </OptionRow>
             </section>
 
             <section>
               <h3 class="adt-section-title">
-                Framing
+                {{ t("instantReplay.sections.framing") }}
               </h3>
-              <OptionRow description="How far the picture zooms in on the board." title="Zoom">
+              <OptionRow :description="t('instantReplay.zoom.description')" :title="t('instantReplay.zoom.title')">
                 <div class="flex w-full items-center gap-3 sm:w-64">
                   <AppSlider
                     v-model="zoomLevel"
@@ -145,11 +143,11 @@
                     :step="0.1"
                     class="flex-1"
                   />
-                  <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ zoomLevel.toFixed(1) }}×</span>
+                  <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ t("instantReplay.zoom.value", { zoom: zoomLevel.toFixed(1) }) }}</span>
                 </div>
               </OptionRow>
               <template v-if="zoomLevel > 1">
-                <OptionRow description="Where the zoomed picture sits, side to side." title="Left and right">
+                <OptionRow :description="t('instantReplay.panX.description')" :title="t('instantReplay.panX.title')">
                   <div class="flex w-full items-center gap-3 sm:w-64">
                     <AppSlider
                       v-model="positionX"
@@ -159,10 +157,10 @@
                       :show-value="false"
                       class="flex-1"
                     />
-                    <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ panLabel(positionX, "left", "right") }}</span>
+                    <span class="w-20 whitespace-nowrap text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ panLabel(positionX, "x") }}</span>
                   </div>
                 </OptionRow>
-                <OptionRow description="And top to bottom." title="Up and down">
+                <OptionRow :description="t('instantReplay.panY.description')" :title="t('instantReplay.panY.title')">
                   <div class="flex w-full items-center gap-3 sm:w-64">
                     <AppSlider
                       v-model="positionY"
@@ -172,7 +170,7 @@
                       :show-value="false"
                       class="flex-1"
                     />
-                    <span class="w-20 text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ panLabel(positionY, "up", "down") }}</span>
+                    <span class="w-20 whitespace-nowrap text-right text-sm font-semibold tabular-nums text-[var(--ad-text-primary)]">{{ panLabel(positionY, "y") }}</span>
                   </div>
                 </OptionRow>
               </template>
@@ -192,12 +190,12 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Instant Replay
+            {{ t("features.instantReplay") }}
             <span class="adt-badge adt-badge-practice ml-2">BETA</span>
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Plays the winning dart back from your own webcam whenever a leg is won.
+            {{ t("instantReplay.card") }}
           </p>
         </div>
         <div class="flex">
@@ -223,18 +221,23 @@ import AppToggle from "../AppToggle.vue";
 
 import OptionRow from "./Library/OptionRow.vue";
 
+import type { MessageKey } from "@/utils/i18n";
+
 const emit = defineEmits([ "toggle" ]);
 
-const VIEW_MODES = [
-  { label: "Board only", value: "board-only" },
-  { label: "Full page", value: "full-page" },
-];
+const { t } = useI18n();
+
+const VIEW_MODES = computed(() => [
+  { label: t("instantReplay.covers.options.boardOnly"), value: "board-only" },
+  { label: t("instantReplay.covers.options.fullPage"), value: "full-page" },
+]);
 
 const { config } = useConfig();
 const videoPreview = ref<HTMLVideoElement | null>(null);
 const mediaStream = ref<MediaStream | null>(null);
 const hasCameraPermission = ref(false);
-const cameraError = ref<string | null>(null);
+/** The message of what went wrong with the camera, kept as its key so the text follows the language. */
+const cameraError = ref<MessageKey | "">("");
 /**
  * Holds the "Camera access needed" block back while the browser can answer by
  * itself, access having been given before. True from the first render until
@@ -247,19 +250,19 @@ const currentFps = ref<number | null>(null);
 
 // Computed properties
 const cameraHint = computed(() => (cameraDevices.value.length
-  ? "Only cameras no other app is using are listed."
-  : "No free camera found. Another app may be using it: close that, then look again."));
+  ? t("instantReplay.camera.hint.some")
+  : t("instantReplay.camera.hint.none")));
 
 /** Start delay's line, which says so when the seconds after the gameshot hold the replay back for longer. */
 const startDelayHint = computed(() => {
   const after = config.value?.instantReplay?.after ?? 0;
-  if (after <= (config.value?.instantReplay?.startDelay ?? 0)) return "From the won leg to the replay, leaving room for autodarts' own celebration.";
-  return `From the won leg to the replay. The ${after} s after the gameshot have to be filmed first, so it starts after ${after} s.`;
+  if (after <= (config.value?.instantReplay?.startDelay ?? 0)) return t("instantReplay.startDelay.description");
+  return t("instantReplay.startDelay.heldBack", { after });
 });
 
 const cameraOptions = computed(() => {
   return cameraDevices.value.map(device => ({
-    label: device.label || `Camera ${device.deviceId.substring(0, 5)}...`,
+    label: device.label || t("instantReplay.camera.unnamed", { id: device.deviceId.substring(0, 5) }),
     value: device.deviceId,
   }));
 });
@@ -344,7 +347,7 @@ async function cameraGranted(): Promise<boolean> {
 
 async function checkCameraPermission() {
   if (!isCameraSupported.value) {
-    cameraError.value = "Your browser does not support camera access.";
+    cameraError.value = "instantReplay.errors.unsupported";
     return;
   }
 
@@ -360,7 +363,7 @@ async function checkCameraPermission() {
       .catch((error) => {
         console.error("Autodarts Tools: Camera permission error:", error);
         hasCameraPermission.value = false;
-        cameraError.value = "Camera access was denied. Please allow camera access in your browser settings.";
+        cameraError.value = "instantReplay.errors.denied";
       });
   } catch (error) {
     console.error("Error checking camera permission:", error);
@@ -371,7 +374,7 @@ async function checkCameraPermission() {
 
 async function requestCameraAccess() {
   if (!isCameraSupported.value) {
-    cameraError.value = "Your browser does not support camera access.";
+    cameraError.value = "instantReplay.errors.unsupported";
     return;
   }
 
@@ -383,22 +386,22 @@ async function requestCameraAccess() {
         stream.getTracks().forEach(track => track.stop());
         // Now load available devices
         loadCameraDevices();
-        cameraError.value = null;
+        cameraError.value = "";
       })
       .catch((error) => {
         console.error("Camera access denied:", error);
-        cameraError.value = "Camera access was denied. Please allow camera access in your browser settings.";
+        cameraError.value = "instantReplay.errors.denied";
         hasCameraPermission.value = false;
       });
   } catch (error) {
     console.error("Error requesting camera access:", error);
-    cameraError.value = "An error occurred while trying to access the camera.";
+    cameraError.value = "instantReplay.errors.failed";
   }
 }
 
 async function loadCameraDevices() {
   isLoadingDevices.value = true;
-  cameraError.value = null;
+  cameraError.value = "";
 
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -455,11 +458,11 @@ async function loadCameraDevices() {
       }
     } else if (allCameraDevices.length > 0) {
       // All devices are in use
-      cameraError.value = "All camera devices are currently in use by other applications. Please close other video applications and try again.";
+      cameraError.value = "instantReplay.errors.allInUse";
     }
   } catch (error) {
     console.error("Error loading camera devices:", error);
-    cameraError.value = "Failed to load camera devices.";
+    cameraError.value = "instantReplay.errors.loadFailed";
   } finally {
     isLoadingDevices.value = false;
   }
@@ -486,7 +489,7 @@ async function updateCameraPreview(deviceId: string) {
     detectCameraFps();
   } catch (error) {
     console.error("Error updating camera preview:", error);
-    cameraError.value = "Failed to access the selected camera.";
+    cameraError.value = "instantReplay.errors.previewFailed";
   }
 }
 
@@ -530,10 +533,12 @@ function measureFpsManually() {
   requestAnimationFrame(measureFrame);
 }
 
-/** Where a pan slider stands, in words: "Centre", "40% left". */
-function panLabel(value: number, negative: string, positive: string): string {
-  if (value === 0) return "Centre";
-  return `${Math.abs(value)}% ${value < 0 ? negative : positive}`;
+/** Where a pan slider stands, in words: "Centre", "40% left", "40% down". */
+function panLabel(value: number, axis: "x" | "y"): string {
+  if (value === 0) return t("instantReplay.pan.centre");
+  const percent = Math.abs(value);
+  if (axis === "x") return value < 0 ? t("instantReplay.pan.left", { percent }) : t("instantReplay.pan.right", { percent });
+  return value < 0 ? t("instantReplay.pan.up", { percent }) : t("instantReplay.pan.down", { percent });
 }
 
 async function toggleFeature() {

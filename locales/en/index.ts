@@ -10,6 +10,7 @@ import enhancedScoringDisplay from "./enhancedScoringDisplay";
 import features from "./features";
 import gameModes from "./gameModes";
 import gotcha from "./gotcha";
+import instantReplay from "./instantReplay";
 import largerLegsSets from "./largerLegsSets";
 import largerPlayerMatchData from "./largerPlayerMatchData";
 import largerPlayerNames from "./largerPlayerNames";
@@ -45,6 +46,7 @@ export default {
   features,
   gameModes,
   gotcha,
+  instantReplay,
   largerLegsSets,
   largerPlayerMatchData,
   largerPlayerNames,

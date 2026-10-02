@@ -304,6 +304,23 @@ Settled in Streaming Mode (`locales/*/streamingMode.ts`), for whatever else name
 | Drawn board (an option) | as in Darts Zoom, but a button label: German keeps the adjective alone, since *Gezeichnetes Board* made the option group wider than a 320 px window | Gezeichnet | Getekend bord |
 | Volume (the sliders' spoken name) | a mistake in the English, which both sliders' thumbs have said from the start and which is kept until it is fixed on its own; the site's *Volume* is `settings.caller.volume` | Lautstärke | Volume |
 
+Settled in Instant Replay (`locales/*/instantReplay.ts`), for whatever else speaks of the replay, its webcam or the dart that wins a leg. *Start delay* is in the What's New table above (Startverzögerung, Startvertraging), and the panel's row and its number field are written the same.
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| the gameshot (the dart that wins the leg) | the site's *game shot* (`referee-dialog.checking-gameshot`, "is verifying game shot"), the only text in which the site names it. The caller's and the trigger's `gameshot` is a token and is never translated. A German player may know it as *Gameshot*, which is also the word the trigger token spells; the site's own German is *Spielwurf* | Spielwurf | game shot (two words, as the site writes it) |
+| the winning dart | not the site's: the dart that wins the leg, where a sentence says so rather than a label | der entscheidende Dart | de winnende dart |
+| Replay | the badge over the replay and the section's heading. The site has no replay text (`yarn i18n:site replay` finds only *needsMorePlayers*), and the feature's name stays Instant Replay in every language, so the badge keeps the word | Replay | Replay |
+| webcam | not the site's: the camera of the player's computer, as against the board's cameras, which the site writes *Kamera* and *camera* | Webcam | webcam |
+| camera access | the site's own (`lens.cameraPermissionDenied.title`, "Kamera-Zugriff erforderlich", "Cameratoegang is vereist") | Kamerazugriff | cameratoegang |
+| Allow camera (a button) | the site's `permissions.camera.rationale.title` is *Kamerazugriff erlauben* and *Camera toestaan*. The German button drops *zugriff* (the button is 159 px at 15 px, against 207 px for the long form, and 187 px for the English), the Dutch is the site's words as they are | Kamera erlauben | Camera toestaan |
+| Try again (the alert's button) | the site's `appError.tryAgain` is *Erneut versuchen* and *Opnieuw proberen*, 110 and 115 px at 13 px against the English 57. The button sits in a slot that does not shrink, beside the message, so a long label leaves the message 93 px at a 390 px window, and a word such as *Kamerazugriff* then runs under the button at 375 px. The button says one word | Nochmal | Opnieuw |
+| Preview | the site's own (`lobby.autoscoring.preview`) | Vorschau | Voorbeeld |
+| Framing | not the site's: the zoom and the two pan sliders, which cut the picture | Bildausschnitt | uitsnede |
+| Covers | not the site's: what the replay is laid over, the board or the whole page | Abdeckung | bedekking |
+| celebration | autodarts' own moment after a won leg, when the card lights up | Siegesfeier | viering |
+| the pan words | beside a slider, in a box that is 80 px wide and holds the longest English value, "100% down", in 79 px. *links*, *oben* and *Mitte* fit as well. *rechts*, *unten*, *boven* and *onder* are over by 2 to 6 px at 100%, which the box lets run on one line. *omhoog* and *omlaag* would be over by 11 to 18, so Dutch says where the picture sits | links, rechts, oben, unten, Mitte | links, rechts, boven, onder, midden |
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".
