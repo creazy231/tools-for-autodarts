@@ -3,7 +3,7 @@ import type { Translation } from "../../utils/i18n/types";
 
 export default {
   card: "Spiel in Teams: mit gemeinsamem Score oder jeder mit seinem eigenen. Füge sie in der Lobby hinzu, dann zeigt das Match in den Farben jedes Teams, wer dran ist.",
-  intro: "Spiel auf zwei Arten in Teams. Mit gemeinsamem Score ist ein Team ein Spieler auf deinem Board, an dem sich seine Spieler abwechseln, wie im Steeldart-Doppel. Wirft jemand anderes, tippe auf der Karte des Teams auf seinen Namen. Mit eigenen Scores spielt jeder für sich, ein Leg zählt für sein Team, und auch ein Bot kann in einem Team spielen. Ein Team kann auch ein einzelner Spieler sein, für 2 gegen 1. Teams mit eigenen Scores können in X01 mit der Partnerregel spielen: Schalte sie auf der Lobby-Seite ein, neben Autoscoring. In einer Lobby mit dir als Host fügst du Teams mit <b>{addTeam}</b> hinzu, neben Spieler hinzufügen und Bot hinzufügen.",
+  intro: "Spiel auf zwei Arten in Teams. Mit gemeinsamem Score ist ein Team ein Spieler auf deinem Board, an dem sich seine Spieler abwechseln, wie im Steeldart-Doppel. Wirft jemand anderes, tippe auf der Karte des Teams auf seinen Namen. Mit eigenen Scores spielt jeder für sich, ein Leg zählt für sein Team, und auch ein Bot kann in einem Team spielen. Ein Team kann auch ein einzelner Spieler sein, für 2 gegen 1. Teams mit eigenen Scores können in X01 mit der Partnerregel spielen: Schalte sie auf der Lobby-Seite ein, neben Autoscoring. In einer Lobby mit dir als Host steht <b>{addTeam}</b> neben Spieler hinzufügen und Bot hinzufügen.",
   savedTeams: "Gespeicherte Teams",
   list: {
     emptyTitle: "Noch keine gespeicherten Teams",

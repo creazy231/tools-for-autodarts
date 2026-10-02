@@ -13,7 +13,7 @@ export default {
     x01Cricket: "X01 en Cricket",
     practice: "Oefenen",
     party: "Party",
-    beforeMatch: "Voor de wedstrijd",
+    beforeMatch: "Vóór de wedstrijd",
   },
   modes: {
     x01: "X01",

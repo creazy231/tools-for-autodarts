@@ -13,7 +13,7 @@ export default {
     },
     settingsFresh: {
       title: "Een paar instellingen beginnen opnieuw",
-      body: "De Vertraging van Instant Replay heet nu Startvertraging en betekent iets anders, daarom begint die op 3 seconden; de Middenpositie van Darts Zoom is verdwenen en de tijd dat het bord op een dart ingezoomd blijft, wordt nu in milliseconden aangegeven. Het is de moeite waard om er voor je volgende wedstrijd even naar te kijken.",
+      body: "De Vertraging van Instant Replay heet nu Startvertraging en betekent iets anders, daarom begint die op 3 seconden; de Middenpositie van Darts Zoom is verdwenen en de tijd dat het bord op een dart ingezoomd blijft, wordt nu in milliseconden aangegeven. Het is de moeite waard om er vóór je volgende wedstrijd even naar te kijken.",
     },
   },
   highlights: {
