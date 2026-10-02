@@ -1,6 +1,8 @@
 import autoStart from "./autoStart";
 import automaticFullscreen from "./automaticFullscreen";
 import automaticNextLeg from "./automaticNextLeg";
+import boardSkins from "./boardSkins";
+import boardView from "./boardView";
 import common from "./common";
 import discordWebhooks from "./discordWebhooks";
 import enhancedScoringDisplay from "./enhancedScoringDisplay";
@@ -15,6 +17,7 @@ import localLobby from "./localLobby";
 import migration from "./migration";
 import nextPlayerOnTakeoutStuck from "./nextPlayerOnTakeoutStuck";
 import qrCode from "./qrCode";
+import quickCorrection from "./quickCorrection";
 import recentLocalPlayers from "./recentLocalPlayers";
 import settings from "./settings";
 import site from "./site";
@@ -24,12 +27,15 @@ import teams from "./teams";
 import triggers from "./triggers";
 import whatsNew from "./whatsNew";
 import winnerAnimation from "./winnerAnimation";
+import zoom from "./zoom";
 
 /** Every English file, under the first part of its keys: `t("site.languageNote")`. Alphabetical. */
 export default {
   autoStart,
   automaticFullscreen,
   automaticNextLeg,
+  boardSkins,
+  boardView,
   common,
   discordWebhooks,
   enhancedScoringDisplay,
@@ -44,6 +50,7 @@ export default {
   migration,
   nextPlayerOnTakeoutStuck,
   qrCode,
+  quickCorrection,
   recentLocalPlayers,
   settings,
   site,
@@ -53,4 +60,5 @@ export default {
   triggers,
   whatsNew,
   winnerAnimation,
+  zoom,
 };

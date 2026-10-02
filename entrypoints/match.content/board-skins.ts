@@ -145,12 +145,12 @@ export async function boardSkins() {
   const ready = !!skin.art && await decodes(skin.art);
   if (run !== generation) return;
 
-  if (skin.art && !ready) console.warn(`Autodarts Tools: Board Skins - ${skin.label} did not load, leaving autodarts' own board`);
+  if (skin.art && !ready) console.warn(`Autodarts Tools: Board Skins - ${skin.id} did not load, leaving autodarts' own board`);
   art = ready ? skin.art : null;
   if (art) addStyles(stylesheet(art), STYLE_ID);
   else removeStyles(STYLE_ID);
 
-  console.log(`Autodarts Tools: Board Skins - ${skin.label}, keeping the board on the drawn one`);
+  console.log(`Autodarts Tools: Board Skins - ${skin.id}, keeping the board on the drawn one`);
   stopKeeping?.();
   stopKeeping = keepBoardView("image");
 }

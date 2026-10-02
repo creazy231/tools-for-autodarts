@@ -112,6 +112,11 @@ interface Correction {
   y: number;
 }
 
+/**
+ * Where each segment sits on the board, by the notation the grid's buttons are labelled with. A button's label
+ * is also the value the correction works from, and the segment name it sends autodarts (MISS has a path of its
+ * own below), so none of them is translated: MISS and BULL are in locales/untranslated.json for that reason.
+ */
 const CORRECTIONS: Record<string, Correction> = {
   S1: { x: 0.23864869472714267, y: 0.7450953567163014 },
   S2: { x: 0.45156927001320907, y: -0.5932624277493371 },

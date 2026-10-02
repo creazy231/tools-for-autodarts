@@ -4,19 +4,18 @@
     <div v-if="config" class="adt-container">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Fixes a dart the board read wrong: open it on a throw and pick the right segment from a grid of the whole board,
-          with the mouse or the number pad.
+          {{ t("quickCorrection.intro") }}
         </p>
 
         <AppAlert class="mb-6" compact variant="warning">
-          Not available in Safari yet: its security rules block the correction window.
+          {{ t("quickCorrection.safari.panel") }}
         </AppAlert>
 
         <section>
           <h3 class="adt-section-title">
-            Options
+            {{ t("quickCorrection.sections.options") }}
           </h3>
-          <OptionRow description="How large the correction window opens." title="Window size">
+          <OptionRow :description="t('quickCorrection.windowSize.description')" :title="t('quickCorrection.windowSize.title')">
             <div class="flex w-full items-center gap-3 sm:w-64">
               <AppSlider
                 v-model="scale"
@@ -44,14 +43,14 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
-            Quick Correction
+            {{ t("features.quickCorrection") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Adds a quick correction to dart throws, allowing you to fix incorrectly recognized darts.
+            {{ t("quickCorrection.card") }}
           </p>
           <p class="mt-1 w-2/3 text-sm text-yellow-400">
-            Not compatible with Safari browsers for now.
+            {{ t("quickCorrection.safari.card") }}
           </p>
         </div>
         <div class="flex">
@@ -63,7 +62,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Quick Correction" class="size-full object-cover opacity-70">
+        <img :src="imageUrl" :alt="t('features.quickCorrection')" class="size-full object-cover opacity-70">
       </div>
     </div>
   </template>
@@ -77,6 +76,7 @@ import AppToggle from "../AppToggle.vue";
 import OptionRow from "./Library/OptionRow.vue";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/quick-correction.png");
 

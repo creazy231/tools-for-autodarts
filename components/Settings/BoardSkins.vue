@@ -4,16 +4,15 @@
     <div v-if="config" class="adt-container">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Draws autodarts' board in the design you pick, for everyone who throws on it, bots included. A camera's picture has
-          no board to redraw, so this also keeps the drawn board up while a game is on.
+          {{ t("boardSkins.intro") }}
         </p>
 
         <section>
           <h3 class="adt-section-title mb-4">
-            Skin
+            {{ t("boardSkins.sections.skin") }}
           </h3>
           <!-- Three to a row across the dialog, two on a phone. -->
-          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4" role="group" aria-label="Skin">
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4" role="group" :aria-label="t('boardSkins.sections.skin')">
             <button
               @click="config.boardSkins.skin = skin.id"
               v-for="skin in BOARD_SKINS"
@@ -27,7 +26,7 @@
               <span class="block p-3 sm:p-5">
                 <img
                   :src="skin.preview"
-                  :alt="`${skin.label} board`"
+                  :alt="t('boardSkins.skinAlt', { skin: t(skin.labelKey) })"
                   class="aspect-square w-full rounded-full"
                   draggable="false"
                 >
@@ -37,26 +36,28 @@
                 class="block px-3 py-2.5 text-[length:var(--ad-text-md)] text-white"
                 :class="config.boardSkins.skin === skin.id ? 'bg-[image:var(--ad-gradient-hot)] font-bold' : 'bg-[var(--ad-navy-400)] font-semibold'"
               >
-                {{ skin.label }}
+                {{ t(skin.labelKey) }}
               </span>
             </button>
           </div>
           <p class="mt-3 max-w-3xl text-sm text-[var(--ad-text-muted)]">
-            <span class="font-semibold text-[var(--ad-text-primary)]">{{ selected.label }}:</span>
-            {{ selected.description }}
-            <template v-if="selected.art">
-              The darts, the yellow of a hit and aiming by hand work as on autodarts' own board, and Darts Zoom's close-ups
-              and Streaming Mode's board wear it too.
-            </template>
-            <template v-else>
-              Nothing about the board changes; it is only kept on the drawn board.
-            </template>
+            <AppTrans
+              v-if="selected.art"
+              :params="{ label: t(selected.labelKey), description: t(selected.descriptionKey) }"
+              class="adt-skin-selected"
+              path="boardSkins.selected.redrawn"
+            />
+            <AppTrans
+              v-else
+              :params="{ label: t(selected.labelKey), description: t(selected.descriptionKey) }"
+              class="adt-skin-selected"
+              path="boardSkins.selected.kept"
+            />
           </p>
         </section>
 
         <p class="mt-8 max-w-3xl border-t border-[var(--ad-border-subtle)] pt-4 text-sm text-[var(--ad-text-muted)]">
-          Pressing the camera button yourself, or autodarts' own 1, 2 and 3 keys, leaves the view to you until the next leg.
-          While this is on, Board View stands aside, and Darts Zoom and Streaming Mode no longer switch the board.
+          {{ t("boardSkins.note") }}
         </p>
       </div>
     </div>
@@ -68,11 +69,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
-            Board Skins
+            {{ t("features.boardSkins") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play on autodarts' board in another design — the classic one, qwellcode, Opal, Marble or Sorbet.
+            {{ t("boardSkins.card") }}
           </p>
         </div>
         <div class="flex">
@@ -81,7 +82,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Board Skins" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.boardSkins')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -89,10 +90,12 @@
 
 <script setup lang="ts">
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 import { BOARD_SKINS, boardSkin } from "@/utils/board-skins";
 
 const emit = defineEmits([ "toggle" ]);
+const { t } = useI18n();
 const { config } = useConfig();
 /** The card always shows a match on the qwellcode board, whichever skin is chosen. */
 const imageUrl = browser.runtime.getURL("/images/board-skins.png");
@@ -111,3 +114,8 @@ async function toggleFeature() {
   }
 }
 </script>
+
+<style scoped>
+/* The skin's name leads the line in bold and in the primary text colour; the rest of it is muted. */
+.adt-skin-selected :deep(b) { font-weight: 600; color: var(--ad-text-primary); }
+</style>

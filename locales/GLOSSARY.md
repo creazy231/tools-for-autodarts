@@ -260,6 +260,20 @@ Settled in the small match features (`locales/*/{takeoutNotification,nextPlayerO
 
 A card's description sits in a column two thirds of the card's width, in a card of fixed height, so on a phone a long German or Dutch sentence cuts off the toggle under it. Aim for about the English length: the Auto Next Player card's "if takeout stucks" sentence was written as "wenn das Abziehen … hängt" and "als de darts … niet zijn verwijderd", and its "automatically" left out, since the card's name says it.
 
+Settled in Darts Zoom, Board View, Board Skins and Quick Correction (`locales/*/{zoom,boardView,boardSkins,quickCorrection}.ts`), for whatever else speaks of the board and its pictures:
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| the drawn board | the board autodarts draws itself, as against a camera's picture | das gezeichnete Board | het getekende bord |
+| the view | what the board shows: camera 1, 2, 3 or the drawn board | Ansicht | weergave |
+| the camera button | the site's button that cycles the view; it has no text of its own, so Tools names it | Kamera-Button | cameraknop |
+| a close-up | Darts Zoom's tile of where a dart landed; not the site's | Nahaufnahme | close-up |
+| skin | the design Board Skins puts on the drawn board; the feature's name keeps the English word, and so does the picker's heading | Skin (*der*) | skin |
+| the skins | Default, Classic, qwellcode, Opal, Marble, Sorbet. qwellcode is a brand and stays. Classic is the site's own *klassisch* / *klassiek* (`userMenu.switchToV1.title`) | Standard, Klassisch, qwellcode, Opal, Marmor, Sorbet | Standaard, Klassiek, qwellcode, Opaal, Marmer, Sorbet |
+| number pad | the keyboard's number block, which Quick Correction reads. Not the site's on-screen *Keypad* (`inGameSettings.scoreEntry.keypad`: *Zifferntastatur*, *Toetsenblok*) | Ziffernblock | numeriek toetsenblok |
+| to correct a dart | the site's own verb (`game.clippy.undoHintBody`), and its words for a dart read wrong (`subscriptions.features.items.referee.description`) | korrigieren, falsch erkannt | corrigeren, verkeerd herkend |
+| to stand aside | one feature keeping out of another's way, as Board View does while Board Skins is on; not the site's | sich heraushalten | zich afzijdig houden |
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".
@@ -294,6 +308,8 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 | `px` | Unit: pixels. |
 | `dB` | Unit: decibels. |
 | `×` | The multiplication sign after a speed or zoom number (`1.5×`). |
+| `MISS` | Notation: the label on Quick Correction's grid for a dart that missed the board, and the value the correction sends to autodarts. A label that is also a value cannot be translated. |
+| `BULL` | Notation: the label on Quick Correction's grid for the bull, and the value the correction sends to autodarts, as `MISS` is. |
 | `Around The Clock` | The game's name, which the site's German leaves in English (`lobby.gamePicker.games.atc`). Its Dutch is "Around the Clock", so only the German is identical. |
 | `Round the World` | The game's name, which the site's German and Dutch both leave in English (`lobby.gamePicker.games.rtw`). |
 | `Edit Channel › Integrations › Webhooks` | Where Discord makes a webhook, as Discord's own menus read, and how the Discord Webhooks panel names it in every language (`discordWebhooks.panel.url.path`). |
