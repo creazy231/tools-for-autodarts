@@ -2,8 +2,8 @@ import type en from "../en/zoom";
 import type { Translation } from "../../utils/i18n/types";
 
 export default {
-  card: "Een close-up van waar elke dart is geland — onderaan het scherm, onder de worpweergave of op het bord zelf.",
-  intro: "Een close-up van waar elke dart van de beurt is geland, één tegel per dart: onderaan het scherm, onder de worpweergave of op het bord zelf.",
+  card: "Een close-up van waar elke dart is geland — onderaan het scherm, onder de scorebalk of op het bord zelf.",
+  intro: "Een close-up van waar elke dart van de beurt is geland, één tegel per dart: onderaan het scherm, onder de scorebalk of op het bord zelf.",
   sections: {
     closeUps: "Close-ups",
     whichDarts: "Welke darts",
@@ -11,7 +11,7 @@ export default {
   },
   position: {
     title: "Positie",
-    description: "Onderaan krijgt elke dart een derde van het venster en gaan Ongedaan maken en Volgende naar rechtsboven, waar je ze overal heen kunt slepen. Bovenaan zet de strook onder de worpweergave. Op het bord zoomt in plaats daarvan het eigen bord van autodarts in op elke dart en voegt niets toe aan het scherm.",
+    description: "Onderaan krijgt elke dart een derde van het venster en gaan Ongedaan maken en Volgende naar rechtsboven, waar je ze overal heen kunt slepen. Bovenaan zet de strook onder de scorebalk. Op het bord zoomt in plaats daarvan het eigen bord van autodarts in op elke dart en voegt niets toe aan het scherm.",
     options: {
       bottom: "Onderaan",
       top: "Bovenaan",

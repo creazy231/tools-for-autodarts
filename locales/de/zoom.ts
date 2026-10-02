@@ -2,8 +2,8 @@ import type en from "../en/zoom";
 import type { Translation } from "../../utils/i18n/types";
 
 export default {
-  card: "Eine Nahaufnahme, wo jeder Dart gelandet ist — am unteren Bildschirmrand, unter der Wurfanzeige oder direkt auf dem Board.",
-  intro: "Eine Nahaufnahme, wo jeder Dart der Aufnahme gelandet ist, eine Kachel pro Dart: am unteren Bildschirmrand, unter der Wurfanzeige oder direkt auf dem Board.",
+  card: "Eine Nahaufnahme, wo jeder Dart gelandet ist — am unteren Bildschirmrand, unter der Punkteleiste oder direkt auf dem Board.",
+  intro: "Eine Nahaufnahme, wo jeder Dart der Aufnahme gelandet ist, eine Kachel pro Dart: am unteren Bildschirmrand, unter der Punkteleiste oder direkt auf dem Board.",
   sections: {
     closeUps: "Nahaufnahmen",
     whichDarts: "Welche Darts",
@@ -11,7 +11,7 @@ export default {
   },
   position: {
     title: "Position",
-    description: "Unten bekommt jeder Dart ein Drittel des Fensters, und Rückgängig und Weiter wandern nach oben rechts, von wo du sie überallhin ziehen kannst. Oben legt den Streifen unter die Wurfanzeige. Auf dem Board zoomt stattdessen das Board von autodarts selbst auf jeden Dart und fügt dem Bildschirm nichts hinzu.",
+    description: "Unten bekommt jeder Dart ein Drittel des Fensters, und Rückgängig und Weiter wandern nach oben rechts, von wo du sie überallhin ziehen kannst. Oben legt den Streifen unter die Punkteleiste. Auf dem Board zoomt stattdessen das Board von autodarts selbst auf jeden Dart und fügt dem Bildschirm nichts hinzu.",
     options: {
       bottom: "Unten",
       top: "Oben",
