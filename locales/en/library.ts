@@ -120,4 +120,65 @@ export default {
     none: "No trigger",
     noneTitle: "Without a trigger it never plays",
   },
+  /**
+   * What the Caller and Sound FX word the same: the list's heading and search, the Add menu, Sort by trigger, the
+   * delete-all dialog, the upload dialog, the two names a sound without one gets, and the toasts of adding and
+   * playing a sound. What each panel words by itself (its intro, its empty list's text, "Caller sounds have been
+   * sorted…") is in its own catalog.
+   */
+  sounds: {
+    title: "Sounds",
+    searchPlaceholder: "Search sounds by name or trigger",
+    emptyTitle: "No sounds yet",
+    /** The name the list gives a sound that has no name, no text and no trigger. It is shown, and it is searched. */
+    untitled: "Untitled sound",
+    /** The name an uploaded file is stored under when none is typed: written once, when the sound is created, in the language of that moment. */
+    unnamed: "Unnamed sound",
+    /** Under the link field of the add and edit dialog, for a link that is no https:// one. */
+    linkNotHttps: "The link has to start with https://, for security.",
+    /** The Add menu and the empty list's buttons. */
+    add: {
+      upload: {
+        label: "Upload files",
+        hint: "MP3, WAV or OGG, several at once",
+      },
+      generate: {
+        label: "Generate a sound",
+        hint: "Text to speech, in a voice on this device",
+        /** Said in place of the hint when the device has no voice, and the item is switched off. */
+        hintUnavailable: "This device has no text-to-speech voices",
+      },
+      link: {
+        label: "Add from a link",
+        hint: "A sound file on the web",
+      },
+    },
+    /** The list's menu. Its button and its Delete all are moreActions, more, deleteAllMenu and deleteAll above. */
+    menu: {
+      sort: {
+        label: "Sort by trigger",
+        hint: "Puts the list in trigger order",
+      },
+    },
+    upload: {
+      title: "Upload sounds",
+      /** The two example file names and the `+` are what a person types, so they stay as they are in every language. */
+      namesHint: "A file named 180.mp3 plays on 180. Anything after a + is left out, so 180+crowd.mp3 does too.",
+    },
+    deleteAll: {
+      /** The dialog's heading. The menu item and the confirm button are deleteAllMenu and deleteAll above. */
+      title: { one: "Delete the {count} sound?", other: "Delete all {count} sounds?" },
+      body: "They're removed for good, stored files included. This can't be undone.",
+    },
+    notifications: {
+      needsSource: "Please provide either a sound URL or upload a file",
+      needsTrigger: "Please provide at least one trigger",
+      added: { one: "Added {count} sound", other: "Added {count} sounds" },
+      processingError: "Error processing files",
+      noSource: "No audio source available for this sound",
+      playFailed: "Failed to play sound",
+      ttsAdded: "TTS sound added",
+      ttsUpdated: "TTS sound updated",
+    },
+  },
 };

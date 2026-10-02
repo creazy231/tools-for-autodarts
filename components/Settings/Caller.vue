@@ -5,44 +5,43 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Calls out scores, checkouts and names during a match, in a voice of your choice. Each sound plays on the
-          triggers you give it.
+          {{ t("caller.intro") }}
         </p>
 
         <section class="mb-10">
           <h3 class="adt-section-title">
-            Options
+            {{ t("caller.sections.options") }}
           </h3>
-          <OptionRow description="Call each dart as it lands, not only the visit's total." title="Call every dart">
+          <OptionRow :description="t('caller.callEveryDart.description')" :title="t('caller.callEveryDart.title')">
             <AppToggle v-model="config.caller.callEveryDart" size="sm" />
           </OptionRow>
-          <OptionRow description="Say what a player requires when they're on a finish, and in Gotcha the number left to the target." title="Call checkout">
+          <OptionRow :description="t('caller.callCheckout.description')" :title="t('caller.callCheckout.title')">
             <AppToggle v-model="config.caller.callCheckout" size="sm" />
           </OptionRow>
-          <OptionRow title="Prefer combined throws">
+          <OptionRow :title="t('caller.combinedThrows.title')">
             <template #description>
-              When there's a sound for the exact darts, such as <code class="adt-code">s20_s5_s1</code>, play it instead of the visit's total.
+              <AppTrans class="adt-caller-code" path="caller.combinedThrows.description" />
             </template>
             <AppToggle v-model="config.caller.preferCombinedThrows" size="sm" />
           </OptionRow>
-          <OptionRow description="The games it calls in." title="Game modes">
-            <GameModesField v-model="config.caller.disabledGameModes" feature="caller" intro="The Caller only calls in the games switched on here." />
+          <OptionRow :description="t('caller.gameModes.description')" :title="t('gameModes.title')">
+            <GameModesField v-model="config.caller.disabledGameModes" :intro="t('caller.gameModes.intro')" feature="caller" />
           </OptionRow>
         </section>
 
         <LibrarySection
           @reorder="moveSound"
+          :empty-text="t('caller.list.emptyText')"
+          :empty-title="t('library.sounds.emptyTitle')"
           :entries="entries"
+          :search-placeholder="t('library.sounds.searchPlaceholder')"
+          :title="t('library.sounds.title')"
           empty-icon="icon-[material-symbols--record-voice-over-outline-rounded]"
-          empty-text="Import a ready-made caller set, upload recordings of your own, or generate them from text."
-          empty-title="No sounds yet"
-          search-placeholder="Search sounds by name or trigger"
-          title="Sounds"
         >
           <template #actions>
             <AppMenu :items="moreActions">
               <template #trigger="{ open, toggle }">
-                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                <button @click="toggle" :aria-expanded="open" :aria-label="t('library.moreActions')" class="adt-icon-btn" :title="t('library.more')" type="button">
                   <span class="icon-[material-symbols--more-horiz]" />
                 </button>
               </template>
@@ -52,7 +51,7 @@
                 <AppButton @click="toggle" :aria-expanded="open" auto size="sm" type="primary">
                   <span class="flex items-center gap-1">
                     <span class="icon-[material-symbols--add-rounded] text-lg" />
-                    Add
+                    {{ t("common.add") }}
                     <span class="icon-[material-symbols--expand-more-rounded] -mr-1 text-lg" />
                   </span>
                 </AppButton>
@@ -86,16 +85,16 @@
 
           <template #empty>
             <AppButton @click="openImportURLModal" auto type="primary">
-              Import a caller set
+              {{ t("caller.import.title") }}
             </AppButton>
             <AppButton @click="openUploadModal" auto>
-              Upload files
+              {{ t("library.sounds.add.upload.label") }}
             </AppButton>
             <AppButton @click="openTTSModal()" :disabled="!isTTSAvailable" auto>
-              Generate a sound
+              {{ t("library.sounds.add.generate.label") }}
             </AppButton>
             <AppButton @click="openAddSoundModal" auto>
-              Add from a link
+              {{ t("library.sounds.add.link.label") }}
             </AppButton>
           </template>
         </LibrarySection>
@@ -115,7 +114,7 @@
       :louder-blocked="louderBlocked"
       :playing="playingKey === DRAFT_KEY"
       :show="showSoundModal"
-      :url-error="urlError"
+      :url-error="urlErrorText"
       feature="caller"
     />
 
@@ -123,15 +122,15 @@
       @close="closeUploadModal"
       @save="processFiles"
       :formats="t('library.upload.formatsAudio')"
+      :names-hint="t('library.sounds.upload.namesHint')"
       :processing="isProcessing"
       :show="showUploadModal"
+      :title="t('library.sounds.upload.title')"
       :triggers-from-name="file => extractTriggerFromFilename(file.name)"
       accept="audio/*"
       add-key="library.upload.addSounds"
       feature="caller"
       file-icon="icon-[material-symbols--audio-file-outline-rounded]"
-      names-hint="A file named 180.mp3 plays on 180. Anything after a + is left out, so 180+crowd.mp3 does too."
-      title="Upload sounds"
     />
 
     <TtsDialog
@@ -151,49 +150,47 @@
       feature="caller"
     />
 
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="`Delete all ${config?.caller.sounds.length ?? 0} sounds?`" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('library.sounds.deleteAll.title', { count: config?.caller.sounds.length ?? 0 })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
-        They're removed for good, stored files included. This can't be undone.
+        {{ t("library.sounds.deleteAll.body") }}
       </p>
       <template #footer>
         <AppButton @click="closeDeleteAllModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="deleteAllSounds" auto type="danger">
-          Delete all
+          {{ t("library.deleteAll") }}
         </AppButton>
       </template>
     </AppModal>
 
-    <AppModal @close="closeImportURLModal" :show="showImportURLModal" ghost-close size="lg" title="Import a caller set">
+    <AppModal @close="closeImportURLModal" :show="showImportURLModal" :title="t('caller.import.title')" ghost-close size="lg">
       <div class="space-y-5">
         <AppSelect
           id="preset-url"
           v-model="selectedPresetURL"
+          :helper-text="t('caller.import.setHelper')"
+          :label="t('caller.import.setLabel')"
           :options="callerSets"
-          helper-text="From darts-downloads.peschi.org. Some sets may not play in Safari, and Tools for Autodarts isn't responsible for what they say."
-          label="Caller set"
         />
         <div>
-          <AppInput id="base-url" v-model="baseURL" label="Link" placeholder="https://darts-downloads.peschi.org/soundfiles/…" type="url">
+          <AppInput id="base-url" v-model="baseURL" :label="t('caller.import.linkLabel')" :placeholder="t('caller.import.linkPlaceholder')" type="url">
             <template #icon>
               <span class="icon-[material-symbols--link-rounded]" />
             </template>
           </AppInput>
           <p class="adt-field-hint">
-            Filled in from the set above, or a link of your own: a ZIP file, or a folder with files named 0.mp3 to 180.mp3.
-            Triggers come from the file names. Links on darts-downloads.peschi.org, adt-socket.tobias-thiele.de and
-            autodarts.x10.mx are supported.
+            {{ t("caller.import.linkHint") }}
           </p>
         </div>
         <AppAlert v-if="urlError" compact variant="error">
-          {{ urlError }}
+          {{ urlErrorText }}
         </AppAlert>
 
         <div v-if="isZipFile && (isDownloadingZip || isExtractingZip || isProcessingCsv)" class="space-y-4 rounded-[var(--ad-radius-lg)] bg-white/[.04] p-4">
           <div v-if="isDownloadingZip">
             <div class="mb-1.5 flex justify-between text-xs">
-              <span>Downloading the ZIP file…</span>
+              <span>{{ t("caller.import.progress.downloading") }}</span>
               <span class="tabular-nums">{{ zipDownloadProgress }}%</span>
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -202,7 +199,7 @@
           </div>
           <div v-if="isExtractingZip">
             <div class="mb-1.5 flex justify-between text-xs">
-              <span>Unpacking…</span>
+              <span>{{ t("caller.import.progress.unpacking") }}</span>
               <span class="tabular-nums">{{ zipExtractedFiles }} / {{ zipTotalFiles || "?" }}</span>
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -211,7 +208,7 @@
           </div>
           <div v-if="isProcessingCsv">
             <div class="mb-1.5 flex justify-between text-xs">
-              <span>Matching sounds to triggers…</span>
+              <span>{{ t("caller.import.progress.matching") }}</span>
               <span class="tabular-nums">{{ csvProcessingProgress }}%</span>
             </div>
             <div class="h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -222,8 +219,8 @@
 
         <div v-else-if="isImporting" class="rounded-[var(--ad-radius-lg)] bg-white/[.04] p-4">
           <div class="mb-1.5 flex justify-between text-xs">
-            <span>Looking for sounds…</span>
-            <span class="tabular-nums">{{ importedCount }} found</span>
+            <span>{{ t("caller.import.progress.looking") }}</span>
+            <span class="tabular-nums">{{ t("caller.import.progress.found", { count: importedCount }) }}</span>
           </div>
           <div class="h-1.5 overflow-hidden rounded-full bg-white/10">
             <div :style="{ width: `${(importProgress / 181) * 100}%` }" class="h-full rounded-full bg-[var(--ad-action-primary)] transition-all duration-300" />
@@ -233,7 +230,7 @@
 
       <template #footer>
         <AppButton @click="closeImportURLModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton
           @click="fetchSoundsFromURL"
@@ -242,7 +239,7 @@
           auto
           type="primary"
         >
-          Import
+          {{ t("caller.import.button") }}
         </AppButton>
       </template>
     </AppModal>
@@ -264,11 +261,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
-            Caller
+            {{ t("features.caller") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Call out scores, checkouts and special events during your matches with customizable sound effects.
+            {{ t("caller.card") }}
           </p>
         </div>
         <div class="flex">
@@ -280,7 +277,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="Caller" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('features.caller')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -298,6 +295,7 @@ import AppModal from "../AppModal.vue";
 import AppNotification from "../AppNotification.vue";
 import AppSelect from "../AppSelect.vue";
 import AppToggle from "../AppToggle.vue";
+import AppTrans from "../AppTrans.vue";
 
 import GameModesField from "./Library/GameModesField.vue";
 import LibraryItem from "./Library/LibraryItem.vue";
@@ -311,6 +309,7 @@ import UploadDialog from "./Library/UploadDialog.vue";
 import VolumeBadge from "./Library/VolumeBadge.vue";
 import { stableKey } from "./Library/stable-key";
 
+import type { MessageKey } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
 
 import { useLouderCheck } from "@/composables/useLouderCheck";
@@ -343,7 +342,8 @@ const showSoundModal = ref(false);
 const isEditMode = ref(false);
 const newSound = ref({ url: "", name: "", base64: "", triggers: [] as string[], volume: DEFAULT_VOLUME });
 const editingIndex = ref<number | null>(null);
-const urlError = ref("");
+/** Why the link in the dialog open is refused, as the key of the line said under it: it follows a language picked meanwhile. */
+const urlError = ref<MessageKey | "">("");
 
 // File upload
 const showUploadModal = ref(false);
@@ -400,58 +400,71 @@ const isProcessingCsv = ref(false);
 const csvProcessingProgress = ref(0);
 const csvTotalEntries = ref(0);
 
-// Predefined caller sets for the select input
-const callerSets = [
-  { value: "", label: "Pick a set…" },
-
+/**
+ * The caller sets that can be imported, by the file they are: the select shows each as "NL - Laura (Female)",
+ * worded by the current language. The region is the set's country code, as its file name has it.
+ */
+const CALLER_SETS: { value: string; region: string; voice: string; gender: "female" | "male" }[] = [
   // Dutch (nl-NL)
-  { value: "https://darts-downloads.peschi.org/soundfiles/nl-NL-Laura-Female-v5.zip", label: "NL - Laura (Female)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/nl-NL-Laura-Female-v5.zip", region: "NL", voice: "Laura", gender: "female" },
 
   // French (fr-FR)
-  { value: "https://darts-downloads.peschi.org/soundfiles/fr-FR-Remi-Male-v3.zip", label: "FR - Remi (Male)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/fr-FR-Lea-Female-v3.zip", label: "FR - Lea (Female)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/fr-FR-Remi-Male-v3.zip", region: "FR", voice: "Remi", gender: "male" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/fr-FR-Lea-Female-v3.zip", region: "FR", voice: "Lea", gender: "female" },
 
   // Spanish (es-ES)
-  { value: "https://darts-downloads.peschi.org/soundfiles/es-ES-Lucia-Female-v3.zip", label: "ES - Lucia (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/es-ES-Sergio-Male-v3.zip", label: "ES - Sergio (Male)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/es-ES-Lucia-Female-v3.zip", region: "ES", voice: "Lucia", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/es-ES-Sergio-Male-v3.zip", region: "ES", voice: "Sergio", gender: "male" },
 
   // Austrian German (de-AT)
-  { value: "https://darts-downloads.peschi.org/soundfiles/de-AT-Hannah-Female-v5.zip", label: "AT - Hannah (Female)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/de-AT-Hannah-Female-v5.zip", region: "AT", voice: "Hannah", gender: "female" },
 
   // German (de-DE)
-  { value: "https://darts-downloads.peschi.org/soundfiles/de-DE-Vicki-Female-v8.zip", label: "DE - Vicki (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/de-DE-Daniel-Male-v8.zip", label: "DE - Daniel (Male)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/de-DE-Vicki-Female-v8.zip", region: "DE", voice: "Vicki", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/de-DE-Daniel-Male-v8.zip", region: "DE", voice: "Daniel", gender: "male" },
 
   // British English (en-GB)
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-GB-Amy-Female-v4.zip", label: "GB - Amy (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-GB-Arthur-Male-v4.zip", label: "GB - Arthur (Male)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-GB-Amy-Female-v4.zip", region: "GB", voice: "Amy", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-GB-Arthur-Male-v4.zip", region: "GB", voice: "Arthur", gender: "male" },
 
   // American English (en-US)
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Ivy-Female-v8.zip", label: "US - Ivy (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Joey-Male-v9.zip", label: "US - Joey (Male)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Joanna-Female-v9.zip", label: "US - Joanna (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Matthew-Male-v6.zip", label: "US - Matthew (Male)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Danielle-Female-v6.zip", label: "US - Danielle (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Kimberly-Female-v5.zip", label: "US - Kimberly (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Ruth-Female-v5.zip", label: "US - Ruth (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Salli-Female-v5.zip", label: "US - Salli (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Kevin-Male-v5.zip", label: "US - Kevin (Male)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Justin-Male-v5.zip", label: "US - Justin (Male)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Stephen-Male-v8.zip", label: "US - Stephen (Male)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Kendra-Female-v9.zip", label: "US - Kendra (Female)" },
-  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Gregory-Male-v6.zip", label: "US - Gregory (Male)" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Ivy-Female-v8.zip", region: "US", voice: "Ivy", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Joey-Male-v9.zip", region: "US", voice: "Joey", gender: "male" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Joanna-Female-v9.zip", region: "US", voice: "Joanna", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Matthew-Male-v6.zip", region: "US", voice: "Matthew", gender: "male" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Danielle-Female-v6.zip", region: "US", voice: "Danielle", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Kimberly-Female-v5.zip", region: "US", voice: "Kimberly", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Ruth-Female-v5.zip", region: "US", voice: "Ruth", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Salli-Female-v5.zip", region: "US", voice: "Salli", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Kevin-Male-v5.zip", region: "US", voice: "Kevin", gender: "male" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Justin-Male-v5.zip", region: "US", voice: "Justin", gender: "male" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Stephen-Male-v8.zip", region: "US", voice: "Stephen", gender: "male" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Kendra-Female-v9.zip", region: "US", voice: "Kendra", gender: "female" },
+  { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Gregory-Male-v6.zip", region: "US", voice: "Gregory", gender: "male" },
 ];
 
 const entries = computed<LibraryEntry[]>(() => (config.value?.caller.sounds ?? []).map((sound, index) => {
   const triggers = Array.isArray(sound.triggers) ? sound.triggers : [];
   return {
     index,
-    name: sound.name || sound.tts?.text || triggers[0] || "Untitled sound",
+    name: sound.name || sound.tts?.text || triggers[0] || t("library.sounds.untitled"),
     triggers,
     source: sound.tts ? `tts ${sound.tts.text}` : sound.url || "uploaded",
     enabled: sound.enabled,
   };
 }));
+
+/** The select's options: "Pick a set…", then each set with its country, voice and gender in the current language. */
+const callerSets = computed(() => [
+  { value: "", label: t("caller.sets.pick") },
+  ...CALLER_SETS.map(set => ({
+    value: set.value,
+    label: t("caller.sets.label", { region: set.region, voice: set.voice, gender: t(`caller.sets.${set.gender}`) }),
+  })),
+]);
+
+/** The line under the link in the add and import dialogs: the key in urlError, said in the current language. */
+const urlErrorText = computed(() => (urlError.value ? t(urlError.value) : ""));
 
 /** An uploaded sound being edited: its file loads a moment after the dialog opens. */
 const draftHasFile = computed(() => {
@@ -469,28 +482,28 @@ const louderBlocked = useLouderCheck(copies, () => ({
 }));
 
 const addActions = computed(() => [
-  { label: "Import a caller set", hint: "Ready-made voices in eight languages", icon: "icon-[material-symbols--library-music-outline-rounded]", action: openImportURLModal },
-  { label: "Upload files", hint: "MP3, WAV or OGG, several at once", icon: "icon-[material-symbols--upload-rounded]", action: openUploadModal },
+  { label: t("caller.import.title"), hint: t("caller.import.hint"), icon: "icon-[material-symbols--library-music-outline-rounded]", action: openImportURLModal },
+  { label: t("library.sounds.add.upload.label"), hint: t("library.sounds.add.upload.hint"), icon: "icon-[material-symbols--upload-rounded]", action: openUploadModal },
   {
-    label: "Generate a sound",
-    hint: isTTSAvailable.value ? "Text to speech, in a voice on this device" : "This device has no text-to-speech voices",
+    label: t("library.sounds.add.generate.label"),
+    hint: t(isTTSAvailable.value ? "library.sounds.add.generate.hint" : "library.sounds.add.generate.hintUnavailable"),
     icon: "icon-[material-symbols--record-voice-over-outline-rounded]",
     disabled: !isTTSAvailable.value,
     action: () => openTTSModal(),
   },
-  { label: "Add from a link", hint: "A sound file on the web", icon: "icon-[material-symbols--link-rounded]", action: openAddSoundModal },
+  { label: t("library.sounds.add.link.label"), hint: t("library.sounds.add.link.hint"), icon: "icon-[material-symbols--link-rounded]", action: openAddSoundModal },
 ]);
 
 const moreActions = computed(() => [
   {
-    label: "Sort by trigger",
-    hint: "Puts the list in trigger order",
+    label: t("library.sounds.menu.sort.label"),
+    hint: t("library.sounds.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
     disabled: (config.value?.caller.sounds.length ?? 0) < 2,
     action: sortSoundsByTriggers,
   },
   {
-    label: "Delete all…",
+    label: t("library.deleteAllMenu"),
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
@@ -621,17 +634,17 @@ async function saveSound() {
 
   // Different validation when editing vs adding new sound
   if (!existingSound && !newSound.value.url && !newSound.value.base64) {
-    showNotification("Please provide either a sound URL or upload a file", "error");
+    showNotification(t("library.sounds.notifications.needsSource"), "error");
     return;
   }
   if (!newSound.value.triggers.length) {
-    showNotification("Please provide at least one trigger", "error");
+    showNotification(t("library.sounds.notifications.needsTrigger"), "error");
     return;
   }
 
   // Check if URL starts with https://
   if (newSound.value.url && !newSound.value.url.startsWith("https://")) {
-    urlError.value = "The link has to start with https://, for security.";
+    urlError.value = "library.sounds.linkNotHttps";
     return;
   }
 
@@ -646,14 +659,14 @@ async function saveSound() {
     if (existingSound?.soundId) {
       // Update existing sound in IndexedDB
       soundId = await saveSoundToIndexedDB(
-        newSound.value.name.trim() || "Unnamed sound",
+        newSound.value.name.trim() || t("library.sounds.unnamed"),
         newSound.value.base64,
         existingSound.soundId, // Pass existing soundId to update instead of creating new
       );
     } else {
       // Create new sound in IndexedDB
       soundId = await saveSoundToIndexedDB(
-        newSound.value.name.trim() || "Unnamed sound",
+        newSound.value.name.trim() || t("library.sounds.unnamed"),
         newSound.value.base64,
       );
     }
@@ -799,10 +812,10 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    showNotification(`Added ${added} ${added === 1 ? "sound" : "sounds"}`);
+    showNotification(t("library.sounds.notifications.added", { count: added }));
   } catch (error) {
     console.error("Error processing files:", error);
-    showNotification("Error processing files", "error");
+    showNotification(t("library.sounds.notifications.processingError"), "error");
   } finally {
     isProcessing.value = false;
     closeUploadModal();
@@ -830,7 +843,7 @@ function sortSoundsByTriggers() {
   });
 
   // Show notification
-  showNotification("Caller sounds have been sorted by their triggers");
+  showNotification(t("caller.notifications.sorted"));
 }
 
 function openDeleteAllModal() {
@@ -860,7 +873,7 @@ async function deleteAllSounds() {
 
   // Close modal and show notification
   closeDeleteAllModal();
-  showNotification("All caller sounds have been deleted", "error");
+  showNotification(t("caller.notifications.allDeleted"), "error");
 }
 
 async function playSound(sound: ISound, key: number) {
@@ -910,7 +923,7 @@ async function playSound(sound: ISound, key: number) {
         source = sound.url;
       } else {
         // No audio source available
-        showNotification("No audio source available for this sound", "error");
+        showNotification(t("library.sounds.notifications.noSource"), "error");
         finish();
         return;
       }
@@ -943,7 +956,7 @@ async function playSound(sound: ISound, key: number) {
         audio.onerror = (e) => {
           console.error("Error loading sound:", e);
           URL.revokeObjectURL(blobUrl);
-          showNotification("Failed to play sound", "error");
+          showNotification(t("library.sounds.notifications.playFailed"), "error");
           finish();
         };
 
@@ -969,7 +982,7 @@ async function playSound(sound: ISound, key: number) {
     await audio.play();
   } catch (error) {
     console.error("Error playing sound:", error);
-    showNotification("Failed to play sound", "error");
+    showNotification(t("library.sounds.notifications.playFailed"), "error");
     finish();
   }
 }
@@ -1010,7 +1023,7 @@ function openImportURLModal() {
 function closeImportURLModal() {
   if (isImporting.value) {
     // Ask for confirmation before closing during import
-    if (confirm("Import in progress. Are you sure you want to cancel?")) {
+    if (confirm(t("caller.import.cancelConfirm"))) {
       isImporting.value = false;
       showImportURLModal.value = false;
       selectedPresetURL.value = "";
@@ -1265,14 +1278,14 @@ async function fetchSoundsFromURL() {
   try {
     // Ensure URL starts with https://
     if (!baseURL.value.startsWith("https://")) {
-      urlError.value = "URL must start with https:// for security reasons";
+      urlError.value = "caller.import.errors.notHttps";
       return;
     }
 
     // Check if URL is from allowed domains
     const isAllowedDomain = checkAllowedDomain(baseURL.value);
     if (!isAllowedDomain) {
-      urlError.value = "Custom URLs are currently not supported due to security reasons";
+      urlError.value = "caller.import.errors.notAllowed";
       return;
     }
 
@@ -1280,7 +1293,7 @@ async function fetchSoundsFromURL() {
     const urlObj = new URL(baseURL.value);
     urlError.value = "";
   } catch (error) {
-    urlError.value = "Invalid URL format";
+    urlError.value = "caller.import.errors.invalid";
     return;
   }
 
@@ -1322,7 +1335,7 @@ async function fetchSoundsFromURL() {
         console.log("Autodarts Tools: Sounds", sounds);
 
         if (sounds.length === 0) {
-          showNotification("No sounds found in the ZIP file or CSV mapping", "error");
+          showNotification(t("caller.notifications.noSoundsInZip"), "error");
           closeImportURLModal();
           return;
         }
@@ -1332,7 +1345,7 @@ async function fetchSoundsFromURL() {
         importedCount.value = sounds.length;
 
         // Show success notification
-        showNotification(`Successfully imported ${sounds.length} sounds from ZIP file`);
+        showNotification(t("caller.notifications.importedFromZip", { count: sounds.length }));
       } else {
         // No CSV file found - process each file individually like regular sounds
         const sounds: ISound[] = [];
@@ -1374,7 +1387,7 @@ async function fetchSoundsFromURL() {
         }
 
         if (sounds.length === 0) {
-          showNotification("No audio files found in the ZIP file", "error");
+          showNotification(t("caller.notifications.noAudioInZip"), "error");
           closeImportURLModal();
           return;
         }
@@ -1384,7 +1397,7 @@ async function fetchSoundsFromURL() {
         importedCount.value = sounds.length;
 
         // Show success notification
-        showNotification(`Successfully imported ${sounds.length} sounds from ZIP file`);
+        showNotification(t("caller.notifications.importedFromZip", { count: sounds.length }));
       }
 
       // Close modal
@@ -1393,12 +1406,12 @@ async function fetchSoundsFromURL() {
       console.error("Error processing ZIP file:", error);
 
       // Provide a more specific error message if possible
-      let errorMessage = "Error processing ZIP file";
+      let errorMessage = t("caller.notifications.zipFailed");
       if (error instanceof Error) {
         if (error.message.includes("Failed to download")) {
-          errorMessage = "Failed to download ZIP file - check your URL";
+          errorMessage = t("caller.notifications.zipDownloadFailed");
         } else if (error.message.includes("Invalid") || error.message.includes("corrupt")) {
-          errorMessage = "Invalid or corrupted ZIP file";
+          errorMessage = t("caller.notifications.zipInvalid");
         }
       }
 
@@ -1551,10 +1564,10 @@ async function fetchSoundsFromURL() {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Show success notification
-    showNotification(`Successfully imported ${importedCount.value} sounds from URL`);
+    showNotification(t("caller.notifications.importedFromUrl", { count: importedCount.value }));
   } catch (error) {
     console.error("Error during import process:", error);
-    showNotification("Error importing sounds from URL", "error");
+    showNotification(t("caller.notifications.urlImportFailed"), "error");
   } finally {
     isImporting.value = false;
     // Close modal if any sounds were imported
@@ -1664,6 +1677,18 @@ function saveTTSSound() {
   }
 
   closeTTSModal();
-  showNotification(editing !== null ? "TTS sound updated" : "TTS sound added");
+  showNotification(t(editing !== null ? "library.sounds.notifications.ttsUpdated" : "library.sounds.notifications.ttsAdded"));
 }
 </script>
+
+<style scoped>
+/* The token in the description is a plain <code> in the message; it is set as .adt-code is (assets/tailwind.css). */
+.adt-caller-code :deep(code) {
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  color: var(--ad-text-secondary);
+  background: rgb(255 255 255 / 8%);
+  border-radius: var(--ad-radius-xs);
+}
+</style>

@@ -4,6 +4,7 @@ import automaticFullscreen from "./automaticFullscreen";
 import automaticNextLeg from "./automaticNextLeg";
 import boardSkins from "./boardSkins";
 import boardView from "./boardView";
+import caller from "./caller";
 import colors from "./colors";
 import common from "./common";
 import discordWebhooks from "./discordWebhooks";
@@ -42,6 +43,7 @@ export default {
   automaticNextLeg,
   boardSkins,
   boardView,
+  caller,
   colors,
   common,
   discordWebhooks,

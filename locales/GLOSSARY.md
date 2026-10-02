@@ -356,6 +356,21 @@ The alt of a tile and its switch fill the triggers into "Animation on …": Germ
 
 A card's description sits in a column of two thirds of a fixed-height card, so the German and Dutch cards are written no longer than the English in lines, at 14, 15 and 16 px in columns of 150 to 290 px (the German drops *special* and lists the events in the singular). The footers of the dialogs fit a 390 px phone (310 px of content): *Abbrechen* and *Hinzufügen* take 247 px, *Annuleren* and *Alles verwijderen* in the Delete all dialog 283 px, against 280 px on a 360 px phone.
 
+Settled in the Caller (`locales/*/caller.ts`, and the words the Caller and Sound FX share in `locales/*/library.ts` under `sounds`), for whatever else speaks of calling a score, a caller set or a sound. The site's in-game caller settings call a score *ansagen* and *afroepen* (`inGameSettings.callerSettings.callCheckout` is the very English *Call checkout*: *Checkout ansagen*, *Checkout afroepen*), and name the Caller's parts with a hyphen and the capital (*Caller-Stimme*, *Caller-stem*, *Caller-Einstellungen*, *Caller-instellingen*). The site's account settings say *omroepen* for the same Dutch verb (`settings.caller.callScores`); the Caller is an in-game feature, so the in-game *afroepen* wins here, as What's New and the trigger hints already have it.
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| Call every dart, Call checkout | the second is the site's own row; the first uses its verb | Jeden Dart ansagen, Checkout ansagen | Elke dart afroepen, Checkout afroepen |
+| a caller set | not the site's: a ready-made set of voice recordings. Written as the site writes *Caller-Stimme* | Caller-Set | Caller-set |
+| the Caller's sounds | the same pattern: *Caller-Sounds*, *Caller-geluiden* | Caller-Sounds | Caller-geluiden |
+| a sound | the sound dialogs' noun (`library.soundDialog`): *der Sound*, *het geluid*. A default name is written once, when the sound is made, and never changed after | Sound (Unbenannter Sound) | geluid (Naamloos geluid) |
+| recordings | German says *Sprachaufnahmen*, because *Aufnahme* is a visit on the site (§ 3) and one sentence must not use it for both | Sprachaufnahmen | opnamen |
+| text to speech | as the sound dialogs say it: *Text-to-Speech* (hyphenated in a compound: *Text-to-Speech-Stimmen*) and *tekst-naar-spraak* | Text-to-Speech | tekst-naar-spraak |
+| female, male (a set's voice) | the words in the select's labels, "NL - Laura (weiblich)" | weiblich, männlich | vrouw, man |
+| Import (a set) | the dialog's button and its heading, beside the shared Cancel | Importieren | Importeren |
+
+The card's sentence is the infinitive in both languages, as the English is an imperative (*… ansagen*, *… afroepen*). The Dutch says *eigen geluiden* where the English says *customizable sound effects*, because *aanpasbare geluidseffecten* takes a line more than the English in a column of 230 px at 14 px; the German card is never longer in lines than the English at 14, 15 and 16 px in columns of 150 to 290 px. The import dialog's footer fits a 390 px phone (310 px of content) and a 360 px one (280): *Abbrechen* and *Importieren* take 248 px, *Annuleren* and *Importeren* 240 px. A search in the sound list finds a sound by the name the list shows, so it also finds *Unbenannter Sound* or *Naamloos geluid* by those words.
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".

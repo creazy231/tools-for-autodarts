@@ -99,4 +99,51 @@ export default {
     none: "Geen trigger",
     noneTitle: "Zonder trigger wordt het nooit afgespeeld",
   },
+  sounds: {
+    title: "Geluiden",
+    searchPlaceholder: "Geluiden zoeken op naam of trigger",
+    emptyTitle: "Nog geen geluiden",
+    untitled: "Naamloos geluid",
+    unnamed: "Naamloos geluid",
+    linkNotHttps: "De link moet om veiligheidsredenen met https:// beginnen.",
+    add: {
+      upload: {
+        label: "Bestanden uploaden",
+        hint: "MP3, WAV of OGG, meerdere tegelijk",
+      },
+      generate: {
+        label: "Geluid genereren",
+        hint: "Tekst-naar-spraak, met een stem op dit apparaat",
+        hintUnavailable: "Dit apparaat heeft geen stemmen voor tekst-naar-spraak",
+      },
+      link: {
+        label: "Toevoegen via een link",
+        hint: "Een geluidsbestand van het web",
+      },
+    },
+    menu: {
+      sort: {
+        label: "Sorteren op trigger",
+        hint: "Zet de lijst in triggervolgorde",
+      },
+    },
+    upload: {
+      title: "Geluiden uploaden",
+      namesHint: "Een bestand met de naam 180.mp3 wordt afgespeeld bij 180. Alles na een + wordt weggelaten, dus 180+crowd.mp3 wordt ook bij 180 afgespeeld.",
+    },
+    deleteAll: {
+      title: { one: "Het geluid verwijderen?", other: "Alle {count} geluiden verwijderen?" },
+      body: "Ze worden definitief verwijderd, opgeslagen bestanden inbegrepen. Dit kan niet ongedaan worden gemaakt.",
+    },
+    notifications: {
+      needsSource: "Geef een link naar een geluid op of upload een bestand",
+      needsTrigger: "Geef minstens één trigger op",
+      added: { one: "{count} geluid toegevoegd", other: "{count} geluiden toegevoegd" },
+      processingError: "Fout bij het verwerken van de bestanden",
+      noSource: "Er is geen audiobron beschikbaar voor dit geluid",
+      playFailed: "Het geluid kon niet worden afgespeeld",
+      ttsAdded: "Geluid met tekst-naar-spraak toegevoegd",
+      ttsUpdated: "Geluid met tekst-naar-spraak bijgewerkt",
+    },
+  },
 } satisfies Translation<typeof en>;

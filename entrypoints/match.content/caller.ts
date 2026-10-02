@@ -2,6 +2,7 @@ import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storag
 import { pageVariant, playsIn } from "@/utils/game-modes";
 import { AutodartsToolsConfig, type IConfig, type ISoundTTS } from "@/utils/storage";
 import { getSoundFromIndexedDB, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
+import { onLanguageChange, t } from "@/utils/i18n";
 import { gotchaCheckout } from "@/utils/checkout";
 import { LAYERS } from "@/utils/layers";
 import { settleGameData } from "@/utils/settle-game-data";
@@ -51,6 +52,8 @@ let bullOffAnnounced = false;
 let interactionNotificationShown = false;
 // Reference to notification element
 let notificationElement: HTMLElement | null = null;
+// Stops the notice following the site's language once the notice is gone
+let stopNoticeLanguage: (() => void) | null = null;
 // Reference to the style element for notification
 let notificationStyleElement: HTMLStyleElement | null = null;
 
@@ -457,22 +460,29 @@ function showInteractionNotification(): void {
     notificationElement = document.createElement("div");
     notificationElement.className = "adt-notification";
     notificationElement.setAttribute("data-adt-notification-source", "caller");
+    // Only static markup goes through innerHTML: the words are put in below as text
     notificationElement.innerHTML = `
       <div class="adt-notification-content">
-        <div class="adt-notification-message">
-          Please interact with the page (click, tap, or press a key) to enable audio for the caller.
-        </div>
-        <button class="adt-notification-close">
+        <div class="adt-notification-message"></div>
+        <button class="adt-notification-close" aria-label="">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><!-- Icon from Pixelarticons by Gerrit Halfmann - https://github.com/halfmage/pixelarticons/blob/master/LICENSE --><path fill="currentColor" d="M5 5h2v2H5zm4 4H7V7h2zm2 2H9V9h2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2zm2-2v2h-2V9zm2-2v2h-2V7zm0 0V5h2v2z"/></svg>
         </button>
       </div>
     `;
+    const message = notificationElement.querySelector<HTMLElement>(".adt-notification-message")!;
+    const close = notificationElement.querySelector<HTMLElement>(".adt-notification-close")!;
+
+    // The notice waits for a gesture that may be a long way off, and a language picked meanwhile has to reach it
+    const paint = () => {
+      message.textContent = t("caller.audioNotice");
+      close.setAttribute("aria-label", t("common.close"));
+    };
+    paint();
+    stopNoticeLanguage?.();
+    stopNoticeLanguage = onLanguageChange(paint);
 
     // Add click listener to close button
-    const closeButton = notificationElement.querySelector(".adt-notification-close");
-    if (closeButton) {
-      closeButton.addEventListener("click", hideInteractionNotification);
-    }
+    close.addEventListener("click", hideInteractionNotification);
 
     // Add the notification to the DOM
     document.body.appendChild(notificationElement);
@@ -489,6 +499,8 @@ function hideInteractionNotification(): void {
     notificationElement.remove();
     notificationElement = null;
   }
+  stopNoticeLanguage?.();
+  stopNoticeLanguage = null;
   interactionNotificationShown = false;
 }
 
@@ -508,6 +520,8 @@ function removeInteractionNotification(): void {
     }
   }
 
+  stopNoticeLanguage?.();
+  stopNoticeLanguage = null;
   interactionNotificationShown = false;
 }
 
