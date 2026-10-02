@@ -250,7 +250,7 @@ import { problemText, suggestName } from "@/utils/teams-text";
 
 const props = defineProps<{ state: DrawerState }>();
 
-const { t } = useI18n();
+const { t, language } = useI18n();
 
 const titleId = "adt-team-drawer-title";
 const nameId = "adt-team-drawer-name";
@@ -261,7 +261,7 @@ const list = ref<HTMLElement>();
 const players = ref<string[]>([ ...(props.state.editing?.players ?? []) ]);
 const colour = ref({ ...(props.state.editing?.colour ?? nextFreeColour(props.state.takenColours)) });
 const name = ref(props.state.editing?.name ?? suggestName(colour.value, props.state.reservedNames));
-/** Once typed into, the name no longer follows the colour. */
+/** Once typed into, the name no longer follows the colour or the language. */
 const nameTouched = ref(Boolean(props.state.editing));
 const query = ref("");
 /** What went wrong, or what to know, as a message: worded when it is shown, so it follows a change of language. */
@@ -319,8 +319,12 @@ onMounted(() => {
   else panel.value?.focus();
 });
 
-watch(colour, (value) => {
-  if (!nameTouched.value) name.value = suggestName(value, props.state.reservedNames);
+// The suggestion is worded in the language of the moment it is made
+// (utils/teams-text.ts), so one nobody has typed into is made again when the
+// colour or the language changes. The team does not exist until it is added,
+// so this never re-translates a name that has been given.
+watch([ colour, language ], () => {
+  if (!nameTouched.value) name.value = suggestName(colour.value, props.state.reservedNames);
 });
 
 // Each list gets its Sortable once it is on screen: the tabs show one of them at a time.
