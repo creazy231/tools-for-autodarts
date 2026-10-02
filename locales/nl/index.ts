@@ -7,6 +7,7 @@ import colors from "./colors";
 import common from "./common";
 import discordWebhooks from "./discordWebhooks";
 import enhancedScoringDisplay from "./enhancedScoringDisplay";
+import externalBoards from "./externalBoards";
 import features from "./features";
 import gameModes from "./gameModes";
 import gotcha from "./gotcha";
@@ -45,6 +46,7 @@ export default {
   common,
   discordWebhooks,
   enhancedScoringDisplay,
+  externalBoards,
   features,
   gameModes,
   gotcha,

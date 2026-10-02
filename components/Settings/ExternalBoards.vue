@@ -6,10 +6,10 @@
     <div class="relative z-10 flex h-full flex-col justify-between">
       <div>
         <h3 class="mb-1 adt-card-title">
-          External Boards
+          {{ t("features.externalBoards") }}
         </h3>
         <p class="w-2/3 text-white/70">
-          Allows you to save external Boards to easily follow them.
+          {{ t("externalBoards.card") }}
         </p>
       </div>
       <div class="flex">
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-      <img :src="imageUrl" alt="External Boards" class="size-full object-cover">
+      <img :src="imageUrl" :alt="t('features.externalBoards')" class="size-full object-cover">
     </div>
   </div>
 </template>
@@ -32,6 +32,7 @@ import AppToggle from "../AppToggle.vue";
 
 const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "external-boards");
+const { t } = useI18n();
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/external-boards.png");
 

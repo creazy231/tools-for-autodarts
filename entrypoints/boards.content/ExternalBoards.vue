@@ -2,7 +2,7 @@
   <section v-if="config" class="mt-6 flex flex-col gap-6">
     <!-- The bracket needs the hint: a bare `font-[…]` reads as a weight. -->
     <h2 class="font-[family-name:var(--ad-font-display)] text-2xl font-normal">
-      External Boards
+      {{ t("features.externalBoards") }}
     </h2>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
@@ -13,7 +13,7 @@
       >
         <div class="min-w-0">
           <h3 class="adt-card-title truncate">
-            {{ board.name || "Unnamed board" }}
+            {{ board.name || t("externalBoards.unnamedBoard") }}
           </h3>
           <p class="truncate text-xs text-white/40">
             {{ board.id }}
@@ -22,7 +22,7 @@
         <div class="flex items-center justify-between gap-2">
           <AppButton
             @click="removeBoard(board.id)"
-            title="Forget this board"
+            :title="t('externalBoards.forget')"
             type="danger"
             size="sm"
             auto
@@ -35,27 +35,29 @@
             size="sm"
             auto
           >
-            Follow
+            {{ t("externalBoards.follow") }}
           </AppButton>
         </div>
       </div>
 
       <div class="adt-container flex flex-col justify-between gap-4">
         <div class="space-y-2">
-          <AppInput v-model="draft.name" placeholder="Board name" />
-          <AppInput v-model="draft.id" placeholder="Board ID or link" />
+          <AppInput v-model="draft.name" :placeholder="t('externalBoards.placeholders.name')" />
+          <AppInput v-model="draft.id" :placeholder="t('externalBoards.placeholders.id')" />
         </div>
         <div class="flex items-center justify-between gap-2">
           <p class="text-xs text-[var(--ad-text-destructive)]">
-            {{ error }}
+            {{ error ? t(error) : "" }}
           </p>
+          <!-- The label keeps its width and the message beside it wraps: "Hinzufügen" is wider than "Add". -->
           <AppButton
             @click="addBoard"
             type="success"
             size="sm"
+            class="shrink-0"
             auto
           >
-            Add
+            {{ t("common.add") }}
           </AppButton>
         </div>
       </div>
@@ -66,6 +68,8 @@
 <script setup lang="ts">
 import { nextTick, onBeforeMount, reactive, ref, watch } from "vue";
 
+import type { MessageKey } from "@/utils/i18n";
+
 import AppButton from "@/components/AppButton.vue";
 import AppInput from "@/components/AppInput.vue";
 import { AutodartsToolsConfig, updateConfigIfChanged } from "@/utils/storage";
@@ -73,8 +77,11 @@ import { AutodartsToolsConfig, updateConfigIfChanged } from "@/utils/storage";
 /** Boards are identified by a UUID anywhere in what was pasted. */
 const BOARD_ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
+const { t } = useI18n();
+
 const config = ref();
-const error = ref("");
+/** What is wrong with the draft, as a message key: the sentence follows a language picked while it is on screen. */
+const error = ref<MessageKey | "">("");
 const draft = reactive({ id: "", name: "" });
 
 watch(config, async () => {
@@ -96,12 +103,12 @@ onBeforeMount(async () => {
 function addBoard() {
   const id = draft.id.trim().match(BOARD_ID)?.[0];
   if (!id) {
-    error.value = "Paste a board link or its ID";
+    error.value = "externalBoards.errors.missingId";
     return;
   }
 
   if (config.value.externalBoards.boards.some((board: { id: string }) => board.id === id)) {
-    error.value = "That board is already in the list";
+    error.value = "externalBoards.errors.alreadyListed";
     return;
   }
 

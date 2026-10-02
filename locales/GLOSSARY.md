@@ -322,6 +322,21 @@ Settled in Instant Replay (`locales/*/instantReplay.ts`), for whatever else spea
 | celebration | autodarts' own moment after a won leg, when the card lights up | Siegesfeier | viering |
 | the pan words | beside a slider, in a box that is 80 px wide and holds the longest English value, "100% down", in 79 px. *links*, *oben* and *Mitte* fit as well. *rechts*, *unten*, *boven* and *onder* are over by 2 to 6 px at 100%, which the box lets run on one line. *omhoog* and *omlaag* would be over by 11 to 18, so Dutch says where the picture sits | links, rechts, oben, unten, Mitte | links, rechts, boven, onder, midden |
 
+Settled in External Boards (`locales/*/externalBoards.ts`), for whatever else names a saved board or what is done with it. The two placeholders are the site's own words, and *Follow* is the site's verb without its noun, since the card already names the board.
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| Follow (a saved board's button) | the site's `myDevices.board.follow`, "Board folgen" and "Bord volgen", without the noun | Folgen | Volgen |
+| Board name (the placeholder) | the site's own (`myDevices.registration.namePlaceholder`) | Board-Name | Naam van bord |
+| Board ID or link (the placeholder) | the site's *Board-ID* and *Bord-ID* (`myDevices.credentials.boardId`) and its *Link* (`lobby.qrShare.copied`; a Dutch noun is lower case mid-sentence) | Board-ID oder Link | Bord-ID of link |
+| to forget a board | not the site's: taking it out of Tools' list, the trash button's tooltip. The word Saved Players already uses for "drops the rest for good" (*vergisst*, *vergeet*) | vergessen | vergeten |
+| Unnamed board | not the site's: what a board saved without a name is called in the list, and never stored | Unbenanntes Board | Naamloos bord |
+| to paste | Tools' own (`settings.importMenu.paste`: "Aus der Zwischenablage einfügen", "Vanaf klembord plakken") | einfügen | plakken |
+| a board link | not the site's: the link that is shared to follow a board. German hyphenates the compound as the site does *Board-ID*; Dutch writes it solid | Board-Link | bordlink |
+| already in the list | the site's own *bereits* and *al* (`errorPage.lobby.description`, `account.email.errors.emailInUse`) | bereits in der Liste | al in de lijst |
+
+The error line sits beside the shared Add button, and *Hinzufügen* and *Toevoegen* (73 and 71 px at 13 px bold, against 25 for *Add*) leave less room for it than the English has. The button keeps its width (`shrink-0`, the one class the boards page gained) and the line wraps in what is left. The two errors are worded about as long as the English ones (141 and 168 px at 12 px; German 158 and 177, Dutch 151 and 143). On a 375 px phone a card is 263 px inside its padding (the site's page column pads 32 px a side, the card 24), and there the German errors take two lines and the English and Dutch ones one; at 390 px only the German duplicate error wraps. The card's sentence is the imperative in both languages (*Speichere … um ihnen einfach zu folgen*, *Bewaar … en volg ze makkelijk*) because the third-person *Speichert … damit du ihnen einfach folgen kannst* is 14% longer than the English (473 px against 414 at 16 px) and takes a third line where the English takes two, in a column of 190 px at 14 px and of 230 px at 16 px.
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".
