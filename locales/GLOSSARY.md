@@ -70,7 +70,8 @@ When a text names a button, a setting or a darts term, it uses the site's word i
 | System | `settings.general.system` | System | Systeem |
 | Average | `botCard.average` | Durchschnitt | Gemiddelde |
 | Winner | `matches.winner` | Gewinner | Winnaar |
-| Reset | `statistics.filters.reset` | Zurücksetzen | Opnieuw instellen |
+| Reset | `statistics.filters.reset`, the bare button | Zurücksetzen | Opnieuw instellen |
+| Reset (something to a value) | `lobby.gamePicker.descriptions.gotcha` (*om die terug te zetten*) and `lobby.howToPlay.rules.gotcha` (*teruggezet naar nul*). Dutch has two words for it: *opnieuw instellen* is the bare button above, and so are Tools' own reset buttons (*Posities opnieuw instellen*), while *terugzetten (naar …)* is putting something back to a value, so *Alle instellingen terugzetten* and *teruggezet naar de standaardwaarden* (`settings.danger`, `migration`) keep it. German has one verb for both | zurücksetzen | terugzetten (naar …) |
 | Delete | `matches.delete` | Löschen | Verwijderen |
 | Clear | `statistics.filters.clear` | Löschen | Wissen |
 | Cancel | `common.cancel` | Abbrechen | Annuleren |
