@@ -10,8 +10,11 @@
  *   differs from the English, form by form for a plural, where only the `one`
  *   form may leave out `{count}`;
  * - an empty message, or a plural that is not exactly `{ one, other }`;
- * - a German or Dutch sentence of three words or more still word for word the
- *   English;
+ * - a German or Dutch text still word for word the English: a sentence of
+ *   three words or more unless locales/untranslated.json allows it, and a word
+ *   or two with letters unless locales/same-as-english.json lists its key — a
+ *   name or the site's own word ("Board") that is right as it is;
+ * - a key on that list that is no longer such a text;
  * - in any language, a tag that is never closed, closes nothing, or crosses
  *   another (`<b>a <i>b</b></i>`).
  *
@@ -44,7 +47,8 @@
  * The source half catches the usual shapes, not every one; the site's debug
  * switch (CLAUDE.md, "Translations") finds the rest on screen. What may stay
  * literal — names, units — is listed in locales/untranslated.json, and nothing
- * else may.
+ * else may. Which German or Dutch words are rightly the English is listed by
+ * key in locales/same-as-english.json.
  */
 
 import { execFileSync } from "node:child_process";
@@ -56,6 +60,7 @@ import * as sfc from "vue/compiler-sfc";
 import ts from "typescript";
 
 import { CATALOGS } from "../locales";
+import SAME_AS_ENGLISH from "../locales/same-as-english.json";
 import UNTRANSLATED from "../locales/untranslated.json";
 
 export interface Problem {
@@ -122,7 +127,15 @@ function tagProblem(text: string): string | undefined {
   return open.length ? `<${open[0]}> is not closed` : undefined;
 }
 
-export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: Untranslated): Problem[] {
+/**
+ * The keys whose German or Dutch is rightly the English, by language: texts of
+ * one or two words such as a name, the site's own word ("Board", "Leg")
+ * or a number with its unit. A plural's form is listed as `key.one` or
+ * `key.other`. Phrases that stay go in untranslated.json instead.
+ */
+type SameAsEnglish = Readonly<Record<string, readonly string[]>>;
+
+export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: Untranslated, sameAsEnglish: SameAsEnglish = {}): Problem[] {
   const problems: Problem[] = [];
   const english = flatten(catalogs.en);
 
@@ -148,6 +161,10 @@ export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: U
 
     if (language === "en") continue;
 
+    const listed = new Set(sameAsEnglish[language] ?? []);
+    // The listed keys that are still a short text identical to the English: the rest are stale.
+    const stillSame = new Set<string>();
+
     for (const key of english.keys()) {
       if (!leaves.has(key)) problems.push({ where: `locales/${language}: ${key}`, what: "is missing" });
     }
@@ -170,9 +187,23 @@ export function checkCatalogs(catalogs: Record<string, unknown>, untranslated: U
         if (signature(text, countOptional) !== signature(translated, countOptional)) {
           problems.push({ where, what: `placeholders or tags differ: en "${signature(text, countOptional)}", ${language} "${signature(translated, countOptional)}"` });
         }
-        if (translated === text && words(text) >= 3 && !untranslated.includes(text)) {
-          problems.push({ where, what: `is still the English: "${text}"` });
+        // Still the English: a sentence only if untranslated.json allows it, a word or two (one
+        // with letters) also if same-as-english.json lists its key.
+        if (translated === text && !untranslated.includes(text)) {
+          const count = words(text);
+          if (count >= 3) {
+            problems.push({ where, what: `is still the English: "${text}"` });
+          } else if (count > 0 && listed.has(key + form)) {
+            stillSame.add(key + form);
+          } else if (count > 0) {
+            problems.push({ where, what: `is the English, "${text}": translate it, or add "${key}${form}" to "${language}" in locales/same-as-english.json if it is right as it is` });
+          }
         }
+      }
+    }
+    for (const key of listed) {
+      if (!stillSame.has(key)) {
+        problems.push({ where: `locales/same-as-english.json: ${language} "${key}"`, what: "is not a word or two that is still the English: take it off the list" });
       }
     }
   }
@@ -648,7 +679,7 @@ function main(): void {
   const root = process.cwd();
   sfc.registerTS(() => ts);
 
-  const problems = checkCatalogs(CATALOGS, UNTRANSLATED);
+  const problems = checkCatalogs(CATALOGS, UNTRANSLATED, SAME_AS_ENGLISH);
   const english = flatten(CATALOGS.en);
   for (const file of sourceFiles(root, process.argv.slice(2))) {
     const source = readFileSync(path.join(root, file), "utf8");

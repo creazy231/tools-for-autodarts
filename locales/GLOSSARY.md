@@ -453,6 +453,8 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 | `Round the World` | The game's name, which the site's German and Dutch both leave in English (`lobby.gamePicker.games.rtw`). |
 | `Edit Channel › Integrations › Webhooks` | Where Discord makes a webhook, as Discord's own menus read, and how the Discord Webhooks panel names it in every language (`discordWebhooks.panel.url.path`). |
 
+A German or Dutch word or two that is rightly the English, such as a feature's name, a game's name or the site's own word (*Board*, *Leg*), is not listed here but by its key in `locales/same-as-english.json`, under its language. The check reports any other word or two copied from the English, and a key on that list that no longer is one.
+
 What is never translated beyond this file (what users type or import, trigger tokens such as `gameshot` and `t20`, names that identify something to autodarts, the site-text lists in `utils/selectors.ts`) is in section 5 of `docs/superpowers/specs/2026-10-01-i18n-design.md`.
 
 ## 9. Dutch review
