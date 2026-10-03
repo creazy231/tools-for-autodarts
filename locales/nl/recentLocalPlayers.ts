@@ -19,12 +19,8 @@ export default {
     noMatch: "Geen opgeslagen speler heeft dat in zijn naam.",
     searchPlaceholder: "Spelers zoeken",
   },
-  moreActions: "Meer acties",
-  more: "Meer",
   deleteAll: {
-    menu: "Alles verwijderen…",
     title: { one: "De opgeslagen speler verwijderen?", other: "Alle {count} opgeslagen spelers verwijderen?" },
     body: "Ze verdwijnen uit de strook van de lobby en uit de eigen lijst van autodarts onder Speler toevoegen. Dit kan niet ongedaan worden gemaakt.",
-    confirm: "Alles verwijderen",
   },
 } satisfies Translation<typeof en>;

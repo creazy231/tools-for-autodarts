@@ -23,16 +23,14 @@ export default {
     noMatch: "No saved player has that in their name.",
     searchPlaceholder: "Search players",
   },
-  /** The list's menu button: its spoken name, and its tooltip. */
-  moreActions: "More actions",
-  more: "More",
+  /**
+   * The list's menu and its delete-all dialog. The menu's button and its item, and the dialog's confirm button, are
+   * library.moreActions, library.more, library.deleteAllMenu and library.deleteAll, as in the four library panels.
+   */
   deleteAll: {
-    /** The menu's item; it opens the dialog. */
-    menu: "Delete all…",
     /** The dialog's heading. */
     title: { one: "Delete the {count} saved player?", other: "Delete all {count} saved players?" },
     /** "Add Player" is the site's own button, in the lobby's dialog that lists the players autodarts remembers. */
     body: "They go from the lobby's strip and from autodarts' own Add Player list. This can't be undone.",
-    confirm: "Delete all",
   },
 };

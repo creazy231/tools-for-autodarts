@@ -19,12 +19,8 @@ export default {
     noMatch: "Kein gespeicherter Spieler hat das im Namen.",
     searchPlaceholder: "Spieler suchen",
   },
-  moreActions: "Weitere Aktionen",
-  more: "Mehr",
   deleteAll: {
-    menu: "Alle löschen…",
     title: { one: "Den gespeicherten Spieler löschen?", other: "Alle {count} gespeicherten Spieler löschen?" },
     body: "Sie verschwinden aus der Leiste der Lobby und aus der eigenen Liste von autodarts unter Spieler hinzufügen. Das lässt sich nicht rückgängig machen.",
-    confirm: "Alle löschen",
   },
 } satisfies Translation<typeof en>;

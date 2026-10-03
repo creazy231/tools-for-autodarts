@@ -39,7 +39,7 @@
           <template #actions>
             <AppMenu :items="moreActions">
               <template #trigger="{ open, toggle }">
-                <button @click="toggle" :aria-expanded="open" :aria-label="t('recentLocalPlayers.moreActions')" class="adt-icon-btn" :title="t('recentLocalPlayers.more')" type="button">
+                <button @click="toggle" :aria-expanded="open" :aria-label="t('library.moreActions')" class="adt-icon-btn" :title="t('library.more')" type="button">
                   <span class="icon-[material-symbols--more-horiz]" />
                 </button>
               </template>
@@ -75,7 +75,7 @@
           {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="deleteAllPlayers" auto type="danger">
-          {{ t("recentLocalPlayers.deleteAll.confirm") }}
+          {{ t("library.deleteAll") }}
         </AppButton>
       </template>
     </AppModal>
@@ -141,7 +141,7 @@ const entries = computed<LibraryEntry[]>(() => (config.value?.recentLocalPlayers
 
 const moreActions = computed(() => [
   {
-    label: t("recentLocalPlayers.deleteAll.menu"),
+    label: t("library.deleteAllMenu"),
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     disabled: !config.value?.recentLocalPlayers.players.length,

@@ -350,7 +350,7 @@ Settled in Animations (`locales/*/animations.ts`, and the four shared words of t
 | Add from a link | as the sound dialogs' *Sound von einem Link hinzufügen* and *Geluid toevoegen via een link* | Von einem Link hinzufügen | Toevoegen via een link |
 | Use the GIF's length | the button that reads how long one run of a GIF takes | GIF-Länge nutzen | GIF-lengte gebruiken |
 | Add animation (the dialog's button) | shortened to the shared *Hinzufügen* and *Toevoegen*, as the sound dialogs' *Add sound* is: next to *Abbrechen* the long form is 323 px against the 310 px a 390 px phone leaves | Hinzufügen | Toevoegen |
-| More actions, More, Delete all…, Delete all | the three-dot menu of a list and its confirm button, shared by the four library panels (`library.moreActions` and the rest); Recent Local Players says the same | Weitere Aktionen, Mehr, Alle löschen…, Alle löschen | Meer acties, Meer, Alles verwijderen…, Alles verwijderen |
+| More actions, More, Delete all…, Delete all | the three-dot menu of a list and its confirm button, shared by the four library panels and by Recent Local Players, which use the same keys (`library.moreActions` and the rest) | Weitere Aktionen, Mehr, Alle löschen…, Alle löschen | Meer acties, Meer, Alles verwijderen…, Alles verwijderen |
 
 The alt of a tile and its switch fill the triggers into "Animation on …": German *bei* takes the dative, so an animation with no trigger is *Animation bei keinem Trigger*, and Dutch *bij* takes *geen trigger*. A trigger that animations have no event for is *Animationen kennen diesen Trigger nicht* and *Animaties kennen deze trigger niet*. The hint under the Show for field names the option through a placeholder (`{option}`), so it can never differ from the row's title.
 
