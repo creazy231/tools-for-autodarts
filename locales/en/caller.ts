@@ -6,8 +6,8 @@
  * and playing a sound. The list menu's button and Delete all are library.moreActions, library.more,
  * library.deleteAllMenu and library.deleteAll; the trigger field's words are in triggers.ts, and the games' in
  * gameModes.ts.
- * A trigger (`s20_s5_s1`), a file name (`0.mp3`) and a host name are what is typed or fetched, so they stay as they
- * are inside a sentence.
+ * A file name (`0.mp3`) and a host name are what is typed or fetched, so they stay as they are inside a sentence. A
+ * trigger is typed too: the one combinedThrows names (`s20_s5_s1`) is a param, as Sound FX's and WLED's are.
  */
 export default {
   card: "Call out scores, checkouts and special events during your matches with customizable sound effects.",
@@ -27,8 +27,8 @@ export default {
   },
   combinedThrows: {
     title: "Prefer combined throws",
-    /** The token in the tag is what is typed as a trigger, so it stays as it is in every language. */
-    description: "When there's a sound for the exact darts, such as <code>s20_s5_s1</code>, play it instead of the visit's total.",
+    /** `token` is `s20_s5_s1`, a trigger. It is what is typed, so it is a param and no translation can change it. */
+    description: "When there's a sound for the exact darts, such as <code>{token}</code>, play it instead of the visit's total.",
   },
   /** The row is headed gameModes.title. */
   gameModes: {

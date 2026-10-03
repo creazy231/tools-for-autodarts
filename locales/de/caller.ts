@@ -20,7 +20,7 @@ export default {
   },
   combinedThrows: {
     title: "Kombinierte Würfe bevorzugen",
-    description: "Gibt es einen Sound für genau diese Darts, etwa <code>s20_s5_s1</code>, wird er statt der Summe der Aufnahme abgespielt.",
+    description: "Gibt es einen Sound für genau diese Darts, etwa <code>{token}</code>, wird er statt der Summe der Aufnahme abgespielt.",
   },
   gameModes: {
     description: "Die Spiele, in denen angesagt wird.",

@@ -20,7 +20,7 @@ export default {
   },
   combinedThrows: {
     title: "Gecombineerde worpen voorrang geven",
-    description: "Als er een geluid is voor precies die darts, zoals <code>s20_s5_s1</code>, wordt dat afgespeeld in plaats van het totaal van de beurt.",
+    description: "Als er een geluid is voor precies die darts, zoals <code>{token}</code>, wordt dat afgespeeld in plaats van het totaal van de beurt.",
   },
   gameModes: {
     description: "De spellen waarin wordt afgeroepen.",

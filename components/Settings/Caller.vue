@@ -20,7 +20,7 @@
           </OptionRow>
           <OptionRow :title="t('caller.combinedThrows.title')">
             <template #description>
-              <AppTrans path="caller.combinedThrows.description" />
+              <AppTrans :params="{ token: 's20_s5_s1' }" path="caller.combinedThrows.description" />
             </template>
             <AppToggle v-model="config.caller.preferCombinedThrows" size="sm" />
           </OptionRow>
