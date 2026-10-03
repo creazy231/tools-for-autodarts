@@ -336,6 +336,12 @@ export async function setEffectByTrigger(trigger: string, wait: boolean = false)
     }
   }
 
+  // A trigger lights nothing while WLED is switched off. The lobby and match
+  // scripts tear WLED down on every page they leave, whether it ever started or
+  // not, and that teardown sends `idle`: it lit the lights with WLED off. The
+  // settings' send and Test buttons go to setEffect directly, so they still work.
+  if (!config.wledFx?.enabled) return;
+
   // Find all effects that match the trigger
   const matchingEffects = config.wledFx.effects.filter(
     effect => effect.enabled && effect.triggers && effect.triggers.includes(trigger),
