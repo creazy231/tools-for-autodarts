@@ -5,7 +5,7 @@ export default {
   // Shorter than the English: the card's text sits in a column of two thirds of a card of fixed height.
   card: "Scores, checkouts en bijzondere momenten tijdens je wedstrijden afroepen, met eigen geluiden.",
   intro: "Roept scores, checkouts en namen af tijdens een wedstrijd, met een stem naar keuze. Elk geluid wordt afgespeeld bij de triggers die je eraan geeft.",
-  audioNotice: "Interageer met de pagina (klik, tik of druk op een toets) om het geluid voor de caller in te schakelen.",
+  audioNotice: "Interageer met de pagina (klik, tik of druk op een toets) om het geluid voor de Caller in te schakelen.",
   sections: {
     options: "Opties",
   },
