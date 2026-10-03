@@ -15,34 +15,130 @@ export interface SelectorUsage {
 }
 
 /** When this index was generated (ms since epoch). */
-export const GENERATED_AT = 1788551141529;
+export const GENERATED_AT = 1791023241665;
 
 /** Newest mtime among the source files scanned, for staleness detection. */
-export const NEWEST_SOURCE_AT = 1788551103594;
+export const NEWEST_SOURCE_AT = 1791020338167;
 
 export const SELECTOR_USAGES: SelectorUsage[] = [
   {
-    "selector": "[data-id]",
-    "file": "components/Settings/Animations.vue",
-    "line": 573,
-    "fn": "querySelectorAll"
-  },
-  {
     "selector": "#root",
     "file": "entrypoints/content/index.ts",
-    "line": 60,
+    "line": 84,
     "fn": "querySelector"
   },
   {
     "selector": "body",
     "file": "entrypoints/content/index.ts",
-    "line": 64,
+    "line": 88,
     "fn": "querySelector"
   },
   {
     "selector": "svg",
     "file": "entrypoints/content/v2-menu.ts",
     "line": 55,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-order",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 504,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-order",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 509,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-edit",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 512,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "button[data-slot='button']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 536,
+    "fn": "matches"
+  },
+  {
+    "selector": ".adt-team-line",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 559,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-order",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 563,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-line",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 564,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-edit",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 567,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-order",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 622,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-line",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 623,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ".adt-team-edit",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 624,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ":scope > [data-slot='card-header']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 684,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "[data-slot='switch']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 685,
+    "fn": "querySelector"
+  },
+  {
+    "selector": ":scope > [data-slot='card-content']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 686,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "[data-slot='card-title']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 692,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "[data-slot='switch-thumb']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 695,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "[role='switch']",
+    "file": "entrypoints/lobby.content/teams.ts",
+    "line": 725,
     "fn": "querySelector"
   },
   {
@@ -54,43 +150,31 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "button",
     "file": "entrypoints/match.content/automatic-fullscreen.ts",
-    "line": 34,
-    "fn": "querySelector"
-  },
-  {
-    "selector": "main",
-    "file": "entrypoints/match.content/button-countdown.ts",
-    "line": 80,
+    "line": 36,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 356,
+    "line": 382,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 361,
+    "line": 387,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 429,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".adt-notification-close",
-    "file": "entrypoints/match.content/caller.ts",
-    "line": 449,
+    "line": 455,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/caller.ts",
-    "line": 482,
+    "line": 517,
     "fn": "querySelector"
   },
   {
@@ -102,91 +186,103 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 505,
+    "line": 536,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 510,
+    "line": 541,
     "fn": "querySelector"
   },
   {
     "selector": "style[data-adt-notification-style]",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 578,
-    "fn": "querySelector"
-  },
-  {
-    "selector": ".adt-notification-close",
-    "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 598,
+    "line": 609,
     "fn": "querySelector"
   },
   {
     "selector": ".adt-notification",
     "file": "entrypoints/match.content/sound-fx.ts",
-    "line": 631,
+    "line": 672,
     "fn": "querySelector"
   },
   {
     "selector": "svg",
     "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 693,
+    "line": 757,
     "fn": "querySelectorAll"
   },
   {
     "selector": "button",
     "file": "entrypoints/match.content/StreamingMode.vue",
-    "line": 858,
+    "line": 942,
     "fn": "querySelector"
+  },
+  {
+    "selector": ":scope .adt-team-order",
+    "file": "entrypoints/match.content/teams.ts",
+    "line": 389,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "input, textarea, [contenteditable='true']",
+    "file": "entrypoints/match.content/teams.ts",
+    "line": 528,
+    "fn": "closest"
   },
   {
     "selector": ".adt-zoom-view",
     "file": "entrypoints/match.content/zoom.ts",
-    "line": 649,
+    "line": 720,
     "fn": "querySelector"
   },
   {
     "selector": "img",
     "file": "entrypoints/match.content/zoom.ts",
-    "line": 758,
+    "line": 837,
     "fn": "querySelector"
   },
   {
     "selector": "label",
     "file": "utils/quiet-own-darts-switch.ts",
-    "line": 178,
+    "line": 192,
     "fn": "querySelector"
   },
   {
     "selector": "label",
     "file": "utils/quiet-own-darts-switch.ts",
-    "line": 224,
+    "line": 238,
     "fn": "querySelector"
   },
   {
     "selector": "input",
     "file": "utils/quiet-own-darts-switch.ts",
-    "line": 231,
+    "line": 245,
     "fn": "querySelectorAll"
   },
   {
     "selector": "[id]",
     "file": "utils/quiet-own-darts-switch.ts",
-    "line": 232,
+    "line": 246,
     "fn": "querySelectorAll"
   },
   {
     "selector": "[aria-labelledby]",
     "file": "utils/quiet-own-darts-switch.ts",
-    "line": 233,
+    "line": 247,
     "fn": "querySelectorAll"
   },
   {
     "selector": "label",
     "file": "utils/quiet-own-darts-switch.ts",
-    "line": 235,
+    "line": 249,
+    "fn": "querySelector"
+  },
+  {
+    "selector": "label",
+    "file": "utils/quiet-own-darts-switch.ts",
+    "line": 324,
     "fn": "querySelector"
   },
   {
@@ -204,13 +300,13 @@ export const SELECTOR_USAGES: SelectorUsage[] = [
   {
     "selector": "Lobby",
     "file": "utils/selectors.ts",
-    "line": 266,
+    "line": 274,
     "fn": "waitForElementWithTextContent"
   },
   {
     "selector": "img[src^=\\\"blob:\\\"]",
     "file": "utils/websocket-helpers.ts",
-    "line": 343,
+    "line": 418,
     "fn": "querySelectorAll"
   }
 ];
