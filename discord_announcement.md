@@ -37,7 +37,7 @@ Tools for Autodarts now speaks **German** and **Dutch**. It follows the language
 📱 On a phone, every feature card in the settings shows its On/Off switch.
 
 ### 🤝 Community
-Thanks to **@MeisterBob** for the Hidden Cricket fix *(#258)*, to **@vesperwatcher** and cab1895 for reporting the Next Leg problem *(#260)*, to Andy Pech's *Teams for Autodarts* and MartinHH's *Autodarts – Team 2vs2* for the idea behind Teams, and to all of you in the bug channels 🎉
+Thanks to **@MeisterBob** for the Hidden Cricket fix *(#258)*, to cab1895 for reporting the Next Leg problem *(#260)*, to Andy Pech's *Teams for Autodarts* and MartinHH's *Autodarts – Team 2vs2* for the idea behind Teams, and to all of you in the bug channels 🎉
 
 :flag_nl: The Dutch translation hasn't been checked by a native speaker yet. If something reads oddly, please tell us: corrections are very welcome!
 
