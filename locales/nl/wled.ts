@@ -3,7 +3,7 @@ import type { Translation } from "../../utils/i18n/types";
 
 export default {
   // Shorter than the English: the card's text sits in a column of two thirds of a card of fixed height.
-  card: "WLED-effecten (of andere links) afspelen bij gameon, takeout en wedstrijdwinst.",
+  card: "WLED-effecten of links afspelen bij gameon, takeout en een gewonnen wedstrijd.",
   imageAlt: "WLED-effecten",
   intro: "Bij gebeurtenissen in het spel lichten je WLED-strips op, of wordt een andere link aangeroepen. Elk effect wordt afgespeeld bij de triggers die je eraan geeft.",
   sections: {
@@ -17,10 +17,10 @@ export default {
   },
   onlyOnce: {
     title: "Een lopend effect niet opnieuw starten",
-    description: "Een effect dat al actief is, wordt niet opnieuw verzonden, zodat de verlichting niet opnieuw begint.",
+    description: "Een effect dat al actief is, wordt niet nog eens verzonden, zodat de verlichting niet opnieuw begint.",
   },
   gameModes: {
-    description: "De spellen waarin WLED oplicht. Effecten in lobby's en toernooien worden in elk spel afgespeeld.",
+    description: "De spellen waarin WLED oplicht. Lobby- en toernooi-effecten worden in elk spel afgespeeld.",
     intro: "WLED licht alleen op in de spellen die hier aan staan.",
   },
   list: {
@@ -95,7 +95,7 @@ export default {
     hint: "Wordt uit de presets.json van het apparaat gelezen zodra je het adres hebt ingevoerd.",
     typeAddress: "Voer eerst het adres in",
     readFailed: "Kon de presets niet van het apparaat lezen",
-    pick: "Kies een preset",
+    pick: "Selecteer een preset",
   },
   link: {
     label: "Link",
@@ -108,7 +108,7 @@ export default {
   },
   errors: {
     linkScheme: "De link moet met http:// of https:// beginnen",
-    presetFirst: "Kies eerst een preset.",
+    presetFirst: "Selecteer eerst een preset.",
     jsonInvalid: "Dit is geen geldige JSON.",
   },
   deleteAll: {

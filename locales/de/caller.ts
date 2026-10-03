@@ -54,7 +54,7 @@ export default {
     },
   },
   sets: {
-    pick: "Set auswählen…",
+    pick: "Wähle ein Set…",
     label: "{region} - {voice} ({gender})",
     female: "weiblich",
     male: "männlich",
