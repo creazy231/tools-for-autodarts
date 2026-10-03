@@ -15,10 +15,11 @@
  * code on 2026-10-01 — see docs/superpowers/specs/2026-10-01-i18n-design.md.
  */
 
-export type Language = "en" | "de" | "nl";
-
 /** The languages Tools has text for. English first: it is the default. */
-export const LANGUAGES: readonly Language[] = [ "en", "de", "nl" ];
+export const LANGUAGES = [ "en", "de", "nl" ] as const;
+
+/** One of them. Taken from the list, so the two can't drift apart. */
+export type Language = (typeof LANGUAGES)[number];
 
 /** Where the site keeps the language picked in its settings. Absent means "System". */
 export const SITE_LANGUAGE_KEY = "autodarts.settings.language";
@@ -35,10 +36,13 @@ export function normaliseLanguage(value: string | null | undefined): Language | 
 /**
  * The value the site stored, or null when there is none — or when storage
  * cannot be read at all (blocked site data), which the site treats the same.
+ *
+ * The store is a parameter for the tests. It is not called `storage`, a name
+ * WXT's auto-import takes for its own module and would import for nothing.
  */
-export function readStoredLanguage(storage?: Pick<Storage, "getItem">): string | null {
+export function readStoredLanguage(store?: Pick<Storage, "getItem">): string | null {
   try {
-    return (storage ?? globalThis.localStorage)?.getItem(SITE_LANGUAGE_KEY) ?? null;
+    return (store ?? globalThis.localStorage)?.getItem(SITE_LANGUAGE_KEY) ?? null;
   } catch {
     return null;
   }
@@ -54,10 +58,10 @@ export function readStoredLanguage(storage?: Pick<Storage, "getItem">): string |
  * 4. English.
  */
 export function readSiteLanguage(
-  storage?: Pick<Storage, "getItem">,
+  store?: Pick<Storage, "getItem">,
   nav?: Partial<Pick<Navigator, "languages" | "language">>,
 ): Language {
-  const stored = readStoredLanguage(storage);
+  const stored = readStoredLanguage(store);
   const picked = normaliseLanguage(stored);
   if (picked) return picked;
   if (stored && stored !== "system") return "en";
