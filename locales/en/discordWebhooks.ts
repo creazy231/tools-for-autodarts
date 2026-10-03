@@ -13,9 +13,13 @@ export default {
     },
     url: {
       title: "Webhook URL",
-      /** `path` is url.path: Discord's own menu path, which no language translates. */
+      /** `path` is url.path: Discord's own menu path. */
       description: "Where the invitation is posted. Discord makes one under a channel's {path}.",
-      /** Where Discord makes a webhook, as Discord's own menus read. The same in every language. */
+      /**
+       * Where Discord makes a webhook, as Discord's own menus read. Its client is translated, so this
+       * is in its words for each language, as its help centre names them (support.discord.com/hc/de
+       * and /hc/nl): "Kanal bearbeiten", "Integrationen"; "Kanaal bewerken", "Integraties".
+       */
       path: "Edit Channel › Integrations › Webhooks",
       /** An example address: the same in every language. */
       placeholder: "https://discord.com/api/webhooks/…",

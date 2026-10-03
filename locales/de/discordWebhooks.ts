@@ -11,7 +11,7 @@ export default {
     url: {
       title: "Webhook-URL",
       description: "Wohin die Einladung gepostet wird. Discord erstellt die URL unter {path} eines Kanals.",
-      path: "Edit Channel › Integrations › Webhooks",
+      path: "Kanal bearbeiten › Integrationen › Webhooks",
       placeholder: "https://discord.com/api/webhooks/…",
       nothingPosted: "Es wird nichts gepostet, bis hier eine URL steht.",
       notWebhook: "Das ist keine Discord-Webhook-URL, sodass die Nachricht womöglich nie ankommt.",
