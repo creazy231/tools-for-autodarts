@@ -14,14 +14,22 @@
  * someone else's lobby it is not your call to make.
  */
 
+import type { RoomStore } from "@/utils/team-room";
 import type { ILobbies } from "@/utils/websocket-helpers";
 
 import { SELECTORS, qs, qsa } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
+import { AutodartsToolsTeamRoom } from "@/utils/storage";
+import { roomOf, screenTeams } from "@/utils/team-room";
 import { fetchWithAuth, getUserIdFromToken } from "@/utils/helpers";
 
 let unwatchLobbyData: (() => void) | null = null;
 let rowObserver: MutationObserver | null = null;
+/** Online Teams' room per lobby (utils/team-room.ts), followed live: another account's team stays on its board. */
+let roomStore: RoomStore = {};
+let unwatchRoom: (() => void) | null = null;
+/** The lobby and user the last pass found this to be the host's private lobby of, for the row observer's passes. */
+let claimFor: { lobby: ILobbies; userId: string } | null = null;
 
 /** Once per lobby: adding yourself back on purpose has to stick. */
 let selfRemoved = false;
@@ -35,6 +43,13 @@ export async function localLobby() {
   selfRemoved = false;
   removing = false;
   skipLogged = false;
+  claimFor = null;
+
+  roomStore = (await AutodartsToolsTeamRoom.getValue()) ?? {};
+  unwatchRoom?.();
+  unwatchRoom = AutodartsToolsTeamRoom.watch((value?: RoomStore) => {
+    roomStore = value ?? {};
+  });
 
   await apply(await AutodartsToolsLobbyData.getValue());
 
@@ -51,7 +66,9 @@ export async function localLobby() {
   // A player's row renders a moment after the update that brought them in, and
   // its board button is only clickable once it is there.
   rowObserver?.disconnect();
-  rowObserver = new MutationObserver(() => claimBoards());
+  rowObserver = new MutationObserver(() => {
+    if (claimFor) claimBoards(claimFor.lobby, claimFor.userId);
+  });
   rowObserver.observe(document.body, { childList: true, subtree: true });
 }
 
@@ -62,12 +79,17 @@ export async function onRemove() {
   rowObserver?.disconnect();
   rowObserver = null;
 
+  unwatchRoom?.();
+  unwatchRoom = null;
+  claimFor = null;
+
   selfRemoved = false;
   removing = false;
   skipLogged = false;
 }
 
 async function apply(lobby?: ILobbies) {
+  claimFor = null;
   if (!lobby) return;
 
   // The stored lobby can still be the one before this, and acting on it would
@@ -85,8 +107,9 @@ async function apply(lobby?: ILobbies) {
     return;
   }
 
+  claimFor = { lobby, userId };
   await removeSelf(lobby, userId);
-  claimBoards();
+  claimBoards(lobby, userId);
 }
 
 /**
@@ -133,13 +156,19 @@ async function removeSelf(lobby: ILobbies, userId: string) {
  * player is already playing here — so an enabled one is precisely a player who
  * needs moving, and clicking it disables it. That makes this safe to run on
  * every render, with no bookkeeping of who has been moved.
+ *
+ * Online Teams: a seat of another account's team stays on that account's
+ * board, whatever the button (utils/team-room.ts). Rows come in seat order.
  */
-function claimBoards() {
-  for (const row of qsa(SELECTORS.lobby.playerRows)) {
+function claimBoards(lobby: ILobbies, userId: string) {
+  const room = roomOf(roomStore, lobby.id);
+  const players = lobby.players ?? [];
+  const theirs = new Set(screenTeams({ players, saved: [], lineup: undefined, shifts: {}, room, me: userId, hostId: lobby.host?.id }).remote.flatMap(team => team.seatIds));
+  qsa(SELECTORS.lobby.playerRows).forEach((row, index) => {
+    if (theirs.has(players[index]?.id ?? "")) return;
     const button = qs<HTMLButtonElement>(SELECTORS.lobby.playerBoardButton, row);
-    if (!button || button.disabled) continue;
-
+    if (!button || button.disabled) return;
     button.click();
     console.log("Autodarts Tools: Local Lobby - Moved a player onto this board");
-  }
+  });
 }

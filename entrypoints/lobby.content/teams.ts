@@ -12,7 +12,8 @@
  * on its name tag, its throwing order under the name, and a pencil that opens
  * the drawer again to change the players or the colour.
  *
- * Only in a lobby the user hosts: nobody else can add players there.
+ * Every participant adds their own team, as the site lets every participant
+ * add players of their own; the seat order stays the host's.
  *
  * Its words follow the site's language. What is redrawn on every pass (the
  * note on uneven teams, a row's "1 of 2") picks the new one up there; what is
@@ -26,18 +27,23 @@ import AddTeamDrawer from "./AddTeamDrawer.vue";
 
 import type { ILobbies } from "@/utils/websocket-helpers";
 import type { ColorScheme } from "@/utils/storage";
-import type { Lineup, LineupStore, LineupTeam, OwnDraft, PartnerCard, SavedTeam, SeatSlot, TeamDraft, TeamFormat, TeamsMessage, TeamsProblem } from "@/utils/teams";
+import type { RoomStore, ScreenTeams } from "@/utils/team-room";
+import type { RoomClientState } from "@/utils/team-room-client";
+import type { Lineup, LineupStore, LineupTeam, OwnDraft, PartnerCard, SavedTeam, SeatLike, SeatSlot, TeamDraft, TeamFormat, TeamsMessage, TeamsProblem } from "@/utils/teams";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SELECTORS, anyOf, qs, qsa } from "@/utils/selectors";
-import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom } from "@/utils/storage";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY, forgetGuestPlayers } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
 import { language, onLanguageChange, t } from "@/utils/i18n";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, isHostedGuest, lineupOf, lineupPartnerRule, lobbyFormat, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
 import { memberLabel, unevenText } from "@/utils/teams-text";
+import { myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
+import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
+import { mirrorRoom } from "@/utils/team-room-mirror";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
@@ -51,6 +57,8 @@ const STYLE_ID = "teams-lobby";
 const ROW_ATTR = "data-adt-team";
 /** On a row's pencil: the team's name, for its spoken name in the language of the moment. */
 const EDIT_ATTR = "data-adt-team-edit";
+/** On a row of another account's team: no pencil, and the site's 🌐 hidden. */
+const REMOTE_ATTR = "data-adt-team-remote";
 
 /** Material Symbols "group" (Apache 2.0), sized by the site's `[&_svg:not([class*='size-'])]:size-4`. */
 const ICON_TEAM = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M1 17.2q0-.85.438-1.562T2.6 14.55q1.55-.775 3.15-1.162T9 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T17 17.2v.8q0 .825-.587 1.413T15 20H3q-.825 0-1.412-.587T1 18zM18.45 20q.275-.45.413-.962T19 18v-1q0-1.1-.612-2.113T16.65 13.15q1.275.15 2.4.513t2.1.887q.9.5 1.375 1.112T23 17v1q0 .825-.587 1.413T21 20zM6.175 10.825Q5 9.65 5 8t1.175-2.825T9 4t2.825 1.175T13 8t-1.175 2.825T9 12t-2.825-1.175m11.65 0Q16.65 12 15 12q-.275 0-.7-.062t-.7-.138q.675-.8 1.038-1.775T15 8t-.362-2.025T13.6 4.2q.35-.125.7-.163T15 4q1.65 0 2.825 1.175T19 8t-1.175 2.825\"/></svg>";
@@ -109,6 +117,8 @@ const LOBBY_CSS = `
   #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] { background: #0b55df; box-shadow: none; }
   #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] > span { position: absolute; top: 3px; left: 3px; width: 28px; height: 18px; border-radius: 999px; background: #fff; transition: transform 150ms; }
   #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] > span { transform: translateX(17px); }
+  /* Online Teams: the site's "play on my board" would pull another account's team onto this board. */
+  [${REMOTE_ATTR}] ${anyOf(SELECTORS.lobby.playerLinkButton)} { display: none !important; }
 `;
 
 /** A seat of the lobby, as Own scores' In this lobby offers it. */
@@ -198,6 +208,17 @@ let lineups: LineupStore = {};
 let unwatchLineups: (() => void) | null = null;
 /** One reorder at a time: the moves it makes come back as lobby updates. */
 let reordering = false;
+/** Online Teams' switch (`teams.online`), followed live. */
+let online = true;
+/** What the team room last said of each lobby (utils/team-room.ts). */
+let roomStore: RoomStore = {};
+let unwatchRoom: (() => void) | null = null;
+/** This lobby's connection to the team room, while Teams and Online Teams are on. */
+let roomClient: RoomClient | null = null;
+let stopClientWatch: (() => void) | null = null;
+/** When each other account's first seat was seen in this lobby: the chip's "isn't connected" counts from it. */
+let firstSeen: Record<string, number> = {};
+let firstSeenLobby = "";
 /** Resolved on the next lobby update: the moves and the adds wait on it. */
 const lobbyWaiters: (() => void)[] = [];
 
@@ -234,6 +255,7 @@ export async function teams(ctx: any) {
   readConfig(await AutodartsToolsConfig.getValue());
   lobby = currentLobby(await AutodartsToolsLobbyData.getValue());
   lineups = (await AutodartsToolsTeamLineups.getValue()) ?? {};
+  roomStore = (await AutodartsToolsTeamRoom.getValue()) ?? {};
   addStyles(LOBBY_CSS, STYLE_ID);
 
   // Leaving one lobby for another runs this again without a teardown, so the
@@ -247,6 +269,11 @@ export async function teams(ctx: any) {
   unwatchLineups?.();
   unwatchLineups = AutodartsToolsTeamLineups.watch((value?: LineupStore) => {
     lineups = value ?? {};
+    schedule();
+  });
+  unwatchRoom?.();
+  unwatchRoom = AutodartsToolsTeamRoom.watch((value?: RoomStore) => {
+    roomStore = value ?? {};
     schedule();
   });
   unwatchConfig?.();
@@ -273,6 +300,9 @@ export async function onRemove() {
   unwatchConfig = null;
   unwatchLineups?.();
   unwatchLineups = null;
+  unwatchRoom?.();
+  unwatchRoom = null;
+  stopRoom();
   teardown();
   for (const done of lobbyWaiters.splice(0)) done();
   removeStyles(STYLE_ID);
@@ -284,6 +314,7 @@ function readConfig(config: any) {
   enabled = teamsConfig.enabled;
   saved = teamsConfig.saved;
   partnerRuleDefault = teamsConfig.partnerRule;
+  online = teamsConfig.online;
   savedPlayers = Array.isArray(config?.recentLocalPlayers?.players) ? config.recentLocalPlayers.players : [];
 }
 
@@ -314,16 +345,20 @@ function apply() {
   // Switched off in the settings: nothing of Teams in the lobby, until it's switched on again.
   if (!enabled) {
     teardown();
+    stopRoom();
     return;
   }
+  syncRoom();
   syncButton();
-  const lineup = currentLineup();
+  const view = teamsView();
+  const local = localLineup();
+  if (local) pruneSeats(local);
+  const lineup = view.lineup;
   if (lineup) {
-    pruneSeats(lineup);
-    dressOwnRows(lineup);
+    dressOwnRows(lineup, view.mine);
     keepOrder(lineup).catch(e => console.error(e));
   } else {
-    dressRows();
+    dressRows(view);
   }
   noteUneven(lineup);
   syncPartnerCard(lineup);
@@ -350,9 +385,33 @@ function teardown() {
   for (const row of document.querySelectorAll<HTMLElement>(`[${ROW_ATTR}]`)) undress(row);
 }
 
-/** This lobby's own-score lineup, if it has one. */
-function currentLineup(): Lineup | undefined {
+/** This lobby's own-score lineup as this screen wrote it: this account's teams only. */
+function localLineup(): Lineup | undefined {
   return lobby ? lineupOf(lineups, lobby.id) : undefined;
+}
+
+/** This lobby's teams as this screen shows them: its own, and what the room says of other accounts' (utils/team-room.ts). */
+function teamsView(): ScreenTeams {
+  return screenTeams({
+    players: lobby?.players ?? [],
+    saved,
+    lineup: localLineup(),
+    shifts: {},
+    room: online ? roomOf(roomStore, lobby?.id) : undefined,
+    me: hostId,
+    hostId: lobby?.host?.id,
+  });
+}
+
+/** This lobby's own-score teams, everyone's: what the order, the partner rule and the drawer's checks go by. */
+function currentLineup(): Lineup | undefined {
+  return teamsView().lineup;
+}
+
+/** The lobby's format once it has a team, anyone's: the first team sets it. */
+function formatOf(view: ScreenTeams): TeamFormat | undefined {
+  if (view.lineup?.teams.length) return "own";
+  return view.shared.size ? "shared" : undefined;
 }
 
 /** The next lobby update, or a few seconds, whichever comes first. */
@@ -369,13 +428,13 @@ function nextLobbyUpdate(): Promise<void> {
 async function writeLineup(teams: readonly LineupTeam[]) {
   if (!lobby) return;
   // A lobby's first team takes the partner rule the last lobby left; later writes keep its own.
-  lineups = withLineup(lineups, lobby.id, teams, Date.now(), lineupPartnerRule(currentLineup(), partnerRuleDefault));
+  lineups = withLineup(lineups, lobby.id, teams, Date.now(), lineupPartnerRule(localLineup(), partnerRuleDefault));
   await AutodartsToolsTeamLineups.setValue(lineups);
 }
 
 /** A team written into this lobby's lineup: an edited team keeps its place, a new one goes last. */
 async function writeLineupTeam(team: LineupTeam) {
-  const teams = [ ...(currentLineup()?.teams ?? []) ];
+  const teams = [ ...(localLineup()?.teams ?? []) ];
   const index = teams.findIndex(other => other.name === team.name);
   if (index >= 0) teams.splice(index, 1, team);
   else teams.push(team);
@@ -437,6 +496,53 @@ async function oneTabAtATime(lobbyId: string, run: () => Promise<void>) {
   }
 }
 
+// ----------------------------------------------------------- online teams
+
+/**
+ * Online Teams: the lobby's room, joined while it has something to say about
+ * this lobby, and told this account's teams and, from the host, the partner
+ * rule. What it says comes back through the mirror, whose watch redraws.
+ */
+function syncRoom() {
+  if (!online || !lobby) {
+    stopRoom();
+    return;
+  }
+  if (!roomClient) {
+    roomClient = new RoomClient({
+      identity: tokenIdentity,
+      onRoom: (state) => {
+        mirrorRoom(state).catch(e => console.error(e));
+      },
+    });
+    stopClientWatch = roomClient.subscribe(onClientState);
+  }
+  roomClient.start(lobby.id).catch(e => console.error(e));
+  const players = lobby.players ?? [];
+  const mine = myRoomTeams(players, saved, localLineup(), hostId);
+  roomClient.setJoin(shouldJoin(players, mine, hostId));
+  roomClient.publishTeams(mine);
+  if (isHost()) roomClient.publishRule(lineupPartnerRule(localLineup(), partnerRuleDefault));
+  if (firstSeenLobby !== lobby.id) {
+    firstSeen = {};
+    firstSeenLobby = lobby.id;
+  }
+  const now = Date.now();
+  for (const account of otherAccounts(players, hostId)) firstSeen[account.userId] ??= now;
+}
+
+function stopRoom() {
+  stopClientWatch?.();
+  stopClientWatch = null;
+  roomClient?.stop();
+  roomClient = null;
+}
+
+/** The connection's news; the chip shows it (TeamRoomStatus.vue). */
+function onClientState(_state: RoomClientState) {
+  schedule();
+}
+
 // ------------------------------------------------------------------ button
 
 /**
@@ -447,11 +553,6 @@ async function oneTabAtATime(lobbyId: string, run: () => Promise<void>) {
  */
 function syncButton() {
   const existing = document.getElementById(BUTTON_ID) as HTMLButtonElement | null;
-  if (!isHost()) {
-    existing?.remove();
-    return;
-  }
-
   const template = qs<HTMLButtonElement>(SELECTORS.lobby.addBotButton) ?? qs<HTMLButtonElement>(SELECTORS.lobby.addPlayerButton);
   if (!template?.parentElement) return;
 
@@ -477,27 +578,17 @@ function syncButton() {
 
 // -------------------------------------------------------------------- rows
 
-/** The lobby's seats that are teams: guests of this host under a saved team's name. */
-function teamsInLobby(): Map<string, SavedTeam> {
-  const out = new Map<string, SavedTeam>();
-  for (const seat of lobby?.players ?? []) {
-    if (!isHostedGuest(seat, hostId)) continue;
-    const team = findTeam(sharedTeams(saved), seat.name);
-    if (team) out.set(team.name, team);
-  }
-  return out;
-}
-
-function dressRows() {
-  const lobbyTeams = teamsInLobby();
+/** The lobby's shared-score teams' rows, this account's and the others', found by name. */
+function dressRows(view: ScreenTeams) {
+  const byName = new Map([ ...view.shared.values() ].map(team => [ team.name, team ]));
   for (const row of qsa<HTMLElement>(SELECTORS.lobby.playerRows)) {
-    const team = lobbyTeams.get(normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent));
-    if (team) dress(row, team);
+    const team = byName.get(normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent));
+    if (team) dress(row, team, view.mine.has(team.name));
     else if (row.hasAttribute(ROW_ATTR)) undress(row);
   }
 }
 
-function dress(row: HTMLElement, team: SavedTeam) {
+function dress(row: HTMLElement, team: SavedTeam, mine: boolean) {
   const key = `${team.name}|${team.players.join(",")}|${team.colour.from}|${team.colour.to}`;
   // Keyed on the order row alone. The pencil needs the row's ✕ to copy, and a
   // row drawn without one was redrawn every frame waiting for it.
@@ -508,6 +599,12 @@ function dress(row: HTMLElement, team: SavedTeam) {
 
     row.querySelector(".adt-team-order")?.remove();
     qs<HTMLElement>(SELECTORS.lobby.playerNameColumn, row)?.append(orderRow(team.players));
+  }
+  // Another account's team: theirs to edit, and to keep on their board.
+  row.toggleAttribute(REMOTE_ATTR, !mine);
+  if (!mine) {
+    row.querySelector(".adt-team-edit")?.remove();
+    return;
   }
   if (!row.querySelector(".adt-team-edit")) {
     addEditButton(row, team.name, () => {
@@ -544,7 +641,7 @@ function labelPencil(edit: HTMLElement) {
 }
 
 /** An own-score team's rows: rows come in seat order, so row `i` is `lobby.players[i]`, which tells two bots of one level apart. */
-function dressOwnRows(lineup: Lineup) {
+function dressOwnRows(lineup: Lineup, mine: ReadonlySet<string>) {
   const seats = lobby?.players ?? [];
   qsa<HTMLElement>(SELECTORS.lobby.playerRows).forEach((row, index) => {
     const seatId = seats[index]?.id;
@@ -564,7 +661,9 @@ function dressOwnRows(lineup: Lineup) {
       row.querySelector(".adt-team-line")?.remove();
       qs<HTMLElement>(SELECTORS.lobby.playerNameColumn, row)?.append(teamLabel(team, place));
     }
-    if (!row.querySelector(".adt-team-edit")) addEditButton(row, team.name, () => openOwnEditor(team.name));
+    row.toggleAttribute(REMOTE_ATTR, !mine.has(team.name));
+    if (!mine.has(team.name)) row.querySelector(".adt-team-edit")?.remove();
+    else if (!row.querySelector(".adt-team-edit")) addEditButton(row, team.name, () => openOwnEditor(team.name));
   });
 }
 
@@ -609,7 +708,7 @@ function noteUneven(lineup: Lineup | undefined) {
 
 /** The pencil on a member's row: the drawer on that team's seats. */
 function openOwnEditor(name: string) {
-  const team = currentLineup()?.teams.find(candidate => candidate.name === name);
+  const team = localLineup()?.teams.find(candidate => candidate.name === name);
   if (!team) return;
   const players = team.seatIds.map(id => normalizeName(lobby?.players?.find(seat => seat.id === id)?.name));
   openDrawer({ name: team.name, players, colour: { ...team.colour }, format: "own" }, [ ...team.seatIds ]);
@@ -617,6 +716,7 @@ function openOwnEditor(name: string) {
 
 function undress(row: HTMLElement) {
   row.removeAttribute(ROW_ATTR);
+  row.removeAttribute(REMOTE_ATTR);
   row.style.removeProperty("--adt-team-from");
   row.style.removeProperty("--adt-team-to");
   row.querySelector(".adt-team-order")?.remove();
@@ -747,11 +847,12 @@ function renderPartnerCard(card: HTMLElement, state: PartnerCard) {
 /** The card's switch: this lobby's rule, and the one the next lobby starts from. */
 async function setPartnerRule(on: boolean) {
   partnerRuleDefault = on;
-  if (lobby && currentLineup()) lineups = withPartnerRule(lineups, lobby.id, on, Date.now());
+  if (lobby && localLineup()) lineups = withPartnerRule(lineups, lobby.id, on, Date.now());
   syncPartnerCard(currentLineup());
-  if (lobby && currentLineup()) await AutodartsToolsTeamLineups.setValue(lineups);
+  if (lobby && localLineup()) await AutodartsToolsTeamLineups.setValue(lineups);
   const config = await AutodartsToolsConfig.getValue();
   await AutodartsToolsConfig.setValue({ ...config, teams: { ...normalizeTeams(config.teams), partnerRule: on } });
+  roomClient?.publishRule(on);
 }
 
 // ------------------------------------------------------------------ drawer
@@ -766,12 +867,13 @@ function siteGuests(): string[] {
 }
 
 function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): Omit<DrawerState, "submit" | "addSaved" | "close" | "submitOwn" | "forget" | "deleteSaved"> {
-  const lobbyTeams = [ ...teamsInLobby().values() ].filter(team => team.name !== editing?.name);
+  const view = teamsView();
+  const lobbyTeams = [ ...view.shared.values() ].filter(team => team.name !== editing?.name);
   const guests = uniqueNames((lobby?.players ?? []).filter(seat => !seat.userId && !seat.cpuPPR).map(seat => seat.name));
   const playerTeams: Record<string, string> = {};
   for (const team of lobbyTeams) for (const player of team.players) playerTeams[player] = team.name;
-  const lineup = currentLineup();
-  const format = lobbyFormat(lobby?.players ?? [], lineup, saved, hostId);
+  const lineup = view.lineup;
+  const format = formatOf(view);
   const ownTeams = (lineup?.teams ?? []).filter(team => team.name !== editing?.name);
   const seatTeam = new Map<string, string>();
   for (const team of ownTeams) for (const id of team.seatIds) seatTeam.set(id, team.name);
@@ -791,6 +893,13 @@ function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): 
     const problem = savedTeamProblem(team, { playerTeams, seatTeams: seatNameTeams });
     if (problem) savedProblems[team.name] = problem;
   }
+  // Online Teams: a seat of an account whose own Tools is in the room is theirs to put on a team.
+  const room = online ? roomOf(roomStore, lobby?.id) : undefined;
+  const inRoom = new Set([ ...(room?.peers ?? []).map(peer => peer.userId), ...(room?.teams ?? []).map(team => team.owner) ]);
+  const theirs = (seat: SeatLike) => {
+    const owner = seatOwner(seat);
+    return Boolean(owner) && owner !== hostId && inRoom.has(owner!);
+  };
   return {
     editing,
     guestNames: guests.filter(name => name !== editing?.name),
@@ -803,17 +912,17 @@ function drawerContext(editing: SavedTeam | null, editingSeats: string[] = []): 
     savedProblems,
     full: isFull(),
     lockedFormat: editing ? editing.format : format,
-    formatTeam: format === "own" ? (lineup?.teams[0]?.name ?? "") : ([ ...teamsInLobby().keys() ][0] ?? ""),
+    formatTeam: format === "own" ? (lineup?.teams[0]?.name ?? "") : ([ ...view.shared.values() ][0]?.name ?? ""),
     setsLobby: Boolean(lobby?.sets),
     legs: lobby?.legs ?? 0,
-    seats: (lobby?.players ?? []).filter(seat => seat.id).map(seat => ({ id: seat.id!, name: normalizeName(seat.name), kind: memberOf(seat).kind, team: seatTeam.get(seat.id!) })),
+    seats: (lobby?.players ?? []).filter(seat => seat.id && !theirs(seat)).map(seat => ({ id: seat.id!, name: normalizeName(seat.name), kind: memberOf(seat).kind, team: seatTeam.get(seat.id!) })),
     editingSeats,
     botsOk: hasBots(lobby?.variant),
   };
 }
 
 async function openDrawer(editing: SavedTeam | null, editingSeats: string[] = []) {
-  if (!isHost() || !ctxRef) return;
+  if (!ctxRef) return;
   Object.assign(drawer, drawerContext(editing, editingSeats));
   if (drawerUi || opening) return;
 

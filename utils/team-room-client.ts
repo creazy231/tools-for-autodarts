@@ -133,11 +133,13 @@ export class RoomClient {
   private async connect(): Promise<void> {
     const identity = await this.options.identity();
     if (!identity || !this.lobbyId) {
+      console.log("Autodarts Tools: Online Teams - no account to connect as");
       this.update({ connection: "offline" });
       this.starting = undefined;
       return;
     }
     this.update({ connection: "connecting" });
+    console.log("Autodarts Tools: Online Teams - connecting to", this.options.url ?? __ADT_TEAMS_SERVER__);
     const socket = (this.options.connect ?? io)(this.options.url ?? __ADT_TEAMS_SERVER__, {
       transports: [ "websocket" ],
       auth: { v: PROTOCOL_VERSION, userId: identity.userId, name: identity.name },
@@ -146,6 +148,7 @@ export class RoomClient {
     });
     this.socket = socket;
     socket.on("connect", () => {
+      console.log("Autodarts Tools: Online Teams - connected");
       this.update({ connection: "connected" });
       this.ping();
       if (this.wantJoin) this.joinRoom();
@@ -154,6 +157,7 @@ export class RoomClient {
       this.update({ connection: "offline", joined: undefined, joinedAt: undefined });
     });
     socket.on("connect_error", (error: Error) => {
+      console.log("Autodarts Tools: Online Teams - connection failed:", error?.message);
       if (error?.message === "version") {
         this.update({ connection: "outdated" });
         socket.disconnect();
