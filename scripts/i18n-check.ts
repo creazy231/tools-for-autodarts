@@ -550,12 +550,29 @@ function shownText(node: ts.Node, html: boolean): string[] {
 }
 
 /**
- * What only code writes. No English message holds a bracket, a brace, `<`, `>`,
- * `=`, `;`, `#`, `\`, `|`, `*`, `~`, `^`, `$` or a backtick, nor a `(` straight
- * after a word, as `rgb(` and `linear-gradient(` have: selectors, CSS, markup
- * and code do.
+ * What only code writes: a bracket, a brace, `<`, `>`, `\`, `~`, `^`, a
+ * backtick, and a `(` straight after a word, as `rgb(` and `linear-gradient(`
+ * have. Selectors, CSS, markup and code hold these; no English message does.
+ * Five more count as code by habit rather than by the messages: `=`, `#`, `*`,
+ * `|` and `$`. A message could hold them, and one does (the WLED hints write
+ * "/win/PL=1"), so the limits of prose() list them. A `;` is code too, but not
+ * where it ends a clause of prose: CODE_SEMICOLON.
  */
-const CODE_CHARACTER = /[[\]{}<>=;#\\|*~^$`]|[\p{L}\p{N}]\(/u;
+const CODE_CHARACTER = /[[\]{}<>=#\\|*~^$`]|[\p{L}\p{N}]\(/u;
+
+/**
+ * A `;` that is code. Prose has one when a space and a letter follow it —
+ * "Pick a colour first; it is saved with the team.", as three English messages
+ * do — while code has `return x;`, `a;b` and `inset: 0;`.
+ */
+const CODE_SEMICOLON = /;(?! \p{L})/u;
+
+/**
+ * A CSS declaration list, `position: fixed; inset: 0`, has the "; " and the
+ * letter that a clause of prose has, but a property and its colon on both sides
+ * of the `;`, which prose rarely does.
+ */
+const CSS_DECLARATIONS = /[a-z-]+\s*:[^;]*;\s*[a-z-]+\s*:/;
 
 /**
  * A word of prose: two letters or more, perhaps joined by an apostrophe or a
@@ -590,9 +607,13 @@ const ELEMENTS = new Set([
  * (`flex items-center`) or elements only (`main section`) in it. A class list
  * of plain words alone ("flex grow") still reads as two words, and lower-case
  * prose with a hyphen ("is a close-up") as a class list.
+ *
+ * Its limits: a sentence with an `=`, `#`, `*`, `|` or `$` in it is read as
+ * code, so one that a function returns passes unseen, and so does one with a
+ * `;` that no space and a letter follow.
  */
 export function prose(text: string, untranslated: Untranslated): boolean {
-  if (CODE_CHARACTER.test(text) || !readable(text, untranslated)) return false;
+  if (CODE_CHARACTER.test(text) || CODE_SEMICOLON.test(text) || CSS_DECLARATIONS.test(text) || !readable(text, untranslated)) return false;
   const tokens = text.trim().split(/\s+/);
   const lowerCaseCode = tokens.every(token => /^[!.]?[a-z0-9][\w:/.%!-]*$/.test(token) && !/[A-Z]|[.,:!?]$/.test(token));
   if (lowerCaseCode && (tokens.some(token => CLASS_TOKEN.test(token)) || tokens.every(token => ELEMENTS.has(token)))) return false;
