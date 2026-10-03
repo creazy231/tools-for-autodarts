@@ -29,9 +29,11 @@
  *   and message of a confirm dialog, `append()`, `replaceChildren()`,
  *   `insertAdjacentText()`, `prompt()`, or a `label`, `title`, `description`,
  *   … property;
- * - prose that a function returns, that an arrow function gives, or that a
- *   `ref()` or `computed()` starts with: two words or more, and nothing only
- *   code writes, so that keys, classes, selectors, URLs and tokens pass;
+ * - prose that a function returns, that an arrow function gives, that a
+ *   `ref()` or `computed()` starts with, or that a ref's value is assigned
+ *   (`error.value = "…"`, `||=`, `??=`; not a form control's): two words or
+ *   more, and nothing only code writes, so that keys, classes, selectors,
+ *   URLs and tokens pass;
  * - in all of these, every literal that can be shown: each branch of `?:`,
  *   both sides of `||`, `??` and `+`, the right side of `&&`, through `as`,
  *   `satisfies` and `!`, a template literal's own text — never the key handed
@@ -477,6 +479,34 @@ const TEXT_CALLS = new Map<string, readonly number[] | "every">([
  */
 const PROSE_HOLDERS = new Set([ "ref", "shallowRef", "computed" ]);
 
+/**
+ * The assignments that leave their right side in a ref: `error.value = "…"`,
+ * `error.value ||= "…"` and `error.value ??= "…"`. A component shows what its
+ * refs hold, so a message assigned to one — `cameraError.value = "Camera
+ * access was denied."` — is the commonest shape of shown English in this
+ * codebase's scripts.
+ */
+const VALUE_ASSIGNMENTS = new Set([
+  ts.SyntaxKind.EqualsToken, ts.SyntaxKind.BarBarEqualsToken, ts.SyntaxKind.QuestionQuestionEqualsToken,
+]);
+
+/** A name that says it is a DOM element, not a ref: `el`, `input`, `selectEl`, `audioElement`. */
+const ELEMENT_NAME = /^(?:el|elem|element|input|select|textarea|field|node|target)$|(?:El|Element)$/;
+
+/**
+ * Whether `.value` on `receiver` is a ref's, whose text a component shows, and
+ * not a form control's: `input.value = "flex grow"` sets what a field holds.
+ * A ref is a plain name or a chain of them (`error`, `state.error`). A control
+ * is named for what it is (see ELEMENT_NAME), is reached through a template ref
+ * (`fileInput.value.value`), a cast, a call or a query, or is not a name at all.
+ */
+function isRefReceiver(receiver: ts.Expression): boolean {
+  const plain = (node: ts.Expression): boolean => ts.isIdentifier(node) || node.kind === ts.SyntaxKind.ThisKeyword
+    || (ts.isPropertyAccessExpression(node) && plain(node.expression));
+  const name = ts.isIdentifier(receiver) ? receiver.text : ts.isPropertyAccessExpression(receiver) ? receiver.name.text : "";
+  return plain(receiver) && name !== "" && name !== "value" && !ELEMENT_NAME.test(name);
+}
+
 /** Object properties that hold shown text by this codebase's conventions. */
 const TEXT_PROPERTIES = new Set([
   "label", "title", "description", "hint", "message", "placeholder", "text", "body", "heading", "confirmText",
@@ -646,6 +676,11 @@ export function scanScript(file: string, source: string, untranslated: Untransla
     if (ts.isArrowFunction(node) && !ts.isBlock(node.body)) checkProse(node.body, "=>");
     if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && PROSE_HOLDERS.has(node.expression.text) && node.arguments[0]) {
       checkProse(node.arguments[0], `${node.expression.text}()`);
+    }
+    // error.value = "Invalid URL format", error.value ||= "…", error.value = entry.name || "Untitled sound"
+    if (ts.isBinaryExpression(node) && VALUE_ASSIGNMENTS.has(node.operatorToken.kind)
+      && ts.isPropertyAccessExpression(node.left) && node.left.name.text === "value" && isRefReceiver(node.left.expression)) {
+      checkProse(node.right, `.value ${node.operatorToken.getText(tree)}`);
     }
 
     // { label: "…" }
