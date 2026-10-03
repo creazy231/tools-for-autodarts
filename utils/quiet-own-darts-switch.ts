@@ -1,6 +1,7 @@
 import type { IConfig } from "@/utils/storage";
 
 import { AutodartsToolsConfig } from "@/utils/storage";
+import { onLanguageChange, t } from "@/utils/i18n";
 import { SELECTORS, qs, qsa } from "@/utils/selectors";
 
 /**
@@ -19,6 +20,11 @@ import { SELECTORS, qs, qsa } from "@/utils/selectors";
  * its variant buttons. So the row goes in as the last thing in that block
  * where there is one, and directly after the switch where there is not; both
  * come out directly under Dart landed with nothing of the site's split up.
+ *
+ * Its words are in the language the site is showing, like the rest of Tools.
+ * The row is a copy built once per placement, and the site, which re-renders
+ * its own rows when a language is picked, knows nothing of it; so
+ * {@link paintRowText} rewrites the label and the switch's name itself.
  *
  * Mounted from entrypoints/content/index.ts, which is the one content script
  * that runs on every autodarts page and so sees both.
@@ -40,6 +46,7 @@ const DART_LANDED_LABELS = [ "dart landed", "dart gelandet", "dart aufgetroffen"
 
 let observer: MutationObserver | null = null;
 let configWatcherUnwatch: (() => void) | undefined;
+let stopLanguageListener: (() => void) | undefined;
 let enabled = false;
 
 export async function quietOwnDartsSwitch(): Promise<void> {
@@ -56,6 +63,11 @@ export async function quietOwnDartsSwitch(): Promise<void> {
     paintRow();
   });
 
+  // A language picked while the row is on screen reaches it here; a row placed
+  // later is built in the language that is showing then.
+  stopLanguageListener?.();
+  stopLanguageListener = onLanguageChange(paintRowText);
+
   observer?.disconnect();
   observer = new MutationObserver(injectRow);
   observer.observe(document.body, { childList: true, subtree: true });
@@ -67,6 +79,8 @@ export function quietOwnDartsSwitchOnRemove(): void {
   observer = null;
   configWatcherUnwatch?.();
   configWatcherUnwatch = undefined;
+  stopLanguageListener?.();
+  stopLanguageListener = undefined;
   document.querySelector(`[${ROW_FLAG}]`)?.remove();
 }
 
@@ -235,7 +249,7 @@ function buildRow(template: HTMLElement): HTMLElement | null {
   const label = row.querySelector("label");
   if (label) {
     label.removeAttribute("for");
-    label.textContent = "Only on others' turns";
+    label.textContent = t("site.quietOwnDarts.label");
     // Inside the label rather than beside it: the dialog stacks its label in a
     // column that a sibling would join, and the settings page lays its label
     // and switch out in a row that a sibling would land in the middle of.
@@ -250,7 +264,7 @@ function buildRow(template: HTMLElement): HTMLElement | null {
     // The clone keeps role="switch" and tabindex="0" from the original but not
     // the component that made them mean anything, so both the name a screen
     // reader reads out and the keys that work it have to be put back.
-    control.setAttribute("aria-label", "Play the dart landed sound only on other players' turns");
+    control.setAttribute("aria-label", t("site.quietOwnDarts.ariaLabel"));
     control.addEventListener("click", (event) => {
       event.preventDefault();
       void toggle();
@@ -294,4 +308,24 @@ function paintRow(): void {
     el.toggleAttribute("data-unchecked", !enabled);
   }
   control.setAttribute("aria-checked", String(enabled));
+}
+
+/**
+ * Say what the row says in the language the site is showing now.
+ *
+ * Only the label's own text is rewritten. The note after it, "Tools for
+ * Autodarts", is a brand and the same in every language, and writing the label
+ * as a whole would take it away along with the old words.
+ */
+function paintRowText(): void {
+  const row = document.querySelector(`[${ROW_FLAG}]`);
+  if (!row) return;
+
+  const label = row.querySelector("label");
+  if (label) {
+    const words = [ ...label.childNodes ].find(node => node.nodeType === Node.TEXT_NODE);
+    if (words) words.nodeValue = t("site.quietOwnDarts.label");
+  }
+
+  qs<HTMLElement>(SELECTORS.soundSettings.switch, row)?.setAttribute("aria-label", t("site.quietOwnDarts.ariaLabel"));
 }
