@@ -206,12 +206,14 @@
               component: several settings components have two root templates
               (panel / card), which makes them multi-root, and Vue does not
               apply fallthrough attributes to those — the class silently landed
-              on only the single-root ones.
+              on only the single-root ones. The corner label of a disabled card,
+              which the stylesheet draws from data-adt-v2-label, is set here too.
             -->
             <div
               v-for="(feature, idx) in featureGroups[activeTab].features"
               :key="feature.id"
               :class="[ 'relative', { 'adt-feature-disabled': !feature.v2Ready } ]"
+              :data-adt-v2-label="feature.v2Ready ? undefined : t('settings.notOnV2')"
             >
               <component
                 :is="feature.component"

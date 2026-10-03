@@ -4,6 +4,7 @@ import type { Translation } from "../../utils/i18n/types";
 export default {
   title: "Einstellungen",
   dialogTitle: "Einstellungen - {feature}",
+  notOnV2: "Noch nicht auf v2",
   tabs: {
     lobbies: "Lobbys",
     matches: "Matches",

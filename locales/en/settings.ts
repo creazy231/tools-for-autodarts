@@ -4,6 +4,8 @@ export default {
   title: "Settings",
   /** A feature's settings dialog: "Settings - Darts Zoom". */
   dialogTitle: "Settings - {feature}",
+  /** The corner label of a feature card not yet ported to v2, drawn by CSS from the card's data-adt-v2-label. */
+  notOnV2: "Not yet on v2",
   tabs: {
     lobbies: "Lobbies",
     matches: "Matches",
