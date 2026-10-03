@@ -288,9 +288,10 @@ let headerObserver: MutationObserver | null = null;
 /** Guards {@link initStreamModeButton} against being run twice at once. */
 let building = false;
 /**
- * Set when the overlay unmounts. {@link initStreamModeButton} waits up to 15 s for
- * the site's header, so a build that is still waiting when the overlay goes has
- * to find that out afterwards, before it registers anything.
+ * Set when the overlay unmounts. `onMounted` reads storage twice before it
+ * registers its watchers, and {@link initStreamModeButton} waits up to 15 s for
+ * the site's header, so one that is still waiting when the overlay goes has to
+ * find that out afterwards, before it registers anything.
  */
 let unmounted = false;
 
@@ -614,6 +615,11 @@ function initDraggable() {
 onMounted(async () => {
   config.value = await AutodartsToolsConfig.getValue();
   gameData.value = await AutodartsToolsGameData.getValue();
+
+  // The overlay goes when the match does, and a match can be left while those two
+  // reads are pending. The watchers and the resize listener registered below would
+  // outlive it, with the unmount that releases them already behind us.
+  if (unmounted) return;
 
   gameDataUnwatch?.();
   gameDataUnwatch = AutodartsToolsGameData.watch((value) => {
