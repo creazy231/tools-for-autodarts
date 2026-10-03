@@ -383,6 +383,24 @@ Settled in Sound FX (`locales/*/soundFx.ts`, and `library.sounds` for what it sh
 
 The card's sentence is the infinitive in both languages, as the Caller's is (*Soundeffekte … abspielen*, the site's own phrase, and *Geluidseffecten afspelen …*). Both list the three examples without *special events like* (*Soundeffekte bei 180, Checkout oder Matchgewinn abspielen*, *Geluidseffecten afspelen bij een 180, checkout of gewonnen wedstrijd*), because the full forms (*Soundeffekte bei Ereignissen wie einer 180, einem Checkout oder einem gewonnenen Match abspielen*, *Geluidseffecten afspelen bij bijzondere momenten zoals een 180, een checkout of een gewonnen wedstrijd*) take one to three lines more than the English in columns of 150 to 290 px, and the short ones are never longer in lines than the English at 14, 15 and 16 px. *Options* is the Caller's and Animations' word (*Optionen*, *Opties*), and the sentence *Jeder Sound wird bei den Triggern abgespielt, die du ihm gibst* (*Elk geluid wordt afgespeeld bij de triggers die je eraan geeft*) is the Caller's intro's, word for word.
 
+Settled in WLED (`locales/*/wled.ts`), for whatever else speaks of a light effect, a preset or a CSV line. The feature's name stays *WLED* (`features.wled`). An effect is stored as `PRESET`, `URL` or `API`, and a CSV line names its type by those words, so they, the example addresses (`wled-device.local`, `192.168.0.69`), `presets.json`, the example board ID and the form of a line stay as they are in every sentence; so do the format names *JSON* and *CSV* (§ 8).
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| an effect | not the site's; the trigger hints already say it (`triggers.wled.*`: *keinen Effekt*, *geen effect*) | Effekt | effect |
+| a preset | WLED's own word for a setting saved on the device. The site has none | Preset (*das*) | preset (*de*) |
+| WLED strips | not the site's: the strips of LEDs. The German keeps the product in the compound (*WLED-Streifen*). The Dutch turns the sentence round (*lichten je WLED-strips op*), because a verb-first *Laat … oplichten* reads as an order | WLED-Streifen | WLED-strips |
+| the lights | what the strips show, as a noun | die Lichter | de verlichting |
+| to send an effect | the play button's tooltip: it sends a request to the device. The site's *Sent* is *Gesendet* and *Verzonden* (§ 5, Discord) | senden | verzenden |
+| JSON API, JSON body | the third type, and what it sends. German and Dutch hyphenate a compound with an abbreviation (*JSON-API*, *JSON-Body*, *WLED-Adresse*) | JSON-API, JSON-Body | JSON-API, JSON-body |
+| an endpoint | not the site's | Endpunkt | eindpunkt |
+| mixed content | not the site's: a page on https that loads an http address, which a browser may block. The English term stays in both languages, as developers write it | Mixed Content | mixed content |
+| a CSV line, its fields | the dialog speaks of lines and fields, not rows and columns | Zeile, Felder | regel, velden |
+| semicolons | | Semikolons | puntkomma's |
+| the Boards list | the row's own title, as the trigger hint for the boards that aren't in it names it (§ 5, *your Boards list*) | Boards | Borden |
+
+The card's sentence is the infinitive in both languages, as the Caller's and Sound FX's are, and lists the three events without *for events like* (*bei gameon, takeout und Matchgewinn*, *bij gameon, takeout en wedstrijdwinst*): *gameon* and *takeout* are trigger names and stay as typed. The longer forms take one line more than the English in columns of 150 to 290 px, and these are never longer in lines at 14, 15 and 16 px. *Wähle „URL“ oder „API“* and *Kies 'URL' of 'API'* say what the English says: the English leaves *PRESET* out of the types a CSV line may name, and the translations stay with it until it is fixed (and then all three change together). The effect dialog's footer holds three buttons, as the text-to-speech dialog's does, and its *Test* button says *Test* in German and Dutch: *Testen* is 18 px wider at 15 px, and the English word is theirs too. At 15 px, with 36 px of padding to a button and 12 px between, that footer is 315 px in English, 352 in German and 345 in Dutch (the text-to-speech one: 328, 380 and 395), and a 390 px phone leaves 310 px, so Checkpoint D measures it where it counts. The primary button is the shared short word, as in the other dialogs: *Hinzufügen* and *Toevoegen*.
+
 ## 6. Takeout
 
 The site never says *takeout* in German or Dutch. It writes "beim Abziehen der Darts" and "nadat de darts zijn verwijderd" (`onboarding.step5.features.takeout`), and "vor dem Abziehen" and "vóór het verwijderen van de darts" (`onboarding.step5.goodToKnow.mistakes`). Descriptions follow that. Feature names keep *Takeout*, the board's own word for its status: "Takeout-Hinweis", "Takeout-melding", "Automatisch weiter bei Takeout".
@@ -408,6 +426,8 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 | `GitHub` | A brand. |
 | `WLED` | The product's name, and the name of the feature. |
 | `GIF` | A file format. |
+| `CSV` | A file format: the list the WLED panel imports effects from, and the label over its field. |
+| `JSON` | A file format: what a WLED effect of the third type sends, and the label over its field. |
 | `OK` | The same word in all three languages. The site's `game.ok` is "OK" in German and Dutch too. |
 | `BETA` | The badge on Teams and Instant Replay, written the same in every language. |
 | `s` | Unit: seconds. |

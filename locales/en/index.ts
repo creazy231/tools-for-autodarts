@@ -34,6 +34,7 @@ import teams from "./teams";
 import triggers from "./triggers";
 import whatsNew from "./whatsNew";
 import winnerAnimation from "./winnerAnimation";
+import wled from "./wled";
 import zoom from "./zoom";
 
 /** Every English file, under the first part of its keys: `t("site.languageNote")`. Alphabetical. */
@@ -74,5 +75,6 @@ export default {
   triggers,
   whatsNew,
   winnerAnimation,
+  wled,
   zoom,
 };

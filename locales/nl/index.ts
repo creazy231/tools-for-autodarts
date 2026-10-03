@@ -34,6 +34,7 @@ import teams from "./teams";
 import triggers from "./triggers";
 import whatsNew from "./whatsNew";
 import winnerAnimation from "./winnerAnimation";
+import wled from "./wled";
 import zoom from "./zoom";
 
 import type en from "../en";
@@ -76,5 +77,6 @@ export default {
   triggers,
   whatsNew,
   winnerAnimation,
+  wled,
   zoom,
 } satisfies Translation<typeof en>;

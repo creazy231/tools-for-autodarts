@@ -9,50 +9,49 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          Lights your WLED strips, or calls any other link, on game events. Each effect plays on the triggers you give it.
+          {{ t("wled.intro") }}
         </p>
 
         <section class="mb-10">
           <h3 class="adt-section-title">
-            Options
+            {{ t("wled.sections.options") }}
           </h3>
-          <OptionRow stacked title="Boards">
+          <OptionRow :title="t('wled.boards.title')" stacked>
             <template #description>
-              Effects play only for throws on these boards, and on every board while the list is empty. An effect on
-              <code class="adt-code">other</code> plays for throws on boards that aren't listed.
+              <AppTrans class="adt-wled-code" :params="{ trigger: 'other' }" path="wled.boards.description" />
             </template>
             <AppTokenInput
               id="wled-boards"
               v-model="boardIds"
               :lowercase="false"
+              :placeholder="t('wled.boards.placeholder')"
               :validate="validateBoardId"
-              placeholder="Paste a board ID and press Enter"
             />
           </OptionRow>
           <OptionRow
-            description="An effect that is already showing isn't sent again, so the lights don't start over."
-            title="Don't restart a running effect"
+            :description="t('wled.onlyOnce.description')"
+            :title="t('wled.onlyOnce.title')"
           >
             <AppToggle v-model="config.wledFx.onlyOnce" size="sm" />
           </OptionRow>
-          <OptionRow description="The games it lights up in. Lobby and tournament effects play in any game." title="Game modes">
-            <GameModesField v-model="config.wledFx.disabledGameModes" feature="wledFx" intro="WLED only lights up in the games switched on here." />
+          <OptionRow :description="t('wled.gameModes.description')" :title="t('gameModes.title')">
+            <GameModesField v-model="config.wledFx.disabledGameModes" :intro="t('wled.gameModes.intro')" feature="wledFx" />
           </OptionRow>
         </section>
 
         <LibrarySection
           @reorder="moveEffect"
+          :empty-text="t('wled.list.emptyText')"
+          :empty-title="t('wled.list.emptyTitle')"
           :entries="entries"
+          :search-placeholder="t('wled.list.searchPlaceholder')"
+          :title="t('wled.list.title')"
           empty-icon="icon-[material-symbols--lightbulb-outline-rounded]"
-          empty-text="Add an effect for each moment you want your lights to show, or import a list of them."
-          empty-title="No effects yet"
-          search-placeholder="Search effects by name, trigger or address"
-          title="Effects"
         >
           <template #actions>
             <AppMenu :items="moreActions">
               <template #trigger="{ open, toggle }">
-                <button @click="toggle" :aria-expanded="open" aria-label="More actions" class="adt-icon-btn" title="More" type="button">
+                <button @click="toggle" :aria-expanded="open" :aria-label="t('library.moreActions')" class="adt-icon-btn" :title="t('library.more')" type="button">
                   <span class="icon-[material-symbols--more-horiz]" />
                 </button>
               </template>
@@ -62,7 +61,7 @@
                 <AppButton @click="toggle" :aria-expanded="open" auto size="sm" type="primary">
                   <span class="flex items-center gap-1">
                     <span class="icon-[material-symbols--add-rounded] text-lg" />
-                    Add
+                    {{ t("common.add") }}
                     <span class="icon-[material-symbols--expand-more-rounded] -mr-1 text-lg" />
                   </span>
                 </AppButton>
@@ -85,7 +84,7 @@
               :triggers="entry.triggers"
             >
               <template #lead>
-                <PlayButton @click="setEffect(config.wledFx.effects[entry.index])" :label="entry.name" title="Send this effect" />
+                <PlayButton @click="setEffect(config.wledFx.effects[entry.index])" :label="entry.name" :title="t('wled.list.send')" />
               </template>
               <template #meta>
                 <span class="shrink-0 text-sm" :class="[TYPE_ICONS[config.wledFx.effects[entry.index].type]]" />
@@ -96,10 +95,10 @@
 
           <template #empty>
             <AppButton @click="openAddEffectModal" auto type="primary">
-              New effect
+              {{ t("wled.add.effect.label") }}
             </AppButton>
             <AppButton @click="openImportCSVModal" auto>
-              Import CSV
+              {{ t("wled.add.csv.label") }}
             </AppButton>
           </template>
         </LibrarySection>
@@ -107,43 +106,43 @@
     </div>
 
     <!-- Import CSV -->
-    <AppModal @close="closeImportCSVModal" :show="showImportCSVModal" ghost-close size="lg" title="Import effects from CSV">
+    <AppModal @close="closeImportCSVModal" :show="showImportCSVModal" ghost-close size="lg" :title="t('wled.csv.title')">
       <div class="space-y-4">
         <p class="text-sm text-[var(--ad-text-muted)]">
-          One effect per line, its fields separated by semicolons, in one of these forms:
+          {{ t("wled.csv.intro") }}
         </p>
         <pre class="adt-code-block">{{ csvImportPlaceholder }}</pre>
         <AppTextarea
           id="csv-data"
           v-model="csvData"
           :autosize="false"
+          :placeholder="t('wled.csv.example')"
           :rows="8"
           label="CSV"
           monospace
-          placeholder="gameon;URL;http://wled-device.local/win/PL=1;gameon"
         />
         <AppAlert v-if="csvError" compact variant="error">
-          {{ csvError }}
+          {{ t(csvError.key, csvError.params) }}
         </AppAlert>
       </div>
       <template #footer>
         <AppButton @click="closeImportCSVModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="processCSV" :disabled="!csvData" auto type="primary">
-          Import
+          {{ t("wled.csv.button") }}
         </AppButton>
       </template>
     </AppModal>
 
     <!-- Effect (add / edit) -->
-    <AppModal @close="closeEffectModal" :show="showEffectModal" :title="isEditMode ? 'Edit effect' : 'New effect'" ghost-close>
+    <AppModal @close="closeEffectModal" :show="showEffectModal" :title="isEditMode ? t('wled.dialog.editTitle') : t('wled.dialog.addTitle')" ghost-close>
       <div class="space-y-5">
-        <AppInput id="effect-name" v-model="newEffect.name" label="Name" placeholder="Optional: shown in the list" />
+        <AppInput id="effect-name" v-model="newEffect.name" :label="t('wled.dialog.nameLabel')" :placeholder="t('wled.dialog.namePlaceholder')" />
 
         <div>
           <p class="adt-field-label">
-            Type
+            {{ t("wled.dialog.typeLabel") }}
           </p>
           <AppRadioGroup v-model="newEffect.type" :options="EFFECT_TYPES" button-size="sm" />
           <p class="adt-field-hint">
@@ -153,61 +152,61 @@
 
         <template v-if="newEffect.type === WledType.PRESET">
           <div>
-            <AppInput id="effect-url" v-model="newEffect.url" label="WLED address" placeholder="wled-device.local or 192.168.0.69">
+            <AppInput id="effect-url" v-model="newEffect.url" :label="t('wled.address.label')" :placeholder="t('wled.address.placeholder')">
               <template #icon>
                 <span class="icon-[material-symbols--router-outline-rounded]" />
               </template>
             </AppInput>
             <p v-if="urlError" class="adt-field-hint !text-[var(--ad-rose-500)]">
-              {{ urlError }}
+              {{ t(urlError) }}
             </p>
             <p v-else-if="newEffect.url && !newEffect.url.startsWith('https://')" class="adt-field-hint !text-[var(--ad-warning)]">
-              A plain http:// address works on your own network, but a browser may block it as mixed content.
+              {{ t("wled.address.mixedContent") }}
             </p>
           </div>
           <div>
-            <AppSelect id="effect-preset" v-model="newEffect.preset" :options="availablePresetsOptions" label="Preset" />
+            <AppSelect id="effect-preset" v-model="newEffect.preset" :label="t('wled.preset.label')" :options="availablePresetsOptions" />
             <p v-if="presetError" class="adt-field-hint !text-[var(--ad-rose-500)]">
-              {{ presetError }}
+              {{ t(presetError) }}
             </p>
             <p v-else class="adt-field-hint">
-              Read from the device's presets.json once the address is typed.
+              {{ t("wled.preset.hint") }}
             </p>
           </div>
         </template>
 
         <div v-if="newEffect.type === WledType.URL">
-          <AppInput id="effect-url" v-model="newEffect.url" label="Link" placeholder="http://wled-device.local/win/PL=1">
+          <AppInput id="effect-url" v-model="newEffect.url" :label="t('wled.link.label')" :placeholder="t('wled.link.placeholder')">
             <template #icon>
               <span class="icon-[material-symbols--link-rounded]" />
             </template>
           </AppInput>
           <p v-if="urlError" class="adt-field-hint !text-[var(--ad-rose-500)]">
-            {{ urlError }}
+            {{ t(urlError) }}
           </p>
           <p v-else-if="newEffect.url.startsWith('http://')" class="adt-field-hint !text-[var(--ad-warning)]">
-            A plain http:// link works on your own network, but a browser may block it as mixed content.
+            {{ t("wled.link.mixedContent") }}
           </p>
         </div>
 
         <template v-if="newEffect.type === WledType.API">
           <div>
-            <AppInput id="effect-url" v-model="newEffect.url" label="API endpoint" placeholder="http://wled-device.local/json">
+            <AppInput id="effect-url" v-model="newEffect.url" :label="t('wled.api.endpointLabel')" :placeholder="t('wled.api.endpointPlaceholder')">
               <template #icon>
                 <span class="icon-[material-symbols--link-rounded]" />
               </template>
             </AppInput>
             <p v-if="urlError" class="adt-field-hint !text-[var(--ad-rose-500)]">
-              {{ urlError }}
+              {{ t(urlError) }}
             </p>
             <p v-else-if="newEffect.url.startsWith('http://')" class="adt-field-hint !text-[var(--ad-warning)]">
-              A plain http:// link works on your own network, but a browser may block it as mixed content.
+              {{ t("wled.link.mixedContent") }}
             </p>
           </div>
           <div>
             <AppTextarea id="wled-json-api" v-model="newEffect.json_api" :autosize="false" :rows="6" label="JSON" monospace placeholder="{}" />
             <p v-if="jsonError" class="adt-field-hint !text-[var(--ad-rose-500)]">
-              {{ jsonError }}
+              {{ t(jsonError) }}
             </p>
           </div>
         </template>
@@ -219,29 +218,29 @@
         <AppButton @click="testDraft" :disabled="!canTestDraft" auto class="mr-auto">
           <span class="flex items-center gap-1.5">
             <span class="icon-[material-symbols--play-arrow-rounded] text-lg" />
-            Test
+            {{ t("wled.dialog.test") }}
           </span>
         </AppButton>
         <AppButton @click="closeEffectModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="saveEffect" auto type="primary">
-          {{ isEditMode ? "Save" : "Add effect" }}
+          {{ isEditMode ? t("common.save") : t("wled.dialog.addButton") }}
         </AppButton>
       </template>
     </AppModal>
 
     <!-- Delete all -->
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="`Delete all ${config?.wledFx.effects.length ?? 0} effects?`" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('wled.deleteAll.title', { count: config?.wledFx.effects.length ?? 0 })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
-        They're removed for good. This can't be undone.
+        {{ t("wled.deleteAll.body") }}
       </p>
       <template #footer>
         <AppButton @click="closeDeleteAllModal" auto>
-          Cancel
+          {{ t("common.cancel") }}
         </AppButton>
         <AppButton @click="deleteAllEffects" auto type="danger">
-          Delete all
+          {{ t("library.deleteAll") }}
         </AppButton>
       </template>
     </AppModal>
@@ -260,11 +259,11 @@
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="adt-card-title mb-1 flex items-center">
-            WLED
+            {{ t("features.wled") }}
             <span class="icon-[material-symbols--settings-alert-outline-rounded] ml-2 size-5" />
           </h3>
           <p class="w-2/3 text-white/70">
-            Play WLED effects (or any other link) for events like gameon, takeout, and match wins.
+            {{ t("wled.card") }}
           </p>
         </div>
         <div class="flex">
@@ -276,7 +275,7 @@
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
-        <img :src="imageUrl" alt="WLED Effects" class="size-full object-cover">
+        <img :src="imageUrl" :alt="t('wled.imageAlt')" class="size-full object-cover">
       </div>
     </div>
   </template>
@@ -296,6 +295,7 @@ import AppSelect from "../AppSelect.vue";
 import AppTextarea from "../AppTextarea.vue";
 import AppToggle from "../AppToggle.vue";
 import AppTokenInput from "../AppTokenInput.vue";
+import AppTrans from "../AppTrans.vue";
 
 import GameModesField from "./Library/GameModesField.vue";
 import LibraryItem from "./Library/LibraryItem.vue";
@@ -305,6 +305,7 @@ import PlayButton from "./Library/PlayButton.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import { stableKey } from "./Library/stable-key";
 
+import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
 
 import { useNotification } from "@/composables/useNotification";
@@ -315,17 +316,20 @@ import { WledType } from "#imports";
 const emit = defineEmits([ "toggle" ]);
 useStorage("adt:active-settings", "wled-fx");
 
-const EFFECT_TYPES = [
-  { label: "Preset", value: WledType.PRESET },
-  { label: "URL", value: WledType.URL },
-  { label: "JSON API", value: WledType.API },
-];
+const { t } = useI18n();
 
-const TYPE_HINTS: Record<WledType, string> = {
-  [WledType.PRESET]: "Plays a preset saved on your WLED device, picked from its own list.",
-  [WledType.URL]: "Calls a link: a WLED API call such as /win/PL=1, or anything else.",
-  [WledType.API]: "Sends a JSON body to WLED's /json endpoint.",
-};
+/** `WledType` is what an effect is stored as and what a CSV line names it by: only the labels are said in the language. */
+const EFFECT_TYPES = computed(() => [
+  { label: t("wled.type.options.preset"), value: WledType.PRESET },
+  { label: t("wled.type.options.url"), value: WledType.URL },
+  { label: t("wled.type.options.api"), value: WledType.API },
+]);
+
+const TYPE_HINTS = computed<Record<WledType, string>>(() => ({
+  [WledType.PRESET]: t("wled.type.hints.preset"),
+  [WledType.URL]: t("wled.type.hints.url"),
+  [WledType.API]: t("wled.type.hints.api"),
+}));
 
 const TYPE_ICONS: Record<WledType, string> = {
   [WledType.PRESET]: "icon-[material-symbols--lightbulb-outline-rounded]",
@@ -351,17 +355,28 @@ const newEffect = ref<IWled>({
 /** The dialog's triggers, as chips; `newEffect.triggers` is left unused while it is open. */
 const effectTriggers = ref<string[]>([]);
 const editingIndex = ref<number | null>(null);
-const urlError = ref("");
-const presetError = ref("");
-const jsonError = ref("");
-const availablePresetsOptions = ref<{ value: string; label: string }[]>([
-  { value: "0", label: "Type the address first" },
+/**
+ * What the dialog's fields refuse, as the key of the line said under each: it follows a language picked while it
+ * shows. "" is nothing to say.
+ */
+const urlError = ref<MessageKey | "">("");
+const presetError = ref<MessageKey | "">("");
+const jsonError = ref<MessageKey | "">("");
+/**
+ * The preset picker's options. A note of ours (type the address first, couldn't read, pick one) holds its message
+ * key, so it follows a language picked while the dialog is open; a preset of the device is shown by its own name.
+ * The value "0" is no preset.
+ */
+const presetChoices = ref<{ value: string; key?: MessageKey; label?: string }[]>([
+  { value: "0", key: "wled.preset.typeAddress" },
 ]);
 
 // Import CSV modal
 const showImportCSVModal = ref(false);
 const csvData = ref("");
-const csvError = ref("");
+/** Why the pasted lines are refused: the key of the message and its params (the line). */
+const csvError = ref<{ key: MessageKey; params: Params } | null>(null);
+// The form of a line as it is typed: its type names are what a line is read by, so it is the same in every language.
 const csvImportPlaceholder = ref(
   "[name];URL;[url];[trigger][;[trigger]...]\n"
   + "[name];PRESET;[url];[preset_id];[trigger][;[trigger]...]\n"
@@ -384,8 +399,9 @@ const entries = computed<LibraryEntry[]>(() => (config.value?.wledFx.effects ?? 
   const triggers = triggerList(effect.triggers);
   return {
     index,
-    name: effect.name || triggers[0] || "Untitled effect",
+    name: effect.name || triggers[0] || t("wled.list.untitled"),
     triggers,
+    // What a search also matches: the type's stored name, the address and "preset <n>". They are tokens, not text, so they are the same in every language.
     source: `${effect.type} ${effect.url} ${effect.type === WledType.PRESET ? `preset ${effect.preset}` : ""}`,
     enabled: effect.enabled,
   };
@@ -394,21 +410,27 @@ const entries = computed<LibraryEntry[]>(() => (config.value?.wledFx.effects ?? 
 const canTestDraft = computed(() => !!newEffect.value.url.trim()
   && (newEffect.value.type !== WledType.PRESET || newEffect.value.preset !== "0"));
 
-const addActions = [
-  { label: "New effect", hint: "A preset, a link or a JSON API call", icon: "icon-[material-symbols--add-rounded]", action: openAddEffectModal },
-  { label: "Import CSV", hint: "Several effects at once, one per line", icon: "icon-[material-symbols--content-paste-rounded]", action: openImportCSVModal },
-];
+/** What the picker shows: our notes said in the current language, the device's presets as they are named. */
+const availablePresetsOptions = computed(() => presetChoices.value.map(choice => ({
+  value: choice.value,
+  label: choice.key ? t(choice.key) : (choice.label ?? ""),
+})));
+
+const addActions = computed(() => [
+  { label: t("wled.add.effect.label"), hint: t("wled.add.effect.hint"), icon: "icon-[material-symbols--add-rounded]", action: openAddEffectModal },
+  { label: t("wled.add.csv.label"), hint: t("wled.add.csv.hint"), icon: "icon-[material-symbols--content-paste-rounded]", action: openImportCSVModal },
+]);
 
 const moreActions = computed(() => [
   {
-    label: "Sort by trigger",
-    hint: "Puts the list in trigger order",
+    label: t("wled.menu.sort.label"),
+    hint: t("wled.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
     disabled: (config.value?.wledFx.effects.length ?? 0) < 2,
     action: sortEffectsByTriggers,
   },
   {
-    label: "Delete all…",
+    label: t("library.deleteAllMenu"),
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
@@ -429,13 +451,14 @@ function triggerList(triggers: string | string[]): string[] {
 }
 
 function describe(effect: IWled): string {
-  if (effect.type === WledType.PRESET) return `Preset ${effect.preset} · ${effect.url}`;
-  if (effect.type === WledType.API) return `JSON API · ${effect.url}`;
+  if (effect.type === WledType.PRESET) return t("wled.list.preset", { n: effect.preset, url: effect.url });
+  if (effect.type === WledType.API) return t("wled.list.api", { url: effect.url });
   return effect.url;
 }
 
+/** What the board field says under a chip that is no board ID, said as it validates; "" for a board ID. */
 function validateBoardId(id: string): string {
-  return BOARD_ID.test(id) ? "" : "That doesn't look like a board ID. They look like 6a501a61-53a5-468a-a56a-17134ace3099.";
+  return BOARD_ID.test(id) ? "" : t("wled.boards.invalid");
 }
 
 function moveEffect(from: number, to: number) {
@@ -449,13 +472,13 @@ function moveEffect(from: number, to: number) {
 function openImportCSVModal() {
   showImportCSVModal.value = true;
   csvData.value = "";
-  csvError.value = "";
+  csvError.value = null;
 }
 
 function closeImportCSVModal() {
   showImportCSVModal.value = false;
   csvData.value = "";
-  csvError.value = "";
+  csvError.value = null;
 }
 
 function stringToWledType(value: string): WledType | null {
@@ -480,7 +503,7 @@ function parseCSV(csv: string): IWled[] {
     const values = line.split(";").map(v => v.trim()).filter(v => v);
 
     if (values.length < 3) {
-      csvError.value = `Line "${line}" doesn't have name, URL and trigger`;
+      csvError.value = { key: "wled.csv.errors.fields", params: { line } };
       return [];
     }
 
@@ -492,12 +515,12 @@ function parseCSV(csv: string): IWled[] {
     const triggers: string[] = values;
 
     if (type === null) {
-      csvError.value = `Line "${line}": Invalid type. Choose from 'URL' or 'API'`;
+      csvError.value = { key: "wled.csv.errors.type", params: { line } };
       return [];
     }
 
     if (!url.startsWith("https://") && !url.startsWith("http://")) {
-      csvError.value = `Line "${line}": URL must start with http:// or https://`;
+      csvError.value = { key: "wled.csv.errors.url", params: { line } };
       return [];
     }
 
@@ -518,7 +541,7 @@ function parseCSV(csv: string): IWled[] {
 async function processCSV() {
   if (!config.value) return;
 
-  csvError.value = "";
+  csvError.value = null;
   const csvEntries = parseCSV(csvData.value);
 
   if (csvError.value) return;
@@ -528,7 +551,7 @@ async function processCSV() {
   });
 
   closeImportCSVModal();
-  showNotification(`${csvEntries.length} effects imported`, "success");
+  showNotification(t("wled.csv.imported", { count: csvEntries.length }), "success");
 }
 
 async function fetchPresets() {
@@ -539,15 +562,15 @@ async function fetchPresets() {
       + (newEffect.value.url.endsWith("/") ? "" : "/")
        }presets.json`;
     console.log("Autodarts Tools: WLED: loading presets from", presetUrl);
-    availablePresetsOptions.value = [ { value: newEffect.value.preset, label: "Couldn't read presets from the device" } ];
+    presetChoices.value = [ { value: newEffect.value.preset, key: "wled.preset.readFailed" } ];
     window.fetch(presetUrl)
       .then(resp => resp.json())
       .then((data: Record<string, { n: string }>) => {
         if (data && typeof data === "object") {
-          availablePresetsOptions.value = [ { value: "0", label: "Pick a preset" } ];
+          presetChoices.value = [ { value: "0", key: "wled.preset.pick" } ];
           Object.entries(data).forEach(([ id, preset ]) => {
             if (id === "0" || !("n" in preset) || preset.n === undefined) return;
-            availablePresetsOptions.value.push({ value: id, label: `[${id}] ${preset.n}` });
+            presetChoices.value.push({ value: id, label: `[${id}] ${preset.n}` });
           });
         } else {
           console.error("Autodarts Tools: WLED: Invalid response format. Expected an object.", data);
@@ -611,29 +634,29 @@ function testDraft() {
 
 async function saveEffect() {
   if (!config.value) {
-    showNotification("Configuration not loaded", "error");
+    showNotification(t("wled.notifications.configNotLoaded"), "error");
     return;
   }
 
   // Check if we have triggers
   if (!effectTriggers.value.length) {
-    showNotification("Please provide at least one trigger", "error");
+    showNotification(t("wled.notifications.needsTrigger"), "error");
     return;
   }
 
   if (newEffect.value.type === WledType.URL) {
     // Check if URL is valid
     if (!newEffect.value.url.trim()) {
-      showNotification("Please provide a URL", "error");
+      showNotification(t("wled.notifications.needsUrl"), "error");
       return;
     }
     if (!newEffect.value.url.startsWith("https://") && !newEffect.value.url.startsWith("http://")) {
-      urlError.value = "The link has to start with http:// or https://";
+      urlError.value = "wled.errors.linkScheme";
       return;
     }
   } else if (newEffect.value.type === WledType.PRESET) {
     if (newEffect.value.preset === "0") {
-      presetError.value = "Pick a preset first.";
+      presetError.value = "wled.errors.presetFirst";
       return;
     }
   } else if (newEffect.value.type === WledType.API) {
@@ -641,8 +664,8 @@ async function saveEffect() {
     try {
       JSON.parse(newEffect.value.json_api);
     } catch (e) {
-      showNotification("JSON is invalid", "error");
-      jsonError.value = "That isn't valid JSON.";
+      showNotification(t("wled.notifications.jsonInvalid"), "error");
+      jsonError.value = "wled.errors.jsonInvalid";
       return;
     }
   }
@@ -676,13 +699,13 @@ async function saveEffect() {
 
   // Reset form and close modal
   closeEffectModal();
-  showNotification(isEditMode.value ? "Effect updated" : "Effect added", "success");
+  showNotification(t(isEditMode.value ? "wled.notifications.updated" : "wled.notifications.added"), "success");
 }
 
 async function removeEffect(index: number) {
   if (config.value?.wledFx.effects) {
     config.value.wledFx.effects.splice(index, 1);
-    showNotification("Effect removed", "success");
+    showNotification(t("wled.notifications.removed"), "success");
   }
 }
 
@@ -721,7 +744,7 @@ function sortEffectsByTriggers() {
   });
 
   // Show notification
-  showNotification("WLED effects have been sorted by their triggers", "success");
+  showNotification(t("wled.notifications.sorted"), "success");
 }
 
 function openDeleteAllModal() {
@@ -742,6 +765,18 @@ async function deleteAllEffects() {
 
   // Close modal and show notification
   closeDeleteAllModal();
-  showNotification(`All ${effectCount} WLED effects have been deleted`, "error");
+  showNotification(t("wled.notifications.allDeleted", { count: effectCount }), "error");
 }
 </script>
+
+<style scoped>
+/* The token in the Boards description is a plain <code> in the message; it is set as .adt-code is (assets/tailwind.css). */
+.adt-wled-code :deep(code) {
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  color: var(--ad-text-secondary);
+  background: rgb(255 255 255 / 8%);
+  border-radius: var(--ad-radius-xs);
+}
+</style>
