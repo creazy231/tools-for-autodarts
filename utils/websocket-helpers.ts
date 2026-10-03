@@ -3,9 +3,11 @@ import { AutodartsToolsBoardImages } from "./board-image-storage";
 import { AutodartsToolsGameData } from "./game-data-storage";
 import { AutodartsToolsLobbyData } from "./lobby-data-storage";
 
+import type { RoomStore } from "@/utils/team-room";
 import type { AdtTeams, LineupStore, TeamViewContext } from "@/utils/teams";
 
-import { AutodartsToolsConfig, AutodartsToolsTeamLineups } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom } from "@/utils/storage";
+import { roomOf, screenTeams, tokenAccount } from "@/utils/team-room";
 import { lineupOf, lineupPartnerRule, normalizeTeams, teamView, voidedVisit } from "@/utils/teams";
 import { VOID_CHECKOUT_ATTR } from "@/utils/void-checkout";
 
@@ -284,34 +286,55 @@ async function isWatchedBoard(id: string | undefined): Promise<boolean> {
  * Teams' settings and own-score lineups, for the team view: read once, then
  * kept current by watchers, so storing a frame waits on nothing after the first.
  */
-let teamsContext: { enabled: boolean; partnerRule: boolean; lineups: LineupStore } | undefined;
+let teamsContext: { enabled: boolean; partnerRule: boolean; online: boolean; lineups: LineupStore; rooms: RoomStore; me: string | null } | undefined;
 let teamsContextLoad: Promise<void> | undefined;
 
 function loadTeamsContext(): Promise<void> {
   teamsContextLoad ??= (async () => {
-    const [ config, lineups ] = await Promise.all([ AutodartsToolsConfig.getValue(), AutodartsToolsTeamLineups.getValue() ]);
+    const [ config, lineups, rooms, status ] = await Promise.all([ AutodartsToolsConfig.getValue(), AutodartsToolsTeamLineups.getValue(), AutodartsToolsTeamRoom.getValue(), AutodartsToolsGlobalStatus.getValue() ]);
     const teams = normalizeTeams(config?.teams);
-    teamsContext = { enabled: teams.enabled, partnerRule: teams.partnerRule, lineups: lineups ?? {} };
+    teamsContext = { enabled: teams.enabled, partnerRule: teams.partnerRule, online: teams.online, lineups: lineups ?? {}, rooms: rooms ?? {}, me: tokenAccount(status?.auth?.token)?.userId ?? null };
     AutodartsToolsConfig.watch((next) => {
       const nextTeams = normalizeTeams(next?.teams);
       if (!teamsContext) return;
       teamsContext.enabled = nextTeams.enabled;
       teamsContext.partnerRule = nextTeams.partnerRule;
+      teamsContext.online = nextTeams.online;
       flagVoidedVisit();
     });
     AutodartsToolsTeamLineups.watch((next) => {
       if (teamsContext) teamsContext.lineups = next ?? {};
       flagVoidedVisit();
     });
+    AutodartsToolsTeamRoom.watch((next) => {
+      if (teamsContext) teamsContext.rooms = next ?? {};
+      flagVoidedVisit();
+    });
+    // The token can arrive after this script, which runs at document_start.
+    AutodartsToolsGlobalStatus.watch((next) => {
+      if (teamsContext) teamsContext.me = tokenAccount(next?.auth?.token)?.userId ?? null;
+    });
   })();
   return teamsContextLoad;
 }
 
-/** Teams' rules for a frame: the lineup is the frame's own match's, whatever page this tab is on, and so is its partner rule. */
+/**
+ * Teams' rules for a frame: the lineup is the frame's own match's, whatever
+ * page this tab is on, with Online Teams' other accounts' teams added
+ * (utils/team-room.ts), and so is its partner rule, which is the host's.
+ */
 function teamContext(match: IMatch): TeamViewContext | undefined {
   if (!teamsContext) return undefined;
-  const lineup = lineupOf(teamsContext.lineups, match.id);
-  return { enabled: teamsContext.enabled, partnerRule: lineupPartnerRule(lineup, teamsContext.partnerRule), lineup };
+  const view = screenTeams({
+    players: match.players ?? [],
+    saved: [],
+    lineup: lineupOf(teamsContext.lineups, match.id),
+    shifts: {},
+    room: teamsContext.online ? roomOf(teamsContext.rooms, match.id) : undefined,
+    me: teamsContext.me,
+    hostId: match.host?.id,
+  });
+  return { enabled: teamsContext.enabled, partnerRule: lineupPartnerRule(view.lineup, teamsContext.partnerRule), lineup: view.lineup };
 }
 
 /**

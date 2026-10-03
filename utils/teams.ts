@@ -374,6 +374,8 @@ export interface CallContext {
   shifts: TeamShifts;
   /** The match's own-score lineup, if it has one. */
   lineup: Lineup | undefined;
+  /** Online Teams: the other accounts' shared-score teams, by seat (utils/team-room.ts `screenTeams`). */
+  remoteShared?: ReadonlyMap<number, SavedTeam>;
 }
 
 /**
@@ -388,7 +390,7 @@ function seatCall(match: TurnState, seat: number, context: CallContext): string[
   const name = players[seat]?.name ?? "";
   const ownTeam = context.lineup ? lineupTeams(players, context.lineup).get(seat) : undefined;
   if (ownTeam) return [ name, ownTeam.name ];
-  const shared = teamSeats(players, context.saved, context.hostId).get(seat);
+  const shared = teamSeats(players, context.saved, context.hostId).get(seat) ?? context.remoteShared?.get(seat);
   if (shared) return [ shared.players[playerUp(match, seat, shared, context.shifts[shared.name] ?? 0)] ?? "", shared.name ];
   return [ name ];
 }

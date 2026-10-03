@@ -1,8 +1,10 @@
 import type { IMatch } from "@/utils/websocket-helpers";
+import type { RoomStore } from "@/utils/team-room";
 import type { CallContext, LineupStore, ShiftStore } from "@/utils/teams";
 
 import { getUserIdFromToken } from "@/utils/helpers";
-import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom, AutodartsToolsTeamShifts } from "@/utils/storage";
+import { roomOf, screenTeams } from "@/utils/team-room";
 import { legWinCallNames, lineupOf, matchWinCallNames, normalizeTeams, shiftsOf, turnCallNames } from "@/utils/teams";
 
 /**
@@ -16,6 +18,7 @@ let teams = normalizeTeams(undefined);
 let hostId: string | null = null;
 let shifts: ShiftStore = {};
 let lineups: LineupStore = {};
+let rooms: RoomStore = {};
 let loading: Promise<void> | undefined;
 
 /** Loads it all once for every feature on the page, and watches it from then on. */
@@ -34,13 +37,27 @@ export function loadTeamCalls(): Promise<void> {
     AutodartsToolsTeamLineups.watch((value) => {
       lineups = value ?? {};
     });
+    rooms = (await AutodartsToolsTeamRoom.getValue()) ?? {};
+    AutodartsToolsTeamRoom.watch((value) => {
+      rooms = value ?? {};
+    });
   })();
   return loading;
 }
 
 function context(match: IMatch): CallContext {
   if (!teams.enabled) return { saved: [], hostId, shifts: {}, lineup: undefined };
-  return { saved: teams.saved, hostId, shifts: shiftsOf(shifts, match.id), lineup: lineupOf(lineups, match.id) };
+  // Online Teams: the other accounts' teams too, as this screen shows them (utils/team-room.ts).
+  const view = screenTeams({
+    players: match.players ?? [],
+    saved: teams.saved,
+    lineup: lineupOf(lineups, match.id),
+    shifts: shiftsOf(shifts, match.id),
+    room: teams.online ? roomOf(rooms, match.id) : undefined,
+    me: hostId,
+    hostId: match.host?.id,
+  });
+  return { saved: teams.saved, hostId, shifts: view.shifts, lineup: view.lineup, remoteShared: view.shared };
 }
 
 /** Whoever is up: the player, then their team. */
