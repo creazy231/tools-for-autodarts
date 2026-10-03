@@ -21,6 +21,8 @@ export function winId(match: IMatch | undefined): string | undefined {
   if (!match) return undefined;
   if ((match.gameWinner ?? -1) < 0 && (match.winner ?? -1) < 0) return undefined;
 
-  const dart = match.turns?.[0]?.throws?.at(-1)?.id ?? "";
+  // Indexed, not .at(-1): Safari has Array.prototype.at from 15.4, and the app supports iOS 15.0.
+  const throws = match.turns?.[0]?.throws;
+  const dart = throws?.[throws.length - 1]?.id ?? "";
   return `${match.id}:${match.set}:${match.leg}:${dart}`;
 }

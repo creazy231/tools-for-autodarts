@@ -592,7 +592,9 @@ function capture(won: number): void {
 
   const from = won - config.before * 1000;
   // The newest take already rolling when the run-up began; early in a match, the oldest there is.
-  const take = takes.filter(candidate => candidate.start <= from).at(-1) ?? takes[0];
+  // Indexed, not .at(-1): Safari has Array.prototype.at from 15.4, and the app supports iOS 15.0.
+  const rolling = takes.filter(candidate => candidate.start <= from);
+  const take = rolling[rolling.length - 1] ?? takes[0];
   // A page opened on a leg that was already won has nothing from before the dart.
   if (!take || won - take.start < MIN_RUN_UP_MS) {
     console.warn("Autodarts Tools: Instant Replay - nothing recorded before the winning dart");

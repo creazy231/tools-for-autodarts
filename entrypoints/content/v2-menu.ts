@@ -46,7 +46,8 @@ function findAnchorItem(group: ParentNode): HTMLElement | null {
   if (byRoute) return byRoute;
 
   const links = qsa(SELECTORS.drawer.linkItems, group);
-  return links.at(-1) ?? null;
+  // Indexed, not .at(-1): Safari has Array.prototype.at from 15.4, and the app supports iOS 15.0.
+  return links[links.length - 1] ?? null;
 }
 
 /** Swap a cloned item's icon for ours, keeping the site's own sizing classes. */

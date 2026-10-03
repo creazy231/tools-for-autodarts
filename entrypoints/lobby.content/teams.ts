@@ -659,7 +659,9 @@ function syncPartnerCard(lineup: Lineup | undefined) {
   }
   // After the last switch card, in its row, or failing that, under the game's
   // own card, in its column; only the first makes the row two columns.
-  const switchCard = qsa<HTMLElement>(SELECTORS.lobby.switchCard).at(-1);
+  // Indexed, not .at(-1): Safari has Array.prototype.at from 15.4, and the app supports iOS 15.0.
+  const switchCards = qsa<HTMLElement>(SELECTORS.lobby.switchCard);
+  const switchCard = switchCards[switchCards.length - 1];
   const anchor = switchCard ?? qs<HTMLElement>(SELECTORS.lobby.gameCard);
   if (!anchor) return;
   const card = existing ?? buildPartnerCard(switchCard ?? null);
