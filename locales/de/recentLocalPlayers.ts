@@ -21,6 +21,6 @@ export default {
   },
   deleteAll: {
     title: { one: "Den gespeicherten Spieler löschen?", other: "Alle {count} gespeicherten Spieler löschen?" },
-    body: "Sie verschwinden aus der Leiste der Lobby und aus der eigenen Liste von autodarts unter Spieler hinzufügen. Das lässt sich nicht rückgängig machen.",
+    body: "Sie verschwinden aus der Leiste der Lobby und aus der eigenen Liste von autodarts unter Spieler hinzufügen. Dies kann nicht rückgängig gemacht werden.",
   },
 } satisfies Translation<typeof en>;
