@@ -22,6 +22,10 @@
       "#imports": ["./.wxt/imports.ts"]
     },
   },
+  // socket/ is its own Bun project, with its own tsconfig and dependencies
+  // (bun:test, socket.io). Naming any exclude replaces the one .wxt/tsconfig.json
+  // gives, so the build output is listed again.
+  "exclude": [".output", "socket"],
   "include": [
     "vite.config.ts",
     "manifest.config.ts",

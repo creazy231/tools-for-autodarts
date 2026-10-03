@@ -1,4 +1,5 @@
 import type { BoardStatus } from "@/utils/types";
+import type { RoomStore } from "@/utils/team-room";
 
 import { defaultColors, normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
@@ -123,6 +124,8 @@ export interface IConfig {
     saved: SavedTeam[];
     /** Own scores' e-darts partner rule; see utils/teams.ts. */
     partnerRule: boolean;
+    /** Online Teams: share this account's teams with the other Tools in a lobby; see utils/team-room.ts. */
+    online: boolean;
   };
 
   animations: {
@@ -553,6 +556,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
     saved: [],
     partnerRule: false,
+    online: true,
   },
 
   boardView: {
@@ -838,7 +842,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 15;
+const CONFIG_VERSION = 16;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -852,6 +856,9 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /** Online Teams is new, and on unless switched off: normalizeTeams fills its switch. */
+      16: (config: any) => ({ ...config, teams: normalizeTeams(config.teams) }),
+
       /**
        * Team Lobby is Local Lobby now, the name the site gives its own local
        * play, and a Team Lobby that was on stays on. Teams is new.
@@ -1092,6 +1099,19 @@ export const AutodartsToolsTeamShifts: WxtStorageItem<ShiftStore, any> = storage
  */
 export const AutodartsToolsTeamLineups: WxtStorageItem<LineupStore, any> = storage.defineItem(
   "local:teams-lineups",
+  {
+    defaultValue: {},
+  },
+);
+
+/**
+ * Online Teams: per lobby id (the match's id too), what the team room last
+ * said (utils/team-room.ts), so a reload, the step from lobby to match, or an
+ * outage keeps the other accounts' teams on screen. Its own item: it is about
+ * a lobby on this browser, and lives a day.
+ */
+export const AutodartsToolsTeamRoom: WxtStorageItem<RoomStore, any> = storage.defineItem(
+  "local:teams-room",
   {
     defaultValue: {},
   },

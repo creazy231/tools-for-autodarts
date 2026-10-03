@@ -357,6 +357,12 @@ export const SELECTORS = {
      * playing here.
      */
     playerBoardButton: [ "button[data-slot='button']:has([data-icon='house'])" ],
+    /**
+     * The 🌐 on a seat someone else hosts: the site's "play on my board"
+     * (`setHostForIndex`), which pulls that seat onto this account's board.
+     * Online Teams hides it on another account's team (lobby.content/teams.ts).
+     */
+    playerLinkButton: [ "button[data-slot='button']:has([data-icon='globe'])" ],
     playerRemoveButton: [ "button[data-slot='button']:has([data-icon='xmark'])" ],
 
     /**

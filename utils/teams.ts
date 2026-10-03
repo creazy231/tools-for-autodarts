@@ -77,6 +77,12 @@ export interface TeamsConfig {
   saved: SavedTeam[];
   /** Own scores' e-darts partner rule; see {@link partnerRuleBreach}. */
   partnerRule: boolean;
+  /**
+   * Online Teams: in a lobby with a team and another account, share this
+   * account's teams with the other Tools there (utils/team-room.ts). On unless
+   * switched off.
+   */
+  online: boolean;
 }
 
 /** Per team name: how far tap-to-correct has moved its order on. */
@@ -268,7 +274,7 @@ export function normalizeTeams(saved: unknown): TeamsConfig {
     if (members) team.members = members;
     teams.push(team);
   }
-  return { enabled: Boolean(value.enabled), saved: teams, partnerRule: Boolean(value.partnerRule) };
+  return { enabled: Boolean(value.enabled), saved: teams, partnerRule: Boolean(value.partnerRule), online: value.online !== false };
 }
 
 /** The saved teams that share a score: the ones a guest seat can be. */

@@ -43,6 +43,17 @@ const DEVTOOLS = process.env.ADT_DEVTOOLS === "1";
 const FAKE_CAMERA = process.env.ADT_FAKE_CAMERA === "1";
 
 /**
+ * Online Teams' server (socket/). `yarn dev` talks to one on this machine
+ * (`bun run dev` in socket/), so debugging it needs nothing deployed; every
+ * build talks to the deployed one. `ADT_TEAMS_SERVER=…` points either anywhere.
+ */
+const TEAMS_SERVER = process.env.ADT_TEAMS_SERVER;
+
+function teamsServer(command: string): string {
+  return TEAMS_SERVER || (command === "serve" ? "http://localhost:4455" : "https://adt-socket.tobias-thiele.de");
+}
+
+/**
  * Board Skins' pictures: every `assets/<name>_board.<png|jpg|jpeg|webp>`.
  *
  * They sit in assets/ with the rest of the board art, but a content script
@@ -225,6 +236,8 @@ export default defineConfig({
       // `import.meta.env.DEV` check covers it; this flag is what lets a
       // PRODUCTION build (yarn build:devtools) include it as well.
       __ADT_PICKER__: JSON.stringify(WITH_PICKER),
+      // Where Online Teams connects; see teamsServer.
+      __ADT_TEAMS_SERVER__: JSON.stringify(teamsServer(env.command)),
     },
     server: {
       watch: {
