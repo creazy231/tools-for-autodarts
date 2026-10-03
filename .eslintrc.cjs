@@ -47,5 +47,20 @@ module.exports = {
       "groups": [ "builtin", "external", "internal", "parent", "sibling", "index", "object", "type" ],
       "newlines-between": "always",
     } ],
+    // Every text a person reads comes from t() (CLAUDE.md, "Translations"). Names and
+    // units that stay the same in every language are in locales/untranslated.json.
+    "vue/no-bare-strings-in-template": [ "error", {
+      allowlist: [ ...require("./locales/untranslated.json"), "(", ")", ",", ".", "&", "+", "-", "=", "*", "/", "#", "%", "!", "?", ":", "[", "]", "{", "}", "<", ">", "·", "•", "–", "—", "−", "|", "✕", "▸", "…", "∅" ],
+      attributes: {
+        "/.+/": [ "title", "aria-label", "aria-placeholder", "aria-roledescription", "aria-valuetext", "aria-description" ],
+        "input": [ "placeholder" ],
+        "img": [ "alt" ],
+        "OptionRow": [ "title", "description" ],
+        "AppAlert": [ "title" ],
+        "AppNumberInput": [ "label" ],
+        "LibrarySection": [ "title", "empty-title", "empty-text", "search-placeholder", "no-match-text" ],
+      },
+      directives: [ "v-text" ],
+    } ],
   },
 };
