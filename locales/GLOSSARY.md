@@ -449,6 +449,7 @@ The site never says *takeout* in German or Dutch. It writes "beim Abziehen der D
 | `×` | The multiplication sign after a speed or zoom number (`1.5×`). |
 | `MISS` | Notation: the label on Quick Correction's grid for a dart that missed the board, and the value the correction sends to autodarts. A label that is also a value cannot be translated. |
 | `BULL` | Notation: the label on Quick Correction's grid for the bull, and the value the correction sends to autodarts, as `MISS` is. |
+| `25` | Notation: the label on Quick Correction's grid for the single bull, and the value the correction sends to autodarts, as `MISS` and `BULL` are. |
 | `Around The Clock` | The game's name, which the site's German leaves in English (`lobby.gamePicker.games.atc`). Its Dutch is "Around the Clock", so only the German is identical. |
 | `Round the World` | The game's name, which the site's German and Dutch both leave in English (`lobby.gamePicker.games.rtw`). |
 
