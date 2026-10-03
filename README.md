@@ -37,10 +37,41 @@ Tools for Autodarts is a browser extension that enhances your gaming experience 
 - [View in Browser](https://therealfoxster.github.io/altsource-viewer/view/?source=https://raw.githubusercontent.com/creazy231/tools-for-autodarts/refs/heads/main/Autodarts_Tools_Source.json)
 - [Add to AltStore](https://intradeus.github.io/http-protocol-redirector?r=altstore://source?url=https://raw.githubusercontent.com/creazy231/tools-for-autodarts/refs/heads/main/Autodarts_Tools_Source.json)
 
+## 🌐 Languages
+
+Tools for Autodarts speaks **English**, **German** and **Dutch**, in whichever language autodarts is set to. It has no language setting of its own, so the extension and the site never disagree on one screen.
+
+- Pick the language on autodarts, in **Settings → General → Language** or in the user menu, and Tools follows it
+- `/settings/general` says so under the Language setting, in the language that is picked: *Also changes the language of Tools for Autodarts and its features*
+- *System* follows your browser's first language, if that is English, German or Dutch
+- Any language Tools has no text for shows English, so a browser set to French under *System* gets English
+- A switch takes effect at once on the page you made it on. A tab that is already open follows when it next loads, as autodarts' own text does
+
+**What is translated**
+- Every feature's name and settings, and the notifications
+- Everything Tools draws on autodarts' own pages: lobbies, matches, boards and the settings pages
+- The Discord announcement, which is written in the host's language
+
+**What is not**
+- What you type or import, such as the names of sounds, players and teams, or the text of a text-to-speech sound
+- Trigger tokens like `t20` or `gameshot`, since those are what you type
+- The voices of the **Caller** and of text-to-speech sounds, which you pick in their own settings
+- Brand names, such as *Tools for Autodarts*, *Discord* and *WLED*
+- This README and the changelog, which stay in English and use the English names of the features
+
+### 📝 Translations are welcome
+
+The texts are in [`locales/`](locales): English in `locales/en`, German in `locales/de` and Dutch in `locales/nl`. [`locales/GLOSSARY.md`](locales/GLOSSARY.md) lists the words that are settled, among them autodarts' own for its buttons and darts terms. **The Dutch has not been checked by a native speaker yet**, so a Dutch speaker's review is the most welcome help of all. A pull request or an issue is fine.
+
+- `yarn i18n:check` checks the catalogs and the code: a text missing in one language, an untranslated sentence, and literal text left in a template
+- `yarn i18n:site "next leg"` prints autodarts' own English, German and Dutch for a word, so a button never has two names
+- Every new or changed text ships in all three languages in the same change. The rules are in the Translations section of [CLAUDE.md](CLAUDE.md#translations-english-german-dutch)
+
 # 📑 Table of Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)
+- [Languages](#-languages)
 - [Features](#-features)
   - [Lobby Enhancements](#-lobby-enhancements)
   - [Match Customization](#-match-customization)
@@ -226,7 +257,7 @@ Autodarts plays a thud whenever a dart lands, wherever in the world it was throw
 
 This turns the sound off for the darts within earshot and leaves it for everybody else.
 
-Its switch is not on this extension's settings page — it sits in autodarts' own sound settings, directly under the *Dart landed* setting it qualifies, labelled **Only on others' turns**. Both places autodarts keeps those settings have it:
+Its switch is not on this extension's settings page — it sits in autodarts' own sound settings, directly under the *Dart landed* setting it qualifies, labelled **Only on others' turns** (the label follows the language autodarts is set to). Both places autodarts keeps those settings have it:
 
 - **In Game Settings**, behind the gear in the match header, for changing your mind mid-leg
 - **Settings → Sound Effects** (`/settings/sound-effects`), for setting it up outside a game
