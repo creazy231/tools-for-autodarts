@@ -61,7 +61,17 @@
           <slot />
         </div>
 
-        <div class="flex justify-end gap-3">
+        <!--
+          A button whose label does not fit beside the others goes to a second line
+          rather than being squeezed, which would cut the label: AppButton truncates
+          it. `gap` is the row gap as well as the column gap, so the lines sit as
+          far apart as the buttons do. Where they all fit, nothing moves.
+
+          A button without `auto` is `w-full`, which would take a line to itself.
+          Here it takes an equal share of its line, as it did while this footer was
+          one line, and wraps only once the labels together do not fit it.
+        -->
+        <div class="flex flex-wrap justify-end gap-3 [&>button.w-full]:min-w-max [&>button.w-full]:flex-1">
           <slot name="footer">
             <AppButton @click="$emit('close')">
               {{ t("common.cancel") }}
