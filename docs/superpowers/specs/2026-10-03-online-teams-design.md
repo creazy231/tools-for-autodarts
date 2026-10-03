@@ -100,14 +100,15 @@ A card for the other team with no seat behind it doesn't work at all: the site w
 
 ### 5. Own-score teams online
 
-- Each captain builds their team from **their own seats** only: their guests on their board, their bots, and themselves. The drawer and the invitation never offer another account's seats.
+- Each captain builds their team from **their own seats**: their guests on their board, their bots, and themselves. As today, a seat of an account with **no Tools in the room** (a friend on their own board without Tools) can also join your team. A seat of an account whose Tools *is* in the room is left to that account, and the drawer doesn't offer it *(refined while planning: the other screen would refuse a team holding its own seat)*.
 - **Seat order:** only the host may move seats, so the **host's** Tools alternates every seat, the other account's teams included (`interleave`, `seatMoves`, one tab at a time as today).
 - **Six seats** in a lobby, so up to 3 v 3, or 2 v 2 v 2. Shared score has one seat per team, so team size isn't limited.
 - The **partner rule** is the host's call, on the lobby card as today. It reaches the other Tools through the room, and a screen takes it only from the lobby's host.
 - **Team legs, the team win and Next Leg held** are worked out on each screen from the same lineup, so both screens agree.
 - **The partner-rule undo**, which the server would let either side make:
   - The side whose seat checked out (the seat's `userId` or `hostId` is theirs) asks the room for the grant `undo|<matchId>|<dart ids>`, and undoes only if it gets it. Without the room, it undoes as today.
-  - If that account's Tools isn't in the room, the **lobby host's** Tools asks for the same grant after 4 s, while the bust still stands, and undoes only if it gets it.
+  - If that account has **no Tools in the room at all** (never joined, no team there, as with a friend without Tools), the **lobby host's** Tools asks for the same grant and undoes only if it gets it.
+  - An account whose Tools is, or was, in the room undoes its own. If its Tools is briefly offline, the checkout stands, rather than risk a second undo *(refined while planning: the spec's first draft let the host step in after 4 s, which could double an undo the offline side also made)*.
   - The room grants a key once, so the visit is never undone twice.
 
 ### 6. Game modes
@@ -214,14 +215,15 @@ Without logins, someone who knows a lobby's id could at worst show wrong team na
 - `seatOwner(seat)`: `userId || hostId`.
 - `roomStatus(input)`: the chip's state and names, from the connection state, the room's peers, the lobby's seats and the time since joining.
 - `shouldJoin(players, myTeams, me)`.
-- `undoActor(match, bust, me, peers, lobbyHostId)`, which returns `"mine" | "fallback" | "none"`.
+- `undoActor(seat, me, room, hostId)`, which returns `"legacy" | "own" | "fallback" | "none"` (`legacy` means no room, so this screen undoes as before), and `undoKey(matchId, dartIds)`.
+- `tokenAccount(token)`: the `sub` and username of this browser's own token, decoded here so that the token never travels, and `utils/helpers.ts`, which creates `Audio` objects at load, stays out of the websocket monitor.
 
-### `utils/team-room-client.ts`: one connection per tab
+### `utils/team-room-client.ts`: one connection per page script
 
-- A single client kept on `globalThis`, so the lobby and match scripts in a tab share it. They are separate bundles in one content world.
+- The lobby's Teams script and the match's each hold a `RoomClient` while their page is open *(refined while planning: they are separate bundles, each with its own Vue, so one client shared on `globalThis` couldn't drive both UIs' reactivity)*. The room keeps the lobby's id into its match, so the step between them is a reconnect, and the mirror shows the teams meanwhile.
 - It wraps `socket.io-client` (already a dependency) and connects to `__ADT_TEAMS_SERVER__` with `transports: ["websocket"]` and the handshake `auth`.
 - Reactive state: `connection` (`connecting | connected | offline | outdated`), `rtt`, the joined `lobbyId`, the last `state`, and `joinedAt`.
-- `use(lobbyId, { join })` and `release()` drive it. It connects while anything uses it, and disconnects 5 s after the last `release` *(implementation choice: a lobby → match step doesn't drop the connection)*.
+- `start(lobbyId)`, `setJoin(join)` and `stop()` drive it. A new lobby id leaves the last one's room.
 - `publishTeams`, `publishShift` and `publishRule` drop a payload the same as the last one sent, and send again after every reconnect.
 - `claim(key)` returns `true`, `false`, or `undefined` while offline.
 - `retry()` reconnects now.
@@ -234,7 +236,7 @@ Without logins, someone who knows a lobby's id could at worst show wrong team na
 | `entrypoints/lobby.content/teams.ts` | Add Team for every participant; `teamsInLobby` and `currentLineup` merged with the room; `pruneSeats` and `writeLineup` touch only your own teams; the pencil only on your teams; `data-adt-team-remote` on other accounts' team rows, with the 🌐 hidden; publishes `myRoomTeams` and the host's rule; `keepOrder` over the merged lineup (host only, as now); mounts the status chip, Invite a team and the invitation |
 | `entrypoints/lobby.content/TeamRoomStatus.vue` (new) | the chip and its card |
 | `entrypoints/lobby.content/TeamInvite.vue` (new) | the invitation |
-| `entrypoints/lobby.content/AddTeamDrawer.vue` | own-score seats limited to your own; taken names and colours include the other accounts' teams |
+| `entrypoints/lobby.content/AddTeamDrawer.vue` | unchanged: `drawerContext` in `teams.ts` feeds it the merged teams, so taken names and colours include the other accounts', and its seat list leaves out seats whose account's Tools is in the room |
 | `entrypoints/lobby.content/local-lobby.ts` | skips seats of other accounts' teams in the room |
 | `entrypoints/match.content/teams.ts` | merged shared seats, lineup and shifts; tap-to-correct only on your own teams and published; the offline note; `askUndo` goes through `undoActor` and `claim` |
 | `utils/websocket-helpers.ts` | the team view's lineup is `onlineLineup(…)` for the frame's id |
@@ -293,7 +295,6 @@ Both dev builds point at `localhost:4455`, which counts as secure, so `ws://` wo
 ## To confirm live
 
 - A participant who isn't seated can open `/lobby/<id>` and gets the lobby's updates.
-- The lobby and match content scripts share `globalThis` in Chrome and Firefox, so one client serves both.
 - A Firefox content script can open `ws://localhost:4455` from `https://play.autodarts.com`.
 - `match.host.id` is in the match frames Tools stores.
 
