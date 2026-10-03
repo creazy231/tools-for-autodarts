@@ -1,0 +1,21 @@
+services:
+  socket:
+    build: .
+    restart: unless-stopped
+    environment:
+      - SERVICE_FQDN_SOCKET_4455
+      - PORT=4455
+    networks:
+      - default
+      - coolify
+    labels:
+      - "traefik.docker.network=coolify"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4455/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  coolify:
+    external: true
