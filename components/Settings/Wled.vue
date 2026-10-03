@@ -18,7 +18,7 @@
           </h3>
           <OptionRow :title="t('wled.boards.title')" stacked>
             <template #description>
-              <AppTrans class="adt-wled-code" :params="{ trigger: 'other' }" path="wled.boards.description" />
+              <AppTrans :params="{ trigger: 'other' }" path="wled.boards.description" />
             </template>
             <AppTokenInput
               id="wled-boards"
@@ -768,15 +768,3 @@ async function deleteAllEffects() {
   showNotification(t("wled.notifications.allDeleted", { count: effectCount }), "error");
 }
 </script>
-
-<style scoped>
-/* The token in the Boards description is a plain <code> in the message; it is set as .adt-code is (assets/tailwind.css). */
-.adt-wled-code :deep(code) {
-  padding: 1px 5px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.92em;
-  color: var(--ad-text-secondary);
-  background: rgb(255 255 255 / 8%);
-  border-radius: var(--ad-radius-xs);
-}
-</style>

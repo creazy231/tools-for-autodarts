@@ -20,7 +20,7 @@
           </OptionRow>
           <OptionRow :title="t('caller.combinedThrows.title')">
             <template #description>
-              <AppTrans class="adt-caller-code" path="caller.combinedThrows.description" />
+              <AppTrans path="caller.combinedThrows.description" />
             </template>
             <AppToggle v-model="config.caller.preferCombinedThrows" size="sm" />
           </OptionRow>
@@ -1680,15 +1680,3 @@ function saveTTSSound() {
   showNotification(t(editing !== null ? "library.sounds.notifications.ttsUpdated" : "library.sounds.notifications.ttsAdded"));
 }
 </script>
-
-<style scoped>
-/* The token in the description is a plain <code> in the message; it is set as .adt-code is (assets/tailwind.css). */
-.adt-caller-code :deep(code) {
-  padding: 1px 5px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.92em;
-  color: var(--ad-text-secondary);
-  background: rgb(255 255 255 / 8%);
-  border-radius: var(--ad-radius-xs);
-}
-</style>

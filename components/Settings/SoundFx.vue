@@ -5,7 +5,7 @@
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <p class="mb-6 max-w-3xl">
-          <AppTrans class="adt-sound-fx-code" :params="{ prefix: 'ambient_' }" path="soundFx.intro" />
+          <AppTrans :params="{ prefix: 'ambient_' }" path="soundFx.intro" />
         </p>
 
         <section class="mb-10">
@@ -881,15 +881,3 @@ function saveTTSSound() {
   showNotification(t(editing !== null ? "library.sounds.notifications.ttsUpdated" : "library.sounds.notifications.ttsAdded"));
 }
 </script>
-
-<style scoped>
-/* The token in the intro is a plain <code> in the message; it is set as .adt-code is (assets/tailwind.css). */
-.adt-sound-fx-code :deep(code) {
-  padding: 1px 5px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.92em;
-  color: var(--ad-text-secondary);
-  background: rgb(255 255 255 / 8%);
-  border-radius: var(--ad-radius-xs);
-}
-</style>

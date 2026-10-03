@@ -9,10 +9,12 @@ import type { MarkupNode } from "./markup";
 import type { Params } from "./types";
 
 /**
- * Tags become their elements and `<br>` a line break. A `{name}` marker
- * becomes the slot of that name, or the param of that name as text, or stays
- * as written. Params are text children, which Vue escapes, so a name can hold
- * anything.
+ * Tags become their elements and `<br>` a line break. A `<code>` is a token the
+ * person types, such as a trigger, and it carries `.adt-code`, the component
+ * class of assets/tailwind.css, which reaches every shadow root: no panel needs
+ * a rule of its own for it. A `{name}` marker becomes the slot of that name, or
+ * the param of that name as text, or stays as written. Params are text
+ * children, which Vue escapes, so a name can hold anything.
  *
  * Only own slots and params count, and a slot only if it is a function: a
  * marker such as `{constructor}` must not find what every object inherits,
@@ -29,7 +31,7 @@ export function renderMarkup(nodes: MarkupNode[], slots: Slots, params?: Params)
       case "break":
         return h("br");
       case "tag":
-        return h(node.tag, renderMarkup(node.children, slots, params));
+        return h(node.tag, node.tag === "code" ? { class: "adt-code" } : null, renderMarkup(node.children, slots, params));
       case "slot": {
         const slot = own(slots, node.name) ? slots[node.name] : undefined;
         if (typeof slot === "function") return slot();
