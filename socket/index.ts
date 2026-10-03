@@ -22,10 +22,13 @@ const SWEEP_MS = 60_000;
 
 /**
  * Where a browser may connect from: autodarts' page (where the content scripts
- * run) and the extensions themselves. A client with no Origin at all (a script,
- * a test) is let through: it could claim any origin anyway.
+ * run) and the extensions themselves. Firefox's content scripts send
+ * `Origin: null`. A client with no Origin at all (a script, a test) is let
+ * through too: anything but a browser could claim any origin anyway, so this
+ * only keeps other websites from using their visitors' browsers.
  */
 const ORIGINS = [
+  /^null$/,
   /^https:\/\/play\.autodarts\.com$/,
   /^chrome-extension:\/\/[a-p]{32}$/,
   /^moz-extension:\/\/[0-9a-f-]+$/i,
@@ -51,7 +54,10 @@ const io = new Server(http, {
   maxHttpBufferSize: MAX_MESSAGE_BYTES,
   allowRequest: (request, callback) => {
     const origin = request.headers.origin;
-    callback(null, !origin || ORIGINS.some(pattern => pattern.test(origin)));
+    const allowed = !origin || ORIGINS.some(pattern => pattern.test(origin));
+    // An origin names a site or an extension, never a person.
+    if (!allowed) console.log(`Online Teams: refused a connection from ${origin}`);
+    callback(null, allowed);
   },
 });
 
