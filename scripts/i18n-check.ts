@@ -552,11 +552,12 @@ function shownText(node: ts.Node, html: boolean): string[] {
 /**
  * What only code writes: a bracket, a brace, `<`, `>`, `\`, `~`, `^`, a
  * backtick, and a `(` straight after a word, as `rgb(` and `linear-gradient(`
- * have. Selectors, CSS, markup and code hold these; no English message does.
- * Five more count as code by habit rather than by the messages: `=`, `#`, `*`,
- * `|` and `$`. A message could hold them, and one does (the WLED hints write
- * "/win/PL=1"), so the limits of prose() list them. A `;` is code too, but not
- * where it ends a clause of prose: CODE_SEMICOLON.
+ * have. Selectors, CSS, markup and code hold these. English text does not, bar
+ * the `{placeholders}` and inline tags of a catalog message, which no script
+ * writes as a literal. Five more count as code by habit rather than by the
+ * messages: `=`, `#`, `*`, `|` and `$`. A message could hold them, and three do
+ * (the WLED hints write "/win/PL=1"), so the limits of prose() list them. A `;`
+ * is code too, but not where it ends a clause of prose: CODE_SEMICOLON.
  */
 const CODE_CHARACTER = /[[\]{}<>=#\\|*~^$`]|[\p{L}\p{N}]\(/u;
 
