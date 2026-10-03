@@ -669,10 +669,12 @@ const SKIPPED = [
   /^utils\/selectors\.ts$/, /^utils\/selector-index\.generated\.ts$/, /^wxt\.config\.ts$/,
 ];
 
+const skipped = (file: string) => SKIPPED.some(skip => skip.test(file));
+
 function sourceFiles(root: string, named: string[]): string[] {
   if (named.length) return named.map(file => path.relative(root, path.resolve(file)));
   const listed = execFileSync("git", [ "ls-files", "--cached", "--others", "--exclude-standard", "--", "*.vue", "*.ts" ], { cwd: root, encoding: "utf8" });
-  return listed.split("\n").filter(file => file && !SKIPPED.some(skip => skip.test(file)) && existsSync(path.join(root, file)));
+  return listed.split("\n").filter(file => file && !skipped(file) && existsSync(path.join(root, file)));
 }
 
 function main(): void {
@@ -682,6 +684,11 @@ function main(): void {
   const problems = checkCatalogs(CATALOGS, UNTRANSLATED, SAME_AS_ENGLISH);
   const english = flatten(CATALOGS.en);
   for (const file of sourceFiles(root, process.argv.slice(2))) {
+    // A named file the whole run skips is skipped too: a catalog's messages are not literal text in code.
+    if (skipped(file)) {
+      console.log(`· ${file}: not read as code${/^locales\//.test(file) ? "; the catalogs are checked as catalogs" : ""}`);
+      continue;
+    }
     const source = readFileSync(path.join(root, file), "utf8");
     problems.push(...(file.endsWith(".vue") ? scanVue(file, source, UNTRANSLATED, english) : scanScript(file, source, UNTRANSLATED, 0, english)));
   }
