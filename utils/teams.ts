@@ -277,6 +277,16 @@ export function normalizeTeams(saved: unknown): TeamsConfig {
   return { enabled: Boolean(value.enabled), saved: teams, partnerRule: Boolean(value.partnerRule), online: value.online !== false };
 }
 
+/**
+ * Migration 16: Online Teams' switch, on unless it was switched off. Only the
+ * switch is added. Saved teams stay exactly as they were: normalizeTeams would
+ * also merge players of one name, such as two bots of one level, and write
+ * that back.
+ */
+export function withOnlineTeams(config: any): any {
+  return { ...config, teams: { ...config?.teams, online: config?.teams?.online !== false } };
+}
+
 /** The saved teams that share a score: the ones a guest seat can be. */
 export function sharedTeams(saved: readonly SavedTeam[]): SavedTeam[] {
   return saved.filter(team => team.format !== "own");

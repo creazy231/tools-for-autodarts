@@ -4,7 +4,7 @@ import type { RoomStore } from "@/utils/team-room";
 import { defaultColors, normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
 import { defaultInstantReplay, normalizeInstantReplay } from "@/utils/instant-replay";
-import { type LineupStore, type SavedTeam, type ShiftStore, normalizeTeams } from "@/utils/teams";
+import { type LineupStore, type SavedTeam, type ShiftStore, normalizeTeams, withOnlineTeams } from "@/utils/teams";
 import type { GameMode } from "@/utils/game-modes";
 
 export interface IConfig {
@@ -856,8 +856,8 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
-      /** Online Teams is new, and on unless switched off: normalizeTeams fills its switch. */
-      16: (config: any) => ({ ...config, teams: normalizeTeams(config.teams) }),
+      /** Online Teams is new, and on unless switched off. Saved teams are left as they are (utils/teams.ts). */
+      16: (config: any) => withOnlineTeams(config),
 
       /**
        * Team Lobby is Local Lobby now, the name the site gives its own local
