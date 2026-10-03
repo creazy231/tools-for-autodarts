@@ -21,13 +21,18 @@
  * - a literal with letters that a template expression shows: in `{{ }}`, or
  *   bound to such an attribute (`:title="editing ? 'Edit sound' : …"`);
  * - a literal with letters handed to textContent, innerHTML, title, an
- *   aria-label, the message of a notification (not its "error" type), the
- *   title and message of a confirm dialog, `append()`, or a `label`,
- *   `title`, `description`, … property;
- * - in both of these, every literal that can be shown: each branch of `?:`,
- *   both sides of `||`, `??` and `+`, a template literal's own text — never
- *   the key handed to `t()`, a comparison, or an option such as
- *   `:variant="'error'"`;
+ *   aria-label, a `data-adt-…-label` or `data-adt-…-message` attribute that
+ *   CSS draws, the message of a notification (not its "error" type), the title
+ *   and message of a confirm dialog, `append()`, `replaceChildren()`,
+ *   `insertAdjacentText()`, `prompt()`, or a `label`, `title`, `description`,
+ *   … property;
+ * - prose that a function returns, that an arrow function gives, or that a
+ *   `ref()` or `computed()` starts with: two words or more, and nothing only
+ *   code writes, so that keys, classes, selectors, URLs and tokens pass;
+ * - in all of these, every literal that can be shown: each branch of `?:`,
+ *   both sides of `||`, `??` and `+`, the right side of `&&`, through `as`,
+ *   `satisfies` and `!`, a template literal's own text — never the key handed
+ *   to `t()`, a comparison, or an option such as `:variant="'error'"`;
  * - a `t("key", …)` call or `<AppTrans path="key">` whose key English doesn't
  *   have, or whose params leave out a `{placeholder}` of its message — or the
  *   `count` of a plural — which would show the raw `{name}`;
@@ -271,6 +276,16 @@ function readable(text: string, untranslated: Untranslated): boolean {
 /** HTML attributes a person reads. */
 const TEXT_ATTRIBUTES = new Set([ "title", "placeholder", "alt", "aria-label", "aria-description", "aria-roledescription", "aria-valuetext", "aria-placeholder" ]);
 
+/**
+ * An attribute whose value CSS draws with `content: attr(…)`, which is how
+ * Tools shows text in a stylesheet: `data-adt-replay-label`,
+ * `data-adt-winner-message`. A person reads it as they read a title.
+ */
+const DRAWN_TEXT_ATTRIBUTE = /^data-adt-(?:[\w-]+-)?(?:label|message)$/;
+
+/** The same attribute written through `dataset`: `el.dataset.adtReplayLabel`. */
+const DRAWN_TEXT_DATASET = /^adt\w*(?:Label|Message)$/;
+
 /** Component props that are never text. Every other static prop of a component is checked. */
 const NON_TEXT_PROPS = new Set([
   "class", "class-name", "id", "key", "ref", "type", "size", "button-size", "variant", "icon", "name", "value",
@@ -290,9 +305,11 @@ const KEY_PROP = /-key$/;
 /**
  * Whether a prop holds text a person reads: on an element, an attribute such
  * as `title` or `aria-label`; on a component, any prop but the ones that never
- * do (`size`, `icon`, `*-class`, `data-*`, …). Written out or bound alike.
+ * do (`size`, `icon`, `*-class`, `data-*`, …). On either, an attribute CSS
+ * draws. Written out or bound alike.
  */
 function textProp(name: string, isComponent: boolean): boolean {
+  if (DRAWN_TEXT_ATTRIBUTE.test(name)) return true;
   return isComponent
     ? !NON_TEXT_PROPS.has(name) && !/(class|icon)$/.test(name) && !name.startsWith("data-")
     : TEXT_ATTRIBUTES.has(name);
@@ -404,19 +421,30 @@ const TEXT_DOM_PROPERTIES = new Set([ "textContent", "innerText", "innerHTML", "
  * third a duration. A confirm dialog shows a title and a message, then takes a
  * callback and options, whose `confirmText` and `cancelText` the
  * TEXT_PROPERTIES rule below already reads. Insertions into the DOM show every
- * argument.
+ * argument, but `insertAdjacentText` only its second: the first is where
+ * ("beforeend"). `prompt` shows its first, the question.
  */
 const TEXT_CALLS = new Map<string, readonly number[] | "every">([
   [ "showNotification", [ 0 ] ],
   [ "showConfirmDialog", [ 0, 1 ] ],
   [ "alert", [ 0 ] ],
   [ "confirm", [ 0 ] ],
+  [ "prompt", [ 0 ] ],
   [ "createTextNode", [ 0 ] ],
+  [ "insertAdjacentText", [ 1 ] ],
   [ "append", "every" ],
   [ "prepend", "every" ],
   [ "before", "every" ],
   [ "after", "every" ],
+  [ "replaceChildren", "every" ],
 ]);
+
+/**
+ * Vue's holders of a value, whose first argument a component starts with and
+ * often shows: `ref("Saving the team")`. A `computed()` getter is an arrow
+ * function or a function, whose prose the same rule reads where it returns.
+ */
+const PROSE_HOLDERS = new Set([ "ref", "shallowRef", "computed" ]);
 
 /** Object properties that hold shown text by this codebase's conventions. */
 const TEXT_PROPERTIES = new Set([
@@ -437,20 +465,77 @@ const SHOWN_OPERATORS = new Set([ ts.SyntaxKind.BarBarToken, ts.SyntaxKind.Quest
 
 /**
  * The literals an expression can put on screen: a string or template literal,
- * every branch of `?:`, and both sides of `||`, `??` and `+`. A call —
- * `t("key")` among them — a comparison or a variable yields none. In an HTML
- * string, the markup and comments are taken out.
+ * every branch of `?:`, both sides of `||`, `??` and `+`, and the right side
+ * of `&&`, through brackets, `as`, `satisfies` and `!`. A call — `t("key")`
+ * among them — a comparison or a variable yields none. In an HTML string, the
+ * markup and comments are taken out.
  */
 function shownText(node: ts.Node, html: boolean): string[] {
-  if (ts.isParenthesizedExpression(node)) return shownText(node.expression, html);
+  // `("…")`, `"…" as const`, `"…" satisfies Label`, `label!`: the value is shown as it is.
+  if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isSatisfiesExpression(node)
+    || ts.isNonNullExpression(node) || ts.isTypeAssertionExpression(node)) {
+    return shownText(node.expression, html);
+  }
   // `on ? "Leave Streaming Mode" : "Streaming Mode"`: every branch is shown.
   if (ts.isConditionalExpression(node)) return [ ...shownText(node.whenTrue, html), ...shownText(node.whenFalse, html) ];
   if (ts.isBinaryExpression(node) && SHOWN_OPERATORS.has(node.operatorToken.kind)) {
     return [ ...shownText(node.left, html), ...shownText(node.right, html) ];
   }
+  // `busy && "Saving the team"`: the left side is a condition, the right side is shown.
+  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) return shownText(node.right, html);
   const text = literalText(node);
   if (text === undefined) return [];
   return [ html ? text.replace(/<!--[\s\S]*?-->/g, " ").replace(/<[^>]*>/g, " ") : text ];
+}
+
+/**
+ * What only code writes. No English message holds a bracket, a brace, `<`, `>`,
+ * `=`, `;`, `#`, `\`, `|`, `*`, `~`, `^`, `$` or a backtick, nor a `(` straight
+ * after a word, as `rgb(` and `linear-gradient(` have: selectors, CSS, markup
+ * and code do.
+ */
+const CODE_CHARACTER = /[[\]{}<>=;#\\|*~^$`]|[\p{L}\p{N}]\(/u;
+
+/**
+ * A word of prose: two letters or more, perhaps joined by an apostrophe or a
+ * hyphen ("didn't", "Mother-of-pearl"), perhaps between quotes, brackets or
+ * sentence marks ("(click,"). A key, a token, a URL or a path is no such word:
+ * `zoom.position.title`, `t20`, `ambient_180`, `https://…`, `bg-black/50`.
+ */
+const PROSE_WORD = /^[("„“‘'«]*\p{L}{2,}(?:['’-]\p{L}+)*[)"”’'».,!?:…]*$/u;
+
+/**
+ * A token only a class list or a selector has: a hyphen or a digit after a
+ * letter (`items-center`, `px-2`, `h2`), or a `.`, `:`, `/`, `_` or `[`.
+ */
+const CLASS_TOKEN = /[a-z][-\d]|[.:/_[]/;
+
+/** HTML elements, which a selector may name bare: "main section", "ul li". */
+const ELEMENTS = new Set([
+  "html", "body", "head", "main", "header", "footer", "nav", "section", "article", "aside", "div", "span", "ul", "ol",
+  "li", "table", "thead", "tbody", "tr", "td", "th", "button", "input", "select", "option", "textarea", "label",
+  "form", "img", "svg", "path", "video", "audio", "canvas", "picture", "iframe", "dialog", "details", "summary",
+  "strong", "em", "small", "code", "pre", "figure", "template", "slot",
+]);
+
+/**
+ * Whether a literal reads as prose, for the places that are not text by
+ * themselves: what a function returns, what an arrow function gives, what a
+ * `ref()` or `computed()` starts with. Those hold keys, classes, selectors,
+ * CSS and tokens as often as text, so it takes more than letters: two words of
+ * prose, and nothing only code writes. A key, a token, a `data-*` name and a
+ * URL are one word, a selector or CSS has a code character, and a class list
+ * or a bare selector is all lower case with no sentence marks, with a class
+ * (`flex items-center`) or elements only (`main section`) in it. A class list
+ * of plain words alone ("flex grow") still reads as two words, and lower-case
+ * prose with a hyphen ("is a close-up") as a class list.
+ */
+export function prose(text: string, untranslated: Untranslated): boolean {
+  if (CODE_CHARACTER.test(text) || !readable(text, untranslated)) return false;
+  const tokens = text.trim().split(/\s+/);
+  const lowerCaseCode = tokens.every(token => /^[!.]?[a-z0-9][\w:/.%!-]*$/.test(token) && !/[A-Z]|[.,:!?]$/.test(token));
+  if (lowerCaseCode && (tokens.some(token => CLASS_TOKEN.test(token)) || tokens.every(token => ELEMENTS.has(token)))) return false;
+  return tokens.filter(token => PROSE_WORD.test(token)).length >= 2;
 }
 
 export function scanScript(file: string, source: string, untranslated: Untranslated, lineOffset = 0, english?: English): Problem[] {
@@ -472,6 +557,24 @@ export function scanScript(file: string, source: string, untranslated: Untransla
     }
     return false;
   };
+  /** The prose `node` returns or starts with, as one finding: keys, classes, selectors and tokens are no prose. */
+  const checkProse = (node: ts.Node, how: string) => {
+    if (inConsole(node)) return;
+    const texts = shownText(node, false).filter(text => prose(text, untranslated));
+    if (texts.length) report(node, texts.join(" / "), how);
+  };
+
+  // The file's string constants by name, for an attribute named through one: setAttribute(MESSAGE_ATTR, …).
+  const constants = new Map<string, string>();
+  const collect = (node: ts.Node) => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer
+      && ts.isVariableDeclarationList(node.parent) && (node.parent.flags & ts.NodeFlags.Const) !== 0) {
+      const text = literalText(node.initializer);
+      if (text !== undefined && !ts.isTemplateExpression(node.initializer)) constants.set(node.name.text, text);
+    }
+    ts.forEachChild(node, collect);
+  };
+  collect(tree);
 
   const visit = (node: ts.Node) => {
     // element.textContent = "…", element.title = "…"
@@ -483,14 +586,21 @@ export function scanScript(file: string, source: string, untranslated: Untransla
       // A translated text, or anything with a param in it, must not go through innerHTML.
       if (html && /\bt\(/.test(node.right.getText(tree))) report(node.right, node.right.getText(tree), `translated text through .${node.left.name.text}`);
     }
+    // element.dataset.adtReplayLabel = "…", which CSS draws
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken
+      && ts.isPropertyAccessExpression(node.left) && DRAWN_TEXT_DATASET.test(node.left.name.text)
+      && ts.isPropertyAccessExpression(node.left.expression) && node.left.expression.name.text === "dataset") {
+      check(node.right, false, `.dataset.${node.left.name.text} =`);
+    }
 
     if (ts.isCallExpression(node) && !inConsole(node)) {
       const callee = node.expression;
       const name = ts.isPropertyAccessExpression(callee) ? callee.name.text : ts.isIdentifier(callee) ? callee.text : "";
-      // element.setAttribute("aria-label", "…")
+      // element.setAttribute("aria-label", "…"), element.setAttribute(MESSAGE_ATTR, "…")
       if (name === "setAttribute" && node.arguments.length === 2) {
-        const attribute = literalText(node.arguments[0]);
-        if (attribute && TEXT_ATTRIBUTES.has(attribute)) check(node.arguments[1], false, `setAttribute("${attribute}")`);
+        const [ first, value ] = node.arguments;
+        const attribute = ts.isIdentifier(first) ? constants.get(first.text) : literalText(first);
+        if (attribute && (TEXT_ATTRIBUTES.has(attribute) || DRAWN_TEXT_ATTRIBUTE.test(attribute))) check(value, false, `setAttribute("${attribute}")`);
       }
       const shown = TEXT_CALLS.get(name);
       if (shown) {
@@ -498,6 +608,13 @@ export function scanScript(file: string, source: string, untranslated: Untransla
           if (shown === "every" || shown.includes(position)) check(argument, false, `${name}()`);
         }
       }
+    }
+
+    // return "Give the team a name.", () => editing ? "Edit team" : "New team", ref("Saving the team")
+    if (ts.isReturnStatement(node) && node.expression) checkProse(node.expression, "return");
+    if (ts.isArrowFunction(node) && !ts.isBlock(node.body)) checkProse(node.body, "=>");
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && PROSE_HOLDERS.has(node.expression.text) && node.arguments[0]) {
+      checkProse(node.arguments[0], `${node.expression.text}()`);
     }
 
     // { label: "…" }

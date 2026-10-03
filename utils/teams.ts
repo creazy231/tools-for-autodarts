@@ -644,9 +644,17 @@ export function botPpr(level: number): number {
   return 10 + 10 * level;
 }
 
+/**
+ * How the site names a bot's seat, ahead of its level. A name, not text: a bot
+ * the drawer adds joins the lobby under it, as one from the site's own Add Bot
+ * does, and a saved team stores it, so it stays as the site writes it in every
+ * language.
+ */
+const BOT_SEAT_NAME = "Bot Level";
+
 /** The name the site gives a bot of that level. */
 export function botName(level: number): string {
-  return `Bot Level ${level}`;
+  return `${BOT_SEAT_NAME} ${level}`;
 }
 
 /** Whether a game has bots. One whose variant isn't known yet gets the benefit of the doubt. */
