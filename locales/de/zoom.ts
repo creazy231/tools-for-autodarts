@@ -2,7 +2,7 @@ import type en from "../en/zoom";
 import type { Translation } from "../../utils/i18n/types";
 
 export default {
-  card: "Eine Nahaufnahme, wo jeder Dart gelandet ist — am unteren Bildschirmrand, unter der Punkteleiste oder direkt auf dem Board.",
+  card: "Eine Nahaufnahme, wo jeder Dart gelandet ist — am unteren Rand, unter der Punkteleiste oder auf dem Board.",
   intro: "Eine Nahaufnahme, wo jeder Dart der Aufnahme gelandet ist, eine Kachel pro Dart: am unteren Bildschirmrand, unter der Punkteleiste oder direkt auf dem Board.",
   sections: {
     closeUps: "Nahaufnahmen",
