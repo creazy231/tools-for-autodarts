@@ -113,7 +113,10 @@ async function processX01Data(
   if (busted && gameData.match.adtTeams?.bust && triggerPresentCB("partner_rule")) return "partner_rule";
   if (busted && triggerPresentCB("busted")) return "busted";
   if (isLastThrow && triggerPresentCB(combinedThrows)) return combinedThrows;
-  if (!busted && isLastThrow && triggerPresentCB(points)) return points;
+  // Cricket counts points only on numbers already closed, so nearly every visit
+  // totals 0 however many marks it took, and an effect on `0` lit up after
+  // almost all of them. Like Sound FX, leave Cricket's visit totals out.
+  if (!busted && isLastThrow && gameData.match.variant !== "Cricket" && triggerPresentCB(points)) return points;
   if (triggerPresentCB(throwName)) return throwName;
   // After the exact segment, so an effect set up on `m17` or `miss` keeps it.
   if (missed && triggerPresentCB("outside")) return "outside";

@@ -546,8 +546,8 @@ Effects can be triggered by various game events using these triggers:
 - **`idle`**: When leaving the match (cleanup effect)
 
 ##### Point Totals
-- **`0` to `180`**: Triggered by the total points scored in a turn
-- **Range Format**: `range_[min]_[max]` (e.g., `range_100_180` for scores between 100-180)
+- **`0` to `180`**: Triggered by the total points scored in a turn. Not in Cricket, which counts points only on numbers already closed, so nearly every visit there totals 0 however many marks it took
+- **Range Format**: `range_[min]_[max]` (e.g., `range_100_180` for scores between 100-180), not in Cricket either
 
 ##### Individual Dart Throws
 - **Singles**: `s1` to `s20`, `s25` (single segments, s25 for single bull)
@@ -634,7 +634,7 @@ Bust preset;PRESET;http://wled-device.local;7;busted
 #### Game Mode Support
 - **X01 Games**: Full support for all triggers and point combinations
 - **ATC, RTW, Shanghai, Bob's 27**: `target[1-20,25,bull]` for the current target 
-- **Cricket**: Basic support with plans for expanded cricket-specific triggers
+- **Cricket**: Every trigger but the point totals and their ranges, since Cricket counts points only on numbers already closed
 - **Bull-off**: `bulloff` trigger on bull-off rounds
 
 #### Best Practices
@@ -671,8 +671,8 @@ Clicking an animation dismisses it early, so a long GIF never has to be waited o
 #### Supported Triggers
 Animations can be triggered by various game events using these tags:
 
-- **Points**: `0` to `180` (total points scored in a turn)
-- **Ranges**: `100-180` (any turn total within the range; `range_100_180` also works)
+- **Points**: `0` to `180` (total points scored in a turn). Not in Cricket, which counts points only on numbers already closed, so nearly every visit there totals 0 however many marks it took
+- **Ranges**: `100-180` (any turn total within the range; `range_100_180` also works), not in Cricket either
 - **Singles**: `s0` to `s20`, and `s25` or `25` for the single bull. Prefer `s25`: `25` also fires whenever a visit totals 25 points, while `s25` only ever fires for the bull. Setups that already use `25` keep working — `s25` takes over only if you have an animation on it
 - **Doubles**: `d1` to `d20` (double segments, `bull` for bullseye)
 - **Triples**: `t1` to `t20` (triple segments)

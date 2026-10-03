@@ -178,7 +178,10 @@ async function processGameData(gameData: IGameData): Promise<void> {
   if (winner) play("gameshot");
   if (busted) play("busted");
   if (isLastThrow && !busted) {
-    play(points.toString());
+    // Cricket counts points only on numbers already closed, so nearly every visit
+    // totals 0 however many marks it took, and an animation on `0` played after
+    // almost all of them. Like Sound FX, leave Cricket's visit totals out.
+    if (gameData.match.variant !== "Cricket") play(points.toString());
     await new Promise(resolve => setTimeout(resolve, COMBINATION_GAP_MS));
     play(combination);
   }
