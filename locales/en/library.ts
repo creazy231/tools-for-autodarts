@@ -1,4 +1,4 @@
-/** The parts the Animations, Caller, Sound FX and WLED settings share: components/Settings/Library/. */
+/** The parts the Animations, Caller, Sound FX, WLED and Recent Local Players settings share: components/Settings/Library/. */
 export default {
   /** A row's switch, spoken: "180: on". `state` is state.on or state.off. */
   itemState: "{title}: {state}",

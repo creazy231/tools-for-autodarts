@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
   - With a shared score, bots can play against a team but not in one, since the server throws every visit of a bot's seat
   - Switching Teams off in the settings takes it off an open lobby or match at once. On a phone, *Add Team* wraps onto its own line under *Add Player* and *Add Bot*
   - Its card carries the BETA badge while it settles in
-- Tools for Autodarts in German and Dutch. It follows the language you pick on autodarts, in Settings → General or the user menu, and the Language setting says so. Every feature, its settings, and what it draws in lobbies and matches is translated, as are the Discord announcements, which use the host's language.
+- **Languages**: Tools for Autodarts now speaks German and Dutch as well as English. It follows the language you pick on autodarts, in Settings → General or the user menu, and the Language setting says so. Every feature, its settings, and what it draws in lobbies and matches is translated, as are the Discord announcements, which use the host's language
 
 ### Changed
 

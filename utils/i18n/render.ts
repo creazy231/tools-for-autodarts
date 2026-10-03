@@ -11,10 +11,12 @@ import type { Params } from "./types";
 /**
  * Tags become their elements and `<br>` a line break. A `<code>` is a token the
  * person types, such as a trigger, and it carries `.adt-code`, the component
- * class of assets/tailwind.css, which reaches every shadow root: no panel needs
- * a rule of its own for it. A `{name}` marker becomes the slot of that name, or
- * the param of that name as text, or stays as written. Params are text
- * children, which Vue escapes, so a name can hold anything.
+ * class of assets/tailwind.css. Every entrypoint that mounts Vue in a shadow
+ * root (content, lobby, match and boards) imports that stylesheet, so no panel
+ * needs a rule of its own for it; lobbynew.content mounts none, renders no
+ * <AppTrans>, and doesn't import it. A `{name}` marker becomes the slot of that
+ * name, or the param of that name as text, or stays as written. Params are
+ * text children, which Vue escapes, so a name can hold anything.
  *
  * Only own slots and params count, and a slot only if it is a function: a
  * marker such as `{constructor}` must not find what every object inherits,
