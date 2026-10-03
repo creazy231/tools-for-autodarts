@@ -1,37 +1,43 @@
-# 🎯 Tools for Autodarts v3.1.0 🎯
+# 🎯 Tools for Autodarts v3.2.0 🎯
 
-### 🎨 Settings, rebuilt
-Every feature's settings are rebuilt in Autodarts' own design language, and every setting shows what it does.
+### 👥 Teams *(beta)*
+Play in teams at your own board. **Add Team**, next to *Add Player* and *Add Bot* in a lobby you host, picks the team's name, its colour and its players in throwing order. Teams are remembered, so next time they're one tap away.
 
-🗂️ **Animations**, the **Caller**, **Sound FX** and **WLED** each show one list: every sound or effect is listed with a play button, its triggers and a switch. Everything new is added with one **Add** button.
+🤝 **Shared score**: the team plays as one, its players taking turns.
 
-🔍 **Search** every list by name or trigger, and show only the scores, darts or player names you want to see.
+🧮 **Own scores**: everyone keeps their own score, a leg counts for the team of whoever checks out, and the first team to the lobby's legs wins. The e-darts **partner rule** is a switch next to *Autoscoring*.
 
-🖐️ Removing a sound takes a second click, so a single click no longer throws one out.
+🎨 The team that's up wears its colour on the match screen, and a pill under the throws says who's up.
 
-### ✨ New
-🔊 **Turn every sound up or down on its own** in the Caller and Sound FX, up to twice as loud, so the quiet Bull can be heard over the rest *(#253)*.
+📣 The **Caller**, **Sound FX** and **WLED** call players by name, and their team when a player has nothing of their own.
 
-⏱️ **Set how long each animation stays up**, one by one, or let the extension take the time of one run of it *(#254)*.
+🤖 Bots can join own-score teams, and 2 vs 1 works too.
 
-💡 **Game modes**: keep the Caller, Sound FX, WLED and Animations to the games you pick. Every game is on until you switch it off *(#222)*.
+### 🌐 Deutsch & Nederlands
+Tools for Autodarts now speaks **German** and **Dutch**. It follows the language you pick on autodarts, in **Settings → General** or the user menu: every feature, every setting, and everything it shows in lobbies and matches. **Discord Webhooks** posts its invites in the host's language.
 
-### ⚙️ Settings page
-🧩 **Export** and **Import** are two menus now, each for a file or the clipboard.
+### ✨ Changed
+💡 **WLED** is out of beta.
 
-📊 Typing a number keeps it as typed until you leave the field, so 15 no longer turns into 5.
+🏠 **Team Lobby** is now **Local Lobby**, autodarts' own name for local play. It works as before.
+
+🎬 **Instant Replay** plays from a set number of seconds before the gameshot to a set number after it.
 
 ### 🔧 Notable fixes
-🖥️ **Smaller Scores** no longer makes your score smaller when a visit goes over or you finish the leg, so the board stays where it is when both players are at the top.
+⏭️ **Automatic Next Leg** also starts the next leg when the darts come out quickly *(#260)*.
 
-👥 A saved guest name you remove stays gone, instead of coming back in the next lobby.
+🔍 **Darts Zoom**'s close-ups show the dart again.
 
-📣 The **Caller** keeps a sound added from a file, and **Animations** are skipped when they cannot be shown, instead of leaving a blank screen.
+🦗 **Sound FX** plays the right Cricket sounds in Hidden Cricket *(#258)*.
 
-✅ Your settings, sounds, animations and WLED presets carry over, and every new option starts where you were: every game on, every sound as loud as before.
+💡 **WLED** plays the right match shot effects, and leaves your lights alone while it is switched off.
+
+📱 On a phone, every feature card in the settings shows its On/Off switch.
 
 ### 🤝 Community
-Thanks to **@MeisterBob** for game modes *(#251)* and the animation times *(#254)*, to **@andypech06** *(#222)* for asking for them, and to all of you in the bug channels 🎉
+Thanks to **@MeisterBob** for the Hidden Cricket fix *(#258)*, to **@vesperwatcher** and cab1895 for reporting the Next Leg problem *(#260)*, to Andy Pech's *Teams for Autodarts* and MartinHH's *Autodarts – Team 2vs2* for the idea behind Teams, and to all of you in the bug channels 🎉
+
+:flag_nl: The Dutch translation hasn't been checked by a native speaker yet. If something reads oddly, please tell us: corrections are very welcome!
 
 ---
 
