@@ -21,7 +21,7 @@
 
   <template v-else>
     <!-- Feature Card -->
-    <div v-if="config" class="adt-container adt-interactive h-56">
+    <div v-if="config" class="adt-container adt-interactive h-full min-h-56">
       <div class="relative z-10 flex h-full flex-col justify-between">
         <div>
           <h3 class="mb-1 flex items-center adt-card-title">
