@@ -270,7 +270,7 @@ Settled in Darts Zoom, Board View, Board Skins and Quick Correction (`locales/*/
 | the camera button | the site's button that cycles the view; it has no text of its own, so Tools names it | Kamera-Button | cameraknop |
 | a close-up | Darts Zoom's tile of where a dart landed; not the site's | Nahaufnahme | close-up |
 | skin | the design Board Skins puts on the drawn board; the feature's name keeps the English word, and so does the picker's heading | Skin (*der*) | skin |
-| the skins | Default, Classic, qwellcode, Opal, Marble, Sorbet. qwellcode is a brand and stays. Classic is the site's own *klassisch* / *klassiek* (`userMenu.switchToV1.title`) | Standard, Klassisch, qwellcode, Opal, Marmor, Sorbet | Standaard, Klassiek, qwellcode, Opaal, Marmer, Sorbet |
+| the skins | Default, Classic, qwellcode, Opal, Marble, Sorbet. They are the designs' own names and stay as they are in every language, as the owner decided on 2026-10-03, and so does the card's list of them. qwellcode is a brand as well | Default, Classic, qwellcode, Opal, Marble, Sorbet | Default, Classic, qwellcode, Opal, Marble, Sorbet |
 | number pad | the keyboard's number block, which Quick Correction reads. Not the site's on-screen *Keypad* (`inGameSettings.scoreEntry.keypad`: *Zifferntastatur*, *Toetsenblok*) | Ziffernblock | numeriek toetsenblok |
 | to correct a dart | the site's own verb (`game.clippy.undoHintBody`), and its words for a dart read wrong (`subscriptions.features.items.referee.description`) | korrigieren, falsch erkannt | corrigeren, verkeerd herkend |
 | to stand aside | one feature keeping out of another's way, as Board View does while Board Skins is on; not the site's | sich heraushalten | zich afzijdig houden |
@@ -281,7 +281,7 @@ Settled in Colors (`locales/*/colors.ts`), for whatever else names a colour pair
 |---|---|---|---|
 | the card pairs | the names under the player card's colour buttons; not the site's. A button is 64 px wide and cuts a longer name off (the widest, Dutch *Standaard*, is 60 px in bold at 12 px), so the names stay short | Blaubeere, Ozean, Limette, Petrol, Orange, Karmin, Gold, Schiefer, qwellcode | Bosbes, Oceaan, Limoen, Petrol, Oranje, Karmijn, Goud, Leisteen, qwellcode |
 | the page pairs | the names under the background's colour buttons, on the same terms | Royal, Wald, Petrol, Wein, Pflaume, Glut, Graphit, qwellcode | Royaal, Bos, Petrol, Wijn, Pruim, Gloed, Grafiet, qwellcode |
-| Default (a pair) | as Board Skins' Default | Standard | Standaard |
+| Default (a pair) | the Colors preset that keeps the site's own colours: a word of the UI, so it is translated. Board Skins' Default is a design's name and is not | Standard | Standaard |
 | Custom (a pair of your own) | not the site's: its *Custom Darts* is *Personalisierte Darts* / *Aangepaste darts*, too long for the label under the two pickers. *Own* is the site's (*Eigene Turniere*, *Eigen toernooien*) | Eigene | Eigen |
 | Top left, Bottom right | the two ends of a pair, as the pickers' tooltips name them; not the site's | Oben links, Unten rechts | Linksboven, Rechtsonder |
 | the throw bar | the site's *score bar* (section 3): the bar that holds the visit's darts | Punkteleiste | scorebalk |
@@ -310,7 +310,7 @@ Settled in Instant Replay (`locales/*/instantReplay.ts`), for whatever else spea
 
 | English | Where it is from | Deutsch | Nederlands |
 |---|---|---|---|
-| the gameshot (the dart that wins the leg) | the site's *game shot* (`referee-dialog.checking-gameshot`, "is verifying game shot"), the only text in which the site names it. The caller's and the trigger's `gameshot` is a token and is never translated. A German player may know it as *Gameshot*, which is also the word the trigger token spells; the site's own German is *Spielwurf* | Spielwurf | game shot (two words, as the site writes it) |
+| the gameshot (the dart that wins the leg) | the site's *game shot* (`referee-dialog.checking-gameshot`, "is verifying game shot"), the only text in which the site names it. The caller's and the trigger's `gameshot` is a token and is never translated. German says *Gameshot* (*der*), the word German players use and the trigger token spells, as the owner decided on 2026-10-03; the site's own German, *Spielwurf*, is not used | Gameshot | game shot (two words, as the site writes it) |
 | the winning dart | not the site's: the dart that wins the leg, where a sentence says so rather than a label | der entscheidende Dart | de winnende dart |
 | Replay | the badge over the replay and the section's heading. The site has no replay text (`yarn i18n:site replay` finds only *needsMorePlayers*), and the feature's name stays Instant Replay in every language, so the badge keeps the word | Replay | Replay |
 | webcam | not the site's: the camera of the player's computer, as against the board's cameras, which the site writes *Kamera* and *camera* | Webcam | webcam |

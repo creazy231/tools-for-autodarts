@@ -49,17 +49,17 @@ export default {
     },
   },
   before: {
-    title: "Vor dem Spielwurf",
+    title: "Vor dem Gameshot",
     description: "Wie viel vom Vorlauf bis zum entscheidenden Dart das Replay zeigt.",
   },
   after: {
-    title: "Nach dem Spielwurf",
+    title: "Nach dem Gameshot",
     description: "Und wie viel von dem, was danach kommt.",
   },
   startDelay: {
     title: "Startverzögerung",
     description: "Vom gewonnenen Leg bis zum Replay, damit Platz für die eigene Siegesfeier von autodarts bleibt.",
-    heldBack: "Vom gewonnenen Leg bis zum Replay. Die {after} s nach dem Spielwurf müssen zuerst gefilmt werden, deshalb startet es erst nach {after} s.",
+    heldBack: "Vom gewonnenen Leg bis zum Replay. Die {after} s nach dem Gameshot müssen zuerst gefilmt werden, deshalb startet es erst nach {after} s.",
   },
   covers: {
     title: "Abdeckung",

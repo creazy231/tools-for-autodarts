@@ -2,7 +2,7 @@ import type en from "../en/boardSkins";
 import type { Translation } from "../../utils/i18n/types";
 
 export default {
-  card: "Speel op het bord van autodarts in een ander ontwerp — klassiek, qwellcode, Opaal, Marmer of Sorbet.",
+  card: "Speel op het bord van autodarts in een ander ontwerp — Classic, qwellcode, Opal, Marble of Sorbet.",
   intro: "Tekent het bord van autodarts in het ontwerp dat je kiest, voor iedereen die erop gooit, bots inbegrepen. Het beeld van een camera heeft geen bord om opnieuw te tekenen, dus deze functie houdt ook het getekende bord in beeld zolang een spel bezig is.",
   sections: {
     skin: "Skin",
@@ -10,11 +10,11 @@ export default {
   skinAlt: "Bordontwerp {skin}",
   skins: {
     default: {
-      label: "Standaard",
+      label: "Default",
       description: "Het bord dat autodarts nu tekent.",
     },
     v1: {
-      label: "Klassiek",
+      label: "Classic",
       description: "Het bord dat autodarts tekende vóór de herbouw.",
     },
     qwellcode: {
@@ -22,11 +22,11 @@ export default {
       description: "Het qwellcode-bord in zwart-wit, met een ring in donkergroen en limoengroen.",
     },
     opal: {
-      label: "Opaal",
+      label: "Opal",
       description: "Parelmoeren segmenten op een pruimkleurige ondergrond, met een koperen ring.",
     },
     marble: {
-      label: "Marmer",
+      label: "Marble",
       description: "Zwart-wit marmer met gouden aders, in een vergulde rand.",
     },
     sorbet: {
