@@ -3,6 +3,8 @@
 ### 👥 Teams *(beta)*
 Play in teams at your own board. **Add Team**, next to *Add Player* and *Add Bot* in a lobby you host, picks the team's name, its colour and its players in throwing order. Teams are remembered, so next time they're one tap away.
 
+📍 Teams is **local only** for now.
+
 🤝 **Shared score**: the team plays as one, its players taking turns.
 
 🧮 **Own scores**: everyone keeps their own score, a leg counts for the team of whoever checks out, and the first team to the lobby's legs wins. The e-darts **partner rule** is a switch next to *Autoscoring*.
