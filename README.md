@@ -706,15 +706,18 @@ You can add multiple triggers for the same animation by entering each trigger on
 
 ## 🔒 Online Teams and your data
 
-With Teams on, and Online Teams with it, Tools connects to its own server (`adt-socket.tobias-thiele.de`) in every autodarts lobby and match, with your autodarts user id and name. That is how the lobby can show whether teams can play online. Once you have a team in play, or another account is in the lobby, Tools joins that lobby on the server and shares with the other Tools in it:
+With Teams on, and Online Teams with it, Tools connects to its own server (`adt-socket.tobias-thiele.de`) in every autodarts lobby, and in the matches you play in, with your autodarts user id and name. That is how the lobby can show whether teams can play online. Once you have a team in play, or another account is in the lobby, Tools joins that lobby on the server and shares with the other Tools in it:
 
 - your autodarts user id and name, to show who is connected
 - the lobby's id
 - each of your teams' name, players in order, colour and format, and their seats
 - tap-to-corrections
 - the host's partner rule
+- when a checkout breaks the partner rule, which screen takes it back, named by the match's and the darts' ids
 
-Your autodarts login never leaves your browser, and no darts or scores are sent. The server keeps all of this in memory only, and drops it half an hour after the last screen has left the lobby and its match, or after 12 hours at the latest. Switch Online Teams off under Teams, and Tools never connects.
+Your autodarts login never leaves your browser, and no darts or scores are sent. The server keeps all of this in memory only, and drops it half an hour after the last screen has left the lobby and its match, or after 12 hours at the latest. Like any website, it sees the IP address you connect from, and it doesn't record it. Switch Online Teams off under Teams, and Tools never connects.
+
+The server has no logins of its own, so it can't check that an account is who it says it is. Someone with a lobby's link and a program of their own could pose as one of its accounts in that lobby's room, and show wrong teams on the other screens, or switch the partner rule on, so that they take back checkouts that break it. Nothing on the server can act on your autodarts account.
 
 ## ⚙️ Configuration
 

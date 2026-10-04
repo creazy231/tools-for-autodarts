@@ -127,7 +127,7 @@ The online part doesn't depend on the mode, because autodarts runs the game. It 
 
   The autodarts token never leaves the browser: the id is read from it locally. Nothing is stored on the server beyond the room's life.
 - **When:**
-  - In any lobby with Teams and Online Teams on, Tools connects to the server, which is what makes the status true.
+  - In any lobby with Teams and Online Teams on, Tools connects to the server, which is what makes the status true. In a match, only an account that plays in it or hosts it connects: someone following a board stays out of its room *(found in the final review)*.
   - It **joins the lobby's room**, which is when data is shared, once it has a team there, or another account has a seat there.
   - A lobby where every seat is yours and none is a team never joins.
 - README gets a section on this. At release, the user adds the disclosure to the store listings.
@@ -180,7 +180,8 @@ interface RoomState { lobbyId: string; teams: RoomTeam[]; shifts: RoomShift[]; r
   - colours are `#rrggbb`
   - shifts are integers from −100 to 100
   - claim keys are at most 200 characters
-- **Size and rate:** 8 KB per message (`maxHttpBufferSize`), at most 30 messages per 10 s per socket, 8 peers per room and 4 rooms per socket. A message over a limit is refused with an error ack.
+- **Size and rate:** 8 KB per message (`maxHttpBufferSize`), at most 30 messages per 10 s per socket, pings included, 8 peers per room and 4 rooms per socket. A message over a limit is refused with an error ack.
+- **Room for everyone:** 24 sockets and 16 accounts with teams per room, 2,000 rooms and 4,000 connections in all (`MAX_SOCKETS`). A flood can fill the server, but not grow its memory without end *(found in the final review; a cap per IP address waits on knowing what the proxy in front of it forwards)*.
 - Allowed origins: `https://play.autodarts.com` and the extension origins (`chrome-extension://`, `moz-extension://`, `safari-web-extension://`). The client uses the WebSocket transport only.
 - `PORT` comes from the environment, default 4455.
 - Deployment files are prepared for the user to deploy:
@@ -195,7 +196,7 @@ interface RoomState { lobbyId: string; teams: RoomTeam[]; shifts: RoomShift[]; r
 - **The partner rule:** only from the lobby's host (`lobby.host.id`, `match.host.id`).
 - **A shift:** only for a team its sender owns.
 
-Without logins, someone who knows a lobby's id could at worst show wrong team names on that lobby's screens. Scores and turns stay autodarts'. Logins on the server stay out of this version.
+Without logins, anyone who knows a lobby's id and its accounts' ids, which is anyone its link reaches, can pose as one of those accounts in the room: show wrong teams, switch the host's partner rule on (the other screens then take back checkouts that break it), or claim take-backs first. Scores and turns stay autodarts', and nothing on the server can act on an autodarts account. The README says so. Checking the autodarts token on the server would close this, at the cost of sending the token there; logins on the server stay out of this version *(corrected in the final review, which found the first draft's "at worst wrong team names" too mild)*.
 
 ## The extension
 
