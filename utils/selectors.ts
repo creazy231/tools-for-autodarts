@@ -261,12 +261,18 @@ export const SELECTORS = {
     /**
      * The site's own Shuffle button, in the "Players" card header.
      *
-     * The only button that is a direct child of a card header on the lobby
-     * page, which makes this pair of data-slots unique without touching text
-     * or an index. Text is not usable: the site ships a language switcher, so
+     * The site's only button that is a direct child of a card header on the
+     * lobby page. Tools puts copies of it before it in the same header (Invite
+     * a team, Discord Webhooks' button), so the shuffle glyph tells it apart,
+     * and failing that, the id each copy has and Shuffle doesn't. Matching a
+     * copy made Teams put Invite a team back on every frame, which restarted
+     * its hover. Text is not usable: the site ships a language switcher, so
      * "Shuffle" and "Players" are not stable anchors.
      */
-    shuffleButton: [ "[data-slot='card-header'] > button[data-slot='button']" ],
+    shuffleButton: [
+      "[data-slot='card-header'] > button[data-slot='button']:has([data-icon='shuffle'])",
+      "[data-slot='card-header'] > button[data-slot='button']:not([id])",
+    ],
 
     /**
      * The header row that button lives in — also the lobby's "am I rendered
