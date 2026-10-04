@@ -14,9 +14,11 @@
  */
 
 import type { ColorScheme } from "@/utils/storage";
+import type { MessageKey } from "@/utils/i18n";
 import type { Lineup, LineupTeam, SavedTeam, SeatLike, TeamFormat, TeamShifts } from "@/utils/teams";
 
 import { MAX_NAME_LENGTH, findTeam, isHostedGuest, normalizeColour, normalizeName, sharedTeams, teamSeats } from "@/utils/teams";
+import { GameMode, gameModeLabelKey } from "@/utils/game-modes";
 
 /** Keep in step with socket/rooms.ts. */
 export const PROTOCOL_VERSION = 1;
@@ -253,6 +255,37 @@ export function statusAccounts(input: { room: RoomState | undefined; me: string 
   const out: StatusAccount[] = me ? [ { userId: me, name: normalizeName(self?.name ?? myName), you: true, connected: connection === "connected" && peers.has(me), teams: [ ...myTeams ] } ] : [];
   for (const account of otherAccounts(players, me)) out.push({ userId: account.userId, name: account.name, you: false, connected: peers.has(account.userId), teams: teamsOf(account.userId) });
   return out;
+}
+
+/**
+ * The invitation's saved teams: those that can join this lobby, and the rest,
+ * with each reason once. A different format comes first; a sets lobby then
+ * takes no own-score team either.
+ */
+export function inviteLists(saved: readonly SavedTeam[], format: TeamFormat, sets: number): { saved: SavedTeam[]; other: SavedTeam[]; reasons: ("format" | "sets")[] } {
+  const out = { saved: [] as SavedTeam[], other: [] as SavedTeam[], reasons: [] as ("format" | "sets")[] };
+  for (const team of saved) {
+    const reason = team.format !== format ? "format" : sets && team.format === "own" ? "sets" : undefined;
+    if (!reason) {
+      out.saved.push(team);
+      continue;
+    }
+    out.other.push(team);
+    if (!out.reasons.includes(reason)) out.reasons.push(reason);
+  }
+  return out;
+}
+
+/**
+ * How the invitation names a lobby's game: X01 by its base score, Cricket by
+ * its game mode (Cricket, Tactics, Hidden Cricket), unchanged as the site's
+ * own "This game" line shows it in every language, and anything else by its
+ * label.
+ */
+export function inviteGame(game: { variant: string; mode: string; score: number }): { text: string } | { key: MessageKey } {
+  if (game.variant === GameMode.X01) return { text: String(game.score) };
+  if (game.variant === GameMode.CRICKET && game.mode) return { text: game.mode };
+  return { key: gameModeLabelKey(game.variant) };
 }
 
 export type StatusKind = "connecting" | "ready" | "synced" | "missing" | "offline" | "outdated";

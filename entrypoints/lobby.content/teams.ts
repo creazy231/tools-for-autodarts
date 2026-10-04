@@ -43,7 +43,7 @@ import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests
 import { language, onLanguageChange, t } from "@/utils/i18n";
 import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedRowTeams, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
 import { memberLabel, unevenText } from "@/utils/teams-text";
-import { myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
+import { inviteLists, myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
 import { mirrorRoom } from "@/utils/team-room-mirror";
 
@@ -211,11 +211,13 @@ export interface InviteView {
   /** The other accounts' teams in the room. */
   teams: { name: string; colour: ColorScheme }[];
   host: string;
-  game: { variant: string; score: number; legs: number; sets: number };
+  game: { variant: string; mode: string; score: number; legs: number; sets: number };
   format: TeamFormat;
   /** This account's saved teams in the lobby's format, offered first; the others, greyed. */
   saved: SavedTeam[];
   other: SavedTeam[];
+  /** Why the others can't join, each once: "format", or "sets" for own scores in a sets lobby. */
+  reasons: ("format" | "sets")[];
   busy: boolean;
   problem: TeamsProblem;
   join: (team: SavedTeam) => void;
@@ -277,10 +279,11 @@ const inviteView = reactive<InviteView>({
   show: false,
   teams: [],
   host: "",
-  game: { variant: "X01", score: 501, legs: 1, sets: 0 },
+  game: { variant: "X01", mode: "", score: 501, legs: 1, sets: 0 },
   format: "shared",
   saved: [],
   other: [],
+  reasons: [],
   busy: false,
   problem: undefined,
   join: (team) => {
@@ -297,6 +300,9 @@ const inviteView = reactive<InviteView>({
 
 let statusUi: any = null;
 let inviteUi: any = null;
+/** On its way in: the first frames ask for the chip and the invitation several times before createShadowRootUi returns. */
+let statusMounting = false;
+let inviteMounting = false;
 let inviteLabel: Text | null = null;
 /** The two apps' props, kept out of the createApp calls: eslint-plugin-vue reads an object literal there as a component. */
 const statusProps = { view: statusView };
@@ -639,17 +645,29 @@ function syncOnline(view: ScreenTeams) {
   Object.assign(statusView, { players: lobby.players ?? [], me: hostId, myName, firstSeen: { ...firstSeen }, myTeams: [ ...view.mine ] });
   syncInviteButton();
   const format: TeamFormat = view.remote.some(team => team.format === "own") ? "own" : "shared";
+  const lists = inviteLists(saved, format, lobby.sets ?? 0);
   Object.assign(inviteView, {
     show: view.remote.length > 0 && view.mine.size === 0 && !dismissed.has(lobby.id),
     teams: view.remote.map(team => ({ name: team.name, colour: team.colour })),
     host: normalizeName(lobby.host?.name),
-    game: { variant: lobby.variant, score: lobby.settings?.baseScore ?? 0, legs: lobby.legs ?? 1, sets: lobby.sets ?? 0 },
+    game: { variant: lobby.variant, mode: lobby.settings?.gameMode ?? "", score: lobby.settings?.baseScore ?? 0, legs: lobby.legs ?? 1, sets: lobby.sets ?? 0 },
     format,
-    saved: saved.filter(team => team.format === format && !(lobby!.sets && team.format === "own")),
-    other: saved.filter(team => team.format !== format),
+    saved: lists.saved,
+    other: lists.other,
+    reasons: lists.reasons,
   });
-  if (!statusUi) mountStatus().catch(e => console.error(e));
-  if (!inviteUi) mountInvite().catch(e => console.error(e));
+  if (!statusUi && !statusMounting) {
+    statusMounting = true;
+    mountStatus().catch(e => console.error(e)).finally(() => {
+      statusMounting = false;
+    });
+  }
+  if (!inviteUi && !inviteMounting) {
+    inviteMounting = true;
+    mountInvite().catch(e => console.error(e)).finally(() => {
+      inviteMounting = false;
+    });
+  }
 }
 
 function removeOnline() {

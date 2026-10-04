@@ -27,10 +27,13 @@
       <button @click="view.newTeam()" :disabled="view.busy" class="adt-invite-pick" type="button">
         {{ t("teams.online.invitation.newTeam") }}
       </button>
-      <span v-for="team in view.other" :key="team.name" :title="t('teams.online.invitation.otherFormat', { format: formatText })" class="adt-invite-pick is-dim">
+      <span v-for="team in view.other" :key="team.name" class="adt-invite-pick is-dim">
         <i :style="{ backgroundImage: gradient(team.colour) }" />{{ team.name }}
       </span>
     </div>
+    <p v-for="reason in view.reasons" :key="reason" class="adt-invite-why">
+      {{ reason === "sets" ? t("teams.online.invitation.setsLobby") : t("teams.online.invitation.otherFormat", { format: formatText }) }}
+    </p>
     <p v-if="view.busy || view.problem" class="adt-invite-note" aria-live="polite">
       {{ view.busy ? t("teams.online.invitation.busy") : problem }}
     </p>
@@ -42,18 +45,19 @@ import type { InviteView } from "./teams";
 
 import { gradient } from "@/utils/colors";
 import { list } from "@/utils/i18n";
-import { GameMode, gameModeLabelKey } from "@/utils/game-modes";
 import { problemText } from "@/utils/teams-text";
+import { inviteGame } from "@/utils/team-room";
 
 const props = defineProps<{ view: InviteView }>();
 
 const { t } = useI18n();
 
 const title = computed(() => t("teams.online.invitation.title", { teams: list(props.view.teams.map(team => team.name)), count: props.view.teams.length }));
-/** The lobby's game in the site's own words: the X01 score, or the mode's name, and what wins it. */
+/** The lobby's game in the site's own words (utils/team-room.ts `inviteGame`), and what wins it. */
 const details = computed(() => {
-  const { variant, score, legs, sets } = props.view.game;
-  const game = variant === GameMode.X01 ? String(score) : t(gameModeLabelKey(variant));
+  const { legs, sets } = props.view.game;
+  const name = inviteGame(props.view.game);
+  const game = "text" in name ? name.text : t(name.key);
   return sets ? t("teams.online.invitation.sets", { game, count: sets }) : t("teams.online.invitation.legs", { game, count: legs });
 });
 const formatText = computed(() => t(props.view.format === "own" ? "teams.online.invitation.formats.own" : "teams.online.invitation.formats.shared"));
@@ -81,4 +85,5 @@ const problem = computed(() => (props.view.problem ? problemText(props.view.prob
 .adt-invite-pick i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
 .adt-invite-pick small { font-size: 10.5px; font-weight: 600; opacity: .8; }
 .adt-invite-note { margin: 8px 0 0; font-size: 12px; color: #ffd7dd; }
+.adt-invite-why { margin: 8px 0 0; font-size: 11.5px; color: #dbe1eb; }
 </style>

@@ -244,6 +244,7 @@ export default {
       join: "Join with {team}",
       newTeam: "New team",
       otherFormat: "This lobby plays {format}",
+      setsLobby: "Own scores play legs, and this lobby plays sets",
       formats: {
         shared: "shared score",
         own: "own scores",

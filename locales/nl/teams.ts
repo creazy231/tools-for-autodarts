@@ -186,6 +186,7 @@ export default {
       join: "Meedoen met {team}",
       newTeam: "Nieuw team",
       otherFormat: "Deze lobby speelt met {format}",
+      setsLobby: "Eigen scores spelen legs, en deze lobby speelt sets",
       formats: {
         shared: "gedeelde score",
         own: "eigen scores",

@@ -186,6 +186,7 @@ export default {
       join: "Mit {team} beitreten",
       newTeam: "Neues Team",
       otherFormat: "Diese Lobby spielt mit {format}",
+      setsLobby: "Eigene Scores spielen Legs, und diese Lobby spielt Sets",
       formats: {
         shared: "gemeinsamem Score",
         own: "eigenen Scores",
