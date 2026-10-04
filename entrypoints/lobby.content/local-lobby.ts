@@ -21,7 +21,7 @@ import { SELECTORS, qsa } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsTeamRoom } from "@/utils/storage";
 import { roomOf, screenTeams } from "@/utils/team-room";
-import { boardButtonsToPress } from "@/utils/local-lobby-rows";
+import { CLAIM_GRACE_MS, boardButtonsToPress } from "@/utils/local-lobby-rows";
 import { fetchWithAuth, getUserIdFromToken } from "@/utils/helpers";
 
 let unwatchLobbyData: (() => void) | null = null;
@@ -31,6 +31,11 @@ let roomStore: RoomStore = {};
 let unwatchRoom: (() => void) | null = null;
 /** The lobby and user the last pass found this to be the host's private lobby of, for the row observer's passes. */
 let claimFor: { lobby: ILobbies; userId: string } | null = null;
+/** When each seat of the lobby was first seen, for the grace before it is pulled onto this board (utils/local-lobby-rows.ts). */
+let seenAt = new Map<string, number>();
+let seenLobby = "";
+/** A pass once the newest seat's grace is over: nothing else may change on the page by then. */
+let claimTimer: ReturnType<typeof setTimeout> | undefined;
 
 /** Once per lobby: adding yourself back on purpose has to stick. */
 let selfRemoved = false;
@@ -83,6 +88,9 @@ export async function onRemove() {
   unwatchRoom?.();
   unwatchRoom = null;
   claimFor = null;
+  clearTimeout(claimTimer);
+  seenAt = new Map();
+  seenLobby = "";
 
   selfRemoved = false;
   removing = false;
@@ -158,10 +166,22 @@ async function removeSelf(lobby: ILobbies, userId: string) {
  * board (utils/team-room.ts). Rows come in seat order.
  */
 function claimBoards(lobby: ILobbies, userId: string) {
-  const room = roomOf(roomStore, lobby.id);
   const players = lobby.players ?? [];
+  const now = Date.now();
+  if (seenLobby !== lobby.id) {
+    seenLobby = lobby.id;
+    seenAt = new Map();
+  }
+  if (players.some(seat => seat.id && !seenAt.has(seat.id))) {
+    for (const seat of players) if (seat.id && !seenAt.has(seat.id)) seenAt.set(seat.id, now);
+    clearTimeout(claimTimer);
+    claimTimer = setTimeout(() => {
+      if (claimFor) claimBoards(claimFor.lobby, claimFor.userId);
+    }, CLAIM_GRACE_MS + 100);
+  }
+  const room = roomOf(roomStore, lobby.id);
   const theirs = new Set(screenTeams({ players, saved: [], lineup: undefined, shifts: {}, room, me: userId, hostId: lobby.host?.id }).remote.flatMap(team => team.seatIds));
-  for (const button of boardButtonsToPress(qsa(SELECTORS.lobby.playerRows), players.map(seat => seat.id), theirs)) {
+  for (const button of boardButtonsToPress(qsa(SELECTORS.lobby.playerRows), players.map(seat => seat.id), theirs, seenAt, now)) {
     button.click();
     console.log("Autodarts Tools: Local Lobby - Moved a player onto this board");
   }
