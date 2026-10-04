@@ -47,6 +47,20 @@ describe("join", () => {
     // An account already in the room still gets in on another socket.
     value(rooms.join(LOBBY, "s0-again", user(0)));
   });
+
+  test("caps the rooms there are at once", () => {
+    const { rooms } = setup();
+    for (let i = 0; i < LIMITS.rooms; i++) value(rooms.join(lobby(i), `s${i}`, A));
+    expect(rooms.join(lobby(LIMITS.rooms), "late", A)).toEqual({ ok: false, error: "busy" });
+    // A room that is already there still takes a socket.
+    value(rooms.join(lobby(0), "another", B));
+  });
+
+  test("caps the sockets in a room, one account's included", () => {
+    const { rooms } = setup();
+    for (let i = 0; i < LIMITS.socketsPerRoom; i++) value(rooms.join(LOBBY, `a${i}`, A));
+    expect(rooms.join(LOBBY, "one-more", A)).toEqual({ ok: false, error: "full" });
+  });
 });
 
 describe("teams", () => {
@@ -68,6 +82,20 @@ describe("teams", () => {
     rooms.join(LOBBY, "a1", A);
     rooms.setTeams(LOBBY, "a1", [ red ]);
     expect(value(rooms.setTeams(LOBBY, "a1", [])).teams).toEqual([]);
+  });
+
+  test("come from a capped number of accounts, however many come and go", () => {
+    const { rooms } = setup();
+    for (let i = 0; i < LIMITS.ownersPerRoom; i++) {
+      value(rooms.join(LOBBY, `s${i}`, user(i)));
+      value(rooms.setTeams(LOBBY, `s${i}`, [ red ]));
+      rooms.leave(LOBBY, `s${i}`);
+    }
+    value(rooms.join(LOBBY, "late", user(99)));
+    expect(rooms.setTeams(LOBBY, "late", [ red ])).toEqual({ ok: false, error: "full" });
+    // An account that has teams there may still change them.
+    value(rooms.join(LOBBY, "s0-again", user(0)));
+    value(rooms.setTeams(LOBBY, "s0-again", [ blue ]));
   });
 
   test("are refused from a socket that isn't in the room", () => {
@@ -167,6 +195,15 @@ describe("leaving and expiry", () => {
     tick(ROOM_IDLE_MS + 1);
     expect(rooms.sweep()).toBe(1);
     expect(rooms.state(LOBBY)).toBeUndefined();
+  });
+
+  test("a room swept away is no longer one of its sockets' rooms", () => {
+    const { rooms, tick } = setup();
+    rooms.join(LOBBY, "a1", A);
+    tick(ROOM_MAX_MS + 1);
+    rooms.sweep();
+    expect(rooms.roomsOf("a1")).toEqual([]);
+    expect(rooms.leaveAll("a1")).toEqual([]);
   });
 
   test("no room outlives ROOM_MAX_MS", () => {

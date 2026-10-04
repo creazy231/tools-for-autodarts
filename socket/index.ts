@@ -19,6 +19,8 @@ const MAX_MESSAGE_BYTES = 8 * 1024;
 const RATE_WINDOW_MS = 10_000;
 const RATE_MAX = 30;
 const SWEEP_MS = 60_000;
+/** Connections at once, in all: a flood can fill the server, but not grow it without end. */
+const MAX_SOCKETS = Number(process.env.MAX_SOCKETS) || 4000;
 
 /**
  * Where a browser may connect from: autodarts' page (where the content scripts
@@ -57,6 +59,11 @@ const io = new Server(http, {
     const allowed = !origin || ORIGINS.some(pattern => pattern.test(origin));
     // An origin names a site or an extension, never a person.
     if (!allowed) console.log(`Online Teams: refused a connection from ${origin}`);
+    if (allowed && io.engine.clientsCount >= MAX_SOCKETS) {
+      console.log(`Online Teams: refused a connection, ${MAX_SOCKETS} already open`);
+      callback("busy", false);
+      return;
+    }
     callback(null, allowed);
   },
 });
@@ -117,7 +124,7 @@ io.on("connection", (socket: Socket) => {
   // Answered wherever its ack comes: `emit("room:ping", cb)` and `emit("room:ping", payload, cb)` alike.
   socket.on("room:ping", (...args: unknown[]) => {
     const ack = args.find((arg): arg is Ack => typeof arg === "function");
-    ack?.({ ok: true });
+    ack?.(allowed() ? { ok: true } : { ok: false, error: "rate" });
   });
 
   socket.on("disconnect", () => {

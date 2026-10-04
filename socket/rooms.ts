@@ -20,7 +20,13 @@ export const LIMITS = {
   playersPerTeam: 6,
   seatsPerTeam: 6,
   peersPerRoom: 8,
+  /** One account's tabs and devices count once as a peer, so sockets get their own cap. */
+  socketsPerRoom: 24,
+  /** Accounts that have teams in a room: a leaving account's teams stay, so peers alone don't bound them. */
+  ownersPerRoom: 16,
   roomsPerSocket: 4,
+  /** Rooms there are at once, in all. */
+  rooms: 2000,
   claimKeyLength: 200,
   maxShift: 100,
 } as const;
@@ -113,6 +119,8 @@ interface Room {
 
 export class Rooms {
   private readonly rooms = new Map<string, Room>();
+  /** Per socket id, the rooms it is in: a socket's rooms are found without going through every room. */
+  private readonly socketRooms = new Map<string, Set<string>>();
 
   constructor(private readonly now: () => number = Date.now) {}
 
@@ -121,19 +129,24 @@ export class Rooms {
     if (this.roomsOf(socketId).filter(id => id !== lobbyId).length >= LIMITS.roomsPerSocket) return { ok: false, error: "rooms" };
     let room = this.rooms.get(lobbyId);
     if (!room) {
+      if (this.rooms.size >= LIMITS.rooms) return { ok: false, error: "busy" };
       room = { id: lobbyId, createdAt: this.now(), teams: new Map(), shifts: new Map(), claims: new Map(), sockets: new Map() };
       this.rooms.set(lobbyId, room);
     }
     const accounts = new Set([ ...room.sockets.values() ].map(other => other.userId));
     if (!accounts.has(peer.userId) && accounts.size >= LIMITS.peersPerRoom) return { ok: false, error: "full" };
+    if (!room.sockets.has(socketId) && room.sockets.size >= LIMITS.socketsPerRoom) return { ok: false, error: "full" };
     room.sockets.set(socketId, peer);
     room.emptySince = undefined;
+    const joined = this.socketRooms.get(socketId) ?? new Set<string>();
+    this.socketRooms.set(socketId, joined.add(lobbyId));
     return { ok: true, value: this.stateOf(room) };
   }
 
   leave(lobbyId: string, socketId: string): RoomState | undefined {
     const room = this.rooms.get(lobbyId);
     if (!room?.sockets.delete(socketId)) return undefined;
+    this.forget(socketId, lobbyId);
     if (!room.sockets.size) room.emptySince = this.now();
     return this.stateOf(room);
   }
@@ -146,7 +159,7 @@ export class Rooms {
   }
 
   roomsOf(socketId: string): string[] {
-    return [ ...this.rooms.values() ].filter(room => room.sockets.has(socketId)).map(room => room.id);
+    return [ ...(this.socketRooms.get(socketId) ?? []) ];
   }
 
   setTeams(lobbyId: unknown, socketId: string, raw: unknown): Result<RoomState> {
@@ -155,6 +168,7 @@ export class Rooms {
     const parsed = parseTeams(raw);
     if (!parsed.ok) return parsed;
     const owner = room.sockets.get(socketId)!.userId;
+    if (parsed.value.length && !room.teams.has(owner) && room.teams.size >= LIMITS.ownersPerRoom) return { ok: false, error: "full" };
     const teams = parsed.value.map(team => ({ ...team, owner }));
     if (teams.length) room.teams.set(owner, teams);
     else room.teams.delete(owner);
@@ -214,6 +228,7 @@ export class Rooms {
       const idle = room.emptySince !== undefined && now - room.emptySince > ROOM_IDLE_MS;
       if (idle || now - room.createdAt > ROOM_MAX_MS) {
         this.rooms.delete(id);
+        for (const socketId of room.sockets.keys()) this.forget(socketId, id);
         dropped++;
       }
     }
@@ -224,6 +239,12 @@ export class Rooms {
     const sockets = new Set<string>();
     for (const room of this.rooms.values()) for (const id of room.sockets.keys()) sockets.add(id);
     return { rooms: this.rooms.size, sockets: sockets.size };
+  }
+
+  private forget(socketId: string, lobbyId: string) {
+    const joined = this.socketRooms.get(socketId);
+    joined?.delete(lobbyId);
+    if (joined && !joined.size) this.socketRooms.delete(socketId);
   }
 
   private memberRoom(lobbyId: unknown, socketId: string): Room | undefined {

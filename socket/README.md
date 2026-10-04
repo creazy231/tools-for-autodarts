@@ -29,3 +29,9 @@ server, set `ADT_TEAMS_SERVER` before `yarn dev`, e.g.
 service (store builds talk to `https://adt-socket.tobias-thiele.de`), and keep
 the `coolify` network and its `traefik.docker.network` label, or Traefik picks
 a network at random and answers 504s.
+
+`MAX_SOCKETS` (default 4000) caps the connections at once. Rooms are capped
+too, in `LIMITS` in `rooms.ts`. There is no cap per IP address yet: behind
+Traefik every client arrives from the proxy, so one would have to read the
+forwarded address, and that is only safe once it's clear what the proxy (and
+anything in front of it) puts there.
