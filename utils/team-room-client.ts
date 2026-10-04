@@ -182,9 +182,11 @@ export class RoomClient {
   }
 
   private joinRoom() {
+    // This join, or the page's word against it, settles any retry still waiting.
+    clearTimeout(this.joinRetry);
     const socket = this.socket;
     const lobbyId = this.lobbyId;
-    if (!socket?.connected || !lobbyId || this.state.joined === lobbyId) return;
+    if (!this.wantJoin || !socket?.connected || !lobbyId || this.state.joined === lobbyId) return;
     socket.timeout(ACK_TIMEOUT_MS).emit("room:join", { lobbyId }, (error: Error | null, answer?: Ack<RoomState>) => {
       if (lobbyId !== this.lobbyId || !this.wantJoin) return;
       if (error) {
@@ -203,6 +205,7 @@ export class RoomClient {
   }
 
   private leaveRoom() {
+    clearTimeout(this.joinRetry);
     const lobbyId = this.state.joined;
     if (lobbyId && this.socket?.connected) this.socket.emit("room:leave", { lobbyId });
     this.update({ joined: undefined, joinedAt: undefined });
