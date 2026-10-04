@@ -253,10 +253,14 @@ export function roomStatus(input: StatusInput): RoomStatus {
   return missing.length ? { kind: "missing", names: missing.map(account => account.name) } : { kind: "ready", names: [] };
 }
 
-/** Whether to join the lobby's room: with a team of this account's in it, or another account's seat. */
-export function shouldJoin(players: readonly SeatLike[], myTeams: readonly RoomTeamInput[], me: string | null | undefined): boolean {
+/**
+ * Whether to join the lobby's room: with a team of this account's in it, or
+ * another account there. The lobby's host is in it with or without a seat, and
+ * their screen counts a guest of ours as an account to wait for.
+ */
+export function shouldJoin(players: readonly SeatLike[], myTeams: readonly RoomTeamInput[], me: string | null | undefined, lobbyHost?: string | null): boolean {
   if (!me) return false;
-  return myTeams.length > 0 || players.some((seat) => {
+  return myTeams.length > 0 || Boolean(lobbyHost && lobbyHost !== me) || players.some((seat) => {
     const owner = seatOwner(seat);
     return Boolean(owner) && owner !== me;
   });

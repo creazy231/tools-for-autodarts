@@ -596,7 +596,7 @@ function syncRoom() {
   roomClient.start(lobby.id).catch(e => console.error(e));
   const players = lobby.players ?? [];
   const mine = myRoomTeams(players, saved, localLineup(), hostId);
-  roomClient.setJoin(shouldJoin(players, mine, hostId));
+  roomClient.setJoin(shouldJoin(players, mine, hostId, lobby.host?.id));
   roomClient.publishTeams(mine);
   if (isHost()) roomClient.publishRule(lineupPartnerRule(localLineup(), partnerRuleDefault));
   if (firstSeenLobby !== lobby.id) {

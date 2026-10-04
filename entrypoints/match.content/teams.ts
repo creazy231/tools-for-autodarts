@@ -327,7 +327,7 @@ function syncRoom(current: IMatch) {
   const players = current.players ?? [];
   const lineup = lineupOf(lineupStore, current.id);
   const mine = myRoomTeams(players, saved, lineup, hostId);
-  roomClient.setJoin(shouldJoin(players, mine, hostId));
+  roomClient.setJoin(shouldJoin(players, mine, hostId, current.host?.id));
   roomClient.publishTeams(mine);
   if (hostId && current.host?.id === hostId && lineup) roomClient.publishRule(lineupPartnerRule(lineup, partnerRuleDefault));
 }
