@@ -825,6 +825,24 @@ export function lineupTeams(players: readonly SeatLike[], lineup: Lineup | undef
   return out;
 }
 
+/**
+ * The shared-score team each lobby row shows. By its name, which holds while
+ * the rows lag the lobby's data; but where two seats share a name, as when two
+ * accounts each add a guest of it, by the row's seat: rows come in seat order.
+ */
+export function sharedRowTeams(rowNames: readonly unknown[], players: readonly SeatLike[], shared: ReadonlyMap<number, SavedTeam>): (SavedTeam | undefined)[] {
+  const seats = new Map<string, number[]>();
+  players.forEach((seat, index) => {
+    const name = normalizeName(seat.name);
+    seats.set(name, [ ...(seats.get(name) ?? []), index ]);
+  });
+  return rowNames.map((raw, index) => {
+    const named = seats.get(normalizeName(raw)) ?? [];
+    if (named.length > 1) return named.includes(index) ? shared.get(index) : undefined;
+    return named.length ? shared.get(named[0]) : undefined;
+  });
+}
+
 /** Every team's legs: its members' legs added up. `scores` is in the same order as `players`. */
 export function teamLegs(match: TeamMatch, lineup: Lineup | undefined): Record<string, number> {
   const legs: Record<string, number> = {};
@@ -971,6 +989,17 @@ export function assignCards(cards: readonly CardInfo[], players: readonly SeatLi
     taken.set(key, nth + 1);
     const ordered = card.small && topBar ? seats : [ ...seats ].sort((a, b) => (players[a].index ?? a) - (players[b].index ?? b));
     return ordered[nth] ?? -1;
+  });
+}
+
+/**
+ * The team each card shows, with its seat, through {@link assignCards}: with
+ * Online Teams, two accounts can each seat a guest of one name.
+ */
+export function cardTeams<T>(cards: readonly CardInfo[], players: readonly SeatLike[], up: number, teams: ReadonlyMap<number, T>): ({ seat: number; team: T } | undefined)[] {
+  return assignCards(cards, players, up).map((seat) => {
+    const team = teams.get(seat);
+    return team === undefined ? undefined : { seat, team };
   });
 }
 

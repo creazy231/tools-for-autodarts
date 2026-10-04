@@ -41,7 +41,7 @@ import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY, forgetGuestPlayers } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
 import { language, onLanguageChange, t } from "@/utils/i18n";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedRowTeams, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
 import { memberLabel, unevenText } from "@/utils/teams-text";
 import { myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
@@ -778,14 +778,15 @@ function syncButton() {
 
 // -------------------------------------------------------------------- rows
 
-/** The lobby's shared-score teams' rows, this account's and the others', found by name. */
+/** The lobby's shared-score teams' rows, this account's and the others', found by name, or by seat where two seats share one. */
 function dressRows(view: ScreenTeams) {
-  const byName = new Map([ ...view.shared.values() ].map(team => [ team.name, team ]));
-  for (const row of qsa<HTMLElement>(SELECTORS.lobby.playerRows)) {
-    const team = byName.get(normalizeName(qs(SELECTORS.lobby.playerNameInRow, row)?.textContent));
+  const rows = qsa<HTMLElement>(SELECTORS.lobby.playerRows);
+  const teams = sharedRowTeams(rows.map(row => qs(SELECTORS.lobby.playerNameInRow, row)?.textContent), lobby?.players ?? [], view.shared);
+  rows.forEach((row, index) => {
+    const team = teams[index];
     if (team) dress(row, team, view.mine.has(team.name));
     else if (row.hasAttribute(ROW_ATTR)) undress(row);
-  }
+  });
 }
 
 function dress(row: HTMLElement, team: SavedTeam, mine: boolean) {

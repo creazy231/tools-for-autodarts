@@ -30,7 +30,7 @@ import { createApp, reactive } from "vue";
 import TeamsPill from "./TeamsPill.vue";
 
 import type { IMatch } from "@/utils/websocket-helpers";
-import type { Breach, Lineup, LineupStore, LineupTeam, PillNote, SavedTeam, ShiftStore } from "@/utils/teams";
+import type { Breach, CardInfo, Lineup, LineupStore, LineupTeam, PillNote, SavedTeam, ShiftStore } from "@/utils/teams";
 import type { PillView } from "@/utils/teams-pill";
 import type { Connection, RoomStore, ScreenTeams } from "@/utils/team-room";
 
@@ -41,7 +41,7 @@ import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { language, onLanguageChange, t } from "@/utils/i18n";
-import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, cardTeams, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, withShift } from "@/utils/teams";
 import { ownPill, sharedPill } from "@/utils/teams-pill";
 import { ruleBustNote, ruleNextNote, ruleRefusedNote } from "@/utils/teams-text";
 import { myRoomTeams, roomOf, screenTeams, shouldJoin, undoActor, undoKey } from "@/utils/team-room";
@@ -464,15 +464,23 @@ function allCards(): HTMLElement[] {
   return [ ...document.querySelectorAll<HTMLElement>(anyOf([ ...SELECTORS.match.scoreCard, ...SELECTORS.match.cricketPlayerCell ])) ];
 }
 
-function dressCards(seats: Map<number, SavedTeam>, shifts: Record<string, number>, up: number, mine: ReadonlySet<string>) {
-  const byName = new Map<string, { seat: number; team: SavedTeam }>();
-  seats.forEach((team, seat) => byName.set(team.name, { seat, team }));
+/** What {@link assignCards} reads off a card: the name it shows, and whether it is a small one. */
+function cardInfo(card: HTMLElement): CardInfo {
+  return {
+    name: card.querySelector(SELECTORS.match.playerName[0])?.textContent ?? "",
+    small: card.matches(anyOf(SELECTORS.match.smallScoreCard)),
+  };
+}
 
-  for (const card of allCards()) {
-    const entry = byName.get(normalizeName(card.querySelector(SELECTORS.match.playerName[0])?.textContent));
+/** By seat, not by name: another account's guest can have the name of one of this account's teams. */
+function dressCards(seats: Map<number, SavedTeam>, shifts: Record<string, number>, up: number, mine: ReadonlySet<string>) {
+  const cards = allCards();
+  const shown = cardTeams(cards.map(cardInfo), match!.players ?? [], up, seats);
+  cards.forEach((card, index) => {
+    const entry = shown[index];
     if (!entry) {
       if (card.hasAttribute(CARD_ATTR)) undressCard(card);
-      continue;
+      return;
     }
     const { seat, team } = entry;
     const throwing = seat === up;
@@ -481,7 +489,7 @@ function dressCards(seats: Map<number, SavedTeam>, shifts: Record<string, number
     card.style.setProperty("--adt-team-from", team.colour.from);
     card.style.setProperty("--adt-team-to", team.colour.to);
     renderOrder(card, team, seat, playerUp(match!, seat, team, shifts[team.name] ?? 0), throwing, mine.has(team.name));
-  }
+  });
 }
 
 function undressCard(card: HTMLElement) {
@@ -497,10 +505,7 @@ function undressCard(card: HTMLElement) {
 function dressOwnCards(seats: Map<number, LineupTeam>, up: number, lineup: Lineup) {
   const cards = allCards();
   const players = match!.players ?? [];
-  const shown = assignCards(cards.map(card => ({
-    name: card.querySelector(SELECTORS.match.playerName[0])?.textContent ?? "",
-    small: card.matches(anyOf(SELECTORS.match.smallScoreCard)),
-  })), players, up);
+  const shown = assignCards(cards.map(cardInfo), players, up);
   const legs = teamLegs(match!, lineup);
   cards.forEach((card, index) => {
     const team = seats.get(shown[index]);
