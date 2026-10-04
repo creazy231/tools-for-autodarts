@@ -64,6 +64,8 @@ interface ILobbySettings {
   inMode: string;
   maxRounds: number;
   outMode: string;
+  /** Cricket's mode: `Cricket`, `Tactics` or `Hidden Cricket`. */
+  gameMode?: string;
 }
 
 export interface ILobbies {
