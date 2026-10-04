@@ -266,9 +266,12 @@ export function normalizeTeams(saved: unknown): TeamsConfig {
   for (const entry of Array.isArray(value.saved) ? value.saved : []) {
     const name = normalizeName(entry?.name).slice(0, MAX_NAME_LENGTH);
     if (!name || teams.some(team => team.name === name)) continue;
-    const players = uniqueNames(Array.isArray(entry?.players) ? entry.players : []).slice(0, MAX_PLAYERS);
-    if (players.length < MIN_PLAYERS) continue;
     const format: TeamFormat = entry?.format === "own" ? "own" : "shared";
+    // A shared team's players are the people who take turns, each named once.
+    // An own-score team's are seats, and two bots of one level share a name.
+    const raw: unknown[] = Array.isArray(entry?.players) ? entry.players : [];
+    const players = (format === "own" ? raw.map(normalizeName).filter(Boolean) : uniqueNames(raw)).slice(0, MAX_PLAYERS);
+    if (players.length < MIN_PLAYERS) continue;
     const team: SavedTeam = { name, players, colour: normalizeColour(entry?.colour), format };
     const members = format === "own" ? normalizeMembers(entry?.members, players) : undefined;
     if (members) team.members = members;
@@ -279,9 +282,7 @@ export function normalizeTeams(saved: unknown): TeamsConfig {
 
 /**
  * Migration 16: Online Teams' switch, on unless it was switched off. Only the
- * switch is added. Saved teams stay exactly as they were: normalizeTeams would
- * also merge players of one name, such as two bots of one level, and write
- * that back.
+ * switch is added: saved teams stay exactly as they were.
  */
 export function withOnlineTeams(config: any): any {
   return { ...config, teams: { ...config?.teams, online: config?.teams?.online !== false } };
