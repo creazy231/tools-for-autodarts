@@ -706,7 +706,7 @@ You can add multiple triggers for the same animation by entering each trigger on
 
 ## 🔒 Online Teams and your data
 
-With Teams on, and Online Teams with it, Tools connects to its own server (`adt.tobias-thiele.de`) in every autodarts lobby, and in the matches you play in, with your autodarts user id and name. That is how the lobby can show whether teams can play online. Once you have a team in play, or another account is in the lobby, Tools joins that lobby on the server and shares with the other Tools in it:
+With Teams on, and Online Teams with it, Tools connects to its own server (`adt-socket.tobias-thiele.de`) in every autodarts lobby, and in the matches you play in, with your autodarts user id and name. That is how the lobby can show whether teams can play online. Once you have a team in play, or another account is in the lobby, Tools joins that lobby on the server and shares with the other Tools in it:
 
 - your autodarts user id and name, to show who is connected
 - the lobby's id

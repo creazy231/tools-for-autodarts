@@ -22,12 +22,12 @@ Network Access). Chrome holds the connection until play.autodarts.com is allowed
 to reach your device in its site settings, and Firefox refuses it while
 `network.lna.blocking` is on in `about:config`. To build against another
 server, set `ADT_TEAMS_SERVER` before `yarn dev`, e.g.
-`ADT_TEAMS_SERVER=https://adt.tobias-thiele.de`.
+`ADT_TEAMS_SERVER=https://adt-socket.tobias-thiele.de`.
 
 ## Deploying
 
 `docker-compose.yml` is set up for Coolify: set the domain on the `socket`
-service (store builds talk to `https://adt.tobias-thiele.de`), and keep
+service (store builds talk to `https://adt-socket.tobias-thiele.de`), and keep
 the `coolify` network and its `traefik.docker.network` label, or Traefik picks
 a network at random and answers 504s.
 

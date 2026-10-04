@@ -88,7 +88,7 @@ Do **not** import these manually — they are globally available.
 
 ### Companion Services (separate sub-projects, not part of the extension build)
 
-- **`socket/`** — Online Teams' server (Bun, socket.io), deployed at `adt.tobias-thiele.de`: a team room per autodarts lobby, in memory only. Store builds talk to it; `yarn dev` builds talk to a local one (`bun run dev` in `socket/`, port 4455) unless `ADT_TEAMS_SERVER` says otherwise. See `socket/README.md`
+- **`socket/`** — Online Teams' server (Bun, socket.io), deployed at `adt-socket.tobias-thiele.de`: a team room per autodarts lobby, in memory only. Store builds talk to it; `yarn dev` builds talk to a local one (`bun run dev` in `socket/`, port 4455) unless `ADT_TEAMS_SERVER` says otherwise. See `socket/README.md`
 - **`proxy/`** — Express server (Docker) that forwards Discord webhook requests via an `x-target-url` header
 - **`scripts/`** — Release automation (Safari/Xcode builds, the Firefox for Android XPI, App Store submission, AltStore source updates — see `scripts/README.md`)
 
