@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- **Local Lobby** moves everyone who joins onto your board again. On the rebuilt site it pressed the house button, which takes a player you host off your board, so it never moved anyone
+- **Local Lobby** moves everyone who joins onto your board again. On the rebuilt site it pressed the house button, which takes a player you host off your board, so it never moved anyone, and the globe in each new player's row had to be pressed by hand. It presses the globe itself now, three seconds after the player joins. Checked in Chrome, with a second account of ours joining a private lobby on its own. Thanks to [@mulich](https://github.com/mulich) for the report ([#263](https://github.com/creazy231/tools-for-autodarts/issues/263))
 - **Teams**: a saved own-score team with two bots of one level keeps both. Reading the settings merged them into one bot
 - **Animations** and **WLED** no longer go by a visit's points in Cricket. Cricket counts points only on numbers already closed, so nearly every visit there totals 0, however many marks it took, and an animation or effect on `0`, or on a range from 0, went off after almost every visit. Point totals and their ranges now go off in every game but Cricket, as Sound FX's already did, and the darts, the three-dart combinations and the game events still play in Cricket. Checked against a Cricket match of our own. Thanks to [@andypech06](https://github.com/andypech06) for the report ([#262](https://github.com/creazy231/tools-for-autodarts/issues/262))
 
