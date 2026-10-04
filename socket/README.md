@@ -11,6 +11,7 @@ scores stay with autodarts. Protocol version 1; the extension's side is
 bun install
 bun run dev      # http://localhost:4455, what `yarn dev` builds talk to
 bun test         # rooms.ts
+bun run typecheck   # tsc, with the Bun types
 ```
 
 `GET /health` answers `{"ok":true,"version":1,"rooms":n,"sockets":n}`.

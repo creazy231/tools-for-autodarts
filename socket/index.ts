@@ -110,12 +110,15 @@ io.on("connection", (socket: Socket) => {
     socket.join(state.lobbyId);
     broadcast(state);
   });
-  on("room:leave", ({ lobbyId }) => {
-    if (typeof lobbyId !== "string") return { ok: false, error: "lobby" };
+  // Leaving is never limited: a socket at its limit must still be able to go.
+  socket.on("room:leave", (payload: unknown, ack?: Ack) => {
+    const reply: Ack = typeof ack === "function" ? ack : () => {};
+    const lobbyId = payload && typeof payload === "object" ? (payload as Payload).lobbyId : undefined;
+    if (typeof lobbyId !== "string") return reply({ ok: false, error: "lobby" });
     const state = rooms.leave(lobbyId, socket.id);
     socket.leave(lobbyId);
     if (state) broadcast(state);
-    return { ok: true, value: true };
+    reply({ ok: true, value: true });
   });
   on("room:teams", ({ lobbyId, teams }) => rooms.setTeams(lobbyId, socket.id, teams), broadcast);
   on("room:shift", ({ lobbyId, team, shift }) => rooms.setShift(lobbyId, socket.id, { team, shift }), broadcast);

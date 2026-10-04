@@ -9,8 +9,8 @@ const SEAT_RED = "01a10312-0000-7000-8000-000000000001";
 const SEAT_BLUE = "01a10312-0000-7000-8000-000000000002";
 const crimson = { preset: "crimson", from: "#6a1624", to: "#b8323f" };
 const ocean = { preset: "ocean", from: "#374c98", to: "#0b55df" };
-const red = { name: "TEAM RED", colour: crimson, format: "shared", seatIds: [ SEAT_RED ], players: [ "ANNA", "TOM" ] };
-const blue = { name: "TEAM BLUE", colour: ocean, format: "shared", seatIds: [ SEAT_BLUE ], players: [ "LISA", "MAX" ] };
+const red = { name: "TEAM RED", colour: crimson, format: "shared" as const, seatIds: [ SEAT_RED ], players: [ "ANNA", "TOM" ] };
+const blue = { name: "TEAM BLUE", colour: ocean, format: "shared" as const, seatIds: [ SEAT_BLUE ], players: [ "LISA", "MAX" ] };
 
 const lobby = (i: number) => `${String(i).padStart(8, "0")}-1111-4000-8000-000000000000`;
 const user = (i: number) => ({ userId: `${String(i).padStart(8, "0")}-2222-4000-8000-000000000000`, name: `p${i}` });
