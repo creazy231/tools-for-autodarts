@@ -185,6 +185,15 @@ export function screenTeams(input: ScreenInput): ScreenTeams {
 
   const own: LineupTeam[] = remote.filter(team => team.format === "own").map(team => ({ name: team.name, colour: team.colour, seatIds: team.seatIds }));
   const teams = [ ...(lineup?.teams ?? []), ...own ];
+  if (own.length) {
+    // Every screen lists the teams alike (the pill's tally): by their first seat
+    // in the lobby's order, which a leg's rotation of `players` leaves alone.
+    const place = (team: LineupTeam) => Math.min(...team.seatIds.map((id) => {
+      const at = players.findIndex(seat => seat.id === id);
+      return at < 0 ? Number.POSITIVE_INFINITY : players[at].index ?? at;
+    }));
+    teams.sort((a, b) => place(a) - place(b));
+  }
   const isHost = Boolean(me) && me === hostId;
   const rule = isHost ? lineup?.partnerRule : (room?.rule && hostId && room.rule.by === hostId ? room.rule.partnerRule : false);
   const merged: Lineup | undefined = teams.length ? { at: lineup?.at ?? 0, teams, ...(rule === undefined ? {} : { partnerRule: rule }) } : undefined;
