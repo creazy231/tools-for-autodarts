@@ -63,16 +63,31 @@ export interface RoomSeat extends SeatLike {
   host?: { id?: string; name?: string } | null;
 }
 
-/** The room as it arrived, kept with the lobbies of the last day. */
+/**
+ * The room as it arrived, kept with the lobbies of the last day. A restarted
+ * server comes back empty, and the first screen to rejoin hears that first:
+ * an account that is neither a peer nor an owner in the new state keeps the
+ * teams and shifts it had here, and an absent author its rule, until it is back.
+ */
 export function withRoom(store: RoomStore | undefined, state: RoomState, now: number): RoomStore {
   const next: RoomStore = {};
   for (const [ id, entry ] of Object.entries(store ?? {})) {
     if (id !== state.lobbyId && entry && now - entry.at < ROOM_TTL_MS) next[id] = entry;
   }
   const last = store?.[state.lobbyId];
-  const before = last && now - last.at < ROOM_TTL_MS ? last.seen ?? [] : [];
-  const seen = [ ...new Set([ ...before, ...state.peers.map(peer => peer.userId), ...state.teams.map(team => team.owner) ]) ];
-  next[state.lobbyId] = { ...state, at: now, seen };
+  const before = last && now - last.at < ROOM_TTL_MS ? last : undefined;
+  const here = new Set([ ...state.peers.map(peer => peer.userId), ...state.teams.map(team => team.owner) ]);
+  const entry: RoomMirror = {
+    ...state,
+    teams: [ ...state.teams, ...(before?.teams ?? []).filter(team => !here.has(team.owner)) ],
+    shifts: [ ...state.shifts, ...(before?.shifts ?? []).filter(shift => !here.has(shift.owner)) ],
+    at: now,
+    seen: [ ...new Set([ ...(before?.seen ?? []), ...here ]) ],
+  };
+  const rule = state.rule ?? (before?.rule && !state.peers.some(peer => peer.userId === before.rule!.by) ? before.rule : undefined);
+  if (rule) entry.rule = rule;
+  else delete entry.rule;
+  next[state.lobbyId] = entry;
   return next;
 }
 
