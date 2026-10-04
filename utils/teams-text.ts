@@ -121,3 +121,8 @@ export function ruleNextNote(breach: Breach): PillNote {
 export function ruleRefusedNote(breach: Breach): PillNote {
   return { primary: t("teams.pill.undoYourself", { name: breach.player }), secondary: t("teams.pill.refused") };
 }
+
+/** When Online Teams couldn't say who takes a rule-breaking checkout back, so nobody did. */
+export function ruleNotAskedNote(breach: Breach): PillNote {
+  return { primary: t("teams.pill.undoYourself", { name: breach.player }), secondary: t("teams.pill.notAsked") };
+}

@@ -45,6 +45,8 @@ type Ack<T> = { ok: true; value: T } | { ok: false; error: string };
 
 const ACK_TIMEOUT_MS = 5000;
 const PING_MS = 20_000;
+/** Refusals that may pass later: the rate limit, or a room this client is no longer in. Any other is final for that payload. */
+const PASSING = new Set([ "rate", "room" ]);
 
 export class RoomClient {
   readonly state: RoomClientState = { connection: "idle", rtt: undefined, joined: undefined, joinedAt: undefined, room: undefined };
@@ -52,9 +54,9 @@ export class RoomClient {
   private starting: Promise<void> | undefined;
   private lobbyId: string | undefined;
   private wantJoin = false;
-  /** What the page wants the room to know, and what the room has taken. */
-  private intended: { teams?: RoomTeamInput[]; rule?: boolean } = {};
-  private sent: { teams: string; rule: boolean | undefined } = { teams: "", rule: undefined };
+  /** What the page wants the room to know, and what has been sent of it: a payload once taken or refused isn't sent again. */
+  private intended: { teams?: RoomTeamInput[]; rule?: boolean; shifts?: Record<string, number> } = {};
+  private sent: { teams: string; rule: boolean | undefined; shifts: Record<string, number> } = { teams: "", rule: undefined, shifts: {} };
   private pinger: ReturnType<typeof setInterval> | undefined;
   private readonly listeners = new Set<(state: RoomClientState) => void>();
 
@@ -65,6 +67,8 @@ export class RoomClient {
     if (this.lobbyId !== lobbyId) {
       this.leaveRoom();
       this.lobbyId = lobbyId;
+      // The new lobby's room is joined when the page says so, as the first one's was.
+      this.wantJoin = false;
       this.intended = {};
       this.update({ room: undefined });
     }
@@ -105,8 +109,10 @@ export class RoomClient {
     this.flush();
   }
 
-  async publishShift(team: string, shift: number) {
-    await this.send("room:shift", { team, shift });
+  /** A tap-to-correct of one of this account's teams, sent after its teams, and again after every (re)join. */
+  publishShift(team: string, shift: number): Promise<void> {
+    this.intended.shifts = { ...this.intended.shifts, [team]: shift };
+    return this.flush();
   }
 
   /** The room's grant for `key`: true for the first to ask, false after that, undefined when the room can't be asked. */
@@ -177,7 +183,7 @@ export class RoomClient {
       if (error || !answer?.ok || lobbyId !== this.lobbyId || !this.wantJoin) return;
       this.update({ joined: lobbyId, joinedAt: Date.now() });
       // A fresh join: the room may have lost what it was told, after a restart.
-      this.sent = { teams: "", rule: undefined };
+      this.sent = { teams: "", rule: undefined, shifts: {} };
       this.receive(answer.value);
       this.flush();
     });
@@ -187,25 +193,43 @@ export class RoomClient {
     const lobbyId = this.state.joined;
     if (lobbyId && this.socket?.connected) this.socket.emit("room:leave", { lobbyId });
     this.update({ joined: undefined, joinedAt: undefined });
-    this.sent = { teams: "", rule: undefined };
+    this.sent = { teams: "", rule: undefined, shifts: {} };
   }
 
+  /** Teams first: the room takes a shift only for a team it knows. */
   private async flush() {
     if (!this.state.joined) return;
-    const { teams, rule } = this.intended;
+    const { teams, rule, shifts } = this.intended;
     if (teams) {
       const key = JSON.stringify(teams);
       if (key !== this.sent.teams) {
         this.sent.teams = key;
         const answer = await this.send("room:teams", { teams });
-        if (!answer?.ok && this.sent.teams === key) this.sent.teams = "";
+        if (this.unsent(answer) && this.sent.teams === key) this.sent.teams = "";
       }
+    }
+    for (const [ team, shift ] of Object.entries(shifts ?? {})) {
+      if (this.sent.shifts[team] === shift) continue;
+      this.sent.shifts[team] = shift;
+      const answer = await this.send("room:shift", { team, shift });
+      if (this.unsent(answer) && this.sent.shifts[team] === shift) delete this.sent.shifts[team];
     }
     if (rule !== undefined && rule !== this.sent.rule) {
       this.sent.rule = rule;
       const answer = await this.send("room:rule", { partnerRule: rule });
-      if (!answer?.ok && this.sent.rule === rule) this.sent.rule = undefined;
+      if (this.unsent(answer) && this.sent.rule === rule) this.sent.rule = undefined;
     }
+  }
+
+  /** Whether a payload should go again: no answer, or a refusal that may pass later. A room that lost this client is joined again. */
+  private unsent(answer: Ack<unknown> | undefined): boolean {
+    if (!answer) return true;
+    if (answer.ok) return false;
+    if (answer.error === "room" && this.state.joined) {
+      this.update({ joined: undefined, joinedAt: undefined });
+      this.joinRoom();
+    }
+    return PASSING.has(answer.error);
   }
 
   private send<T>(event: string, payload: Record<string, unknown>): Promise<Ack<T> | undefined> {

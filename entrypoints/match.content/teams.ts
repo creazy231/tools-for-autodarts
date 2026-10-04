@@ -43,8 +43,8 @@ import { getUserIdFromToken } from "@/utils/helpers";
 import { language, onLanguageChange, t } from "@/utils/i18n";
 import { TEAMS_PILL_TAG, assignCards, cardTeams, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, withShift } from "@/utils/teams";
 import { ownPill, sharedPill } from "@/utils/teams-pill";
-import { ruleBustNote, ruleNextNote, ruleRefusedNote } from "@/utils/teams-text";
-import { myRoomTeams, roomOf, screenTeams, shouldJoin, undoActor, undoKey } from "@/utils/team-room";
+import { ruleBustNote, ruleNextNote, ruleNotAskedNote, ruleRefusedNote } from "@/utils/teams-text";
+import { myRoomTeams, roomOf, screenTeams, shouldJoin, takesPart, undoActor, undoKey, undoOutcome } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
 import { mirrorRoom } from "@/utils/team-room-mirror";
 
@@ -306,7 +306,8 @@ function offlineNote(view: ScreenTeams): boolean {
  * the host, the partner rule.
  */
 function syncRoom(current: IMatch) {
-  if (!online) {
+  // The room is for the accounts that play the match or host it, not for someone following it.
+  if (!online || !takesPart(current.players ?? [], hostId, current.host?.id)) {
     stopRoom();
     return;
   }
@@ -329,6 +330,11 @@ function syncRoom(current: IMatch) {
   const mine = myRoomTeams(players, saved, lineup, hostId);
   roomClient.setJoin(shouldJoin(players, mine, hostId, current.host?.id));
   roomClient.publishTeams(mine);
+  // Its corrections too, which a reloaded page or a restarted server would otherwise go without.
+  const shifts = shiftsOf(shiftStore, current.id);
+  for (const team of mine) {
+    if (shifts[team.name] !== undefined) roomClient.publishShift(team.name, shifts[team.name]).catch(e => console.error(e));
+  }
   if (hostId && current.host?.id === hostId && lineup) roomClient.publishRule(lineupPartnerRule(lineup, partnerRuleDefault));
 }
 
@@ -419,8 +425,16 @@ function askUndo() {
   }
   const asking = roomClient ? roomClient.claim(undoKey(matchId, dartIds)) : Promise.resolve(undefined);
   asking.then((granted) => {
-    // This account's own visit goes ahead when the room can't be asked; standing in for another account's needs the grant.
-    if (granted === true || (actor === "own" && granted === undefined)) send();
+    const outcome = undoOutcome(granted);
+    if (outcome === "undo") {
+      send();
+      return;
+    }
+    // No word from the room, so no screen took it back: rather that than two undos.
+    if (outcome === "stands" && bustNote === note) {
+      note.words = ruleNotAskedNote;
+      apply();
+    }
   }, e => console.error(e));
 }
 

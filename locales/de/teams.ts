@@ -146,6 +146,7 @@ export default {
     pressNext: "drück Weiter für den nächsten Spieler",
     undoYourself: "Mach das Checkout von {name} selbst rückgängig",
     refused: "es verstößt gegen die Partnerregel, und autodarts hat es nicht zurückgenommen",
+    notAsked: "es verstößt gegen die Partnerregel, und weil Online-Teams offline ist, hat es niemand zurückgenommen",
   },
   online: {
     status: {
@@ -198,7 +199,7 @@ export default {
     },
     settings: {
       title: "Online-Teams",
-      description: "In einer Lobby von autodarts verbindet sich Tools mit seinem eigenen Server und nennt ihm deine Benutzer-ID und deinen Namen, damit die Lobby zeigen kann, ob Teams online spielen können. Mit einem Team und einem weiteren Account in der Lobby teilt es außerdem die Namen, Spieler, Farben und die Reihenfolge der Teams mit dem Tools der anderen. Darts und Punkte bleiben bei autodarts, und der Server vergisst alles eine halbe Stunde, nachdem alle gegangen sind.",
+      description: "In einer Lobby von autodarts und in deinen Matches verbindet sich Tools mit seinem eigenen Server und nennt ihm deine Benutzer-ID und deinen Namen, damit die Lobby zeigen kann, ob Teams online spielen können. Mit einem Team und einem weiteren Account in der Lobby teilt es außerdem die Namen, Spieler, Farben und die Reihenfolge der Teams mit dem Tools der anderen. Darts und Punkte bleiben bei autodarts, und der Server vergisst alles eine halbe Stunde, nachdem alle gegangen sind.",
     },
   },
 } satisfies Translation<typeof en>;

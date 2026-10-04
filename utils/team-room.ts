@@ -16,7 +16,7 @@
 import type { ColorScheme } from "@/utils/storage";
 import type { Lineup, LineupTeam, SavedTeam, SeatLike, TeamFormat, TeamShifts } from "@/utils/teams";
 
-import { findTeam, isHostedGuest, normalizeColour, normalizeName, sharedTeams, teamSeats } from "@/utils/teams";
+import { MAX_NAME_LENGTH, findTeam, isHostedGuest, normalizeColour, normalizeName, sharedTeams, teamSeats } from "@/utils/teams";
 
 /** Keep in step with socket/rooms.ts. */
 export const PROTOCOL_VERSION = 1;
@@ -46,7 +46,11 @@ export interface RoomPeer { userId: string; name: string }
 export interface RoomState { lobbyId: string; teams: RoomTeam[]; shifts: RoomShift[]; rule?: RoomRule; peers: RoomPeer[] }
 
 /** A room as this browser last heard it, for a reload, the step to the match, or an outage. */
-export interface RoomMirror extends RoomState { at: number }
+export interface RoomMirror extends RoomState {
+  at: number;
+  /** Every account the room has had, as a peer or with teams: a restarted, empty room mustn't make one look Tools-less. */
+  seen?: string[];
+}
 
 /** Per lobby id, which is also its match's id. */
 export type RoomStore = Record<string, RoomMirror>;
@@ -65,7 +69,10 @@ export function withRoom(store: RoomStore | undefined, state: RoomState, now: nu
   for (const [ id, entry ] of Object.entries(store ?? {})) {
     if (id !== state.lobbyId && entry && now - entry.at < ROOM_TTL_MS) next[id] = entry;
   }
-  next[state.lobbyId] = { ...state, at: now };
+  const last = store?.[state.lobbyId];
+  const before = last && now - last.at < ROOM_TTL_MS ? last.seen ?? [] : [];
+  const seen = [ ...new Set([ ...before, ...state.peers.map(peer => peer.userId), ...state.teams.map(team => team.owner) ]) ];
+  next[state.lobbyId] = { ...state, at: now, seen };
   return next;
 }
 
@@ -86,17 +93,19 @@ export function seatOwner(seat: SeatLike | undefined): string | undefined {
  */
 export function myRoomTeams(players: readonly SeatLike[], saved: readonly SavedTeam[], lineup: Lineup | undefined, me: string | null | undefined): RoomTeamInput[] {
   if (!me) return [];
+  // The room refuses an account's whole set for one name over its length.
+  const fit = (name: string) => name.slice(0, MAX_NAME_LENGTH).trim();
   const present = new Map(players.filter(seat => seat.id).map(seat => [ seat.id!, seat ]));
   const teams: RoomTeamInput[] = [];
   for (const seat of players) {
     if (!seat.id || !isHostedGuest(seat, me)) continue;
     const team = findTeam(sharedTeams(saved), seat.name);
-    if (team) teams.push({ name: team.name, colour: { ...team.colour }, format: "shared", seatIds: [ seat.id ], players: [ ...team.players ] });
+    if (team) teams.push({ name: team.name, colour: { ...team.colour }, format: "shared", seatIds: [ seat.id ], players: team.players.map(fit) });
   }
   for (const team of lineup?.teams ?? []) {
     const seatIds = team.seatIds.filter(id => present.has(id));
     if (!seatIds.length) continue;
-    teams.push({ name: team.name, colour: { ...team.colour }, format: "own", seatIds, players: seatIds.map(id => normalizeName(present.get(id)!.name)) });
+    teams.push({ name: team.name, colour: { ...team.colour }, format: "own", seatIds, players: seatIds.map(id => fit(normalizeName(present.get(id)!.name))) });
   }
   return teams;
 }
@@ -276,13 +285,30 @@ export function shouldJoin(players: readonly SeatLike[], myTeams: readonly RoomT
  */
 export type UndoActor = "legacy" | "own" | "fallback" | "none";
 
-export function undoActor(seat: SeatLike | undefined, me: string | null | undefined, room: RoomState | undefined, hostId: string | null | undefined): UndoActor {
+export function undoActor(seat: SeatLike | undefined, me: string | null | undefined, room: (RoomState & Pick<RoomMirror, "seen">) | undefined, hostId: string | null | undefined): UndoActor {
   if (!room) return "legacy";
   const owner = seatOwner(seat);
   if (!owner || !me) return "none";
   if (owner === me) return "own";
-  const inRoom = room.peers.some(peer => peer.userId === owner) || room.teams.some(team => team.owner === owner);
+  // "Is, or was": an account whose Tools a restart has briefly taken out of the room still takes back its own.
+  const inRoom = room.peers.some(peer => peer.userId === owner) || room.teams.some(team => team.owner === owner) || Boolean(room.seen?.includes(owner));
   return !inRoom && me === hostId ? "fallback" : "none";
+}
+
+/**
+ * What a side that may take a visit back does with the room's answer to its
+ * claim: undo with the grant; leave it to whoever got it; and with no answer,
+ * let the checkout stand rather than risk a second undo from another screen.
+ */
+export function undoOutcome(granted: boolean | undefined): "undo" | "theirs" | "stands" {
+  if (granted === true) return "undo";
+  return granted === false ? "theirs" : "stands";
+}
+
+/** Whether this account plays in a match, or hosts it: a match's room is theirs, not a spectator's. */
+export function takesPart(players: readonly SeatLike[], me: string | null | undefined, matchHost: string | null | undefined): boolean {
+  if (!me) return false;
+  return matchHost === me || players.some(seat => seatOwner(seat) === me);
 }
 
 /** The room's key for one visit's take-back. */

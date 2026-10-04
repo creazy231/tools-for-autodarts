@@ -203,6 +203,8 @@ export default {
     /** When autodarts refused to take the checkout back. Undo is the site's button. */
     undoYourself: "Undo {name}'s checkout yourself",
     refused: "it breaks the partner rule, and autodarts didn't take it back",
+    /** When Online Teams was offline, so no screen could be granted the take-back. */
+    notAsked: "it breaks the partner rule, and with Online Teams offline, nobody took it back",
   },
   online: {
     status: {
@@ -255,7 +257,7 @@ export default {
     },
     settings: {
       title: "Online Teams",
-      description: "In an autodarts lobby, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
+      description: "In an autodarts lobby, and in a match you play, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
     },
   },
 };
