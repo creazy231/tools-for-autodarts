@@ -50,7 +50,7 @@ const FAKE_CAMERA = process.env.ADT_FAKE_CAMERA === "1";
 const TEAMS_SERVER = process.env.ADT_TEAMS_SERVER;
 
 function teamsServer(command: string): string {
-  return TEAMS_SERVER || (command === "serve" ? "http://localhost:4455" : "https://adt-socket.tobias-thiele.de");
+  return TEAMS_SERVER || (command === "serve" ? "http://localhost:4455" : "https://adt.tobias-thiele.de");
 }
 
 /**
