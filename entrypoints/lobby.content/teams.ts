@@ -109,6 +109,8 @@ const LOBBY_CSS = `
   div:has(> #${BUTTON_ID}) > button { min-width: max-content; }
   /* Online Teams' chip and Invite a team join the Players card's header: on a narrow screen it wraps rather than push the site's Shuffle off the card. */
   div:has(> ${STATUS_TAG}), div:has(> #${INVITE_ID}) { flex-wrap: wrap; row-gap: 8px; }
+  /* Invite a team is a copy of Shuffle, auto margin and all: the two split the room between them unless one gives it up. */
+  #${INVITE_ID} + button { margin-left: 0; }
   /* The partner rule's card goes under Autoscoring, the page's other switch, in the right-hand column. */
   @media (width >= 48rem) {
     div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; }
