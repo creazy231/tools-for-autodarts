@@ -15,6 +15,14 @@ bun test         # rooms.ts
 
 `GET /health` answers `{"ok":true,"version":1,"rooms":n,"sockets":n}`.
 
+A `yarn dev` build connects from play.autodarts.com to `ws://localhost:4455`,
+which both browsers treat as a public site reaching into your machine (Local
+Network Access). Chrome holds the connection until play.autodarts.com is allowed
+to reach your device in its site settings, and Firefox refuses it while
+`network.lna.blocking` is on in `about:config`. To build against another
+server, set `ADT_TEAMS_SERVER` before `yarn dev`, e.g.
+`ADT_TEAMS_SERVER=https://adt-socket.tobias-thiele.de`.
+
 ## Deploying
 
 `docker-compose.yml` is set up for Coolify: set the domain on the `socket`

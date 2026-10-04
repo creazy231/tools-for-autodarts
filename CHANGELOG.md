@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Online Teams**: two teams on two boards in different places play one autodarts online match, with both teams shown on both screens: who's up, the order, colours, tap-to-correct, own scores' team legs and the partner rule. A chip in the lobby shows whether the team server is reachable and who is in sync, *Invite a team* copies the lobby's link, and the other captain joins with a saved team in one tap. It comes on with Teams and is switched off under Teams → *Online Teams*. What it shares is in the README, under [Online Teams and your data](README.md#-online-teams-and-your-data)
+
+### Changed
+
+- **Teams**: *Add Team* is in every lobby you're in, not only the ones you host, so each captain adds their own team, on their own board
+- **The `socket/` server** is the Online Teams room now: its friends and invitations code is gone
+
 ### Fixed
 
 - **Animations** and **WLED** no longer go by a visit's points in Cricket. Cricket counts points only on numbers already closed, so nearly every visit there totals 0, however many marks it took, and an animation or effect on `0`, or on a range from 0, went off after almost every visit. Point totals and their ranges now go off in every game but Cricket, as Sound FX's already did, and the darts, the three-dart combinations and the game events still play in Cricket. Checked against a Cricket match of our own. Thanks to [@andypech06](https://github.com/andypech06) for the report ([#262](https://github.com/creazy231/tools-for-autodarts/issues/262))

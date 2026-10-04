@@ -8,6 +8,12 @@
           <AppTrans :params="{ addTeam: t('teams.lobby.addTeam') }" class="adt-teams-intro" path="teams.intro" />
         </p>
 
+        <section class="mb-6">
+          <OptionRow :description="t('teams.online.settings.description')" :title="t('teams.online.settings.title')">
+            <AppToggle v-model="config.teams.online" :aria-label="t('teams.online.settings.title')" size="sm" />
+          </OptionRow>
+        </section>
+
         <!-- Not sortable: the drawer keeps these newest first. -->
         <LibrarySection
           :empty-text="t('teams.list.emptyText', { addTeam: t('teams.lobby.addTeam') })"
@@ -80,6 +86,7 @@ import AppTrans from "../AppTrans.vue";
 
 import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
+import OptionRow from "./Library/OptionRow.vue";
 
 import type { LibraryEntry } from "@/utils/library-search";
 

@@ -9,7 +9,7 @@
 export default {
   card: "Play in teams: on a shared score, or each on their own. Add them in the lobby, and the match shows whose turn it is in each team's colours.",
   /** `addTeam` is lobby.addTeam, the button's own name. Add Player and Add Bot are the site's buttons beside it, in the site's words. */
-  intro: "Play in teams two ways. With a shared score, a team is one player on your board and its players take turns on it, like steel-tip doubles. When someone else steps up, tap their name on the team's card. With own scores, everyone keeps their own score and a leg counts for their team, and a bot can play on a team. A team can be a single player, for 2 vs 1. Own-score teams in X01 can play the partner rule: switch it on the lobby page, next to Autoscoring. Add teams in a lobby you host with <b>{addTeam}</b>, next to Add Player and Add Bot.",
+  intro: "Play in teams two ways. With a shared score, a team is one player on your board and its players take turns on it, like steel-tip doubles. When someone else steps up, tap their name on the team's card. With own scores, everyone keeps their own score and a leg counts for their team, and a bot can play on a team. A team can be a single player, for 2 vs 1. Own-score teams in X01 can play the partner rule: switch it on the lobby page, next to Autoscoring. Add teams in a lobby with <b>{addTeam}</b>, next to Add Player and Add Bot.",
   /** The heading of the saved teams, in the panel and in the drawer. problems.savedNotAdded names it in the same words. */
   savedTeams: "Saved teams",
   /** The panel's list of saved teams. */
@@ -252,6 +252,10 @@ export default {
     offline: {
       badge: "Teams offline",
       hint: "Online Teams is offline: the other team's players may be out of date.",
+    },
+    settings: {
+      title: "Online Teams",
+      description: "In an autodarts lobby, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
     },
   },
 };

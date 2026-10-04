@@ -3,7 +3,7 @@ import type { Translation } from "../../utils/i18n/types";
 
 export default {
   card: "Speel in teams: met een gedeelde score, of ieder met een eigen score. Voeg ze toe in de lobby, dan toont de wedstrijd in de kleuren van elk team wie er aan de beurt is.",
-  intro: "Speel op twee manieren in teams. Met een gedeelde score is een team één speler op je bord en gooien zijn spelers om de beurt, zoals bij koppels in steeldarts. Gooit iemand anders, tik dan op de kaart van het team op zijn naam. Met eigen scores speelt iedereen voor zichzelf, telt een leg voor zijn team en kan ook een bot in een team spelen. Een team kan ook uit één speler bestaan, voor 2 tegen 1. Teams met eigen scores kunnen in X01 met de partnerregel spelen: zet die aan op de lobbypagina, naast Autoscoring. In een lobby waar jij host bent, voeg je teams toe met <b>{addTeam}</b>, naast Speler toevoegen en Bot toevoegen.",
+  intro: "Speel op twee manieren in teams. Met een gedeelde score is een team één speler op je bord en gooien zijn spelers om de beurt, zoals bij koppels in steeldarts. Gooit iemand anders, tik dan op de kaart van het team op zijn naam. Met eigen scores speelt iedereen voor zichzelf, telt een leg voor zijn team en kan ook een bot in een team spelen. Een team kan ook uit één speler bestaan, voor 2 tegen 1. Teams met eigen scores kunnen in X01 met de partnerregel spelen: zet die aan op de lobbypagina, naast Autoscoring. In een lobby voeg je teams toe met <b>{addTeam}</b>, naast Speler toevoegen en Bot toevoegen.",
   savedTeams: "Opgeslagen teams",
   list: {
     emptyTitle: "Nog geen opgeslagen teams",
@@ -195,6 +195,10 @@ export default {
     offline: {
       badge: "Teams offline",
       hint: "Online teams is offline: de spelers van het andere team zijn misschien niet actueel.",
+    },
+    settings: {
+      title: "Online teams",
+      description: "In een lobby van autodarts maakt Tools met je gebruikers-id en naam verbinding met zijn eigen server, zodat de lobby kan laten zien of teams online kunnen spelen. Met een team en nog een account in de lobby deelt het ook de namen, spelers, kleuren en volgorde van de teams met de Tools van de anderen. Darts en scores blijven bij autodarts, en de server vergeet alles een half uur nadat iedereen weg is.",
     },
   },
 } satisfies Translation<typeof en>;

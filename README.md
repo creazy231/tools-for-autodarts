@@ -80,6 +80,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - [WLED Integration](#-wled-integration)
   - [Animations](#-animations)
   - [Utility Features](#-utility-features)
+- [Online Teams and your data](#-online-teams-and-your-data)
 - [Configuration](#️-configuration)
 - [Development](#-development)
 - [Contributing](#-contributing)
@@ -111,7 +112,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - A team can be a **single player**, for 2 vs 1. With a shared score, the player on their own throws every visit of their team's turn; with own scores, the bigger team throws more often each round, which the lobby says under its players
   - In the drawer, the **✕** on a name deletes it from your recent players, from Saved players and from the site's own list alike, with a second click to confirm. A name that belongs to a saved team stays until the team goes, and the bin beside a saved team deletes the team
   - **Two formats**, chosen in the drawer: *Shared score* makes the team one player on your board, and its players take turns on that score. *Own scores* keeps everyone on their own score, and a leg counts for the team of whoever checks out: the first team to the lobby's "First to N legs" wins the match. The first team in a lobby sets its format
-  - With own scores, a team can mix guests, people playing on their own board and bots (bots in X01 and Cricket). Pick seats already in the lobby, type new names, or add a bot at its level under **Bots** in the drawer: pick the level and press *Add bot*, and it joins with the team. A bot added with the site's own *Add Bot* is tapped under *In this lobby*. The seats are kept in turn order so the teams alternate. Own scores play legs, not sets, and only the browser you host from shows the teams
+  - With own scores, a team can mix guests, people playing on their own board and bots (bots in X01 and Cricket). Pick seats already in the lobby, type new names, or add a bot at its level under **Bots** in the drawer: pick the level and press *Add bot*, and it joins with the team. A bot added with the site's own *Add Bot* is tapped under *In this lobby*. The seats are kept in turn order so the teams alternate. Own scores play legs, not sets. Without **Online Teams**, only the browser that added a team shows it
   - When an own-score team wins, the pill says so and Next Leg is held back. The site still counts the match per player, so it's only saved to your history when the winning leg also took one player to the target
   - **Partner rule** (own scores, X01, two teams): a switch on the lobby page, next to *Autoscoring*. Each lobby keeps its own, and the next lobby starts from the last one you set. Nobody may check out while their partner has more left than both opponents together. A checkout that breaks it counts as a bust, and the pill warns before the visit. The site shows it as a bust too, without its GAME SHOT animation or its caller's "game shot", while the darts are taken back and the turn passes. The Caller, Sound FX and WLED play their `partner_rule` trigger for it (`ambient_partner_rule` in Sound FX), or `busted` when they have none, and never a game shot
   - The colours are the card colours from **Colors**: raspberry, its nine pairs, or a pair of your own. A colour another team in the lobby already has is greyed out, and a saved team whose colour is taken joins in the next free one
@@ -120,8 +121,14 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - Every new leg starts with each team's next player. The order is worked out from the site's own set, leg and round, so a reload or an undo doesn't throw it off. **Tap a name** in a team's card to make that player the one who's up (or next), and the order carries on from them
   - The **Caller**, **Sound FX** and **WLED** call the player whose turn it is by their name, by their team's name when they have nothing for the player, and with their own fallback after that (`next_player`, `ambient_next_player`), with a shared score and with own scores alike. A leg won goes to the player who checked out and then the team (`gameshot_<name>`), a match won to the team first (`matchshot_<name>`)
   - Teams are remembered by name: any guest of yours with a saved team's name plays as that team, in any lobby
-  - With a shared score, each team is a guest on your board, so teams play in **lobbies you host**, and only the browser you host from shows them. Bots can play against a team but not in one, since the server throws every visit of a bot's seat: use own scores to put a bot on a team
+  - With a shared score, each team is a guest on its captain's board. With **Online Teams**, below, every screen in the lobby shows every team; without it, only the browser that added a team shows it. Bots can play against a team but not in one, since the server throws every visit of a bot's seat: use own scores to put a bot on a team
   - Switching Teams off in the settings takes it off an open lobby or match straight away
+  - **Online Teams**: two teams can play from two boards in different places, in one autodarts online lobby. Autodarts runs the match: each team's darts come from its own board, and the site hands the turn between the boards. Tools shows both teams the Teams way on both screens
+    - The host adds their team and copies **Invite a team**, beside *Shuffle* in the Players card. The other captain opens the link, and Tools offers to join with one of their saved teams, seated on their own board
+    - Each captain edits and corrects only their own team. With own scores, the host's Tools alternates everyone's seats, and the partner rule is the host's
+    - A chip beside the player count shows the connection: connecting, ready, in sync with whom, not connected, or offline. Tap it to see the server, who is connected and what is shared. In the match, *Teams offline* in the pill says the other team's players may be out of date
+    - Both captains need Tools with Teams on. Without it, the other team shows as plain seats, and the match plays as normal
+    - Switch it off under Teams → **Online Teams**. What it shares is under [Online Teams and your data](#-online-teams-and-your-data)
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything
   - Autodarts' own QR button occupies the same corner, so it is hidden while the pinned code is up and comes back the moment you close it
   - The ✕ underneath hides the code for the rest of that lobby; from then on the site's own button is there if you want it
@@ -696,6 +703,18 @@ You can add multiple triggers for the same animation by entering each trigger on
 - **Settings Import/Export**: Transfer your configuration between devices or create backups, as a file or through the clipboard, from the **Export** and **Import** menus at the top of the settings page
 - **Support**: The coffee cup beside the gear opens the project's Ko-fi page in a new tab
 - **What's New**: A summary of what changed, shown once the first time you open the settings page on a new release — what needs your attention, and what is worth switching on. Re-open it any time from **Release Notes** in the advanced panel behind the gear
+
+## 🔒 Online Teams and your data
+
+With Teams on, and Online Teams with it, Tools connects to its own server (`adt-socket.tobias-thiele.de`) in every autodarts lobby and match, with your autodarts user id and name. That is how the lobby can show whether teams can play online. Once you have a team in play, or another account is in the lobby, Tools joins that lobby on the server and shares with the other Tools in it:
+
+- your autodarts user id and name, to show who is connected
+- the lobby's id
+- each of your teams' name, players in order, colour and format, and their seats
+- tap-to-corrections
+- the host's partner rule
+
+Your autodarts login never leaves your browser, and no darts or scores are sent. The server keeps all of this in memory only, and drops it half an hour after the last screen has left the lobby and its match, or after 12 hours at the latest. Switch Online Teams off under Teams, and Tools never connects.
 
 ## ⚙️ Configuration
 
