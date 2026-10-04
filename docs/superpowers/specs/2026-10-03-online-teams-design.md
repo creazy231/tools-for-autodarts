@@ -149,7 +149,7 @@ The online part doesn't depend on the mode, because autodarts runs the game. It 
 | Message | From → to | Payload / answer |
 |---|---|---|
 | connect | client → server | handshake `auth: { v: 1, userId, name }`. A wrong `v` is refused with `connect_error` "version", which the client shows as *outdated* |
-| `room:join` | client → server | `{ lobbyId }` → ack `{ ok, state }` |
+| `room:join` | client → server | `{ lobbyId }` → ack `{ ok, value: state }` (every ack is `{ ok: true, value } \| { ok: false, error }`) |
 | `room:leave` | client → server | `{ lobbyId }` |
 | `room:teams` | client → server | `{ lobbyId, teams: RoomTeamInput[] }` replaces **all** teams of the sender's `userId` in the room → ack `{ ok }` |
 | `room:shift` | client → server | `{ lobbyId, team, shift }`, for a team of the sender → ack `{ ok }` |
