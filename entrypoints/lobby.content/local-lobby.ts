@@ -17,10 +17,11 @@
 import type { RoomStore } from "@/utils/team-room";
 import type { ILobbies } from "@/utils/websocket-helpers";
 
-import { SELECTORS, qs, qsa } from "@/utils/selectors";
+import { SELECTORS, qsa } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsTeamRoom } from "@/utils/storage";
 import { roomOf, screenTeams } from "@/utils/team-room";
+import { boardButtonsToPress } from "@/utils/local-lobby-rows";
 import { fetchWithAuth, getUserIdFromToken } from "@/utils/helpers";
 
 let unwatchLobbyData: (() => void) | null = null;
@@ -150,25 +151,18 @@ async function removeSelf(lobby: ILobbies, userId: string) {
 }
 
 /**
- * Pull everyone onto this board.
- *
- * Every player row carries a board button, which the site disables while that
- * player is already playing here — so an enabled one is precisely a player who
- * needs moving, and clicking it disables it. That makes this safe to run on
- * every render, with no bookkeeping of who has been moved.
+ * Pull everyone onto this board, by the 🌐 on each row whose seat someone
+ * else hosts (utils/local-lobby-rows.ts).
  *
  * Online Teams: a seat of another account's team stays on that account's
- * board, whatever the button (utils/team-room.ts). Rows come in seat order.
+ * board (utils/team-room.ts). Rows come in seat order.
  */
 function claimBoards(lobby: ILobbies, userId: string) {
   const room = roomOf(roomStore, lobby.id);
   const players = lobby.players ?? [];
   const theirs = new Set(screenTeams({ players, saved: [], lineup: undefined, shifts: {}, room, me: userId, hostId: lobby.host?.id }).remote.flatMap(team => team.seatIds));
-  qsa(SELECTORS.lobby.playerRows).forEach((row, index) => {
-    if (theirs.has(players[index]?.id ?? "")) return;
-    const button = qs<HTMLButtonElement>(SELECTORS.lobby.playerBoardButton, row);
-    if (!button || button.disabled) return;
+  for (const button of boardButtonsToPress(qsa(SELECTORS.lobby.playerRows), players.map(seat => seat.id), theirs)) {
     button.click();
     console.log("Autodarts Tools: Local Lobby - Moved a player onto this board");
-  });
+  }
 }

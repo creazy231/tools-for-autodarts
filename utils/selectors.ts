@@ -354,15 +354,12 @@ export const SELECTORS = {
      *
      * The buttons carry no data-slot of their own beyond the generic `button`,
      * but FontAwesome stamps `data-icon` on the glyph it renders, which names
-     * the action without depending on a class or a position. The board button
-     * is v1's "Use my board"; the site disables it while that player is already
-     * playing here.
-     */
-    playerBoardButton: [ "button[data-slot='button']:has([data-icon='house'])" ],
-    /**
+     * the action without depending on a class or a position.
+     *
      * The 🌐 on a seat someone else hosts: the site's "play on my board"
      * (`setHostForIndex`), which pulls that seat onto this account's board.
-     * Online Teams hides it on another account's team (lobby.content/teams.ts).
+     * Local Lobby presses it (utils/local-lobby-rows.ts); Online Teams hides
+     * it on another account's team (lobby.content/teams.ts).
      */
     playerLinkButton: [ "button[data-slot='button']:has([data-icon='globe'])" ],
     playerRemoveButton: [ "button[data-slot='button']:has([data-icon='xmark'])" ],
