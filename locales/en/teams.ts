@@ -61,6 +61,11 @@ export default {
       /** Under the text while the rule is on but can't come in yet. */
       pending: "It counts once there are two own-score teams and everyone is on one.",
     },
+    /** Online Teams' switch card, under the site's Autoscoring: its line while Online Teams is on, and while it's off. Its title is online.settings.title. */
+    online: {
+      on: "Teams show on every screen with Tools in this lobby",
+      off: "Your teams stay on this screen",
+    },
     /**
      * The note under the players when the teams aren't the same size: "RED has 2
      * players and BLUE 1: the bigger team throws more often each round." `first` is

@@ -39,6 +39,10 @@ export default {
       text: "Teams mit eigenen Scores in X01: Niemand darf auschecken, solange ein Teamkollege mehr übrig hat als beide Gegner zusammen. Ein Checkout, das dagegen verstößt, ist ein Bust.",
       pending: "Die Regel gilt, sobald es zwei Teams mit eigenen Scores gibt und jeder in einem davon spielt.",
     },
+    online: {
+      on: "Teams erscheinen auf jedem Bildschirm mit Tools in dieser Lobby",
+      off: "Deine Teams bleiben auf diesem Bildschirm",
+    },
     uneven: {
       first: { one: "{name} hat {count} Spieler", other: "{name} hat {count} Spieler" },
       rest: "{name} {count}",

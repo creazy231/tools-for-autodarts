@@ -39,6 +39,10 @@ export default {
       text: "Teams met eigen scores in X01: niemand mag uitgooien zolang een teamgenoot meer over heeft dan beide tegenstanders samen. Een checkout die de regel breekt, is bust.",
       pending: "De regel geldt zodra er twee teams met eigen scores zijn en iedereen in een ervan speelt.",
     },
+    online: {
+      on: "Teams verschijnen op elk scherm met Tools in deze lobby",
+      off: "Je teams blijven op dit scherm",
+    },
     uneven: {
       first: { one: "{name} heeft {count} speler", other: "{name} heeft {count} spelers" },
       rest: "{name} {count}",

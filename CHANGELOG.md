@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **Online Teams**: two teams on two boards in different places play one autodarts online match of X01 or Cricket, with both teams shown on both screens: who's up, the order, colours, tap-to-correct, own scores' team legs and the partner rule. A chip in the lobby shows whether the team server is reachable and who is in sync, *Invite a team* copies the lobby's link, and the other captain joins with a saved team in one tap. It comes on with Teams and is switched off under Teams → *Online Teams*. What it shares is in the README, under [Online Teams and your data](README.md#-online-teams-and-your-data)
+- **Online Teams**: two teams on two boards in different places play one autodarts online match of X01 or Cricket, with both teams shown on both screens: who's up, the order, colours, tap-to-correct, own scores' team legs and the partner rule. A chip in the lobby shows whether the team server is reachable and who is in sync, *Invite a team* copies the lobby's link, and the other captain joins with a saved team in one tap. It comes on with Teams, and its switch is on the lobby page, in a card under *Autoscoring*, as well as under Teams → *Online Teams*. What it shares is in the README, under [Online Teams and your data](README.md#-online-teams-and-your-data)
 
 ### Changed
 

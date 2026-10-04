@@ -128,7 +128,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
     - Each captain edits and corrects only their own team. With own scores, the host's Tools alternates everyone's seats, and the partner rule is the host's
     - A chip beside the player count shows the connection: connecting, ready, in sync with whom, not connected, or offline. Tap it to see the server, who is connected and what is shared. In the match, *Teams offline* in the pill says the other team's players may be out of date
     - Both captains need Tools with Teams on. Without it, the other team shows as plain seats, and the match plays as normal
-    - Switch it off under Teams → **Online Teams**. What it shares is under [Online Teams and your data](#-online-teams-and-your-data)
+    - Switch it on or off in its card on the lobby page, under *Autoscoring*, or under Teams → **Online Teams**. It's one switch, for every lobby and match. What it shares is under [Online Teams and your data](#-online-teams-and-your-data)
 - **QR Code**: Pins the lobby's join code to the top right corner, so anyone walking up to the board can scan it without the host opening anything
   - Autodarts' own QR button occupies the same corner, so it is hidden while the pinned code is up and comes back the moment you close it
   - The ✕ underneath hides the code for the rest of that lobby; from then on the site's own button is there if you want it
@@ -715,7 +715,7 @@ With Teams on, and Online Teams with it, Tools connects to its own server (`adt-
 - the host's partner rule
 - when a checkout breaks the partner rule, which screen takes it back, named by the match's and the darts' ids
 
-Your autodarts login never leaves your browser, and no darts or scores are sent. The server keeps all of this in memory only, and drops it half an hour after the last screen has left the lobby and its match, or after 12 hours at the latest. Like any website, it sees the IP address you connect from, and it doesn't record it. Switch Online Teams off under Teams, and Tools never connects.
+Your autodarts login never leaves your browser, and no darts or scores are sent. The server keeps all of this in memory only, and drops it half an hour after the last screen has left the lobby and its match, or after 12 hours at the latest. Like any website, it sees the IP address you connect from, and it doesn't record it. Switch Online Teams off, in a lobby or under Teams, and Tools never connects.
 
 The server has no logins of its own, so it can't check that an account is who it says it is. Someone with a lobby's link and a program of their own could pose as one of its accounts in that lobby's room, and show wrong teams on the other screens, or switch the partner rule on, so that they take back checkouts that break it. Nothing on the server can act on your autodarts account.
 

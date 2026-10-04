@@ -17,8 +17,8 @@
  *
  * Its words follow the site's language. What is redrawn on every pass (the
  * note on uneven teams, a row's "1 of 2") picks the new one up there; what is
- * written once (Add Team, the pencils, the partner rule's card) is rewritten
- * when the language changes.
+ * written once (Add Team, the pencils, the partner rule's and Online Teams'
+ * cards) is rewritten when the language changes.
  */
 
 import { createApp, reactive } from "vue";
@@ -46,10 +46,12 @@ import { memberLabel, unevenText } from "@/utils/teams-text";
 import { inviteLists, myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
 import { mirrorRoom } from "@/utils/team-room-mirror";
+import { BESIDE_ATTR, FALLBACK_ATTR, SWITCH_CARD_ATTR, buildSwitchCard, placeSwitchCards, renderSwitch, siteSwitchCard } from "@/utils/lobby-switch-cards";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
 const PARTNER_CARD_ID = "adt-partner-rule";
+const ONLINE_CARD_ID = "adt-online-teams";
 /** A reorder settles within this many moves: one fewer than the seats. */
 const MAX_REORDER_MOVES = 6;
 /** How long a move or an add waits for the lobby update it brings. */
@@ -111,22 +113,28 @@ const LOBBY_CSS = `
   div:has(> ${STATUS_TAG}), div:has(> #${INVITE_ID}) { flex-wrap: wrap; row-gap: 8px; }
   /* Invite a team is a copy of Shuffle, auto margin and all: the two split the room between them unless one gives it up. */
   #${INVITE_ID} + button { margin-left: 0; }
-  /* The partner rule's card goes under Autoscoring, the page's other switch, in the right-hand column. */
+  /*
+   * Teams' switch cards (Online Teams, the partner rule) go under Autoscoring, the page's other switch, in the
+   * right-hand column, and the game's card on the left spans as many rows as that column has cards.
+   */
   @media (width >= 48rem) {
-    div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; }
-    div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) > :first-child { grid-row: span 2; }
+    div:has(> [${BESIDE_ATTR}]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; }
+    div:has(> [${BESIDE_ATTR}]) > :first-child { grid-row: span 2; }
+    div:has(> [${BESIDE_ATTR}]) > :not(:first-child) { grid-column: 2; }
+    div:has(> [${BESIDE_ATTR}] + [${BESIDE_ATTR}]) { grid-template-rows: auto auto 1fr; }
+    div:has(> [${BESIDE_ATTR}] + [${BESIDE_ATTR}]) > :first-child { grid-row: span 3; }
   }
-  #${PARTNER_CARD_ID} [data-adt-line] { display: block; font-size: 12px; font-weight: 600; line-height: 16px; color: rgb(184 188 197); }
-  #${PARTNER_CARD_ID} [data-adt-line][hidden] { display: none; }
+  [${SWITCH_CARD_ATTR}] [data-adt-line] { display: block; font-size: 12px; font-weight: 600; line-height: 16px; color: rgb(184 188 197); }
+  [${SWITCH_CARD_ATTR}] [data-adt-line][hidden] { display: none; }
   /* With no Autoscoring card to copy: the same card in the site's measured styles. */
-  #${PARTNER_CARD_ID}[data-adt-fallback] { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 18px; background: rgb(27 31 41); color: #f7f8fa; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] > div:first-child { display: flex; gap: 16px; align-items: flex-start; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] > div:first-child > div { flex: 1; font-family: "Bebas Neue", var(--ad-font-display, sans-serif); font-size: 24px; line-height: 1.2; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] > div:last-child { display: flex; flex-direction: column; gap: 16px; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] { position: relative; flex: none; width: 51px; height: 24px; border-radius: 999px; background: #16181c; box-shadow: inset 0 0 0 1px rgb(55 76 152 / 60%); cursor: pointer; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] { background: #0b55df; box-shadow: none; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"] > span { position: absolute; top: 3px; left: 3px; width: 28px; height: 18px; border-radius: 999px; background: #fff; transition: transform 150ms; }
-  #${PARTNER_CARD_ID}[data-adt-fallback] [role="switch"][aria-checked="true"] > span { transform: translateX(17px); }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 18px; background: rgb(27 31 41); color: #f7f8fa; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] > div:first-child { display: flex; gap: 16px; align-items: flex-start; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] > div:first-child > div { flex: 1; font-family: "Bebas Neue", var(--ad-font-display, sans-serif); font-size: 24px; line-height: 1.2; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] > div:last-child { display: flex; flex-direction: column; gap: 16px; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] [role="switch"] { position: relative; flex: none; width: 51px; height: 24px; border-radius: 999px; background: #16181c; box-shadow: inset 0 0 0 1px rgb(55 76 152 / 60%); cursor: pointer; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] [role="switch"][aria-checked="true"] { background: #0b55df; box-shadow: none; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] [role="switch"] > span { position: absolute; top: 3px; left: 3px; width: 28px; height: 18px; border-radius: 999px; background: #fff; transition: transform 150ms; }
+  [${SWITCH_CARD_ATTR}][${FALLBACK_ATTR}] [role="switch"][aria-checked="true"] > span { transform: translateX(17px); }
   /* Online Teams: the site's "play on my board" would pull another account's team onto this board. */
   [${REMOTE_ATTR}] ${anyOf(SELECTORS.lobby.playerLinkButton)} { display: none !important; }
 `;
@@ -450,7 +458,7 @@ function apply() {
     dressRows(view);
   }
   noteUneven(lineup);
-  syncPartnerCard(lineup);
+  placeSwitchCards([ syncOnlineCard(), syncPartnerCard(lineup) ].filter((card): card is HTMLElement => Boolean(card)));
   syncOnline(view);
 }
 
@@ -464,6 +472,8 @@ function relabel() {
   for (const edit of document.querySelectorAll<HTMLElement>(`[${EDIT_ATTR}]`)) labelPencil(edit);
   const card = document.getElementById(PARTNER_CARD_ID);
   if (card) labelPartnerCard(card);
+  const onlineCard = document.getElementById(ONLINE_CARD_ID);
+  if (onlineCard) labelOnlineCard(onlineCard);
   schedule();
 }
 
@@ -473,6 +483,7 @@ function teardown() {
   document.getElementById(BUTTON_ID)?.remove();
   document.getElementById(NOTE_ID)?.remove();
   document.getElementById(PARTNER_CARD_ID)?.remove();
+  document.getElementById(ONLINE_CARD_ID)?.remove();
   for (const row of document.querySelectorAll<HTMLElement>(`[${ROW_ATTR}]`)) undress(row);
   removeOnline();
 }
@@ -668,6 +679,49 @@ function syncOnline(view: ScreenTeams) {
       inviteMounting = false;
     });
   }
+}
+
+/**
+ * Online Teams' switch, as a card under the site's Autoscoring for everyone in
+ * the lobby (utils/lobby-switch-cards.ts places it): the same switch as in
+ * Teams' settings (`teams.online`), so a lobby can go online, or off it,
+ * without leaving it. The config's watch brings the change to the room, the
+ * chip and the invitation.
+ */
+function syncOnlineCard(): HTMLElement | undefined {
+  const existing = document.getElementById(ONLINE_CARD_ID);
+  if (!lobby) {
+    existing?.remove();
+    return undefined;
+  }
+  let card = existing;
+  if (!card) {
+    card = buildSwitchCard(ONLINE_CARD_ID, siteSwitchCard() ?? null, [ "text" ], (on) => {
+      setOnline(on).catch(e => console.error(e));
+    });
+    labelOnlineCard(card);
+  }
+  renderSwitch(card, online);
+  // Only when it changes: the page's observer counts the new text as a change, and would draw again.
+  const line = card.querySelector<HTMLElement>("[data-adt-line='text']");
+  const text = t(online ? "teams.lobby.online.on" : "teams.lobby.online.off");
+  if (line && line.textContent !== text) line.textContent = text;
+  return card;
+}
+
+/** The card's title and its switch's spoken name, in the language of the moment: when it is built, and again on a change. Its line follows on the next pass. */
+function labelOnlineCard(card: HTMLElement) {
+  const title = card.querySelector<HTMLElement>("[data-adt-title]");
+  if (title) title.textContent = t("teams.online.settings.title");
+  card.querySelector("[role='switch']")?.setAttribute("aria-label", t("teams.online.settings.title"));
+}
+
+/** The card's switch: Online Teams, here and in every lobby and match after. */
+async function setOnline(on: boolean) {
+  online = on;
+  schedule();
+  const config = await AutodartsToolsConfig.getValue();
+  await AutodartsToolsConfig.setValue({ ...config, teams: { ...normalizeTeams(config.teams), online: on } });
 }
 
 function removeOnline() {
@@ -972,83 +1026,34 @@ function orderRow(players: readonly string[]): HTMLElement {
 // ------------------------------------------------------------ partner rule
 
 /**
- * The partner rule, as a switch card beside the site's Autoscoring on the
- * lobby page, where the game is set up. Each lobby keeps its own, and the next
- * one starts from the last set (utils/teams.ts `partnerCardState`).
+ * The partner rule, as a switch card under the site's Autoscoring on the lobby
+ * page, where the game is set up (utils/lobby-switch-cards.ts places it). Each
+ * lobby keeps its own, and the next one starts from the last set
+ * (utils/teams.ts `partnerCardState`).
  */
-function syncPartnerCard(lineup: Lineup | undefined) {
+function syncPartnerCard(lineup: Lineup | undefined): HTMLElement | undefined {
   const existing = document.getElementById(PARTNER_CARD_ID);
   const state = lobby && isHost() ? partnerCardState(lobby, lineup, saved, hostId, partnerRuleDefault) : undefined;
   if (!state?.show) {
     existing?.remove();
-    return;
+    return undefined;
   }
-  // After the last switch card, in its row, or failing that, under the game's
-  // own card, in its column; only the first makes the row two columns.
-  // Indexed, not .at(-1): Safari has Array.prototype.at from 15.4, and the app supports iOS 15.0.
-  const switchCards = qsa<HTMLElement>(SELECTORS.lobby.switchCard);
-  const switchCard = switchCards[switchCards.length - 1];
-  const anchor = switchCard ?? qs<HTMLElement>(SELECTORS.lobby.gameCard);
-  if (!anchor) return;
-  const card = existing ?? buildPartnerCard(switchCard ?? null);
-  card.toggleAttribute("data-adt-beside", Boolean(switchCard));
-  if (anchor.nextElementSibling !== card) anchor.after(card);
+  const card = existing ?? buildPartnerCard();
   renderPartnerCard(card, state);
+  return card;
 }
 
-/** A shallow copy of one of the site's elements, so it keeps the site's styling; or a plain one when there's nothing to copy. */
-function copyOf<K extends keyof HTMLElementTagNameMap>(source: Element | null | undefined, tag: K): HTMLElementTagNameMap[K] {
-  const copy = (source ? source.cloneNode(false) : document.createElement(tag)) as HTMLElementTagNameMap[K];
-  copy.removeAttribute("id");
-  return copy;
-}
-
-/**
- * The card, as a copy of the site's Autoscoring card: its card, header, title
- * and line, and its switch, which Base UI drives there and this drives here.
- * With no card to copy, the same thing in the site's measured styles (LOBBY_CSS).
- */
-function buildPartnerCard(template: HTMLElement | null): HTMLElement {
-  const header = template?.querySelector(":scope > [data-slot='card-header']");
-  const siteSwitch = header?.querySelector("[data-slot='switch']");
-  const content = template?.querySelector(":scope > [data-slot='card-content']");
-
-  const card = copyOf(template, "div");
-  card.id = PARTNER_CARD_ID;
-  if (!template) card.dataset.adtFallback = "";
-  const head = copyOf(header, "div");
-  const title = copyOf(header?.querySelector("[data-slot='card-title']"), "div");
-  title.setAttribute("data-adt-partner-title", "");
-  const toggle = copyOf(siteSwitch, "span");
-  toggle.append(copyOf(siteSwitch?.querySelector("[data-slot='switch-thumb']"), "span"));
-  toggle.setAttribute("role", "switch");
-  toggle.tabIndex = 0;
-  toggle.addEventListener("click", () => {
-    setPartnerRule(toggle.getAttribute("aria-checked") !== "true").catch(e => console.error(e));
+function buildPartnerCard(): HTMLElement {
+  const card = buildSwitchCard(PARTNER_CARD_ID, siteSwitchCard() ?? null, [ "text", "pending" ], (on) => {
+    setPartnerRule(on).catch(e => console.error(e));
   });
-  toggle.addEventListener("keydown", (event) => {
-    if (event.key !== " " && event.key !== "Enter") return;
-    event.preventDefault();
-    toggle.click();
-  });
-  head.append(title, toggle);
-  const body = copyOf(content, "div");
-  // The lines are our own, in the style of the site's card line ("You'll score
-  // this match yourself", LOBBY_CSS). Copying Autoscoring's first line took the
-  // board picker's text style whenever autoscoring was on.
-  const text = document.createElement("span");
-  text.dataset.adtLine = "text";
-  const pending = document.createElement("span");
-  pending.dataset.adtLine = "pending";
-  body.append(text, pending);
-  card.append(head, body);
   labelPartnerCard(card);
   return card;
 }
 
 /** The card's title, its switch's spoken name and its two lines, in the language of the moment: when it is built, and again on a change. */
 function labelPartnerCard(card: HTMLElement) {
-  const title = card.querySelector<HTMLElement>("[data-adt-partner-title]");
+  const title = card.querySelector<HTMLElement>("[data-adt-title]");
   if (title) title.textContent = t("teams.lobby.partnerRule.title");
   card.querySelector("[role='switch']")?.setAttribute("aria-label", t("teams.lobby.partnerRule.title"));
   const text = card.querySelector<HTMLElement>("[data-adt-line='text']");
@@ -1057,15 +1062,8 @@ function labelPartnerCard(card: HTMLElement) {
   if (pending) pending.textContent = t("teams.lobby.partnerRule.pending");
 }
 
-/** The switch as the site draws its own: its data attributes pick the colours, and the thumb follows. */
 function renderPartnerCard(card: HTMLElement, state: PartnerCard) {
-  const toggle = card.querySelector<HTMLElement>("[role='switch']");
-  if (!toggle) return;
-  for (const part of [ toggle, toggle.firstElementChild ]) {
-    part?.toggleAttribute("data-checked", state.on);
-    part?.toggleAttribute("data-unchecked", !state.on);
-  }
-  if (toggle.getAttribute("aria-checked") !== String(state.on)) toggle.setAttribute("aria-checked", String(state.on));
+  renderSwitch(card, state.on);
   const pending = card.querySelector<HTMLElement>("[data-adt-line='pending']");
   if (pending) pending.hidden = !state.on || state.applies;
 }
