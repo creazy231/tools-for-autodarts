@@ -62,6 +62,7 @@ const EDIT_ATTR = "data-adt-team-edit";
 /** On a row of another account's team: no pencil, and the site's 🌐 hidden. */
 const REMOTE_ATTR = "data-adt-team-remote";
 const INVITE_ID = "adt-invite-team";
+const STATUS_TAG = "autodarts-tools-team-room-status";
 /** Material Symbols "link" (Apache 2.0). */
 const ICON_LINK = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M7 17q-2.075 0-3.537-1.463T2 12t1.463-3.537T7 7h3q.425 0 .713.288T11 8t-.288.713T10 9H7q-1.25 0-2.125.875T4 12t.875 2.125T7 15h3q.425 0 .713.288T11 16t-.288.713T10 17zm2-4q-.425 0-.712-.288T8 12t.288-.712T9 11h6q.425 0 .713.288T16 12t-.288.713T15 13zm5 4q-.425 0-.712-.288T13 16t.288-.712T14 15h3q1.25 0 2.125-.875T20 12t-.875-2.125T17 9h-3q-.425 0-.712-.288T13 8t.288-.712T14 7h3q2.075 0 3.538 1.463T22 12t-1.463 3.538T17 17z\"/></svg>";
 
@@ -106,6 +107,8 @@ const LOBBY_CSS = `
   /* With Add Team there are three buttons: on a narrow screen they wrap rather than clip their labels. */
   div:has(> #${BUTTON_ID}) { flex-wrap: wrap; }
   div:has(> #${BUTTON_ID}) > button { min-width: max-content; }
+  /* Online Teams' chip and Invite a team join the Players card's header: on a narrow screen it wraps rather than push the site's Shuffle off the card. */
+  div:has(> ${STATUS_TAG}), div:has(> #${INVITE_ID}) { flex-wrap: wrap; row-gap: 8px; }
   /* The partner rule's card goes under Autoscoring, the page's other switch, in the right-hand column. */
   @media (width >= 48rem) {
     div:has(> #${PARTNER_CARD_ID}[data-adt-beside]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; }
@@ -654,7 +657,7 @@ function removeOnline() {
 /** The chip, after the seat count in the Players card's header; WXT mounts it whenever the header is there. */
 async function mountStatus() {
   const ui = await createShadowRootUi(ctxRef, {
-    name: "autodarts-tools-team-room-status",
+    name: STATUS_TAG,
     position: "inline",
     // A selector, not an element: autoMount watches for it.
     anchor: anyOf(SELECTORS.lobby.playerCountChip),

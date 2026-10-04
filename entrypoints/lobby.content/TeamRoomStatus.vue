@@ -4,12 +4,21 @@
       @click="open = !open"
       :aria-expanded="open"
       :class="`is-${status.kind}`"
+      :title="chipText"
       class="adt-room-chip"
       type="button"
     >
-      {{ chipText }}
+      <span class="adt-room-text">{{ chipText }}</span>
     </button>
-    <div @keydown.esc="open = false" v-if="open" :aria-label="t('teams.online.card.title')" class="adt-room-card" role="dialog">
+    <div
+      @keydown.esc="open = false"
+      v-if="open"
+      ref="card"
+      :aria-label="t('teams.online.card.title')"
+      :style="{ left: `${cardLeft}px` }"
+      class="adt-room-card"
+      role="dialog"
+    >
       <div class="adt-room-head">
         <b>{{ t("teams.online.card.title") }}</b>
         <button @click="open = false" :aria-label="t('teams.online.card.close')" class="adt-room-x" type="button">
@@ -48,6 +57,8 @@ const props = defineProps<{ view: StatusView }>();
 
 /** How often the chip looks again: its "isn't connected" turns up after a while, not on an event. */
 const TICK_MS = 2000;
+/** The least room the card leaves to the screen's edge. */
+const EDGE_PX = 8;
 const CHIP: Record<Exclude<StatusKind, "synced" | "missing">, MessageKey> = {
   connecting: "teams.online.status.connecting",
   ready: "teams.online.status.ready",
@@ -59,6 +70,9 @@ const { t } = useI18n();
 
 const now = ref(Date.now());
 const open = ref(false);
+const card = ref<HTMLElement>();
+/** Where the card starts, from the chip's left edge. */
+const cardLeft = ref(0);
 
 const status = computed(() => roomStatus({ ...props.view, now: now.value }));
 const chipText = computed(() => {
@@ -94,7 +108,22 @@ onMounted(() => {
   }, TICK_MS);
 });
 
+watch(open, async (isOpen) => {
+  if (!isOpen) return;
+  cardLeft.value = 0;
+  await nextTick();
+  placeCard();
+});
+
 onBeforeUnmount(() => clearInterval(timer));
+
+/** Keeps the card on the screen: under the chip, and moved left as far as a chip near the right edge needs. */
+function placeCard() {
+  const box = card.value?.getBoundingClientRect();
+  if (!box) return;
+  const width = document.documentElement.clientWidth;
+  cardLeft.value = Math.max(Math.min(0, width - EDGE_PX - box.right), EDGE_PX - box.left);
+}
 </script>
 
 <style scoped>
@@ -104,13 +133,15 @@ onBeforeUnmount(() => clearInterval(timer));
   font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer;
   color: #a0a6b8; background: rgb(160 166 184 / 12%);
 }
-.adt-room-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.adt-room-chip::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+/* No wider than the Players card on a phone: page and card padding, and the chip's own, come to about 112px. */
+.adt-room-text { max-width: min(28rem, calc(100vw - 112px)); overflow: hidden; text-overflow: ellipsis; }
 .adt-room-chip.is-connecting::before { animation: adt-room-pulse 1.2s ease-in-out infinite; }
 .adt-room-chip.is-ready, .adt-room-chip.is-synced { color: #49da9e; background: rgb(73 218 158 / 12%); }
 .adt-room-chip.is-missing { color: #f29727; background: rgb(242 151 39 / 12%); }
 .adt-room-chip.is-offline, .adt-room-chip.is-outdated { color: #ff6b81; background: rgb(226 78 103 / 14%); }
 .adt-room-card {
-  position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; width: 300px; box-sizing: border-box;
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; width: 300px; max-width: calc(100vw - 16px); box-sizing: border-box;
   padding: 12px 14px; border-radius: 12px; background: #0b0b23; border: 1px solid rgb(255 255 255 / 10%);
   box-shadow: 0 12px 30px rgb(0 0 0 / 45%); color: #f7f8fa; font-size: 11.5px;
 }
