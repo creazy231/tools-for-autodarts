@@ -41,12 +41,12 @@ import { getUserIdFromToken } from "@/utils/helpers";
 import { GUEST_KEY, forgetGuestPlayers } from "@/utils/guest-players";
 import { addBot, addGuest, lobbyIdFromUrl, moveSeat } from "@/utils/lobby-guests";
 import { language, onLanguageChange, t } from "@/utils/i18n";
-import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedRowTeams, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withPartnerRule } from "@/utils/teams";
+import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedRowTeams, sharedTeams, uniqueNames, unseated, withFreeColour, withLineup, withOnlineTeams, withPartnerRule } from "@/utils/teams";
 import { memberLabel, unevenText } from "@/utils/teams-text";
 import { inviteLists, myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
 import { mirrorRoom } from "@/utils/team-room-mirror";
-import { BESIDE_ATTR, FALLBACK_ATTR, SWITCH_CARD_ATTR, buildSwitchCard, placeSwitchCards, renderSwitch, siteSwitchCard } from "@/utils/lobby-switch-cards";
+import { BESIDE_ATTR, FALLBACK_ATTR, SWITCH_CARD_ATTR, buildSwitchCard, placeSwitchCards, renderSwitch, siteSwitchCard, switchCardsAnchor } from "@/utils/lobby-switch-cards";
 
 const BUTTON_ID = "adt-add-team";
 const NOTE_ID = "adt-team-note";
@@ -696,6 +696,8 @@ function syncOnlineCard(): HTMLElement | undefined {
   }
   let card = existing;
   if (!card) {
+    // Not before the page has somewhere to put it.
+    if (!switchCardsAnchor()) return undefined;
     card = buildSwitchCard(ONLINE_CARD_ID, siteSwitchCard() ?? null, [ "text" ], (on) => {
       setOnline(on).catch(e => console.error(e));
     });
@@ -716,12 +718,11 @@ function labelOnlineCard(card: HTMLElement) {
   card.querySelector("[role='switch']")?.setAttribute("aria-label", t("teams.online.settings.title"));
 }
 
-/** The card's switch: Online Teams, here and in every lobby and match after. */
+/** The card's switch: Online Teams, here and in every lobby and match after. Only the switch is written: saved teams stay as they are stored. */
 async function setOnline(on: boolean) {
   online = on;
   schedule();
-  const config = await AutodartsToolsConfig.getValue();
-  await AutodartsToolsConfig.setValue({ ...config, teams: { ...normalizeTeams(config.teams), online: on } });
+  await AutodartsToolsConfig.setValue(withOnlineTeams(await AutodartsToolsConfig.getValue(), on));
 }
 
 function removeOnline() {
@@ -1038,8 +1039,9 @@ function syncPartnerCard(lineup: Lineup | undefined): HTMLElement | undefined {
     existing?.remove();
     return undefined;
   }
-  const card = existing ?? buildPartnerCard();
-  renderPartnerCard(card, state);
+  // Not built before the page has somewhere to put it.
+  const card = existing ?? (switchCardsAnchor() ? buildPartnerCard() : undefined);
+  if (card) renderPartnerCard(card, state);
   return card;
 }
 

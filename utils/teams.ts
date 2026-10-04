@@ -281,11 +281,12 @@ export function normalizeTeams(saved: unknown): TeamsConfig {
 }
 
 /**
- * Migration 16: Online Teams' switch, on unless it was switched off. Only the
- * switch is added: saved teams stay exactly as they were.
+ * Online Teams' switch set to `on`, for the lobby's card; without it, migration
+ * 16's switch, on unless it was switched off. Only the switch changes: saved
+ * teams stay exactly as they were.
  */
-export function withOnlineTeams(config: any): any {
-  return { ...config, teams: { ...config?.teams, online: config?.teams?.online !== false } };
+export function withOnlineTeams(config: any, on: boolean = config?.teams?.online !== false): any {
+  return { ...config, teams: { ...config?.teams, online: on } };
 }
 
 /** The saved teams that share a score: the ones a guest seat can be. */

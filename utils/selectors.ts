@@ -391,8 +391,15 @@ export const SELECTORS = {
      * id is ours, not the site's (utils/lobby-switch-cards.ts).
      */
     switchCard: [ "main [data-slot='card']:not([id^='adt-']):has(> [data-slot='card-header'] [data-slot='switch'])" ],
-    /** The game's own card, with its Edit settings gear: where Teams' switch cards go when there's no switch card. */
-    gameCard: [ "main [data-slot='card']:has(button [data-icon='gear'])" ],
+    /**
+     * The game's own card: where Teams' switch cards go when there's no switch
+     * card. By its Edit settings gear, which only the host has, and failing
+     * that by How to Play's info glyph, which everyone has.
+     */
+    gameCard: [
+      "main [data-slot='card']:has(button [data-icon='gear'])",
+      "main [data-slot='card']:has(button [data-icon='circle-info'])",
+    ],
   },
 
   /**

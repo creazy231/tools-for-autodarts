@@ -164,8 +164,9 @@ function isSiteOwned(el: Element): boolean {
  *
  * Both places that list sound effects list several — the settings page shows
  * six, and the dialog its master switch and one per effect. Nowhere else on the
- * site comes close: the lobby has a single Autoscoring switch, and
- * /settings/general two. It is also the floor the group branch of
+ * site comes close: the lobby has its Autoscoring switch, and with Teams on, up
+ * to two switch cards of ours under it (Online Teams, the partner rule); and
+ * /settings/general has two. It is also the floor the group branch of
  * {@link rowByStructure} already went by, so both halves now assume the same
  * thing.
  */

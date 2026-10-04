@@ -24,6 +24,13 @@ export function siteSwitchCard(root: ParentNode = document): HTMLElement | undef
   return cards[cards.length - 1];
 }
 
+/**
+ * What Base UI sets on a switch and its thumb for the state of the moment, or
+ * to name it by the site's own label: a copy keeps none of it, or it could stay
+ * disabled, focused, or named "Autoscoring" for good.
+ */
+const SWITCH_STATE = [ "data-disabled", "aria-disabled", "data-readonly", "aria-readonly", "data-focused", "data-focus-visible", "aria-labelledby", "aria-describedby" ];
+
 /** A shallow copy of one of the site's elements, so it keeps the site's styling; or a plain one when there's nothing to copy. */
 function copyOf<K extends keyof HTMLElementTagNameMap>(source: Element | null | undefined, tag: K, doc: Document): HTMLElementTagNameMap[K] {
   const copy = (source ? source.cloneNode(false) : doc.createElement(tag)) as HTMLElementTagNameMap[K];
@@ -53,12 +60,17 @@ export function buildSwitchCard(id: string, template: HTMLElement | null, lines:
   title.setAttribute("data-adt-title", "");
   const toggle = copyOf(siteSwitch, "span", doc);
   toggle.append(copyOf(siteSwitch?.querySelector("[data-slot='switch-thumb']"), "span", doc));
+  for (const part of [ toggle, toggle.firstElementChild! ]) {
+    for (const name of SWITCH_STATE) part.removeAttribute(name);
+  }
   toggle.setAttribute("role", "switch");
   toggle.setAttribute("tabindex", "0");
   toggle.addEventListener("click", () => onToggle(toggle.getAttribute("aria-checked") !== "true"));
   toggle.addEventListener("keydown", (event) => {
     if (event.key !== " " && event.key !== "Enter") return;
     event.preventDefault();
+    // A held key repeats faster than the switch redraws, and each repeat would flip it back.
+    if (event.repeat) return;
     onToggle(toggle.getAttribute("aria-checked") !== "true");
   });
   head.append(title, toggle);
@@ -87,17 +99,29 @@ export function renderSwitch(card: HTMLElement, on: boolean) {
 }
 
 /**
- * Teams' switch cards, in the order given, after the site's last switch card,
- * in its row, or failing that, under the game's own card, in its column; only
- * the first makes the row two columns (LOBBY_CSS). A card already in its place
- * is left where it is, so that running this on every frame changes nothing.
+ * Where Teams' switch cards go: after the site's last switch card, in its row
+ * (`beside`), or failing that, after the game's own card, in its column.
+ * Nowhere while the page has neither, and then no card is worth building.
+ */
+export function switchCardsAnchor(root: ParentNode = document): { anchor: HTMLElement; beside: boolean } | undefined {
+  const switchCard = siteSwitchCard(root);
+  if (switchCard) return { anchor: switchCard, beside: true };
+  const gameCard = qs<HTMLElement>(SELECTORS.lobby.gameCard, root);
+  return gameCard ? { anchor: gameCard, beside: false } : undefined;
+}
+
+/**
+ * Teams' switch cards, in the order given, after {@link switchCardsAnchor};
+ * only the cards beside a switch card make its row two columns (LOBBY_CSS). A
+ * card already in its place is left where it is, so that running this on every
+ * frame changes nothing.
  */
 export function placeSwitchCards(cards: readonly HTMLElement[], root: ParentNode = document) {
-  const switchCard = siteSwitchCard(root);
-  let anchor: HTMLElement | null = switchCard ?? qs<HTMLElement>(SELECTORS.lobby.gameCard, root);
-  if (!anchor) return;
+  const found = switchCardsAnchor(root);
+  if (!found) return;
+  let anchor = found.anchor;
   for (const card of cards) {
-    card.toggleAttribute(BESIDE_ATTR, Boolean(switchCard));
+    card.toggleAttribute(BESIDE_ATTR, found.beside);
     if (anchor.nextElementSibling !== card) anchor.after(card);
     anchor = card;
   }
