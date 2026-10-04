@@ -24,10 +24,12 @@
 import { createApp, reactive } from "vue";
 
 import AddTeamDrawer from "./AddTeamDrawer.vue";
+import TeamInvite from "./TeamInvite.vue";
+import TeamRoomStatus from "./TeamRoomStatus.vue";
 
 import type { ILobbies } from "@/utils/websocket-helpers";
 import type { ColorScheme } from "@/utils/storage";
-import type { RoomStore, ScreenTeams } from "@/utils/team-room";
+import type { Connection, RoomSeat, RoomState, RoomStore, ScreenTeams } from "@/utils/team-room";
 import type { RoomClientState } from "@/utils/team-room-client";
 import type { Lineup, LineupStore, LineupTeam, OwnDraft, PartnerCard, SavedTeam, SeatLike, SeatSlot, TeamDraft, TeamFormat, TeamsMessage, TeamsProblem } from "@/utils/teams";
 
@@ -59,6 +61,9 @@ const ROW_ATTR = "data-adt-team";
 const EDIT_ATTR = "data-adt-team-edit";
 /** On a row of another account's team: no pencil, and the site's 🌐 hidden. */
 const REMOTE_ATTR = "data-adt-team-remote";
+const INVITE_ID = "adt-invite-team";
+/** Material Symbols "link" (Apache 2.0). */
+const ICON_LINK = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M7 17q-2.075 0-3.537-1.463T2 12t1.463-3.537T7 7h3q.425 0 .713.288T11 8t-.288.713T10 9H7q-1.25 0-2.125.875T4 12t.875 2.125T7 15h3q.425 0 .713.288T11 16t-.288.713T10 17zm2-4q-.425 0-.712-.288T8 12t.288-.712T9 11h6q.425 0 .713.288T16 12t-.288.713T15 13zm5 4q-.425 0-.712-.288T13 16t.288-.712T14 15h3q1.25 0 2.125-.875T20 12t-.875-2.125T17 9h-3q-.425 0-.712-.288T13 8t.288-.712T14 7h3q2.075 0 3.538 1.463T22 12t-1.463 3.538T17 17z\"/></svg>";
 
 /** Material Symbols "group" (Apache 2.0), sized by the site's `[&_svg:not([class*='size-'])]:size-4`. */
 const ICON_TEAM = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M1 17.2q0-.85.438-1.562T2.6 14.55q1.55-.775 3.15-1.162T9 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T17 17.2v.8q0 .825-.587 1.413T15 20H3q-.825 0-1.412-.587T1 18zM18.45 20q.275-.45.413-.962T19 18v-1q0-1.1-.612-2.113T16.65 13.15q1.275.15 2.4.513t2.1.887q.9.5 1.375 1.112T23 17v1q0 .825-.587 1.413T21 20zM6.175 10.825Q5 9.65 5 8t1.175-2.825T9 4t2.825 1.175T13 8t-1.175 2.825T9 12t-2.825-1.175m11.65 0Q16.65 12 15 12q-.275 0-.7-.062t-.7-.138q.675-.8 1.038-1.775T15 8t-.362-2.025T13.6 4.2q.35-.125.7-.163T15 4q1.65 0 2.825 1.175T19 8t-1.175 2.825\"/></svg>";
@@ -179,6 +184,38 @@ export interface DrawerState {
   close: () => void;
 }
 
+/** What the status chip shows; shared with TeamRoomStatus.vue. */
+export interface StatusView {
+  connection: Connection;
+  rtt: number | undefined;
+  joinedAt: number | undefined;
+  room: RoomState | undefined;
+  players: RoomSeat[];
+  me: string | null;
+  firstSeen: Record<string, number>;
+  /** This account's teams in the lobby, by name, for the chip's card. */
+  myTeams: string[];
+  retry: () => void;
+}
+
+/** What the invitation shows and does; shared with TeamInvite.vue. */
+export interface InviteView {
+  show: boolean;
+  /** The other accounts' teams in the room. */
+  teams: { name: string; colour: ColorScheme }[];
+  host: string;
+  game: { variant: string; score: number; legs: number; sets: number };
+  format: TeamFormat;
+  /** This account's saved teams in the lobby's format, offered first; the others, greyed. */
+  saved: SavedTeam[];
+  other: SavedTeam[];
+  busy: boolean;
+  problem: TeamsProblem;
+  join: (team: SavedTeam) => void;
+  newTeam: () => void;
+  dismiss: () => void;
+}
+
 let ctxRef: any = null;
 let drawerUi: any = null;
 /**
@@ -219,6 +256,42 @@ let stopClientWatch: (() => void) | null = null;
 /** When each other account's first seat was seen in this lobby: the chip's "isn't connected" counts from it. */
 let firstSeen: Record<string, number> = {};
 let firstSeenLobby = "";
+
+/** What the status chip shows; shared with TeamRoomStatus.vue. */
+const statusView = reactive<StatusView>({ connection: "idle", rtt: undefined, joinedAt: undefined, room: undefined, players: [], me: null, firstSeen: {}, myTeams: [], retry: () => roomClient?.retry() });
+
+/** Lobbies whose invitation was dismissed, for as long as the page is open. */
+const dismissed = new Set<string>();
+
+/** What the invitation shows; shared with TeamInvite.vue. */
+const inviteView = reactive<InviteView>({
+  show: false,
+  teams: [],
+  host: "",
+  game: { variant: "X01", score: 501, legs: 1, sets: 0 },
+  format: "shared",
+  saved: [],
+  other: [],
+  busy: false,
+  problem: undefined,
+  join: (team) => {
+    joinWith(team).catch(e => console.error(e));
+  },
+  newTeam: () => {
+    openDrawer(null).catch(e => console.error(e));
+  },
+  dismiss: () => {
+    if (lobby) dismissed.add(lobby.id);
+    inviteView.show = false;
+  },
+});
+
+let statusUi: any = null;
+let inviteUi: any = null;
+let inviteLabel: Text | null = null;
+/** The two apps' props, kept out of the createApp calls: eslint-plugin-vue reads an object literal there as a component. */
+const statusProps = { view: statusView };
+const inviteProps = { view: inviteView };
 /** Resolved on the next lobby update: the moves and the adds wait on it. */
 const lobbyWaiters: (() => void)[] = [];
 
@@ -362,6 +435,7 @@ function apply() {
   }
   noteUneven(lineup);
   syncPartnerCard(lineup);
+  syncOnline(view);
 }
 
 /**
@@ -370,6 +444,7 @@ function apply() {
  */
 function relabel() {
   if (addTeamLabel) addTeamLabel.textContent = t("teams.lobby.addTeam");
+  if (inviteLabel) inviteLabel.textContent = t("teams.online.invite.button");
   for (const edit of document.querySelectorAll<HTMLElement>(`[${EDIT_ATTR}]`)) labelPencil(edit);
   const card = document.getElementById(PARTNER_CARD_ID);
   if (card) labelPartnerCard(card);
@@ -383,6 +458,7 @@ function teardown() {
   document.getElementById(NOTE_ID)?.remove();
   document.getElementById(PARTNER_CARD_ID)?.remove();
   for (const row of document.querySelectorAll<HTMLElement>(`[${ROW_ATTR}]`)) undress(row);
+  removeOnline();
 }
 
 /** This lobby's own-score lineup as this screen wrote it: this account's teams only. */
@@ -538,9 +614,130 @@ function stopRoom() {
   roomClient = null;
 }
 
-/** The connection's news; the chip shows it (TeamRoomStatus.vue). */
-function onClientState(_state: RoomClientState) {
+/** The connection's news, for the chip; a (re)join can change what is shown, so the lobby is redrawn too. */
+function onClientState(state: RoomClientState) {
+  Object.assign(statusView, { connection: state.connection, rtt: state.rtt, joinedAt: state.joinedAt, room: state.room });
   schedule();
+}
+
+/** Online Teams in the lobby's own parts: the chip, Invite a team (the host's), and the invitation. */
+function syncOnline(view: ScreenTeams) {
+  if (!online || !lobby || !ctxRef) {
+    removeOnline();
+    return;
+  }
+  Object.assign(statusView, { players: lobby.players ?? [], me: hostId, firstSeen: { ...firstSeen }, myTeams: [ ...view.mine ] });
+  syncInviteButton();
+  const format: TeamFormat = view.remote.some(team => team.format === "own") ? "own" : "shared";
+  Object.assign(inviteView, {
+    show: view.remote.length > 0 && view.mine.size === 0 && !dismissed.has(lobby.id),
+    teams: view.remote.map(team => ({ name: team.name, colour: team.colour })),
+    host: normalizeName(lobby.host?.name),
+    game: { variant: lobby.variant, score: lobby.settings?.baseScore ?? 0, legs: lobby.legs ?? 1, sets: lobby.sets ?? 0 },
+    format,
+    saved: saved.filter(team => team.format === format && !(lobby!.sets && team.format === "own")),
+    other: saved.filter(team => team.format !== format),
+  });
+  if (!statusUi) mountStatus().catch(e => console.error(e));
+  if (!inviteUi) mountInvite().catch(e => console.error(e));
+}
+
+function removeOnline() {
+  statusUi?.remove();
+  statusUi = null;
+  inviteUi?.remove();
+  inviteUi = null;
+  document.getElementById(INVITE_ID)?.remove();
+  inviteLabel = null;
+}
+
+/** The chip, after the seat count in the Players card's header; WXT mounts it whenever the header is there. */
+async function mountStatus() {
+  const ui = await createShadowRootUi(ctxRef, {
+    name: "autodarts-tools-team-room-status",
+    position: "inline",
+    // A selector, not an element: autoMount watches for it.
+    anchor: anyOf(SELECTORS.lobby.playerCountChip),
+    append: "after",
+    onMount: (container: HTMLElement) => {
+      const app = createApp(TeamRoomStatus, statusProps);
+      app.mount(container);
+      return app;
+    },
+    onRemove: (app: any) => app?.unmount(),
+  });
+  if (statusUi || !online) return;
+  statusUi = ui;
+  ui.autoMount();
+}
+
+/** The invitation, above the Players card. */
+async function mountInvite() {
+  const ui = await createShadowRootUi(ctxRef, {
+    name: "autodarts-tools-team-invite",
+    position: "inline",
+    anchor: anyOf(SELECTORS.lobby.playersCard),
+    append: "before",
+    onMount: (container: HTMLElement) => {
+      const app = createApp(TeamInvite, inviteProps);
+      app.mount(container);
+      return app;
+    },
+    onRemove: (app: any) => app?.unmount(),
+  });
+  if (inviteUi || !online) return;
+  inviteUi = ui;
+  ui.autoMount();
+}
+
+/**
+ * Invite a team, the host's: a copy of the site's Shuffle, as Discord Webhooks
+ * copies it, before it in the Players card's header. It copies the lobby's
+ * own link: the site's /join/ link would seat whoever opens it as a player too.
+ */
+function syncInviteButton() {
+  const existing = document.getElementById(INVITE_ID) as HTMLButtonElement | null;
+  if (!isHost()) {
+    existing?.remove();
+    return;
+  }
+  const shuffle = qs<HTMLButtonElement>(SELECTORS.lobby.shuffleButton);
+  if (!shuffle?.parentElement) return;
+  let button = existing;
+  if (!button) {
+    button = shuffle.cloneNode(false) as HTMLButtonElement;
+    for (const attr of [ "data-disabled", "aria-disabled", "data-focus-visible", "aria-describedby", "tabindex" ]) button.removeAttribute(attr);
+    button.id = INVITE_ID;
+    button.type = "button";
+    button.innerHTML = ICON_LINK;
+    inviteLabel = document.createTextNode(t("teams.online.invite.button"));
+    button.append(inviteLabel);
+    button.addEventListener("click", () => {
+      copyInvite().catch(e => console.error(e));
+    });
+  }
+  if (shuffle.previousElementSibling !== button) shuffle.before(button);
+}
+
+async function copyInvite() {
+  if (!lobby) return;
+  const copied = await navigator.clipboard.writeText(`https://play.autodarts.com/lobby/${lobby.id}`).then(() => true, () => false);
+  if (inviteLabel) inviteLabel.textContent = t(copied ? "teams.online.invite.copied" : "teams.online.invite.copyFailed");
+  setTimeout(() => {
+    if (inviteLabel) inviteLabel.textContent = t("teams.online.invite.button");
+  }, 2000);
+}
+
+/** The invitation's one tap: the saved team seated on this account's board, as the drawer's saved teams are. */
+async function joinWith(team: SavedTeam) {
+  inviteView.busy = true;
+  inviteView.problem = undefined;
+  try {
+    Object.assign(drawer, drawerContext(null));
+    inviteView.problem = await addSavedTeam(team);
+  } finally {
+    inviteView.busy = false;
+  }
 }
 
 // ------------------------------------------------------------------ button

@@ -274,6 +274,8 @@ export const SELECTORS = {
      * `waitForElementWithTextContent("h2", "Lobby")` gate never resolved.
      */
     playersCardHeader: [ "[data-slot='card-header']:has(> button[data-slot='button'])" ],
+    /** The Players card itself: Online Teams' invitation goes before it. */
+    playersCard: [ "[data-slot='card']:has(> [data-slot='card-header'] > button[data-slot='button'])" ],
 
     /**
      * The site's own "Share lobby QR code" button, in the top right corner.

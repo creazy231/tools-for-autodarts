@@ -83,6 +83,15 @@ export const GAME_MODE_GROUPS: readonly GameModeGroup[] = [
   },
 ];
 
+/** A mode's label key, by the site's variant name; X01's for a variant the groups don't list. */
+export function gameModeLabelKey(variant: string): MessageKey {
+  for (const group of GAME_MODE_GROUPS) {
+    const found = group.modes.find(entry => entry.mode === variant);
+    if (found) return found.labelKey;
+  }
+  return "gameModes.modes.x01";
+}
+
 /** The groups a feature's editor shows. Animations never play in a bull-off, so they have no switch for it. */
 export function gameModeGroupsFor(feature: GameModeFeature): GameModeGroup[] {
   if (feature !== "animations") return [ ...GAME_MODE_GROUPS ];
