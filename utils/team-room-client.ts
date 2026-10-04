@@ -45,6 +45,7 @@ type Ack<T> = { ok: true; value: T } | { ok: false; error: string };
 
 const ACK_TIMEOUT_MS = 5000;
 const PING_MS = 20_000;
+const JOIN_RETRY_MS = 3000;
 /** Refusals that may pass later: the rate limit, or a room this client is no longer in. Any other is final for that payload. */
 const PASSING = new Set([ "rate", "room" ]);
 
@@ -58,6 +59,7 @@ export class RoomClient {
   private intended: { teams?: RoomTeamInput[]; rule?: boolean; shifts?: Record<string, number> } = {};
   private sent: { teams: string; rule: boolean | undefined; shifts: Record<string, number> } = { teams: "", rule: undefined, shifts: {} };
   private pinger: ReturnType<typeof setInterval> | undefined;
+  private joinRetry: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Set<(state: RoomClientState) => void>();
 
   constructor(private readonly options: RoomClientOptions) {}
@@ -88,6 +90,7 @@ export class RoomClient {
     this.leaveRoom();
     clearInterval(this.pinger);
     this.pinger = undefined;
+    clearTimeout(this.joinRetry);
     this.socket?.disconnect();
     this.socket = undefined;
     this.starting = undefined;
@@ -159,8 +162,11 @@ export class RoomClient {
       this.ping();
       if (this.wantJoin) this.joinRoom();
     });
-    socket.on("disconnect", () => {
-      this.update({ connection: "offline", joined: undefined, joinedAt: undefined });
+    socket.on("disconnect", (reason: string) => {
+      // socket.io tries again unless the server or this client ended it, and
+      // until an attempt fails, that is still connecting.
+      const retrying = reason !== "io server disconnect" && reason !== "io client disconnect";
+      this.update({ connection: retrying ? "connecting" : "offline", joined: undefined, joinedAt: undefined });
     });
     socket.on("connect_error", (error: Error) => {
       console.log("Autodarts Tools: Online Teams - connection failed:", error?.message);
@@ -180,7 +186,14 @@ export class RoomClient {
     const lobbyId = this.lobbyId;
     if (!socket?.connected || !lobbyId || this.state.joined === lobbyId) return;
     socket.timeout(ACK_TIMEOUT_MS).emit("room:join", { lobbyId }, (error: Error | null, answer?: Ack<RoomState>) => {
-      if (error || !answer?.ok || lobbyId !== this.lobbyId || !this.wantJoin) return;
+      if (lobbyId !== this.lobbyId || !this.wantJoin) return;
+      if (error) {
+        // No answer in time: ask again while this lobby's room is still wanted.
+        clearTimeout(this.joinRetry);
+        this.joinRetry = setTimeout(() => this.joinRoom(), JOIN_RETRY_MS);
+        return;
+      }
+      if (!answer?.ok) return;
       this.update({ joined: lobbyId, joinedAt: Date.now() });
       // A fresh join: the room may have lost what it was told, after a restart.
       this.sent = { teams: "", rule: undefined, shifts: {} };
