@@ -197,6 +197,8 @@ export interface StatusView {
   room: RoomState | undefined;
   players: RoomSeat[];
   me: string | null;
+  /** This account's name from its token, for the card until the room has it. */
+  myName: string;
   firstSeen: Record<string, number>;
   /** This account's teams in the lobby, by name, for the chip's card. */
   myTeams: string[];
@@ -239,6 +241,8 @@ let stopLanguage: (() => void) | null = null;
 let addTeamLabel: Text | null = null;
 let lobby: ILobbies | undefined;
 let hostId: string | null = null;
+/** This account's name, from its token. */
+let myName = "";
 let saved: SavedTeam[] = [];
 let savedPlayers: string[] = [];
 /** Teams' own switch, followed live: off, nothing of Teams stays in the lobby. */
@@ -263,7 +267,7 @@ let firstSeen: Record<string, number> = {};
 let firstSeenLobby = "";
 
 /** What the status chip shows; shared with TeamRoomStatus.vue. */
-const statusView = reactive<StatusView>({ connection: "idle", rtt: undefined, joinedAt: undefined, room: undefined, players: [], me: null, firstSeen: {}, myTeams: [], retry: () => roomClient?.retry() });
+const statusView = reactive<StatusView>({ connection: "idle", rtt: undefined, joinedAt: undefined, room: undefined, players: [], me: null, myName: "", firstSeen: {}, myTeams: [], retry: () => roomClient?.retry() });
 
 /** Lobbies whose invitation was dismissed, for as long as the page is open. */
 const dismissed = new Set<string>();
@@ -330,6 +334,7 @@ export async function teams(ctx: any) {
   console.log("Autodarts Tools: Teams - Starting (lobby)");
   ctxRef = ctx;
   hostId = await getUserIdFromToken();
+  myName = (await tokenIdentity())?.name ?? "";
   readConfig(await AutodartsToolsConfig.getValue());
   lobby = currentLobby(await AutodartsToolsLobbyData.getValue());
   lineups = (await AutodartsToolsTeamLineups.getValue()) ?? {};
@@ -631,7 +636,7 @@ function syncOnline(view: ScreenTeams) {
     removeOnline();
     return;
   }
-  Object.assign(statusView, { players: lobby.players ?? [], me: hostId, firstSeen: { ...firstSeen }, myTeams: [ ...view.mine ] });
+  Object.assign(statusView, { players: lobby.players ?? [], me: hostId, myName, firstSeen: { ...firstSeen }, myTeams: [ ...view.mine ] });
   syncInviteButton();
   const format: TeamFormat = view.remote.some(team => team.format === "own") ? "own" : "shared";
   Object.assign(inviteView, {

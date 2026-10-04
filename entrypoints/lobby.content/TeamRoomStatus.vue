@@ -50,8 +50,7 @@ import type { MessageKey } from "@/utils/i18n";
 import type { StatusKind } from "@/utils/team-room";
 
 import { list } from "@/utils/i18n";
-import { normalizeName } from "@/utils/teams";
-import { otherAccounts, roomStatus } from "@/utils/team-room";
+import { roomStatus, statusAccounts } from "@/utils/team-room";
 
 const props = defineProps<{ view: StatusView }>();
 
@@ -90,15 +89,7 @@ const serverText = computed(() => {
 });
 const serverClass = computed(() => (props.view.connection === "connected" ? "is-ok" : props.view.connection === "connecting" ? "" : "is-warn"));
 /** This account first, then everyone else with seats here: whether their Tools is in the room, and their teams. */
-const accounts = computed(() => {
-  const { room, me, players, myTeams, connection } = props.view;
-  const peers = new Set((room?.peers ?? []).map(peer => peer.userId));
-  const teamsOf = (userId: string) => (room?.teams ?? []).filter(team => team.owner === userId).map(team => normalizeName(team.name));
-  const self = (room?.peers ?? []).find(peer => peer.userId === me);
-  const out = me ? [ { userId: me, name: normalizeName(self?.name ?? ""), you: true, connected: connection === "connected" && peers.has(me), teams: myTeams } ] : [];
-  for (const account of otherAccounts(players, me)) out.push({ userId: account.userId, name: account.name, you: false, connected: peers.has(account.userId), teams: teamsOf(account.userId) });
-  return out;
-});
+const accounts = computed(() => statusAccounts(props.view));
 
 let timer: ReturnType<typeof setInterval> | undefined;
 

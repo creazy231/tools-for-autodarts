@@ -241,6 +241,20 @@ export function otherAccounts(players: readonly RoomSeat[], me: string | null | 
   return [ ...out ].map(([ userId, name ]) => ({ userId, name }));
 }
 
+/** An account on the status card: whether its Tools is in the room, and its teams there. */
+export interface StatusAccount { userId: string; name: string; you: boolean; connected: boolean; teams: string[] }
+
+/** The status card's accounts: this one first, by the room's name for it or else its token's, then every other account with seats here. */
+export function statusAccounts(input: { room: RoomState | undefined; me: string | null; myName: string; players: readonly RoomSeat[]; myTeams: readonly string[]; connection: Connection }): StatusAccount[] {
+  const { room, me, myName, players, myTeams, connection } = input;
+  const peers = new Set((room?.peers ?? []).map(peer => peer.userId));
+  const teamsOf = (userId: string) => (room?.teams ?? []).filter(team => team.owner === userId).map(team => normalizeName(team.name));
+  const self = (room?.peers ?? []).find(peer => peer.userId === me);
+  const out: StatusAccount[] = me ? [ { userId: me, name: normalizeName(self?.name ?? myName), you: true, connected: connection === "connected" && peers.has(me), teams: [ ...myTeams ] } ] : [];
+  for (const account of otherAccounts(players, me)) out.push({ userId: account.userId, name: account.name, you: false, connected: peers.has(account.userId), teams: teamsOf(account.userId) });
+  return out;
+}
+
 export type StatusKind = "connecting" | "ready" | "synced" | "missing" | "offline" | "outdated";
 
 export interface StatusInput {
