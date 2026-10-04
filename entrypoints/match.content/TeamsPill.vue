@@ -24,6 +24,7 @@
         <i :style="{ backgroundImage: swatch(team) }" /><span class="adt-teams-tally-name">{{ team.name }}</span><b>{{ team.legs }}</b>
       </span>
       <em v-if="view.target && view.left.length" class="adt-teams-target">{{ t("teams.pill.firstTo", { count: view.target }) }}</em>
+      <span v-if="view.offline" :title="t('teams.online.offline.hint')" class="adt-teams-offline" role="status">{{ t("teams.online.offline.badge") }}</span>
       <span class="adt-teams-line" aria-hidden="true" />
     </div>
   </div>
@@ -115,5 +116,10 @@ function legsLabel(team: TallyTeam) {
 @media (prefers-reduced-motion: reduce) {
   .adt-teams-line, .adt-teams-pill, .adt-teams-layers, .adt-teams-fade-enter-active, .adt-teams-fade-leave-active,
   .adt-teams-slide-enter-active, .adt-teams-slide-leave-active { transition: none; }
+}
+/* Online Teams' outage, inside the one line: the board doesn't move when the room drops. */
+.adt-teams-offline {
+  flex: none; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  font-size: 10.5px; font-weight: 800; color: #ffb4c0; background: rgb(226 78 103 / 18%);
 }
 </style>

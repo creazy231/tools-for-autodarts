@@ -32,17 +32,21 @@ import TeamsPill from "./TeamsPill.vue";
 import type { IMatch } from "@/utils/websocket-helpers";
 import type { Breach, Lineup, LineupStore, LineupTeam, PillNote, SavedTeam, ShiftStore } from "@/utils/teams";
 import type { PillView } from "@/utils/teams-pill";
+import type { Connection, RoomStore, ScreenTeams } from "@/utils/team-room";
 
 import { addStyles, removeStyles } from "@/utils";
 import { SITE_CARD, normalizeColors } from "@/utils/colors";
 import { SELECTORS, anyOf, qs } from "@/utils/selectors";
-import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamShifts } from "@/utils/storage";
+import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { language, onLanguageChange, t } from "@/utils/i18n";
-import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, teamSeats, withShift } from "@/utils/teams";
+import { TEAMS_PILL_TAG, assignCards, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, withShift } from "@/utils/teams";
 import { ownPill, sharedPill } from "@/utils/teams-pill";
 import { ruleBustNote, ruleNextNote, ruleRefusedNote } from "@/utils/teams-text";
+import { myRoomTeams, roomOf, screenTeams, shouldJoin, undoActor, undoKey } from "@/utils/team-room";
+import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
+import { mirrorRoom } from "@/utils/team-room-mirror";
 
 const STYLE_ID = "teams-match";
 const CARD_ATTR = "data-adt-team";
@@ -76,6 +80,9 @@ const BASE_CSS = `
     transition: background-color 300ms cubic-bezier(.2, .6, .2, 1), color 300ms cubic-bezier(.2, .6, .2, 1), box-shadow 300ms cubic-bezier(.2, .6, .2, 1);
   }
   .adt-team-chip:hover { color: #f7f8fa; }
+  /* Another account's team: its names show who's up, but only its own screen corrects them. */
+  span.adt-team-chip { cursor: default; }
+  span.adt-team-chip:not(.is-up):not(.is-next):hover { color: rgb(247 248 250 / 60%); }
   .adt-team-chip:focus-visible { outline: 2px solid #0b55df; outline-offset: 2px; }
   .adt-team-chip.is-up { background: #f7f8fa; color: #16181c; }
   .adt-team-chip.is-next { background: transparent; color: #f7f8fa; box-shadow: inset 0 0 0 1.5px var(--adt-team-to); }
@@ -104,7 +111,7 @@ const BASE_CSS = `
 interface Coloured { name: string; colour: { from: string; to: string } }
 
 /** What the pill shows (utils/teams-pill.ts); shared with TeamsPill.vue. */
-const pill = reactive<PillView>({ turnKey: "", text: "", detail: "", ...SITE_CARD, left: [], right: [], target: 0, noteKind: "" });
+const pill = reactive<PillView>({ turnKey: "", text: "", detail: "", ...SITE_CARD, left: [], right: [], target: 0, noteKind: "", offline: false });
 
 let ctxRef: any = null;
 let pillUi: any = null;
@@ -128,6 +135,15 @@ let partnerRuleDefault = false;
 let holding = false;
 /** The partner-rule bust last sent to be undone, by match and darts. */
 let lastUndo = "";
+/** Online Teams' switch (`teams.online`), followed live. */
+let online = true;
+/** What the team room last said of each lobby, which is each match's too (utils/team-room.ts). */
+let roomStore: RoomStore = {};
+let unwatchRoom: (() => void) | null = null;
+/** This match's connection to the team room, while Teams and Online Teams are on. */
+let roomClient: RoomClient | null = null;
+let stopClientWatch: (() => void) | null = null;
+let connection: Connection = "idle";
 /**
  * "ANNA's checkout didn't count": shown from the bust through the visit after
  * it. `bustTurn` is the busted visit, whose frames go on arriving while the
@@ -147,6 +163,7 @@ export async function teams(ctx: any) {
   readConfig(await AutodartsToolsConfig.getValue());
   shiftStore = (await AutodartsToolsTeamShifts.getValue()) ?? {};
   lineupStore = (await AutodartsToolsTeamLineups.getValue()) ?? {};
+  roomStore = (await AutodartsToolsTeamRoom.getValue()) ?? {};
   match = thisMatch((await AutodartsToolsGameData.getValue())?.match);
 
   unwatchGameData?.();
@@ -168,6 +185,11 @@ export async function teams(ctx: any) {
   unwatchLineups?.();
   unwatchLineups = AutodartsToolsTeamLineups.watch((value) => {
     lineupStore = value ?? {};
+    schedule();
+  });
+  unwatchRoom?.();
+  unwatchRoom = AutodartsToolsTeamRoom.watch((value) => {
+    roomStore = value ?? {};
     schedule();
   });
 
@@ -199,6 +221,9 @@ export function onRemove() {
   unwatchShifts = null;
   unwatchLineups?.();
   unwatchLineups = null;
+  unwatchRoom?.();
+  unwatchRoom = null;
+  stopRoom();
   clear();
   match = undefined;
   lastTurn = "";
@@ -211,6 +236,7 @@ function readConfig(config: any) {
   enabled = teamsConfig.enabled;
   saved = teamsConfig.saved;
   partnerRuleDefault = teamsConfig.partnerRule;
+  online = teamsConfig.online;
   const colors = normalizeColors(config?.colors);
   otherCard = colors.enabled && colors.card.preset !== "default" ? colors.card : SITE_CARD;
 }
@@ -247,33 +273,94 @@ function apply() {
   // Switched off in the settings: nothing of Teams on the page, until it's switched on again.
   if (!enabled) {
     clear();
+    stopRoom();
     return;
   }
-  const lineup = match ? lineupOf(lineupStore, match.id) : undefined;
-  if (lineup) applyOwn(lineup);
-  else applyShared();
+  if (match) syncRoom(match);
+  const view = match ? teamsView(match) : undefined;
+  if (view?.lineup) applyOwn(view);
+  else applyShared(view);
 }
 
-function applyShared() {
-  const seats = match ? teamSeats(match.players ?? [], saved, hostId) : new Map<number, SavedTeam>();
-  if (!match || !seats.size) {
+/** This match's teams as this screen shows them: its own, and the other accounts' from the room (utils/team-room.ts). */
+function teamsView(current: IMatch): ScreenTeams {
+  return screenTeams({
+    players: current.players ?? [],
+    saved,
+    lineup: lineupOf(lineupStore, current.id),
+    shifts: shiftsOf(shiftStore, current.id),
+    room: online ? roomOf(roomStore, current.id) : undefined,
+    me: hostId,
+    hostId: current.host?.id,
+  });
+}
+
+/** The pill's offline badge: only while the room can't be reached and the other team's players came from it. */
+function offlineNote(view: ScreenTeams): boolean {
+  return online && view.remote.length > 0 && (connection === "offline" || connection === "outdated");
+}
+
+/**
+ * Online Teams in the match: the lobby's room, which keeps the lobby's id,
+ * told this account's teams again (a restarted server has lost them) and, from
+ * the host, the partner rule.
+ */
+function syncRoom(current: IMatch) {
+  if (!online) {
+    stopRoom();
+    return;
+  }
+  if (!roomClient) {
+    roomClient = new RoomClient({
+      identity: tokenIdentity,
+      onRoom: (state) => {
+        mirrorRoom(state).catch(e => console.error(e));
+      },
+    });
+    stopClientWatch = roomClient.subscribe((state) => {
+      if (state.connection === connection) return;
+      connection = state.connection;
+      schedule();
+    });
+  }
+  roomClient.start(current.id).catch(e => console.error(e));
+  const players = current.players ?? [];
+  const lineup = lineupOf(lineupStore, current.id);
+  const mine = myRoomTeams(players, saved, lineup, hostId);
+  roomClient.setJoin(shouldJoin(players, mine, hostId));
+  roomClient.publishTeams(mine);
+  if (hostId && current.host?.id === hostId && lineup) roomClient.publishRule(lineupPartnerRule(lineup, partnerRuleDefault));
+}
+
+function stopRoom() {
+  stopClientWatch?.();
+  stopClientWatch = null;
+  roomClient?.stop();
+  roomClient = null;
+  connection = "idle";
+}
+
+function applyShared(view: ScreenTeams | undefined) {
+  const seats = view?.shared ?? new Map<number, SavedTeam>();
+  if (!match || !view || !seats.size) {
     clear();
     return;
   }
 
-  const shifts = shiftsOf(shiftStore, match.id);
+  const shifts = view.shifts;
   const up = match.player ?? 0;
   const upTeam = seats.get(up);
   writeStyles([ ...new Set(seats.values()) ]);
-  dressCards(seats, shifts, up);
-  Object.assign(pill, sharedPill(match, seats, shifts, otherCard));
+  dressCards(seats, shifts, up, view.mine);
+  Object.assign(pill, sharedPill(match, seats, shifts, otherCard), { offline: offlineNote(view) });
   ensurePill();
   handover(upTeam, up);
   holdNextLeg(false);
 }
 
 /** Own scores: every member's card in its team's colours, the team's legs, and the team win. */
-function applyOwn(lineup: Lineup) {
+function applyOwn(view: ScreenTeams) {
+  const lineup = view.lineup!;
   const seats = lineupTeams(match!.players ?? [], lineup);
   if (!seats.size) {
     clear();
@@ -286,7 +373,7 @@ function applyOwn(lineup: Lineup) {
   askUndo();
   writeStyles(decided ? undefined : lineup.teams);
   dressOwnCards(seats, up, lineup);
-  Object.assign(pill, ownPill(match!, lineup, { other: otherCard, partnerRule: lineupPartnerRule(lineup, partnerRuleDefault), note: shownBustNote(up) }));
+  Object.assign(pill, ownPill(match!, lineup, { other: otherCard, partnerRule: lineupPartnerRule(lineup, partnerRuleDefault), note: shownBustNote(up) }), { offline: offlineNote(view) });
   ensurePill();
   holdNextLeg(Boolean(decided && panelUp));
   handover(decided ? undefined : upTeam, up);
@@ -314,10 +401,27 @@ function askUndo() {
     note.words = result.stage === "next" ? ruleNextNote : ruleRefusedNote;
     apply();
   };
-  browser.runtime.sendMessage({ type: "teams:undo-visit", matchId: match.id, dartIds: bust.dartIds }).then(settle, (e) => {
+  // Online Teams: autodarts lets either account undo either's darts, so the
+  // thrower's own Tools does it, granted once by the room (utils/team-room.ts
+  // `undoActor`); the other screens only show the line.
+  const room = online ? roomOf(roomStore, match.id) : undefined;
+  const actor = undoActor(match.players?.[bust.seat], hostId, room, match.host?.id);
+  if (actor === "none") return;
+  const matchId = match.id;
+  const dartIds = [ ...bust.dartIds ];
+  const send = () => browser.runtime.sendMessage({ type: "teams:undo-visit", matchId, dartIds }).then(settle, (e) => {
     console.error(e);
     settle({ ok: false });
   });
+  if (actor === "legacy") {
+    send();
+    return;
+  }
+  const asking = roomClient ? roomClient.claim(undoKey(matchId, dartIds)) : Promise.resolve(undefined);
+  asking.then((granted) => {
+    // This account's own visit goes ahead when the room can't be asked; standing in for another account's needs the grant.
+    if (granted === true || (actor === "own" && granted === undefined)) send();
+  }, e => console.error(e));
 }
 
 /**
@@ -360,7 +464,7 @@ function allCards(): HTMLElement[] {
   return [ ...document.querySelectorAll<HTMLElement>(anyOf([ ...SELECTORS.match.scoreCard, ...SELECTORS.match.cricketPlayerCell ])) ];
 }
 
-function dressCards(seats: Map<number, SavedTeam>, shifts: Record<string, number>, up: number) {
+function dressCards(seats: Map<number, SavedTeam>, shifts: Record<string, number>, up: number, mine: ReadonlySet<string>) {
   const byName = new Map<string, { seat: number; team: SavedTeam }>();
   seats.forEach((team, seat) => byName.set(team.name, { seat, team }));
 
@@ -376,7 +480,7 @@ function dressCards(seats: Map<number, SavedTeam>, shifts: Record<string, number
     card.toggleAttribute(WAITING_ATTR, !throwing);
     card.style.setProperty("--adt-team-from", team.colour.from);
     card.style.setProperty("--adt-team-to", team.colour.to);
-    renderOrder(card, team, seat, playerUp(match!, seat, team, shifts[team.name] ?? 0), throwing);
+    renderOrder(card, team, seat, playerUp(match!, seat, team, shifts[team.name] ?? 0), throwing, mine.has(team.name));
   }
 }
 
@@ -447,7 +551,7 @@ function aboveBoard(card: HTMLElement): boolean {
   return Boolean(bar) && card.getBoundingClientRect().bottom <= bar!.getBoundingClientRect().top + 1;
 }
 
-function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: number, throwing: boolean) {
+function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: number, throwing: boolean, tappable: boolean) {
   const current = card.querySelector<HTMLElement>(":scope .adt-team-order");
   // A top-bar cell takes no chips: it would stand taller than the seats beside
   // it, with the band's colour showing under those, and the board would shrink.
@@ -457,7 +561,7 @@ function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: nu
   }
   const small = card.getBoundingClientRect().width < NARROW_CARD_PX;
   // The language too: the chips' tooltips are written into them.
-  const key = `${team.players.join(",")}|${index}|${throwing ? 1 : 0}|${small ? 1 : 0}|${language.value}`;
+  const key = `${team.players.join(",")}|${index}|${throwing ? 1 : 0}|${small ? 1 : 0}|${tappable ? 1 : 0}|${language.value}`;
   if (current?.dataset.key === key) return;
 
   const nameRow = qs<HTMLElement>(SELECTORS.match.nameRow, card);
@@ -468,28 +572,33 @@ function renderOrder(card: HTMLElement, team: SavedTeam, seat: number, index: nu
   order.className = "adt-team-order";
   order.dataset.key = key;
   for (const i of small ? [ index ] : team.players.map((_, i) => i)) {
-    const chip = document.createElement("button");
-    chip.type = "button";
+    // Another account's team is corrected on its own screen; here its names only show who's up.
+    const chip = document.createElement(tappable ? "button" : "span");
     chip.className = "adt-team-chip";
     if (i === index) chip.classList.add(throwing ? "is-up" : "is-next");
     chip.textContent = team.players[i];
-    chip.setAttribute("aria-pressed", String(i === index));
     chip.title = throwing ? t("teams.match.isThrowing", { name: team.players[i] }) : t("teams.match.throwsNext", { name: team.players[i] });
-    chip.addEventListener("click", (event) => {
-      event.stopPropagation();
-      correct(team, seat, i);
-    });
+    if (tappable) {
+      (chip as HTMLButtonElement).type = "button";
+      chip.setAttribute("aria-pressed", String(i === index));
+      chip.addEventListener("click", (event) => {
+        event.stopPropagation();
+        correct(team, seat, i);
+      });
+    }
     order.append(chip);
   }
   nameRow.after(order);
 }
 
-/** Tap to correct: the tapped player is up (or next), and the order carries on from them. */
+/** Tap to correct: the tapped player is up (or next), and the order carries on from them; with Online Teams, on the other screens too. */
 async function correct(team: SavedTeam, seat: number, wanted: number) {
   if (!match) return;
-  shiftStore = withShift(shiftStore, match.id, team.name, shiftFor(match, seat, team, wanted), Date.now());
+  const shift = shiftFor(match, seat, team, wanted);
+  shiftStore = withShift(shiftStore, match.id, team.name, shift, Date.now());
   schedule();
   await AutodartsToolsTeamShifts.setValue(shiftStore);
+  await roomClient?.publishShift(team.name, shift);
 }
 
 /**

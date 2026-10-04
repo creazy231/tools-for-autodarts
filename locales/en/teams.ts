@@ -249,5 +249,9 @@ export default {
       dismiss: "Dismiss",
       busy: "Joining…",
     },
+    offline: {
+      badge: "Teams offline",
+      hint: "Online Teams is offline: the other team's players may be out of date.",
+    },
   },
 };

@@ -192,5 +192,9 @@ export default {
       dismiss: "Verbergen",
       busy: "Bezig met meedoen…",
     },
+    offline: {
+      badge: "Teams offline",
+      hint: "Online teams is offline: de spelers van het andere team zijn misschien niet actueel.",
+    },
   },
 } satisfies Translation<typeof en>;

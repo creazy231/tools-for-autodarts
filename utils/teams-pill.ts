@@ -43,6 +43,8 @@ export interface PillView {
   target: number;
   /** The pill as a partner-rule line, in place of the gradient. */
   noteKind: "" | "rule" | "bust";
+  /** Online Teams: the room can't be reached, in a match with another account's team. */
+  offline: boolean;
 }
 
 interface Colours {
@@ -53,7 +55,7 @@ interface Colours {
 type ViewParts = Partial<Omit<PillView, "from" | "to">> & Pick<PillView, "turnKey" | "text"> & { colour: Colours };
 
 function view({ colour, ...parts }: ViewParts): PillView {
-  return { detail: "", left: [], right: [], target: 0, noteKind: "", ...parts, from: colour.from, to: colour.to };
+  return { detail: "", left: [], right: [], target: 0, noteKind: "", offline: false, ...parts, from: colour.from, to: colour.to };
 }
 
 /** The tally's two sides: the first half of the teams, rounded up, on the left. */
