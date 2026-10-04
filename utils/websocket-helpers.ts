@@ -366,6 +366,8 @@ function flagVoidedVisit(match: IMatch | undefined = lastSeen): void {
 }
 
 export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string) {
+  // Frames that only name their topic, as some at a match's start do, carry nothing to act on.
+  if (data == null) return;
   // do a switch on the channel
   switch (channel) {
     case "autodarts.lobbies": {
