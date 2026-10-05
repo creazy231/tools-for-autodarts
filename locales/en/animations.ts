@@ -42,6 +42,12 @@ export default {
     },
   },
   /** The row is headed gameModes.title. */
+  boards: {
+    title: "Boards",
+    description: "Animations play only for throws and wins on these boards, and on every board while the list is empty. This is useful in online matches so a remote opponent does not trigger your local GIFs.",
+    placeholder: "Paste a board ID and press Enter",
+    invalid: "That doesn't look like a board ID. Example: 6a501a61-53a5-468a-a56a-17134ace3099.",
+  },
   gameModes: {
     description: "The games it shows GIFs in.",
     intro: "Animations only show in the games switched on here.",

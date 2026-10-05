@@ -13,7 +13,7 @@ export default {
     caller: "Also scores 0–180, ranges like 100-180, s1–s20, d1–d20, t1–t20, combinations like s20_s5_s1, and a player's or team's name.",
     soundFx: "Also scores 0–180, ranges like 100-180, s/d/t1–20, combinations like s20_t19_d12 and a player's or team's name, each with or without ambient_.",
     wled: "Also scores 0–180, range_100_180, s/d/t1–20, m1–m20, combinations like t20_t20_t20, target7, and a player's or team's name.",
-    animations: "Also scores 0–180, ranges like 100-180, s0–s20, d1–d20, t1–t20, and combinations like s20_s5_d20.",
+    animations: "Also scores 0–180, ranges like 100-180, s0–s20, d1–d20, t1–t20, and combinations like s20_s5_d20 or miss_s20_d20, where miss matches any missed dart.",
   },
   /** The board's events, one set for every feature: Sound FX offers them with `ambient_` in front. */
   board: {
@@ -95,6 +95,7 @@ export default {
   },
   animations: {
     gameshot: "A player wins the leg",
+    matchshot: "A player wins the match",
     busted: "A player busts",
     bull: "A bullseye",
     s25: "The single bull",

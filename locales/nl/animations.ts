@@ -34,6 +34,12 @@ export default {
       fullPage: "Hele pagina",
     },
   },
+  boards: {
+    title: "Borden",
+    description: "Animaties worden alleen afgespeeld voor worpen en overwinningen op deze borden. Als de lijst leeg is, werken ze op alle borden. Dit voorkomt dat een online tegenstander je lokale GIFs activeert.",
+    placeholder: "Plak een bord-ID en druk op Enter",
+    invalid: "Dit lijkt niet op een bord-ID. Bijvoorbeeld: 6a501a61-53a5-468a-a56a-17134ace3099.",
+  },
   gameModes: {
     description: "De spellen waarin GIF's worden getoond.",
     intro: "Animaties worden alleen getoond in de spellen die hier aan staan.",
