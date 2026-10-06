@@ -179,7 +179,7 @@ export default {
       connected: "verbonden",
       notConnected: "niet verbonden",
       shared: "Gedeeld",
-      sharedValue: "teamnamen, spelers, kleuren, volgorde",
+      sharedValue: "teamnamen, spelers, kleuren, volgorde, wie voor welk team speelt",
       retry: "Opnieuw proberen",
       close: "Sluiten",
     },
@@ -215,7 +215,7 @@ export default {
     },
     settings: {
       title: "Online teams",
-      description: "In een lobby van autodarts en in je eigen matches maakt Tools met je gebruikers-id en naam verbinding met zijn eigen server, zodat de lobby kan laten zien of teams online kunnen spelen. Met een team en nog een account in de lobby deelt het ook de namen, spelers, kleuren en volgorde van de teams met de Tools van de anderen. Darts en scores blijven bij autodarts, en de server vergeet alles een half uur nadat iedereen weg is.",
+      description: "In een lobby van autodarts en in je eigen matches maakt Tools met je gebruikers-id en naam verbinding met zijn eigen server, zodat de lobby kan laten zien of teams online kunnen spelen. Met een team en nog een account in de lobby deelt het ook de namen, spelers, kleuren en volgorde van de teams met de Tools van de anderen, en als je in het team van een ander account speelt, ook welk team dat is. Darts en scores blijven bij autodarts, en de server vergeet alles een half uur nadat iedereen weg is.",
     },
   },
 } satisfies Translation<typeof en>;

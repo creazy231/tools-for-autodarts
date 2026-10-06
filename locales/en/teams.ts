@@ -241,7 +241,7 @@ export default {
       connected: "connected",
       notConnected: "not connected",
       shared: "Shared",
-      sharedValue: "team names, players, colours, order",
+      sharedValue: "team names, players, colours, order, who plays for which team",
       retry: "Retry",
       close: "Close",
     },
@@ -279,7 +279,7 @@ export default {
     },
     settings: {
       title: "Online Teams",
-      description: "In an autodarts lobby, and in a match you play, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
+      description: "In an autodarts lobby, and in a match you play, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there, and when you play for another account's team, which team that is. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
     },
   },
 };

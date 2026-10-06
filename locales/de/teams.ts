@@ -179,7 +179,7 @@ export default {
       connected: "verbunden",
       notConnected: "nicht verbunden",
       shared: "Geteilt",
-      sharedValue: "Teamnamen, Spieler, Farben, Reihenfolge",
+      sharedValue: "Teamnamen, Spieler, Farben, Reihenfolge, wer für welches Team spielt",
       retry: "Erneut versuchen",
       close: "Schließen",
     },
@@ -215,7 +215,7 @@ export default {
     },
     settings: {
       title: "Online-Teams",
-      description: "In einer Lobby von autodarts und in deinen Matches verbindet sich Tools mit seinem eigenen Server und nennt ihm deine Benutzer-ID und deinen Namen, damit die Lobby zeigen kann, ob Teams online spielen können. Mit einem Team und einem weiteren Account in der Lobby teilt es außerdem die Namen, Spieler, Farben und die Reihenfolge der Teams mit dem Tools der anderen. Darts und Punkte bleiben bei autodarts, und der Server vergisst alles eine halbe Stunde, nachdem alle gegangen sind.",
+      description: "In einer Lobby von autodarts und in deinen Matches verbindet sich Tools mit seinem eigenen Server und nennt ihm deine Benutzer-ID und deinen Namen, damit die Lobby zeigen kann, ob Teams online spielen können. Mit einem Team und einem weiteren Account in der Lobby teilt es außerdem die Namen, Spieler, Farben und die Reihenfolge der Teams mit dem Tools der anderen, und wenn du im Team eines anderen Accounts spielst, auch, welches Team das ist. Darts und Punkte bleiben bei autodarts, und der Server vergisst alles eine halbe Stunde, nachdem alle gegangen sind.",
     },
   },
 } satisfies Translation<typeof en>;
