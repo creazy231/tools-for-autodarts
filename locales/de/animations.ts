@@ -35,6 +35,12 @@ export default {
       fullPage: "Ganze Seite",
     },
   },
+  boards: {
+    title: "Boards",
+    description: "Animationen werden nur für Würfe und Siege auf diesen Boards ausgelöst. Ist die Liste leer, funktionieren sie auf allen Boards. Das verhindert bei Online-Matches, dass der Gegner deine lokalen GIFs auslöst.",
+    placeholder: "Board-ID einfügen und Enter drücken",
+    invalid: "Das sieht nicht wie eine Board-ID aus. Beispiel: 6a501a61-53a5-468a-a56a-17134ace3099.",
+  },
   gameModes: {
     description: "Die Spiele, in denen GIFs gezeigt werden.",
     intro: "Animationen werden nur in den hier eingeschalteten Spielen gezeigt.",

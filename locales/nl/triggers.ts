@@ -7,7 +7,7 @@ export default {
     caller: "Ook mogelijk: scores 0–180, bereiken zoals 100-180, s1–s20, d1–d20, t1–t20, combinaties zoals s20_s5_s1 en de naam van een speler of team.",
     soundFx: "Ook mogelijk: scores 0–180, bereiken zoals 100-180, s/d/t1–20, combinaties zoals s20_t19_d12 en de naam van een speler of team, elk met of zonder ambient_.",
     wled: "Ook mogelijk: scores 0–180, range_100_180, s/d/t1–20, m1–m20, combinaties zoals t20_t20_t20, target7 en de naam van een speler of team.",
-    animations: "Ook mogelijk: scores 0–180, bereiken zoals 100-180, s0–s20, d1–d20, t1–t20 en combinaties zoals s20_s5_d20.",
+    animations: "Ook mogelijk: scores 0–180, bereiken zoals 100-180, s0–s20, d1–d20, t1–t20 en combinaties zoals s20_s5_d20 of miss_s20_d20, waarbij miss elke gemiste dart betekent.",
   },
   board: {
     boardStarted: "Het bord is gestart",
@@ -76,6 +76,7 @@ export default {
   },
   animations: {
     gameshot: "Een speler wint de leg",
+    matchshot: "Een speler wint de wedstrijd",
     busted: "Een speler is bust",
     bull: "Een bullseye",
     s25: "De single bull",
