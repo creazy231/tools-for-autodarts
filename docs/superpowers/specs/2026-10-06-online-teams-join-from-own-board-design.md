@@ -146,7 +146,7 @@ interface RoomState { lobbyId; teams; shifts; rule?; peers; joins: RoomJoin[] }
 - **A server restart:**
   - The room comes back empty, and each screen sends its teams and joins again when it rejoins.
   - Meanwhile the mirror keeps an absent author's joins.
-- **Seating yourself fails, or no seat shows within the wait the drawer uses (`SEAT_WAIT_MS`):** the card says "autodarts didn't give you a seat. Try again." (a new `teams.problems.notSeated`), and nothing is written.
+- **Seating yourself fails, or no seat shows within the wait the drawer uses (`SEAT_WAIT_MS`):** the card says "autodarts didn't add you to the lobby. Try again." (a new `teams.problems.notSeated`, worded as the drawer's `playersNotAdded` is), and nothing is written.
 - **Someone poses as an account in the room** (no logins, as today): they can show that account's seat on a team on the other screens. That account's own screen trusts only its own lineup, so it never does. The README's paragraph on posing says so.
 
 ### 6. What is shared
@@ -242,5 +242,5 @@ The README's *Online Teams and your data* adds "which team each of your seats jo
 
 ## To confirm live
 
-- The request the site's `/join/<id>` link makes to seat the opener's own account, and that the seat lands on their selected board.
+- That the seat `addSelf` makes lands on the account's selected board. The request itself is read from the site (2026-10-06): its `/join/<id>` page posts `{ name: username, userId, boardId: <resolved scoring board> }` to `/gs/v0/lobbies/<id>/players` (`join_._lobbyId-*.js`, `clients-*.js` `addPlayer`).
 - On the captain's own team, `data-adt-team-remote` on a joined row hides the 🌐 and leaves the pencil.
