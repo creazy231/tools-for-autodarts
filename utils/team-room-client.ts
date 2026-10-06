@@ -63,7 +63,7 @@ export class RoomClient {
   private pinger: ReturnType<typeof setInterval> | undefined;
   private joinRetry: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Set<(state: RoomClientState) => void>();
-  /** Protocol 2 until a server refuses it; then 1, for this client's life, so a page talks to an older server as 3.3.0 did. */
+  /** Protocol 2 until a server refuses it; then 1, until that connection ends, so a page talks to an older server as 3.3.0 did. */
   private protocol = PROTOCOL_VERSION;
 
   constructor(private readonly options: RoomClientOptions) {}
@@ -175,6 +175,9 @@ export class RoomClient {
       if (this.wantJoin) this.joinRoom();
     });
     socket.on("disconnect", (reason: string) => {
+      // Every new connection tries the newest protocol first: the server may have been upgraded while this page was away.
+      this.protocol = PROTOCOL_VERSION;
+      socket.auth = { v: PROTOCOL_VERSION, userId: identity.userId, name: identity.name };
       // socket.io tries again unless the server or this client ended it, and
       // until an attempt fails, that is still connecting.
       const retrying = reason !== "io server disconnect" && reason !== "io client disconnect";

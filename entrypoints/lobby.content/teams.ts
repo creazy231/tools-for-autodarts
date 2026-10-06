@@ -43,7 +43,7 @@ import { addBot, addGuest, addSelf, lobbyIdFromUrl, moveSeat } from "@/utils/lob
 import { language, onLanguageChange, t } from "@/utils/i18n";
 import { checkOwnTeam, checkTeam, colourTaken, findTeam, forgettableNames, hasBots, interleave, lineupOf, lineupPartnerRule, memberOf, normalizeName, normalizeTeams, partnerCardState, pickSlots, pruneJoins, pruneLineup, rejoinProblem, rejoinSlots, rememberTeam, resolveSlots, savedTeamProblem, seatMoves, sharedRowTeams, sharedTeams, uniqueNames, unseated, withFreeColour, withJoins, withLineup, withOnlineTeams, withPartnerRule, withSeatJoin } from "@/utils/teams";
 import { memberLabel, unevenText } from "@/utils/teams-text";
-import { inRoomOf, inviteLists, joinOffer, myRoomJoins, myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
+import { PROTOCOL_VERSION, inRoomOf, inviteLists, joinOffer, myRoomJoins, myRoomTeams, otherAccounts, roomOf, screenTeams, seatOwner, shouldJoin } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
 import { mirrorRoom } from "@/utils/team-room-mirror";
 import { BESIDE_ATTR, FALLBACK_ATTR, SWITCH_CARD_ATTR, buildSwitchCard, placeSwitchCards, renderSwitch, siteSwitchCard, switchCardsAnchor } from "@/utils/lobby-switch-cards";
@@ -690,9 +690,10 @@ function syncOnline(view: ScreenTeams) {
   syncInviteButton();
   const format: TeamFormat = view.remote.some(team => team.format === "own") ? "own" : "shared";
   const lists = inviteLists(saved, format, lobby.sets ?? 0);
-  // Only while connected: offline, the mirror may still carry joins, and a join made now would show on this screen alone.
-  const connected = roomClient?.state.connection === "connected";
-  const offer = connected ? joinOffer({ view, players: lobby.players ?? [], room: roomOf(roomStore, lobby.id), me: hostId, sets: lobby.sets ?? 0, maxSeats: lobby.maxPlayers || 6 }) : undefined;
+  // Only in this lobby's room, on protocol 2: offline, on protocol 1, or before the join is acknowledged, a join made now would show on this screen alone.
+  const client = roomClient?.state;
+  const joinable = client?.connection === "connected" && client.protocol === PROTOCOL_VERSION && client.joined === lobby.id;
+  const offer = joinable ? joinOffer({ view, players: lobby.players ?? [], room: roomOf(roomStore, lobby.id), me: hostId, sets: lobby.sets ?? 0, maxSeats: lobby.maxPlayers || 6 }) : undefined;
   Object.assign(inviteView, {
     show: view.remote.length > 0 && view.mine.size === 0 && !myJoins.length && !dismissed.has(lobby.id),
     teams: view.remote.map(team => ({ name: team.name, colour: team.colour })),
