@@ -35,6 +35,7 @@ import { animationDuration } from "@/utils/animation-duration";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { playsIn } from "@/utils/game-modes";
 import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/helpers";
+import { settleGameData } from "@/utils/settle-game-data";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, type IAnimation, type IConfig } from "@/utils/storage";
 import { LAYERS } from "@/utils/layers";
@@ -67,6 +68,13 @@ let unwatchGameData: (() => void) | undefined;
 /** The win the gameshot last played for — see {@link winId}. */
 let announcedWin: string | undefined;
 
+// Autodarts can report the same dart or completed visit more than once while
+// game data settles. Process only the settled state so an old visit cannot
+// replay its score animation during the next turn.
+const settled = settleGameData((gameData: IGameData) => {
+  void processGameData(gameData);
+});
+
 /** Object URLs handed out by OPFS, revoked on unmount. */
 const opfsUrls = new Map<string, string>();
 /** Links whose GIF failed to load, so a dead one never covers the board. */
@@ -96,8 +104,9 @@ onMounted(async () => {
 
     // Keep the handle: without it a remount — a new leg, or the hand-off out of
     // a bull-off — stacks a second watcher and every animation plays twice.
-    unwatchGameData = AutodartsToolsGameData.watch((gameData: IGameData) => {
-      if (playsIn(config.value?.animations, gameData.match?.variant)) processGameData(gameData);
+    unwatchGameData = AutodartsToolsGameData.watch((gameData: IGameData, oldGameData: IGameData) => {
+      if (!playsIn(config.value?.animations, gameData.match?.variant)) return;
+      settled.push(gameData, oldGameData);
     });
   } catch (error) {
     console.error("Autodarts Tools: Animations - initialization error", error);
@@ -106,6 +115,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   unwatchGameData?.();
+  settled.cancel();
   window.removeEventListener("resize", measureBoard);
   if (hideTimer) clearTimeout(hideTimer);
   for (const url of opfsUrls.values()) URL.revokeObjectURL(url);
