@@ -1,5 +1,5 @@
 /**
- * Online Teams: what the team room (socket/, protocol version 1) says about a
+ * Online Teams: what the team room (socket/, protocol version 2) says about a
  * lobby or its match, and how that merges with this screen's own teams.
  *
  * Both teams sit in one autodarts match, each on its captain's board; the room
@@ -17,11 +17,13 @@ import type { ColorScheme } from "@/utils/storage";
 import type { MessageKey } from "@/utils/i18n";
 import type { Lineup, LineupTeam, SavedTeam, SeatLike, TeamFormat, TeamShifts } from "@/utils/teams";
 
-import { MAX_NAME_LENGTH, findTeam, isHostedGuest, normalizeColour, normalizeName, sharedTeams, teamSeats } from "@/utils/teams";
+import { MAX_NAME_LENGTH, MAX_PLAYERS, findTeam, isHostedGuest, normalizeColour, normalizeName, sharedTeams, teamSeats } from "@/utils/teams";
 import { GameMode, gameModeLabelKey } from "@/utils/game-modes";
 
-/** Keep in step with socket/rooms.ts. */
-export const PROTOCOL_VERSION = 1;
+/** Keep in step with socket/rooms.ts: 2 added joins. */
+export const PROTOCOL_VERSION = 2;
+/** What the client falls back to when a server refuses 2: one deployed before joins. */
+export const OLDEST_PROTOCOL = 1;
 /** A lobby's mirror lives as long as its lineup does. */
 export const ROOM_TTL_MS = 24 * 60 * 60 * 1000;
 /** How long another account may take to reach the room before the chip says they aren't connected. */
@@ -44,8 +46,37 @@ export interface RoomTeam extends RoomTeamInput {
 
 export interface RoomShift { owner: string; team: string; shift: number }
 export interface RoomRule { by: string; partnerRule: boolean }
-export interface RoomPeer { userId: string; name: string }
-export interface RoomState { lobbyId: string; teams: RoomTeam[]; shifts: RoomShift[]; rule?: RoomRule; peers: RoomPeer[] }
+/**
+ * Seats of one account's that play for another account's own-score team,
+ * named by its owner and name: the joiner speaks for its own seats only.
+ */
+export interface RoomJoinInput {
+  owner: string;
+  team: string;
+  seatIds: string[];
+}
+
+export interface RoomJoin extends RoomJoinInput {
+  /** The account that said it, stamped by the server. */
+  by: string;
+}
+
+export interface RoomPeer {
+  userId: string;
+  name: string;
+  /** The oldest protocol among the account's sockets; a protocol-1 server sends none. */
+  v?: number;
+}
+
+export interface RoomState {
+  lobbyId: string;
+  teams: RoomTeam[];
+  shifts: RoomShift[];
+  rule?: RoomRule;
+  peers: RoomPeer[];
+  /** Protocol 2: who joined which team. A room without it carries no joins. */
+  joins?: RoomJoin[];
+}
 
 /** A room as this browser last heard it, for a reload, the step to the match, or an outage. */
 export interface RoomMirror extends RoomState {
@@ -68,8 +99,9 @@ export interface RoomSeat extends SeatLike {
 /**
  * The room as it arrived, kept with the lobbies of the last day. A restarted
  * server comes back empty, and the first screen to rejoin hears that first:
- * an account that is neither a peer nor an owner in the new state keeps the
- * teams and shifts it had here, and an absent author its rule, until it is back.
+ * an account that is neither a peer, an owner nor a joiner in the new state
+ * keeps the teams, shifts and joins it had here, and an absent author its
+ * rule, until it is back. A room from a protocol-1 server carries no joins.
  */
 export function withRoom(store: RoomStore | undefined, state: RoomState, now: number): RoomStore {
   const next: RoomStore = {};
@@ -78,7 +110,7 @@ export function withRoom(store: RoomStore | undefined, state: RoomState, now: nu
   }
   const last = store?.[state.lobbyId];
   const before = last && now - last.at < ROOM_TTL_MS ? last : undefined;
-  const here = new Set([ ...state.peers.map(peer => peer.userId), ...state.teams.map(team => team.owner) ]);
+  const here = new Set([ ...state.peers.map(peer => peer.userId), ...state.teams.map(team => team.owner), ...(state.joins ?? []).map(join => join.by) ]);
   const entry: RoomMirror = {
     ...state,
     teams: [ ...state.teams, ...(before?.teams ?? []).filter(team => !here.has(team.owner)) ],
@@ -86,6 +118,8 @@ export function withRoom(store: RoomStore | undefined, state: RoomState, now: nu
     at: now,
     seen: [ ...new Set([ ...(before?.seen ?? []), ...here ]) ],
   };
+  if (state.joins) entry.joins = [ ...state.joins, ...(before?.joins ?? []).filter(join => !here.has(join.by)) ];
+  else delete entry.joins;
   const rule = state.rule ?? (before?.rule && !state.peers.some(peer => peer.userId === before.rule!.by) ? before.rule : undefined);
   if (rule) entry.rule = rule;
   else delete entry.rule;
@@ -101,6 +135,17 @@ export function roomOf(store: RoomStore | undefined, id: string | undefined): Ro
 /** The account a seat plays for: its own, or for a guest or a bot, whoever added it. */
 export function seatOwner(seat: SeatLike | undefined): string | undefined {
   return seat?.userId || seat?.hostId || undefined;
+}
+
+/** A seat's place in the lobby's order, which a leg's rotation of the match's `players` leaves alone. */
+function lobbyPlace(players: readonly SeatLike[], id: string): number {
+  const at = players.findIndex(seat => seat.id === id);
+  return at < 0 ? Number.POSITIVE_INFINITY : players[at].index ?? at;
+}
+
+/** The accounts with Tools in a room: its peers, its teams' owners and its joins' authors. */
+function inRoomOf(room: RoomState): Set<string> {
+  return new Set([ ...room.peers.map(peer => peer.userId), ...room.teams.map(team => team.owner), ...(room.joins ?? []).map(join => join.by) ]);
 }
 
 /**
@@ -127,6 +172,32 @@ export function myRoomTeams(players: readonly SeatLike[], saved: readonly SavedT
   return teams;
 }
 
+/** This account's joins as the room should know them: its lineup's, each with the seats still in the lobby or match. */
+export function myRoomJoins(players: readonly SeatLike[], lineup: Lineup | undefined): RoomJoinInput[] {
+  const present = new Set(players.map(seat => seat.id).filter(Boolean));
+  return (lineup?.joins ?? [])
+    .map(join => ({ owner: join.owner, team: join.team, seatIds: join.seatIds.filter(id => present.has(id)) }))
+    .filter(join => join.seatIds.length);
+}
+
+/**
+ * The seats other accounts joined to a team, each checked to be its joiner's
+ * own, whether or not the team is there: Local Lobby leaves them on their own
+ * board, without needing anyone's lineup.
+ */
+export function joinedSeats(room: RoomState | undefined, players: readonly SeatLike[], me: string | null | undefined): Set<string> {
+  const out = new Set<string>();
+  if (!room?.joins) return out;
+  const byId = new Map(players.filter(seat => seat.id).map(seat => [ seat.id!, seat ]));
+  for (const join of room.joins) {
+    if (join.by === me) continue;
+    for (const id of join.seatIds ?? []) {
+      if (seatOwner(byId.get(id)) === join.by) out.add(id);
+    }
+  }
+  return out;
+}
+
 /**
  * The room's teams this screen takes. Not its own account's, which it knows
  * better itself. Of the others', only seats that are in autodarts' data, aren't
@@ -134,12 +205,13 @@ export function myRoomTeams(players: readonly SeatLike[], saved: readonly SavedT
  * its owner's one guest seat, named after it; an own-score team's seats are its
  * owner's, or an account's with no Tools in the room, as a friend on their own
  * board can play on someone's team. A seat that has left drops out; a team
- * with none left, or named like a team taken before, isn't taken.
+ * with none left, or named like a team taken before, isn't taken. An account
+ * with a join in the room has Tools there, as one with a team does.
  */
 function trusted(room: RoomState | undefined, players: readonly SeatLike[], me: string | null | undefined, names: ReadonlySet<string>, seats: ReadonlySet<string>): RoomTeam[] {
   if (!room || !me) return [];
   const byId = new Map(players.filter(seat => seat.id).map(seat => [ seat.id!, seat ]));
-  const inRoom = new Set([ ...room.peers.map(peer => peer.userId), ...room.teams.map(team => team.owner) ]);
+  const inRoom = inRoomOf(room);
   const takenNames = new Set(names);
   const takenSeats = new Set(seats);
   const out: RoomTeam[] = [];
@@ -188,6 +260,54 @@ export interface ScreenTeams {
   remote: RoomTeam[];
   /** This account's own teams here, by name: the ones its screen may edit and correct. */
   mine: Set<string>;
+  /** Online Teams: the joins that count here, by seat: a seat of one account's on another account's own-score team. */
+  joined: Map<string, RoomJoin>;
+}
+
+/** An own-score team with the account that owns it: joins find their team by both. */
+interface OwnedTeam { owner: string; team: LineupTeam }
+
+/**
+ * The joins this screen may count: none in a room that carries none (one from
+ * a protocol-1 server), so no screen shows a team the others can't; this
+ * account's own from its lineup, its own word, never the room's; the other
+ * accounts' from the room.
+ */
+function joinsHere(room: RoomState | undefined, lineup: Lineup | undefined, me: string | null | undefined): RoomJoin[] {
+  if (!room?.joins || !me) return [];
+  return [
+    ...(lineup?.joins ?? []).map(join => ({ owner: join.owner, team: join.team, seatIds: join.seatIds, by: me })),
+    ...room.joins.filter(join => join.by && join.by !== me),
+  ];
+}
+
+/**
+ * Each join's seats onto its team, found by its owner and name among the
+ * own-score teams this screen has taken. A seat counts when it is in
+ * autodarts' data, is its joiner's own, is on no team yet (a team of its
+ * owner's own keeps it), and the team has room. Seats earlier in the lobby's
+ * order go first, so every screen fills a team alike, and a team that took a
+ * seat is put back in the lobby's order. Returns the joins that count, by seat.
+ */
+function applyJoins(owned: OwnedTeam[], joins: readonly RoomJoin[], players: readonly SeatLike[]): Map<string, RoomJoin> {
+  const joined = new Map<string, RoomJoin>();
+  if (!joins.length) return joined;
+  const byId = new Map(players.filter(seat => seat.id).map(seat => [ seat.id!, seat ]));
+  const taken = new Set(owned.flatMap(entry => entry.team.seatIds));
+  const candidates = joins
+    .flatMap(join => (join.seatIds ?? []).map(id => ({ id, join })))
+    .sort((a, b) => lobbyPlace(players, a.id) - lobbyPlace(players, b.id));
+  const grown = new Set<OwnedTeam>();
+  for (const { id, join } of candidates) {
+    const target = owned.find(entry => entry.owner === join.owner && entry.team.name === normalizeName(join.team));
+    if (!target || taken.has(id) || seatOwner(byId.get(id)) !== join.by || target.team.seatIds.length >= MAX_PLAYERS) continue;
+    target.team.seatIds.push(id);
+    taken.add(id);
+    joined.set(id, join);
+    grown.add(target);
+  }
+  for (const entry of grown) entry.team.seatIds.sort((a, b) => lobbyPlace(players, a) - lobbyPlace(players, b));
+  return joined;
 }
 
 /** A lobby's or a match's teams as this screen shows them: its own, and what the room says of everyone else's. */
@@ -209,15 +329,17 @@ export function screenTeams(input: ScreenInput): ScreenTeams {
     if (index >= 0) shared.set(index, { name: team.name, players: team.players, colour: team.colour, format: "shared" });
   }
 
-  const own: LineupTeam[] = remote.filter(team => team.format === "own").map(team => ({ name: team.name, colour: team.colour, seatIds: team.seatIds }));
-  const teams = [ ...(lineup?.teams ?? []), ...own ];
-  if (own.length) {
+  // Own-score teams with their owners, as copies: joins add seats to them.
+  const owned: OwnedTeam[] = [
+    ...(lineup?.teams ?? []).map(team => ({ owner: me ?? "", team: { ...team, seatIds: [ ...team.seatIds ] } })),
+    ...remote.filter(team => team.format === "own").map(team => ({ owner: team.owner, team: { name: team.name, colour: team.colour, seatIds: [ ...team.seatIds ] } })),
+  ];
+  const joined = applyJoins(owned, joinsHere(room, lineup, me), players);
+  const teams = owned.map(entry => entry.team);
+  if (owned.length > (lineup?.teams.length ?? 0) || joined.size) {
     // Every screen lists the teams alike (the pill's tally): by their first seat
     // in the lobby's order, which a leg's rotation of `players` leaves alone.
-    const place = (team: LineupTeam) => Math.min(...team.seatIds.map((id) => {
-      const at = players.findIndex(seat => seat.id === id);
-      return at < 0 ? Number.POSITIVE_INFINITY : players[at].index ?? at;
-    }));
+    const place = (team: LineupTeam) => Math.min(...team.seatIds.map(id => lobbyPlace(players, id)));
     teams.sort((a, b) => place(a) - place(b));
   }
   const isHost = Boolean(me) && me === hostId;
@@ -229,7 +351,7 @@ export function screenTeams(input: ScreenInput): ScreenTeams {
     const team = remote.find(candidate => candidate.format === "shared" && candidate.owner === shift.owner && candidate.name === normalizeName(shift.team));
     if (team && Number.isInteger(shift.shift)) mergedShifts[team.name] = shift.shift;
   }
-  return { shared, lineup: merged, shifts: mergedShifts, remote, mine };
+  return { shared, lineup: merged, shifts: mergedShifts, remote, mine, joined };
 }
 
 /** The other accounts with seats here, each once, by the name the site shows for them. */
@@ -353,7 +475,7 @@ export function undoActor(seat: SeatLike | undefined, me: string | null | undefi
   if (!owner || !me) return "none";
   if (owner === me) return "own";
   // "Is, or was": an account whose Tools a restart has briefly taken out of the room still takes back its own.
-  const inRoom = room.peers.some(peer => peer.userId === owner) || room.teams.some(team => team.owner === owner) || Boolean(room.seen?.includes(owner));
+  const inRoom = inRoomOf(room).has(owner) || Boolean(room.seen?.includes(owner));
   return !inRoom && me === hostId ? "fallback" : "none";
 }
 
