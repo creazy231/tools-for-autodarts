@@ -4,8 +4,7 @@ The team room for Tools for Autodarts' Online Teams: one room per autodarts
 lobby, held in memory while the lobby and its match last. It shares each
 account's teams (names, players, order, colours), tap-to-correct, the host's
 partner rule and one-time claims between the Tools in a lobby. Darts and
-scores stay with autodarts. Protocol version 1; the extension's side is
-`utils/team-room.ts`.
+scores stay with autodarts. Protocol version 2, which added the seats one account plays for another account's team (`room:joins`). Version 1 (Tools 3.3.0) is still taken, and simply sees no joins. The extension's side is `utils/team-room.ts`.
 
 ```bash
 bun install
@@ -14,7 +13,7 @@ bun test         # rooms.ts
 bun run typecheck   # tsc, with the Bun types
 ```
 
-`GET /health` answers `{"ok":true,"version":1,"rooms":n,"sockets":n}`.
+`GET /health` answers `{"ok":true,"version":2,"oldest":1,"rooms":n,"sockets":n}`.
 
 A `yarn dev` build connects from play.autodarts.com to `ws://localhost:4455`,
 which both browsers treat as a public site reaching into your machine (Local
@@ -25,6 +24,8 @@ server, set `ADT_TEAMS_SERVER` before `yarn dev`, e.g.
 `ADT_TEAMS_SERVER=https://adt-socket.tobias-thiele.de`.
 
 ## Deploying
+
+Deploy this before releasing a Tools that speaks a newer protocol. A newer Tools that meets an older server falls back to the protocol that server speaks, so Online Teams keeps working, but without what the newer protocol added: with protocol 2, joining a team from your own board.
 
 `docker-compose.yml` is set up for Coolify: set the domain on the `socket`
 service (store builds talk to `https://adt-socket.tobias-thiele.de`), and keep

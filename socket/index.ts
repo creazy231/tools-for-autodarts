@@ -1,7 +1,7 @@
 /**
  * Online Teams' server: a team room per autodarts lobby (rooms.ts), over
  * socket.io. It carries the team layer only (names, players, order, colours,
- * tap-to-correct, the host's partner rule, one-time claims); darts and scores
+ * tap-to-correct, the host's partner rule, which seats joined which team, one-time claims); darts and scores
  * stay with autodarts.
  *
  * Run locally with `bun run dev` (port 4455), which the extension's `yarn dev`
@@ -11,7 +11,7 @@
 import { createServer } from "node:http";
 import { Server, type Socket } from "socket.io";
 
-import { PROTOCOL_VERSION, type Result, type RoomState, Rooms, parsePeer } from "./rooms";
+import { OLDEST_PROTOCOL, PROTOCOL_VERSION, type Result, type RoomState, Rooms, isProtocol, parsePeer } from "./rooms";
 
 const PORT = Number(process.env.PORT) || 4455;
 /** socket.io's own cap on one message. */
@@ -45,7 +45,7 @@ const rooms = new Rooms();
 const http = createServer((request, response) => {
   if (request.url === "/health") {
     response.writeHead(200, { "Content-Type": "application/json" });
-    response.end(JSON.stringify({ ok: true, version: PROTOCOL_VERSION, ...rooms.counts() }));
+    response.end(JSON.stringify({ ok: true, version: PROTOCOL_VERSION, oldest: OLDEST_PROTOCOL, ...rooms.counts() }));
     return;
   }
   response.writeHead(404).end();
@@ -70,7 +70,7 @@ const io = new Server(http, {
 
 io.use((socket, next) => {
   const auth = (socket.handshake.auth ?? {}) as Payload;
-  if (auth.v !== PROTOCOL_VERSION) return next(new Error("version"));
+  if (!isProtocol(auth.v)) return next(new Error("version"));
   const peer = parsePeer(auth);
   if (!peer) return next(new Error("identity"));
   socket.data.peer = peer;
@@ -123,6 +123,7 @@ io.on("connection", (socket: Socket) => {
   on("room:teams", ({ lobbyId, teams }) => rooms.setTeams(lobbyId, socket.id, teams), broadcast);
   on("room:shift", ({ lobbyId, team, shift }) => rooms.setShift(lobbyId, socket.id, { team, shift }), broadcast);
   on("room:rule", ({ lobbyId, partnerRule }) => rooms.setRule(lobbyId, socket.id, { partnerRule }), broadcast);
+  on("room:joins", ({ lobbyId, joins }) => rooms.setJoins(lobbyId, socket.id, joins), broadcast);
   on("room:claim", ({ lobbyId, key }) => rooms.claim(lobbyId, socket.id, key));
   // Answered wherever its ack comes: `emit("room:ping", cb)` and `emit("room:ping", payload, cb)` alike.
   socket.on("room:ping", (...args: unknown[]) => {
@@ -141,5 +142,5 @@ setInterval(() => {
 }, SWEEP_MS);
 
 http.listen(PORT, () => {
-  console.log(`Online Teams server on :${PORT}, protocol ${PROTOCOL_VERSION}`);
+  console.log(`Online Teams server on :${PORT}, protocols ${OLDEST_PROTOCOL}–${PROTOCOL_VERSION}`);
 });
