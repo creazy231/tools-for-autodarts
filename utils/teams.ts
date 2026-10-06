@@ -110,12 +110,21 @@ export interface LineupTeam {
   seatIds: string[];
 }
 
-/** A lobby's own-score teams, in the order they were added. */
+/** Online Teams: seats of this account's that play for another account's own-score team, the team named by its owner and name. */
+export interface LineupJoin {
+  owner: string;
+  team: string;
+  seatIds: string[];
+}
+
+/** A lobby's own-score teams as this account set them up, in the order they were added, and the teams its seats joined. */
 export interface Lineup {
   at: number;
   teams: LineupTeam[];
   /** The lobby's partner rule, from its card. A lineup written before the card has none, and goes by the setting. */
   partnerRule?: boolean;
+  /** This account's own word for the seats it joined to other accounts' teams (utils/team-room.ts). */
+  joins?: LineupJoin[];
 }
 
 /** Per lobby id, which is also its match's id. */
@@ -501,26 +510,51 @@ function plainLineupTeam(team: LineupTeam): LineupTeam {
   return { name: team.name, colour: { preset, from, to }, seatIds: [ ...team.seatIds ] };
 }
 
-/**
- * A lobby's own-score teams written into the store, as plain data. Teams with
- * no seats are dropped, a lobby with no teams has no lineup, and entries older
- * than a day go. The lobby's partner rule is kept unless a new one is given.
- */
-export function withLineup(store: LineupStore | undefined, lobbyId: string, teams: readonly LineupTeam[], now: number, partnerRule?: boolean): LineupStore {
+function plainJoin(join: LineupJoin): LineupJoin {
+  return { owner: join.owner, team: join.team, seatIds: [ ...join.seatIds ] };
+}
+
+/** The store's other lobbies, those written within the last day. */
+function otherLineups(store: LineupStore | undefined, lobbyId: string, now: number): LineupStore {
   const next: LineupStore = {};
   for (const [ id, entry ] of Object.entries(store ?? {})) {
     if (id !== lobbyId && entry && now - entry.at < SHIFT_TTL_MS) next[id] = entry;
   }
+  return next;
+}
+
+/** A lobby's entry as plain data, or none when it has neither a team nor a join with seats. */
+function lineupEntry(teams: readonly LineupTeam[], joins: readonly LineupJoin[] | undefined, partnerRule: boolean | undefined, now: number): Lineup | undefined {
   const kept = teams.filter(team => team.seatIds.length).map(plainLineupTeam);
-  const rule = partnerRule ?? store?.[lobbyId]?.partnerRule;
-  if (kept.length) next[lobbyId] = rule === undefined ? { at: now, teams: kept } : { at: now, teams: kept, partnerRule: rule };
+  const keptJoins = (joins ?? []).filter(join => join.seatIds.length).map(plainJoin);
+  if (!kept.length && !keptJoins.length) return undefined;
+  const entry: Lineup = { at: now, teams: kept };
+  if (partnerRule !== undefined) entry.partnerRule = partnerRule;
+  if (keptJoins.length) entry.joins = keptJoins;
+  return entry;
+}
+
+/**
+ * A lobby's own-score teams written into the store, as plain data. Teams with
+ * no seats are dropped, a lobby with neither teams nor joins has no lineup, and
+ * entries older than a day go. The lobby's partner rule and joins are kept
+ * unless a new rule is given.
+ */
+export function withLineup(store: LineupStore | undefined, lobbyId: string, teams: readonly LineupTeam[], now: number, partnerRule?: boolean): LineupStore {
+  const next = otherLineups(store, lobbyId, now);
+  const entry = lineupEntry(teams, store?.[lobbyId]?.joins, partnerRule ?? store?.[lobbyId]?.partnerRule, now);
+  if (entry) next[lobbyId] = entry;
   return next;
 }
 
 /** The lobby card's partner rule written into the lobby's lineup. A lobby with no lineup yet has nothing to hold it; the setting does. */
 export function withPartnerRule(store: LineupStore | undefined, lobbyId: string, on: boolean, now: number): LineupStore {
   const lineup = store?.[lobbyId];
-  return lineup ? withLineup(store, lobbyId, lineup.teams, now, on) : { ...store };
+  if (!lineup) return { ...store };
+  const next = otherLineups(store, lobbyId, now);
+  const entry = lineupEntry(lineup.teams, lineup.joins, on, now);
+  if (entry) next[lobbyId] = entry;
+  return next;
 }
 
 /** Whether a match plays the partner rule: its lobby's choice, or for a lineup from before the lobby card, the setting. */
@@ -544,6 +578,29 @@ export function pruneLineup(teams: readonly LineupTeam[], seatIds: readonly stri
   return teams
     .map(team => ({ ...team, seatIds: team.seatIds.filter(id => position.has(id)).sort((a, b) => position.get(a)! - position.get(b)!) }))
     .filter(team => team.seatIds.length);
+}
+
+/** The joins as the lobby stands: the seats that left taken out, and the joins with none left dropped. */
+export function pruneJoins(joins: readonly LineupJoin[], seatIds: readonly string[]): LineupJoin[] {
+  const present = new Set(seatIds);
+  return joins
+    .map(join => ({ ...join, seatIds: join.seatIds.filter(id => present.has(id)) }))
+    .filter(join => join.seatIds.length);
+}
+
+/** One seat on one team: off any team it joined before, and onto `join`'s, or off all of them when there is none. */
+export function withSeatJoin(joins: readonly LineupJoin[], seatId: string, join?: LineupJoin): LineupJoin[] {
+  const rest = pruneJoins(joins, joins.flatMap(other => other.seatIds).filter(id => id !== seatId));
+  return join ? [ ...rest, join ] : rest;
+}
+
+/** A lobby's joins written into the store, its teams and partner rule kept. Joins with no seats are dropped. */
+export function withJoins(store: LineupStore | undefined, lobbyId: string, joins: readonly LineupJoin[], now: number): LineupStore {
+  const next = otherLineups(store, lobbyId, now);
+  const last = store?.[lobbyId];
+  const entry = lineupEntry(last?.teams ?? [], joins, last?.partnerRule, now);
+  if (entry) next[lobbyId] = entry;
+  return next;
 }
 
 /** The format a lobby's teams have, or none while it has no team: the first team sets it. */
