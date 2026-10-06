@@ -15,6 +15,16 @@
     </div>
     <div class="adt-invite-picks">
       <button
+        @click="view.playFor(team)"
+        v-for="team in view.play"
+        :key="`${team.owner}|${team.name}`"
+        :disabled="view.busy || view.full || view.behind.length > 0"
+        class="adt-invite-pick is-go"
+        type="button"
+      >
+        <i :style="{ backgroundImage: gradient(team.colour) }" />{{ t("teams.online.invitation.play", { team: team.name }) }}<small v-if="team.captain">{{ team.captain }}</small>
+      </button>
+      <button
         @click="view.join(team)"
         v-for="team in view.saved"
         :key="team.name"
@@ -33,6 +43,12 @@
     </div>
     <p v-for="reason in view.reasons" :key="reason" class="adt-invite-why">
       {{ reason === "sets" ? t("teams.online.invitation.setsLobby") : t("teams.online.invitation.otherFormat", { format: formatText }) }}
+    </p>
+    <p v-if="view.play.length && view.behind.length" class="adt-invite-why">
+      {{ t("teams.online.invitation.behind", { names: list(view.behind), count: view.behind.length }) }}
+    </p>
+    <p v-else-if="view.play.length && view.full" class="adt-invite-why">
+      {{ t("teams.problems.lobbyFull") }}
     </p>
     <p v-if="view.busy || view.problem" class="adt-invite-note" aria-live="polite">
       {{ view.busy ? t("teams.online.invitation.busy") : problem }}
