@@ -20,7 +20,7 @@ import type { ILobbies } from "@/utils/websocket-helpers";
 import { SELECTORS, qsa } from "@/utils/selectors";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
 import { AutodartsToolsTeamRoom } from "@/utils/storage";
-import { roomOf, screenTeams } from "@/utils/team-room";
+import { joinedSeats, roomOf, screenTeams } from "@/utils/team-room";
 import { CLAIM_GRACE_MS, boardButtonsToPress } from "@/utils/local-lobby-rows";
 import { fetchWithAuth, getUserIdFromToken } from "@/utils/helpers";
 
@@ -162,8 +162,9 @@ async function removeSelf(lobby: ILobbies, userId: string) {
  * Pull everyone onto this board, by the 🌐 on each row whose seat someone
  * else hosts (utils/local-lobby-rows.ts).
  *
- * Online Teams: a seat of another account's team stays on that account's
- * board (utils/team-room.ts). Rows come in seat order.
+ * Online Teams: a seat of another account's team, or one another account
+ * joined to a team, stays on that account's board (utils/team-room.ts). Rows
+ * come in seat order.
  */
 function claimBoards(lobby: ILobbies, userId: string) {
   const players = lobby.players ?? [];
@@ -180,7 +181,9 @@ function claimBoards(lobby: ILobbies, userId: string) {
     }, CLAIM_GRACE_MS + 100);
   }
   const room = roomOf(roomStore, lobby.id);
-  const theirs = new Set(screenTeams({ players, saved: [], lineup: undefined, shifts: {}, room, me: userId, hostId: lobby.host?.id }).remote.flatMap(team => team.seatIds));
+  // Another account's team stays on its board, and so does a seat another account joined to any team, ours included.
+  const view = screenTeams({ players, saved: [], lineup: undefined, shifts: {}, room, me: userId, hostId: lobby.host?.id });
+  const theirs = new Set([ ...view.remote.flatMap(team => team.seatIds), ...joinedSeats(room, players, userId) ]);
   for (const button of boardButtonsToPress(qsa(SELECTORS.lobby.playerRows), players.map(seat => seat.id), theirs, seenAt, now)) {
     button.click();
     console.log("Autodarts Tools: Local Lobby - Moved a player onto this board");

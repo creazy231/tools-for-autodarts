@@ -44,7 +44,7 @@ import { language, onLanguageChange, t } from "@/utils/i18n";
 import { TEAMS_PILL_TAG, assignCards, cardTeams, decidedTeam, lineupOf, lineupPartnerRule, lineupTeams, normalizeName, normalizeTeams, playerUp, shiftFor, shiftsOf, teamLegs, withShift } from "@/utils/teams";
 import { ownPill, sharedPill } from "@/utils/teams-pill";
 import { ruleBustNote, ruleNextNote, ruleNotAskedNote, ruleRefusedNote } from "@/utils/teams-text";
-import { myRoomTeams, roomOf, screenTeams, shouldJoin, takesPart, undoActor, undoKey, undoOutcome } from "@/utils/team-room";
+import { myRoomJoins, myRoomTeams, roomOf, screenTeams, shouldJoin, takesPart, undoActor, undoKey, undoOutcome } from "@/utils/team-room";
 import { RoomClient, tokenIdentity } from "@/utils/team-room-client";
 import { mirrorRoom } from "@/utils/team-room-mirror";
 
@@ -330,6 +330,8 @@ function syncRoom(current: IMatch) {
   const mine = myRoomTeams(players, saved, lineup, hostId);
   roomClient.setJoin(shouldJoin(players, mine, hostId, current.host?.id));
   roomClient.publishTeams(mine);
+  // And its joins, which a reloaded page or a restarted server would otherwise go without.
+  roomClient.publishJoins(myRoomJoins(players, lineup));
   // Its corrections too, which a reloaded page or a restarted server would otherwise go without.
   const shifts = shiftsOf(shiftStore, current.id);
   for (const team of mine) {

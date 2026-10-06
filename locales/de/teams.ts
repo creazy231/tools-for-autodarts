@@ -33,6 +33,10 @@ export default {
       title: "Team bearbeiten",
       label: "{name} bearbeiten",
     },
+    leave: {
+      title: "Team verlassen",
+      label: "{team} verlassen",
+    },
     memberOf: "{place} von {size}",
     partnerRule: {
       title: "Partnerregel",
@@ -128,6 +132,7 @@ export default {
     notLoaded: "Die Lobby ist noch nicht geladen. Versuch es gleich noch einmal.",
     playersNotAdded: "autodarts hat nicht alle neuen Spieler hinzugefügt. Versuch es noch einmal.",
     namesNotAdded: "autodarts hat {names} nicht hinzugefügt. Versuch es noch einmal.",
+    notSeated: "autodarts hat dich nicht zur Lobby hinzugefügt. Versuch es noch einmal.",
     notInLobby: {
       one: "Hinzugefügt. {names} ist nicht in der Lobby: Angemeldete Spieler treten von ihrem eigenen Board aus bei.",
       other: "Hinzugefügt. {names} sind nicht in der Lobby: Angemeldete Spieler treten von ihrem eigenen Board aus bei.",
@@ -160,6 +165,7 @@ export default {
       missing: { one: "{names} ist nicht verbunden", other: "{names} sind nicht verbunden" },
       offline: "Online-Teams offline",
       outdated: "Aktualisiere Tools für Online-Teams",
+      behind: { one: "{names} braucht ein neueres Tools", other: "{names} brauchen ein neueres Tools" },
     },
     card: {
       title: "Online-Teams",
@@ -173,7 +179,7 @@ export default {
       connected: "verbunden",
       notConnected: "nicht verbunden",
       shared: "Geteilt",
-      sharedValue: "Teamnamen, Spieler, Farben, Reihenfolge",
+      sharedValue: "Teamnamen, Spieler, Farben, Reihenfolge, wer für welches Team spielt",
       retry: "Erneut versuchen",
       close: "Schließen",
     },
@@ -189,6 +195,11 @@ export default {
       sets: { one: "{game} · Erster bis {count} Set", other: "{game} · Erster bis {count} Sets" },
       join: "Mit {team} beitreten",
       newTeam: "Neues Team",
+      play: "Für {team} spielen",
+      behind: {
+        one: "{names} braucht ein neueres Tools, bevor jemand vom eigenen Board aus einem Team beitreten kann",
+        other: "{names} brauchen ein neueres Tools, bevor jemand vom eigenen Board aus einem Team beitreten kann",
+      },
       otherFormat: "Diese Lobby spielt mit {format}",
       setsLobby: "Eigene Scores spielen Legs, und diese Lobby spielt Sets",
       formats: {
@@ -204,7 +215,7 @@ export default {
     },
     settings: {
       title: "Online-Teams",
-      description: "In einer Lobby von autodarts und in deinen Matches verbindet sich Tools mit seinem eigenen Server und nennt ihm deine Benutzer-ID und deinen Namen, damit die Lobby zeigen kann, ob Teams online spielen können. Mit einem Team und einem weiteren Account in der Lobby teilt es außerdem die Namen, Spieler, Farben und die Reihenfolge der Teams mit dem Tools der anderen. Darts und Punkte bleiben bei autodarts, und der Server vergisst alles eine halbe Stunde, nachdem alle gegangen sind.",
+      description: "In einer Lobby von autodarts und in deinen Matches verbindet sich Tools mit seinem eigenen Server und nennt ihm deine Benutzer-ID und deinen Namen, damit die Lobby zeigen kann, ob Teams online spielen können. Mit einem Team und einem weiteren Account in der Lobby teilt es außerdem die Namen, Spieler, Farben und die Reihenfolge der Teams mit dem Tools der anderen, und wenn du im Team eines anderen Accounts spielst, auch, welches Team das ist. Darts und Punkte bleiben bei autodarts, und der Server vergisst alles eine halbe Stunde, nachdem alle gegangen sind.",
     },
   },
 } satisfies Translation<typeof en>;

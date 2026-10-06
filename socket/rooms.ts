@@ -1,6 +1,7 @@
 /**
  * Online Teams' rooms: one per autodarts lobby (its match keeps the lobby's
- * id), holding each account's teams while the lobby and its match last.
+ * id), holding each account's teams, and the seats it joined to other
+ * accounts' teams, while the lobby and its match last.
  *
  * Pure: no sockets and no timers of its own. index.ts wires it to socket.io
  * and sweeps it once a minute. The extension's side is utils/team-room.ts;
@@ -8,11 +9,15 @@
  *
  * The server can't tell who anyone is (there are no logins), so it only keeps
  * each account to its own entries: a socket names its account once, at
- * connect, and can only write that account's teams and shifts. Whether a team
- * may be shown at all is each screen's call, from autodarts' own data.
+ * connect, and can only write that account's teams, shifts and joins. Whether
+ * a team, or a seat joined to it, may be shown at all is each screen's call,
+ * from autodarts' own data.
  */
 
-export const PROTOCOL_VERSION = 1;
+/** Protocol 2 added joins: a seat of one account playing for another account's team. */
+export const PROTOCOL_VERSION = 2;
+/** The oldest protocol still taken: Tools 3.3.0 speaks 1, and simply sees no joins. */
+export const OLDEST_PROTOCOL = 1;
 
 export const LIMITS = {
   teamsPerOwner: 6,
@@ -29,6 +34,9 @@ export const LIMITS = {
   rooms: 2000,
   claimKeyLength: 200,
   maxShift: 100,
+  /** An account's joins in a room, and the accounts with joins there: a leaving account's joins stay, as its teams do. */
+  joinsPerAccount: 6,
+  joinersPerRoom: 16,
 } as const;
 
 /** An empty room waits this long: a reload, or the step from lobby to match, comes back well within it. */
@@ -44,8 +52,11 @@ export interface RoomTeamInput { name: string; colour: Colour; format: TeamForma
 export interface RoomTeam extends RoomTeamInput { owner: string }
 export interface RoomShift { owner: string; team: string; shift: number }
 export interface RoomRule { by: string; partnerRule: boolean }
-export interface RoomPeer { userId: string; name: string }
-export interface RoomState { lobbyId: string; teams: RoomTeam[]; shifts: RoomShift[]; rule?: RoomRule; peers: RoomPeer[] }
+export interface RoomPeer { userId: string; name: string; v: number }
+/** Seats of the sender's own that play for another account's own-score team, named by its owner and name. */
+export interface RoomJoinInput { owner: string; team: string; seatIds: string[] }
+export interface RoomJoin extends RoomJoinInput { by: string }
+export interface RoomState { lobbyId: string; teams: RoomTeam[]; shifts: RoomShift[]; rule?: RoomRule; peers: RoomPeer[]; joins: RoomJoin[] }
 
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
@@ -62,11 +73,16 @@ function text(value: unknown, max: number): string | undefined {
   return trimmed && trimmed.length <= max ? trimmed : undefined;
 }
 
-/** Who a socket says it is, at connect. */
+/** A protocol this server speaks. */
+export function isProtocol(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= OLDEST_PROTOCOL && value <= PROTOCOL_VERSION;
+}
+
+/** Who a socket says it is at connect, and which protocol it speaks. */
 export function parsePeer(raw: unknown): RoomPeer | undefined {
   const value = (raw ?? {}) as Record<string, unknown>;
   const name = text(value.name, 64);
-  return isId(value.userId) && name ? { userId: value.userId, name } : undefined;
+  return isId(value.userId) && name && isProtocol(value.v) ? { userId: value.userId, name, v: value.v } : undefined;
 }
 
 function parseColour(raw: unknown): Colour | undefined {
@@ -102,6 +118,32 @@ export function parseTeams(raw: unknown): Result<RoomTeamInput[]> {
   return { ok: true, value: teams };
 }
 
+function parseJoin(raw: unknown, by: string): RoomJoinInput | undefined {
+  const value = (raw ?? {}) as Record<string, unknown>;
+  const team = text(value.team, LIMITS.nameLength);
+  if (!isId(value.owner) || value.owner === by || !team || !Array.isArray(value.seatIds)) return undefined;
+  const seatIds = value.seatIds as unknown[];
+  if (!seatIds.length || seatIds.length > LIMITS.seatsPerTeam || !seatIds.every(isId)) return undefined;
+  return { owner: value.owner, team, seatIds: seatIds as string[] };
+}
+
+/** An account's joins for a room: all of them valid, each seat on one team only, or none taken. */
+export function parseJoins(raw: unknown, by: string): Result<RoomJoinInput[]> {
+  if (!Array.isArray(raw) || raw.length > LIMITS.joinsPerAccount) return { ok: false, error: "joins" };
+  const joins: RoomJoinInput[] = [];
+  const seats = new Set<string>();
+  for (const entry of raw) {
+    const join = parseJoin(entry, by);
+    if (!join) return { ok: false, error: "joins" };
+    for (const id of join.seatIds) {
+      if (seats.has(id)) return { ok: false, error: "joins" };
+      seats.add(id);
+    }
+    joins.push(join);
+  }
+  return { ok: true, value: joins };
+}
+
 interface Room {
   id: string;
   createdAt: number;
@@ -112,6 +154,8 @@ interface Room {
   /** Per "owner|team". */
   shifts: Map<string, RoomShift>;
   rule?: RoomRule;
+  /** Per account, the seats it joined to other accounts' teams. */
+  joins: Map<string, RoomJoin[]>;
   claims: Map<string, { by: string; at: number }>;
   /** Per socket id, the account it named at connect. */
   sockets: Map<string, RoomPeer>;
@@ -130,7 +174,7 @@ export class Rooms {
     let room = this.rooms.get(lobbyId);
     if (!room) {
       if (this.rooms.size >= LIMITS.rooms) return { ok: false, error: "busy" };
-      room = { id: lobbyId, createdAt: this.now(), teams: new Map(), shifts: new Map(), claims: new Map(), sockets: new Map() };
+      room = { id: lobbyId, createdAt: this.now(), teams: new Map(), shifts: new Map(), joins: new Map(), claims: new Map(), sockets: new Map() };
       this.rooms.set(lobbyId, room);
     }
     const accounts = new Set([ ...room.sockets.values() ].map(other => other.userId));
@@ -189,6 +233,18 @@ export class Rooms {
     const owner = room.sockets.get(socketId)!.userId;
     if (!(room.teams.get(owner) ?? []).some(candidate => candidate.name === team)) return { ok: false, error: "owner" };
     room.shifts.set(`${owner}|${team}`, { owner, team, shift });
+    return { ok: true, value: this.stateOf(room) };
+  }
+
+  setJoins(lobbyId: unknown, socketId: string, raw: unknown): Result<RoomState> {
+    const room = this.memberRoom(lobbyId, socketId);
+    if (!room) return { ok: false, error: "room" };
+    const by = room.sockets.get(socketId)!.userId;
+    const parsed = parseJoins(raw, by);
+    if (!parsed.ok) return parsed;
+    if (parsed.value.length && !room.joins.has(by) && room.joins.size >= LIMITS.joinersPerRoom) return { ok: false, error: "full" };
+    if (parsed.value.length) room.joins.set(by, parsed.value.map(join => ({ ...join, by })));
+    else room.joins.delete(by);
     return { ok: true, value: this.stateOf(room) };
   }
 
@@ -254,13 +310,18 @@ export class Rooms {
 
   private stateOf(room: Room): RoomState {
     const peers = new Map<string, RoomPeer>();
-    for (const peer of room.sockets.values()) peers.set(peer.userId, peer);
+    for (const peer of room.sockets.values()) {
+      const known = peers.get(peer.userId);
+      // An account speaks the oldest protocol among its sockets: a 3.3.0 phone beside a new desktop can't show joins.
+      if (!known || peer.v < known.v) peers.set(peer.userId, peer);
+    }
     return {
       lobbyId: room.id,
       teams: [ ...room.teams.values() ].flat(),
       shifts: [ ...room.shifts.values() ],
       ...(room.rule ? { rule: room.rule } : {}),
       peers: [ ...peers.values() ],
+      joins: [ ...room.joins.values() ].flat(),
     };
   }
 }

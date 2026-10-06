@@ -33,6 +33,10 @@ export default {
       title: "Team bewerken",
       label: "{name} bewerken",
     },
+    leave: {
+      title: "Team verlaten",
+      label: "{team} verlaten",
+    },
     memberOf: "{place} van {size}",
     partnerRule: {
       title: "Partnerregel",
@@ -128,6 +132,7 @@ export default {
     notLoaded: "De lobby is nog niet geladen. Probeer het zo opnieuw.",
     playersNotAdded: "autodarts heeft niet alle nieuwe spelers toegevoegd. Probeer het opnieuw.",
     namesNotAdded: "autodarts heeft {names} niet toegevoegd. Probeer het opnieuw.",
+    notSeated: "autodarts heeft je niet aan de lobby toegevoegd. Probeer het opnieuw.",
     notInLobby: {
       one: "Toegevoegd. {names} is niet in de lobby: aangemelde spelers nemen deel vanaf hun eigen bord.",
       other: "Toegevoegd. {names} zijn niet in de lobby: aangemelde spelers nemen deel vanaf hun eigen bord.",
@@ -160,6 +165,7 @@ export default {
       missing: { one: "{names} is niet verbonden", other: "{names} zijn niet verbonden" },
       offline: "Online teams offline",
       outdated: "Werk Tools bij voor Online teams",
+      behind: { one: "{names} heeft een nieuwere Tools nodig", other: "{names} hebben een nieuwere Tools nodig" },
     },
     card: {
       title: "Online teams",
@@ -173,7 +179,7 @@ export default {
       connected: "verbonden",
       notConnected: "niet verbonden",
       shared: "Gedeeld",
-      sharedValue: "teamnamen, spelers, kleuren, volgorde",
+      sharedValue: "teamnamen, spelers, kleuren, volgorde, wie voor welk team speelt",
       retry: "Opnieuw proberen",
       close: "Sluiten",
     },
@@ -189,6 +195,11 @@ export default {
       sets: { one: "{game} · Eerste tot {count} set", other: "{game} · Eerste tot {count} sets" },
       join: "Meedoen met {team}",
       newTeam: "Nieuw team",
+      play: "Spelen voor {team}",
+      behind: {
+        one: "{names} heeft een nieuwere Tools nodig voordat iemand vanaf het eigen bord met een team kan meedoen",
+        other: "{names} hebben een nieuwere Tools nodig voordat iemand vanaf het eigen bord met een team kan meedoen",
+      },
       otherFormat: "Deze lobby speelt met {format}",
       setsLobby: "Eigen scores spelen legs, en deze lobby speelt sets",
       formats: {
@@ -204,7 +215,7 @@ export default {
     },
     settings: {
       title: "Online teams",
-      description: "In een lobby van autodarts en in je eigen matches maakt Tools met je gebruikers-id en naam verbinding met zijn eigen server, zodat de lobby kan laten zien of teams online kunnen spelen. Met een team en nog een account in de lobby deelt het ook de namen, spelers, kleuren en volgorde van de teams met de Tools van de anderen. Darts en scores blijven bij autodarts, en de server vergeet alles een half uur nadat iedereen weg is.",
+      description: "In een lobby van autodarts en in je eigen matches maakt Tools met je gebruikers-id en naam verbinding met zijn eigen server, zodat de lobby kan laten zien of teams online kunnen spelen. Met een team en nog een account in de lobby deelt het ook de namen, spelers, kleuren en volgorde van de teams met de Tools van de anderen, en als je in het team van een ander account speelt, ook welk team dat is. Darts en scores blijven bij autodarts, en de server vergeet alles een half uur nadat iedereen weg is.",
     },
   },
 } satisfies Translation<typeof en>;

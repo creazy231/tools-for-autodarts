@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Online Teams**: players on their own board join a team themselves. With own scores, the captains add their teams, and each player taps **Play for TEAM RED** in the invitation, which seats them on their own board first if they need a seat. **Leave team**, a person with a minus on their own row, takes them off again. Four players on four boards can now play two against two. Every Tools in the lobby needs this version: the invitation and the chip name any account whose Tools is older. The team server speaks a new protocol for it, and still takes 3.3.0's
+
 ## [3.3.0] - 2026-10-04
 
 ### Added

@@ -52,6 +52,11 @@ export default {
       title: "Edit team",
       label: "Edit {name}",
     },
+    /** The button on your own row when your seat plays for another account's team (Online Teams): its tooltip, and its spoken name. */
+    leave: {
+      title: "Leave team",
+      label: "Leave {team}",
+    },
     /** A player's place in an own-score team, beside its name under theirs: "1 of 2". */
     memberOf: "{place} of {size}",
     /** The switch card beside the site's Autoscoring. */
@@ -176,6 +181,8 @@ export default {
     notLoaded: "The lobby isn't loaded yet. Try again in a moment.",
     playersNotAdded: "autodarts didn't add every new player. Try again.",
     namesNotAdded: "autodarts didn't add {names}. Try again.",
+    /** When Play for (online.invitation.play) couldn't seat this account in the lobby. */
+    notSeated: "autodarts didn't add you to the lobby. Try again.",
     /** After a saved team is added: its signed-in players who aren't in the lobby. `count` is how many names `names` has. */
     notInLobby: {
       one: "Added. {names} isn't in the lobby: signed-in players join from their own board.",
@@ -219,6 +226,8 @@ export default {
       missing: { one: "{names} isn't connected", other: "{names} aren't connected" },
       offline: "Online Teams offline",
       outdated: "Update Tools for Online Teams",
+      /** While a player plays for another account's team: the accounts whose Tools is too old to show it. */
+      behind: { one: "{names} needs a newer Tools", other: "{names} need a newer Tools" },
     },
     card: {
       title: "Online Teams",
@@ -232,7 +241,7 @@ export default {
       connected: "connected",
       notConnected: "not connected",
       shared: "Shared",
-      sharedValue: "team names, players, colours, order",
+      sharedValue: "team names, players, colours, order, who plays for which team",
       retry: "Retry",
       close: "Close",
     },
@@ -248,6 +257,13 @@ export default {
       sets: { one: "{game} · First to {count} Set", other: "{game} · First to {count} Sets" },
       join: "Join with {team}",
       newTeam: "New team",
+      /** One button per own-score team of another account: this account's own seat joins it, from its own board. */
+      play: "Play for {team}",
+      /** Under the Play for buttons, greyed while an account in the room is still on an older Tools. */
+      behind: {
+        one: "{names} needs a newer Tools before anyone can join a team from their own board",
+        other: "{names} need a newer Tools before anyone can join a team from their own board",
+      },
       otherFormat: "This lobby plays {format}",
       setsLobby: "Own scores play legs, and this lobby plays sets",
       formats: {
@@ -263,7 +279,7 @@ export default {
     },
     settings: {
       title: "Online Teams",
-      description: "In an autodarts lobby, and in a match you play, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
+      description: "In an autodarts lobby, and in a match you play, Tools connects to its own server with your user id and name, so the lobby can show whether teams can play online. With a team and another account in the lobby, it also shares the teams' names, players, colours and order with the other Tools there, and when you play for another account's team, which team that is. Darts and scores stay with autodarts, and the server forgets it all half an hour after everyone has left.",
     },
   },
 };

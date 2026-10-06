@@ -46,6 +46,33 @@ export async function addGuest(name: string, feature: string): Promise<boolean> 
   }
 }
 
+/**
+ * Seat this account in the lobby on screen, on its own board, with the request
+ * the site's own /join/<lobby> page makes ({ name, userId, boardId }, read from
+ * the site on 2026-10-06). Resolves whether autodarts took it.
+ */
+export async function addSelf(name: string, feature: string): Promise<boolean> {
+  const lobbyId = lobbyIdFromUrl();
+  const userId = await getUserIdFromToken();
+  if (!lobbyId || !userId) {
+    console.warn(`Autodarts Tools: ${feature} - Cannot take a seat without a lobby and a user id`);
+    return false;
+  }
+
+  try {
+    const response = await fetchWithAuth(`https://api.autodarts.com/gs/v0/lobbies/${lobbyId}/players`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, userId, boardId: selectedBoard() }),
+    });
+    if (!response.ok) console.error(`Autodarts Tools: ${feature} - Failed to take a seat`, response.status, response.statusText);
+    return response.ok;
+  } catch (error) {
+    console.error(`Autodarts Tools: ${feature} - Error taking a seat:`, error);
+    return false;
+  }
+}
+
 /** Where the site's Bot Settings keep the play speed it last used. */
 const BOT_SPEED_KEY = "autodarts-bot-speed";
 

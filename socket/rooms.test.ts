@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 
-import { CLAIM_TTL_MS, LIMITS, ROOM_IDLE_MS, ROOM_MAX_MS, Rooms, parsePeer, parseTeams } from "./rooms";
+import { CLAIM_TTL_MS, LIMITS, OLDEST_PROTOCOL, PROTOCOL_VERSION, ROOM_IDLE_MS, ROOM_MAX_MS, Rooms, isProtocol, parseJoins, parsePeer, parseTeams } from "./rooms";
 
 const LOBBY = "01a10312-5fd9-7b43-88ab-73ac80cb938e";
-const A = { userId: "5e1f2afd-6ac0-4fb0-b98a-cb9cf2811917", name: "creazy" };
-const B = { userId: "39a06afc-edfd-4a82-b1af-5155a475fa37", name: "creazy_dev" };
+const A = { userId: "5e1f2afd-6ac0-4fb0-b98a-cb9cf2811917", name: "creazy", v: 2 };
+const B = { userId: "39a06afc-edfd-4a82-b1af-5155a475fa37", name: "creazy_dev", v: 2 };
 const SEAT_RED = "01a10312-0000-7000-8000-000000000001";
 const SEAT_BLUE = "01a10312-0000-7000-8000-000000000002";
 const crimson = { preset: "crimson", from: "#6a1624", to: "#b8323f" };
@@ -13,7 +13,7 @@ const red = { name: "TEAM RED", colour: crimson, format: "shared" as const, seat
 const blue = { name: "TEAM BLUE", colour: ocean, format: "shared" as const, seatIds: [ SEAT_BLUE ], players: [ "LISA", "MAX" ] };
 
 const lobby = (i: number) => `${String(i).padStart(8, "0")}-1111-4000-8000-000000000000`;
-const user = (i: number) => ({ userId: `${String(i).padStart(8, "0")}-2222-4000-8000-000000000000`, name: `p${i}` });
+const user = (i: number) => ({ userId: `${String(i).padStart(8, "0")}-2222-4000-8000-000000000000`, name: `p${i}`, v: 2 });
 
 function setup() {
   let now = 1_000_000;
@@ -216,9 +216,96 @@ describe("leaving and expiry", () => {
 });
 
 describe("peers", () => {
-  test("need a UUID and a name", () => {
-    expect(parsePeer({ userId: A.userId, name: "creazy" })).toEqual(A);
-    expect(parsePeer({ userId: "x", name: "creazy" })).toBeUndefined();
-    expect(parsePeer({ userId: A.userId, name: " " })).toBeUndefined();
+  test("need a UUID, a name and a protocol this server speaks", () => {
+    expect(parsePeer({ userId: A.userId, name: "creazy", v: 2 })).toEqual(A);
+    expect(parsePeer({ userId: A.userId, name: "creazy", v: 1 })).toEqual({ ...A, v: 1 });
+    expect(parsePeer({ userId: A.userId, name: "creazy", v: 3 })).toBeUndefined();
+    expect(parsePeer({ userId: A.userId, name: "creazy" })).toBeUndefined();
+    expect(parsePeer({ userId: "x", name: "creazy", v: 2 })).toBeUndefined();
+    expect(parsePeer({ userId: A.userId, name: " ", v: 2 })).toBeUndefined();
+  });
+
+  test("an account speaks the oldest protocol among its sockets", () => {
+    const { rooms } = setup();
+    value(rooms.join(LOBBY, "a1", A));
+    expect(value(rooms.join(LOBBY, "a2", { ...A, v: 1 })).peers).toEqual([ { ...A, v: 1 } ]);
+    expect(rooms.leave(LOBBY, "a2")!.peers).toEqual([ A ]);
+  });
+});
+
+describe("protocol", () => {
+  test("1 and 2 are spoken, nothing else", () => {
+    expect([ OLDEST_PROTOCOL, PROTOCOL_VERSION ]).toEqual([ 1, 2 ]);
+    expect([ 1, 2 ].every(isProtocol)).toBe(true);
+    expect([ 0, 3, 1.5, "2", undefined, null ].some(isProtocol)).toBe(false);
+  });
+});
+
+describe("joins", () => {
+  const SEAT_BEN = "01a10312-0000-7000-8000-0000000000b1";
+  const seat = (i: number) => `01a10312-0000-7000-8000-${String(i).padStart(12, "0")}`;
+  const join = { owner: A.userId, team: "TEAM RED", seatIds: [ SEAT_BEN ] };
+
+  test("are stamped with the sender and replace only the sender's", () => {
+    const { rooms } = setup();
+    rooms.join(LOBBY, "a1", A);
+    rooms.join(LOBBY, "b1", B);
+    value(rooms.setTeams(LOBBY, "a1", [ red ]));
+    expect(value(rooms.setJoins(LOBBY, "b1", [ join ])).joins).toEqual([ { ...join, by: B.userId } ]);
+    expect(value(rooms.setJoins(LOBBY, "b1", [ { ...join, team: "TEAM BLUE" } ])).joins).toEqual([ { ...join, team: "TEAM BLUE", by: B.userId } ]);
+    expect(value(rooms.setJoins(LOBBY, "b1", [])).joins).toEqual([]);
+    expect(value(rooms.setTeams(LOBBY, "a1", [ red ])).teams.length).toBe(1);
+  });
+
+  test("are checked: owner, team, seat ids, counts, one team per seat", () => {
+    expect(parseJoins([ join ], B.userId)).toEqual({ ok: true, value: [ join ] });
+    expect(parseJoins([ { ...join, owner: "x" } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ join ], A.userId).ok).toBe(false);
+    expect(parseJoins([ { ...join, team: " " } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ { ...join, team: "X".repeat(LIMITS.nameLength + 1) } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ { ...join, seatIds: [] } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ { ...join, seatIds: [ "seat-1" ] } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ { ...join, seatIds: Array.from({ length: LIMITS.seatsPerTeam + 1 }, (_, i) => seat(i)) } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ { ...join, seatIds: [ SEAT_BEN, SEAT_BEN ] } ], B.userId).ok).toBe(false);
+    expect(parseJoins([ join, { ...join, team: "TEAM BLUE" } ], B.userId).ok).toBe(false);
+    expect(parseJoins(Array.from({ length: LIMITS.joinsPerAccount + 1 }, (_, i) => ({ ...join, seatIds: [ seat(i) ] })), B.userId).ok).toBe(false);
+    expect(parseJoins("joins", B.userId).ok).toBe(false);
+  });
+
+  test("a refused list leaves the sender's joins as they were", () => {
+    const { rooms } = setup();
+    rooms.join(LOBBY, "b1", B);
+    value(rooms.setJoins(LOBBY, "b1", [ join ]));
+    expect(rooms.setJoins(LOBBY, "b1", [ { ...join, owner: B.userId } ])).toEqual({ ok: false, error: "joins" });
+    expect(rooms.state(LOBBY)!.joins).toEqual([ { ...join, by: B.userId } ]);
+  });
+
+  test("stay when their author's socket leaves", () => {
+    const { rooms } = setup();
+    rooms.join(LOBBY, "a1", A);
+    rooms.join(LOBBY, "b1", B);
+    rooms.setJoins(LOBBY, "b1", [ join ]);
+    const [ state ] = rooms.leaveAll("b1");
+    expect(state.joins).toEqual([ { ...join, by: B.userId } ]);
+  });
+
+  test("come from a capped number of accounts, however many come and go", () => {
+    const { rooms } = setup();
+    for (let i = 0; i < LIMITS.joinersPerRoom; i++) {
+      value(rooms.join(LOBBY, `s${i}`, user(i)));
+      value(rooms.setJoins(LOBBY, `s${i}`, [ { ...join, seatIds: [ seat(i) ] } ]));
+      rooms.leave(LOBBY, `s${i}`);
+    }
+    value(rooms.join(LOBBY, "late", user(99)));
+    expect(rooms.setJoins(LOBBY, "late", [ { ...join, seatIds: [ seat(99) ] } ])).toEqual({ ok: false, error: "full" });
+    // An account that has joins there may still change them.
+    value(rooms.join(LOBBY, "s0-again", user(0)));
+    value(rooms.setJoins(LOBBY, "s0-again", [ { ...join, seatIds: [ seat(100) ] } ]));
+  });
+
+  test("are refused from a socket that isn't in the room", () => {
+    const { rooms } = setup();
+    rooms.join(LOBBY, "a1", A);
+    expect(rooms.setJoins(LOBBY, "b1", [ join ])).toEqual({ ok: false, error: "room" });
   });
 });

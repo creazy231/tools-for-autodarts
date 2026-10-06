@@ -12,9 +12,9 @@
 
 import { type Socket, io } from "socket.io-client";
 
-import type { Connection, RoomState, RoomTeamInput } from "@/utils/team-room";
+import type { Connection, RoomJoinInput, RoomState, RoomTeamInput } from "@/utils/team-room";
 
-import { PROTOCOL_VERSION, tokenAccount } from "@/utils/team-room";
+import { OLDEST_PROTOCOL, PROTOCOL_VERSION, tokenAccount } from "@/utils/team-room";
 
 declare const __ADT_TEAMS_SERVER__: string;
 
@@ -29,6 +29,8 @@ export interface RoomClientState {
   joinedAt: number | undefined;
   /** The room's last word. */
   room: RoomState | undefined;
+  /** The protocol the server took: 2, or 1 from a server deployed before joins. Undefined until connected. */
+  protocol: number | undefined;
 }
 
 export interface RoomClientOptions {
@@ -50,17 +52,19 @@ const JOIN_RETRY_MS = 3000;
 const PASSING = new Set([ "rate", "room" ]);
 
 export class RoomClient {
-  readonly state: RoomClientState = { connection: "idle", rtt: undefined, joined: undefined, joinedAt: undefined, room: undefined };
+  readonly state: RoomClientState = { connection: "idle", rtt: undefined, joined: undefined, joinedAt: undefined, room: undefined, protocol: undefined };
   private socket: Socket | undefined;
   private starting: Promise<void> | undefined;
   private lobbyId: string | undefined;
   private wantJoin = false;
   /** What the page wants the room to know, and what has been sent of it: a payload once taken or refused isn't sent again. */
-  private intended: { teams?: RoomTeamInput[]; rule?: boolean; shifts?: Record<string, number> } = {};
-  private sent: { teams: string; rule: boolean | undefined; shifts: Record<string, number> } = { teams: "", rule: undefined, shifts: {} };
+  private intended: { teams?: RoomTeamInput[]; rule?: boolean; shifts?: Record<string, number>; joins?: RoomJoinInput[] } = {};
+  private sent: { teams: string; rule: boolean | undefined; shifts: Record<string, number>; joins: string } = { teams: "", rule: undefined, shifts: {}, joins: "" };
   private pinger: ReturnType<typeof setInterval> | undefined;
   private joinRetry: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Set<(state: RoomClientState) => void>();
+  /** Protocol 2 until a server refuses it; then 1, until that connection ends, so a page talks to an older server as 3.3.0 did. */
+  private protocol = PROTOCOL_VERSION;
 
   constructor(private readonly options: RoomClientOptions) {}
 
@@ -97,7 +101,9 @@ export class RoomClient {
     this.lobbyId = undefined;
     this.wantJoin = false;
     this.intended = {};
-    this.update({ connection: "idle", rtt: undefined, joined: undefined, joinedAt: undefined, room: undefined });
+    // The next page tries 2 again.
+    this.protocol = PROTOCOL_VERSION;
+    this.update({ connection: "idle", rtt: undefined, joined: undefined, joinedAt: undefined, room: undefined, protocol: undefined });
   }
 
   /** This account's teams in the lobby, sent when they change, and again after every (re)join. */
@@ -116,6 +122,12 @@ export class RoomClient {
   publishShift(team: string, shift: number): Promise<void> {
     this.intended.shifts = { ...this.intended.shifts, [team]: shift };
     return this.flush();
+  }
+
+  /** The seats this account joined to other accounts' teams, sent after its teams, and again after every (re)join. A protocol-1 server is sent none. */
+  publishJoins(joins: RoomJoinInput[]) {
+    this.intended.joins = joins;
+    this.flush();
   }
 
   /** The room's grant for `key`: true for the first to ask, false after that, undefined when the room can't be asked. */
@@ -151,18 +163,21 @@ export class RoomClient {
     console.log("Autodarts Tools: Online Teams - connecting to", this.options.url ?? __ADT_TEAMS_SERVER__);
     const socket = (this.options.connect ?? io)(this.options.url ?? __ADT_TEAMS_SERVER__, {
       transports: [ "websocket" ],
-      auth: { v: PROTOCOL_VERSION, userId: identity.userId, name: identity.name },
+      auth: { v: this.protocol, userId: identity.userId, name: identity.name },
       reconnectionDelay: 1000,
       reconnectionDelayMax: 15_000,
     });
     this.socket = socket;
     socket.on("connect", () => {
       console.log("Autodarts Tools: Online Teams - connected");
-      this.update({ connection: "connected" });
+      this.update({ connection: "connected", protocol: this.protocol });
       this.ping();
       if (this.wantJoin) this.joinRoom();
     });
     socket.on("disconnect", (reason: string) => {
+      // Every new connection tries the newest protocol first: the server may have been upgraded while this page was away.
+      this.protocol = PROTOCOL_VERSION;
+      socket.auth = { v: PROTOCOL_VERSION, userId: identity.userId, name: identity.name };
       // socket.io tries again unless the server or this client ended it, and
       // until an attempt fails, that is still connecting.
       const retrying = reason !== "io server disconnect" && reason !== "io client disconnect";
@@ -171,6 +186,13 @@ export class RoomClient {
     socket.on("connect_error", (error: Error) => {
       console.log("Autodarts Tools: Online Teams - connection failed:", error?.message);
       if (error?.message === "version") {
+        // A server deployed before this protocol: Online Teams as it was, without joins.
+        if (this.protocol > OLDEST_PROTOCOL) {
+          this.protocol = OLDEST_PROTOCOL;
+          socket.auth = { v: this.protocol, userId: identity.userId, name: identity.name };
+          socket.connect();
+          return;
+        }
         this.update({ connection: "outdated" });
         socket.disconnect();
         return;
@@ -198,7 +220,7 @@ export class RoomClient {
       if (!answer?.ok) return;
       this.update({ joined: lobbyId, joinedAt: Date.now() });
       // A fresh join: the room may have lost what it was told, after a restart.
-      this.sent = { teams: "", rule: undefined, shifts: {} };
+      this.sent = { teams: "", rule: undefined, shifts: {}, joins: "" };
       this.receive(answer.value);
       this.flush();
     });
@@ -209,13 +231,13 @@ export class RoomClient {
     const lobbyId = this.state.joined;
     if (lobbyId && this.socket?.connected) this.socket.emit("room:leave", { lobbyId });
     this.update({ joined: undefined, joinedAt: undefined });
-    this.sent = { teams: "", rule: undefined, shifts: {} };
+    this.sent = { teams: "", rule: undefined, shifts: {}, joins: "" };
   }
 
-  /** Teams first: the room takes a shift only for a team it knows. */
+  /** Teams first: the room takes a shift only for a team it knows. Joins come after the teams, which is the order they make sense in. */
   private async flush() {
     if (!this.state.joined) return;
-    const { teams, rule, shifts } = this.intended;
+    const { teams } = this.intended;
     if (teams) {
       const key = JSON.stringify(teams);
       if (key !== this.sent.teams) {
@@ -224,12 +246,25 @@ export class RoomClient {
         if (this.unsent(answer) && this.sent.teams === key) this.sent.teams = "";
       }
     }
-    for (const [ team, shift ] of Object.entries(shifts ?? {})) {
-      if (this.sent.shifts[team] === shift) continue;
+    // What the page wants is read where it is sent, never carried over an await: it may have published again while a reply was on its way, and the room would be left with the older word.
+    const { joins } = this.intended;
+    if (joins && this.protocol > OLDEST_PROTOCOL) {
+      const key = JSON.stringify(joins);
+      if (key !== this.sent.joins) {
+        this.sent.joins = key;
+        const answer = await this.send("room:joins", { joins });
+        if (this.unsent(answer) && this.sent.joins === key) this.sent.joins = "";
+      }
+    }
+    for (const team of Object.keys(this.intended.shifts ?? {})) {
+      // As its turn comes: the reply to the shift before it may have been slow.
+      const shift = this.intended.shifts?.[team];
+      if (shift === undefined || this.sent.shifts[team] === shift) continue;
       this.sent.shifts[team] = shift;
       const answer = await this.send("room:shift", { team, shift });
       if (this.unsent(answer) && this.sent.shifts[team] === shift) delete this.sent.shifts[team];
     }
+    const { rule } = this.intended;
     if (rule !== undefined && rule !== this.sent.rule) {
       this.sent.rule = rule;
       const answer = await this.send("room:rule", { partnerRule: rule });
