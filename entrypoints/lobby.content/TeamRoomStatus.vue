@@ -30,8 +30,8 @@
       </div>
       <div v-for="account in accounts" :key="account.userId" class="adt-room-line">
         <span>{{ account.you ? t("teams.online.card.you", { name: account.name }) : account.name }}</span>
-        <span :class="account.connected ? 'is-ok' : 'is-warn'">
-          {{ account.connected ? t("teams.online.card.connected") : t("teams.online.card.notConnected") }}<template v-if="account.teams.length"> · {{ account.teams.join(", ") }}</template>
+        <span :class="account.connected && !account.behind ? 'is-ok' : 'is-warn'">
+          {{ account.connected ? t("teams.online.card.connected") : t("teams.online.card.notConnected") }}<template v-if="account.behind"> · {{ t("teams.online.card.outdated") }}</template><template v-if="account.teams.length"> · {{ account.teams.join(", ") }}</template>
         </span>
       </div>
       <div class="adt-room-line">
@@ -78,6 +78,7 @@ const chipText = computed(() => {
   const { kind, names } = status.value;
   if (kind === "synced") return t("teams.online.status.synced", { names: list(names) });
   if (kind === "missing") return t("teams.online.status.missing", { names: list(names), count: names.length });
+  if (kind === "behind") return t("teams.online.status.behind", { names: list(names), count: names.length });
   return t(CHIP[kind]);
 });
 const serverText = computed(() => {
@@ -129,7 +130,7 @@ function placeCard() {
 .adt-room-text { max-width: min(28rem, calc(100vw - 112px)); overflow: hidden; text-overflow: ellipsis; }
 .adt-room-chip.is-connecting::before { animation: adt-room-pulse 1.2s ease-in-out infinite; }
 .adt-room-chip.is-ready, .adt-room-chip.is-synced { color: #49da9e; background: rgb(73 218 158 / 12%); }
-.adt-room-chip.is-missing { color: #f29727; background: rgb(242 151 39 / 12%); }
+.adt-room-chip.is-missing, .adt-room-chip.is-behind { color: #f29727; background: rgb(242 151 39 / 12%); }
 .adt-room-chip.is-offline, .adt-room-chip.is-outdated { color: #ff6b81; background: rgb(226 78 103 / 14%); }
 .adt-room-card {
   position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; width: 300px; max-width: calc(100vw - 16px); box-sizing: border-box;
