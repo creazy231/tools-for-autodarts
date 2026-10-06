@@ -285,9 +285,11 @@ function joinsHere(room: RoomState | undefined, lineup: Lineup | undefined, me: 
  * Each join's seats onto its team, found by its owner and name among the
  * own-score teams this screen has taken. A seat counts when it is in
  * autodarts' data, is its joiner's own, is on no team yet (a team of its
- * owner's own keeps it), and the team has room. Seats earlier in the lobby's
- * order go first, so every screen fills a team alike, and a team that took a
- * seat is put back in the lobby's order. Returns the joins that count, by seat.
+ * owner's own keeps it), and the team has room: six seats at most, those still
+ * in the lobby, since a lineup lists a seat that has left until it is pruned.
+ * Seats earlier in the lobby's order go first, so every screen fills a team
+ * alike, and a team that took a seat is put back in the lobby's order. Returns
+ * the joins that count, by seat.
  */
 function applyJoins(owned: OwnedTeam[], joins: readonly RoomJoin[], players: readonly SeatLike[]): Map<string, RoomJoin> {
   const joined = new Map<string, RoomJoin>();
@@ -300,7 +302,7 @@ function applyJoins(owned: OwnedTeam[], joins: readonly RoomJoin[], players: rea
   const grown = new Set<OwnedTeam>();
   for (const { id, join } of candidates) {
     const target = owned.find(entry => entry.owner === join.owner && entry.team.name === normalizeName(join.team));
-    if (!target || taken.has(id) || seatOwner(byId.get(id)) !== join.by || target.team.seatIds.length >= MAX_PLAYERS) continue;
+    if (!target || taken.has(id) || seatOwner(byId.get(id)) !== join.by || target.team.seatIds.filter(seatId => byId.has(seatId)).length >= MAX_PLAYERS) continue;
     target.team.seatIds.push(id);
     taken.add(id);
     joined.set(id, join);
