@@ -234,7 +234,7 @@ export class RoomClient {
   /** Teams first: the room takes a shift only for a team it knows. Joins come after the teams, which is the order they make sense in. */
   private async flush() {
     if (!this.state.joined) return;
-    const { teams, rule, shifts, joins } = this.intended;
+    const { teams } = this.intended;
     if (teams) {
       const key = JSON.stringify(teams);
       if (key !== this.sent.teams) {
@@ -243,6 +243,8 @@ export class RoomClient {
         if (this.unsent(answer) && this.sent.teams === key) this.sent.teams = "";
       }
     }
+    // What the page wants is read where it is sent, never carried over an await: it may have published again while a reply was on its way, and the room would be left with the older word.
+    const { joins } = this.intended;
     if (joins && this.protocol > OLDEST_PROTOCOL) {
       const key = JSON.stringify(joins);
       if (key !== this.sent.joins) {
@@ -251,12 +253,15 @@ export class RoomClient {
         if (this.unsent(answer) && this.sent.joins === key) this.sent.joins = "";
       }
     }
-    for (const [ team, shift ] of Object.entries(shifts ?? {})) {
-      if (this.sent.shifts[team] === shift) continue;
+    for (const team of Object.keys(this.intended.shifts ?? {})) {
+      // As its turn comes: the reply to the shift before it may have been slow.
+      const shift = this.intended.shifts?.[team];
+      if (shift === undefined || this.sent.shifts[team] === shift) continue;
       this.sent.shifts[team] = shift;
       const answer = await this.send("room:shift", { team, shift });
       if (this.unsent(answer) && this.sent.shifts[team] === shift) delete this.sent.shifts[team];
     }
+    const { rule } = this.intended;
     if (rule !== undefined && rule !== this.sent.rule) {
       this.sent.rule = rule;
       const answer = await this.send("room:rule", { partnerRule: rule });
