@@ -144,7 +144,7 @@ function lobbyPlace(players: readonly SeatLike[], id: string): number {
 }
 
 /** The accounts with Tools in a room: its peers, its teams' owners and its joins' authors. */
-function inRoomOf(room: RoomState): Set<string> {
+export function inRoomOf(room: RoomState): Set<string> {
   return new Set([ ...room.peers.map(peer => peer.userId), ...room.teams.map(team => team.owner), ...(room.joins ?? []).map(join => join.by) ]);
 }
 
