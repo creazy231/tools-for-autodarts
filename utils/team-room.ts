@@ -365,17 +365,29 @@ export function otherAccounts(players: readonly RoomSeat[], me: string | null | 
   return [ ...out ].map(([ userId, name ]) => ({ userId, name }));
 }
 
-/** An account on the status card: whether its Tools is in the room, and its teams there. */
-export interface StatusAccount { userId: string; name: string; you: boolean; connected: boolean; teams: string[] }
+/** An account on the status card: whether its Tools is in the room, and its teams there, the ones it joined included. */
+export interface StatusAccount {
+  userId: string;
+  name: string;
+  you: boolean;
+  connected: boolean;
+  teams: string[];
+  /** Its Tools is in the room on protocol 1, so its screen can't show who joined which team. */
+  behind: boolean;
+}
 
 /** The status card's accounts: this one first, by the room's name for it or else its token's, then every other account with seats here. */
 export function statusAccounts(input: { room: RoomState | undefined; me: string | null; myName: string; players: readonly RoomSeat[]; myTeams: readonly string[]; connection: Connection }): StatusAccount[] {
   const { room, me, myName, players, myTeams, connection } = input;
-  const peers = new Set((room?.peers ?? []).map(peer => peer.userId));
-  const teamsOf = (userId: string) => (room?.teams ?? []).filter(team => team.owner === userId).map(team => normalizeName(team.name));
-  const self = (room?.peers ?? []).find(peer => peer.userId === me);
-  const out: StatusAccount[] = me ? [ { userId: me, name: normalizeName(self?.name ?? myName), you: true, connected: connection === "connected" && peers.has(me), teams: [ ...myTeams ] } ] : [];
-  for (const account of otherAccounts(players, me)) out.push({ userId: account.userId, name: account.name, you: false, connected: peers.has(account.userId), teams: teamsOf(account.userId) });
+  const peers = new Map((room?.peers ?? []).map(peer => [ peer.userId, peer ]));
+  const teamsOf = (userId: string) => [
+    ...(room?.teams ?? []).filter(team => team.owner === userId).map(team => normalizeName(team.name)),
+    ...(room?.joins ?? []).filter(join => join.by === userId).map(join => normalizeName(join.team)),
+  ];
+  const behind = (userId: string) => Boolean(room?.joins) && (peers.get(userId)?.v ?? PROTOCOL_VERSION) < PROTOCOL_VERSION;
+  const self = me ? peers.get(me) : undefined;
+  const out: StatusAccount[] = me ? [ { userId: me, name: normalizeName(self?.name ?? myName), you: true, connected: connection === "connected" && peers.has(me), teams: [ ...myTeams ], behind: false } ] : [];
+  for (const account of otherAccounts(players, me)) out.push({ userId: account.userId, name: account.name, you: false, connected: peers.has(account.userId), teams: teamsOf(account.userId), behind: behind(account.userId) });
   return out;
 }
 
@@ -410,7 +422,49 @@ export function inviteGame(game: { variant: string; mode: string; score: number 
   return { key: gameModeLabelKey(game.variant) };
 }
 
-export type StatusKind = "connecting" | "ready" | "synced" | "missing" | "offline" | "outdated";
+/** An own-score team of another account's that this account can play for, and its captain's name. */
+export interface JoinTeam {
+  owner: string;
+  name: string;
+  colour: ColorScheme;
+  captain: string;
+}
+
+/** What the invitation offers an account with no team: Play for each team with room, and why the buttons may be greyed. */
+export interface JoinOffer {
+  teams: JoinTeam[];
+  /** Accounts in the room still on protocol 1, by name: their screens can't show a join, so nobody joins until they update. */
+  behind: string[];
+  /** This account's own seat, which a join brings; none when Play for has to seat it first. */
+  seatId: string | undefined;
+  /** No seat of its own, and none free in the lobby. */
+  full: boolean;
+}
+
+/**
+ * Play for: the other accounts' own-score teams with room for one more, for an
+ * account none of whose seats is on a team. None in a sets lobby, a shared-score
+ * one, or a room that carries no joins.
+ */
+export function joinOffer(input: { view: ScreenTeams; players: readonly RoomSeat[]; room: RoomState | undefined; me: string | null | undefined; sets: number; maxSeats: number }): JoinOffer | undefined {
+  const { view, players, room, me, sets, maxSeats } = input;
+  if (!me || !room?.joins || sets || view.shared.size || view.mine.size) return undefined;
+  if ([ ...view.joined.values() ].some(join => join.by === me)) return undefined;
+  const own = view.remote.filter(team => team.format === "own");
+  if (!own.length) return undefined;
+  const sizes = new Map((view.lineup?.teams ?? []).map(team => [ team.name, team.seatIds.length ]));
+  const names = new Map(otherAccounts(players, me).map(account => [ account.userId, account.name ]));
+  for (const peer of room.peers) names.set(peer.userId, normalizeName(peer.name));
+  const teams = own
+    .filter(team => (sizes.get(team.name) ?? team.seatIds.length) < MAX_PLAYERS)
+    .map(team => ({ owner: team.owner, name: team.name, colour: team.colour, captain: names.get(team.owner) ?? "" }));
+  if (!teams.length) return undefined;
+  const seatId = players.find(seat => seat.id && seat.userId === me)?.id ?? undefined;
+  const behind = room.peers.filter(peer => peer.userId !== me && (peer.v ?? OLDEST_PROTOCOL) < PROTOCOL_VERSION).map(peer => normalizeName(peer.name));
+  return { teams, behind, seatId, full: !seatId && players.length >= maxSeats };
+}
+
+export type StatusKind = "connecting" | "ready" | "synced" | "missing" | "offline" | "outdated" | "behind";
 
 export interface StatusInput {
   connection: Connection;
@@ -422,19 +476,27 @@ export interface StatusInput {
   me: string | null | undefined;
   /** When each other account's first seat was seen here, by user id. */
   firstSeen: Readonly<Record<string, number>>;
+  /** How many joins count in this lobby: with any, an account in the room still on protocol 1 is named. */
+  joined?: number;
 }
 
 export interface RoomStatus { kind: StatusKind; names: string[] }
 
 /**
- * The lobby's status chip: the connection first; once connected, the other
- * accounts in the room, or those with seats here whose Tools hasn't shown up
- * within MISSING_AFTER_MS of both their first seat and our joining.
+ * The lobby's status chip: the connection first; once connected, anyone in the
+ * room who can't show the joins that count here, then the other accounts in
+ * the room, or those with seats here whose Tools hasn't shown up within
+ * MISSING_AFTER_MS of both their first seat and our joining.
  */
 export function roomStatus(input: StatusInput): RoomStatus {
   if (input.connection === "outdated") return { kind: "outdated", names: [] };
   if (input.connection === "offline") return { kind: "offline", names: [] };
   if (input.connection !== "connected") return { kind: "connecting", names: [] };
+  // Their screens show joined players without a team: worth naming before anything else.
+  if (input.joined && input.room?.joins) {
+    const behind = input.room.peers.filter(peer => peer.userId !== input.me && (peer.v ?? OLDEST_PROTOCOL) < PROTOCOL_VERSION);
+    if (behind.length) return { kind: "behind", names: behind.map(peer => normalizeName(peer.name)) };
+  }
   const peers = (input.room?.peers ?? []).filter(peer => peer.userId !== input.me);
   if (peers.length) return { kind: "synced", names: peers.map(peer => normalizeName(peer.name)) };
   const joinedAt = input.joinedAt;

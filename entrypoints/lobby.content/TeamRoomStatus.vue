@@ -58,7 +58,7 @@ const props = defineProps<{ view: StatusView }>();
 const TICK_MS = 2000;
 /** The least room the card leaves to the screen's edge. */
 const EDGE_PX = 8;
-const CHIP: Record<Exclude<StatusKind, "synced" | "missing">, MessageKey> = {
+const CHIP: Record<Exclude<StatusKind, "synced" | "missing" | "behind">, MessageKey> = {
   connecting: "teams.online.status.connecting",
   ready: "teams.online.status.ready",
   offline: "teams.online.status.offline",
