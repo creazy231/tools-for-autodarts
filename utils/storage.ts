@@ -193,6 +193,12 @@ export interface IConfig {
     /** Milliseconds the board stays zoomed on a dart, in the `board` position. */
     resetAfterMs: number;
     /**
+     * Milliseconds a close-up from a camera waits for the picture taken after
+     * its own dart before it shows the board as it is, in the `top` and
+     * `bottom` positions. See `pictureWait` in entrypoints/match.content/zoom.ts.
+     */
+    pictureWaitMs: number;
+    /**
      * What the board shows while a game is on, and so where the close-ups come
      * from: a camera's own picture, or a copy of the drawn board. The same
      * choice Board View offers; that feature takes over when it is switched on.
@@ -571,6 +577,7 @@ export const defaultConfig: IConfig = {
     enabled: false,
     position: "bottom",
     resetAfterMs: 1000,
+    pictureWaitMs: 1500,
     level: 3,
     mode: "camera-1",
     zoomOn: "everyone",
@@ -842,7 +849,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 16;
+const CONFIG_VERSION = 17;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -856,6 +863,16 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * How long Darts Zoom's camera close-ups wait for their dart's picture is
+       * a setting now. Saved configs start at the second and a half it has
+       * been since 3.2.0.
+       */
+      17: (config: any) => ({
+        ...config,
+        zoom: { ...config.zoom, pictureWaitMs: config.zoom?.pictureWaitMs ?? defaultConfig.zoom.pictureWaitMs },
+      }),
+
       /** Online Teams is new, and on unless switched off. Saved teams are left as they are (utils/teams.ts). */
       16: (config: any) => withOnlineTeams(config),
 

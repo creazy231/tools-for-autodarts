@@ -25,6 +25,10 @@ export default {
     title: "Hold for",
     description: "How long the board stays on a dart. It pulls back out as soon as the visit ends or passes on.",
   },
+  pictureWait: {
+    title: "Picture wait",
+    description: "How long a camera close-up waits for its dart's picture before it shows the board as it is. The picture usually comes a fifth of a second after the dart. Longer suits a slow connection, shorter a quick thrower.",
+  },
   zoomLevel: {
     title: "Zoom level",
     description: "How closely each tile zooms in on its dart.",

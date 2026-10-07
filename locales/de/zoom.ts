@@ -27,6 +27,10 @@ export default {
     title: "Haltedauer",
     description: "Wie lange das Board auf einem Dart bleibt. Es zoomt wieder heraus, sobald die Aufnahme endet oder weitergeht.",
   },
+  pictureWait: {
+    title: "Wartezeit aufs Bild",
+    description: "Wie lange eine Nahaufnahme von der Kamera auf das Bild ihres Darts wartet, bevor sie das Board zeigt, wie es gerade ist. Das Bild kommt meist eine Fünftelsekunde nach dem Dart. Länger passt zu einer langsamen Verbindung, kürzer zu schnellem Werfen.",
+  },
   zoomLevel: {
     title: "Zoomstufe",
     description: "Wie nah jede Kachel an ihren Dart heranzoomt.",

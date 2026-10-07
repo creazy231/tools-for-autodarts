@@ -27,6 +27,10 @@ export default {
     title: "Duur",
     description: "Hoe lang het bord op een dart blijft. Het zoomt weer uit zodra de beurt eindigt of doorgaat.",
   },
+  pictureWait: {
+    title: "Wachttijd voor het beeld",
+    description: "Hoe lang een close-up van de camera op het beeld van zijn dart wacht, voordat hij het bord toont zoals het nu is. Het beeld komt meestal een vijfde seconde na de dart. Langer past bij een trage verbinding, korter bij snel gooien.",
+  },
   zoomLevel: {
     title: "Zoomniveau",
     description: "Hoe dicht elke tegel op zijn dart inzoomt.",

@@ -75,6 +75,20 @@
           <OptionRow :title="t('zoom.view.title')" :description="t('zoom.view.description')">
             <AppRadioGroup v-model="config.zoom.mode" :options="VIEWS" :aria-label="t('zoom.view.ariaLabel')" button-size="sm" class-name="is-grid" />
           </OptionRow>
+          <OptionRow
+            v-if="config.zoom.position !== 'board' && config.zoom.mode !== 'image'"
+            :description="t('zoom.pictureWait.description')"
+            :title="t('zoom.pictureWait.title')"
+          >
+            <AppNumberInput
+              v-model="pictureWaitSeconds"
+              :max="5"
+              :min="0"
+              :step="0.1"
+              :label="t('zoom.pictureWait.title')"
+              unit="s"
+            />
+          </OptionRow>
         </section>
       </div>
     </div>
@@ -147,6 +161,14 @@ const holdSeconds = computed({
   get: () => (config.value?.zoom.resetAfterMs ?? 1000) / 1000,
   set: (seconds: number) => {
     if (config.value) config.value.zoom.resetAfterMs = Math.round(seconds * 1000);
+  },
+});
+
+/** Milliseconds as well, and shown in seconds the same way. */
+const pictureWaitSeconds = computed({
+  get: () => (config.value?.zoom.pictureWaitMs ?? 1500) / 1000,
+  set: (seconds: number) => {
+    if (config.value) config.value.zoom.pictureWaitMs = Math.round(seconds * 1000);
   },
 });
 
