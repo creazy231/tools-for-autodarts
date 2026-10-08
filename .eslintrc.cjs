@@ -42,6 +42,9 @@ module.exports = {
     "vue/define-macros-order": [ "error", {
       order: [ "defineProps", "defineEmits", "definePageMeta" ],
     } ],
+    // TypeScript checks default imports already. This rule parsed every module a file
+    // default-imports to do it, all 9 MB of typescript.js for scripts/i18n-check.ts: 7 s a run.
+    "import/default": "off",
     // Recommend correct import order
     "import/order": [ "warn", {
       "groups": [ "builtin", "external", "internal", "parent", "sibling", "index", "object", "type" ],

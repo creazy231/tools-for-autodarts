@@ -18,6 +18,7 @@ yarn build -b safari    # Safari build
 yarn zip                # Create Chrome distribution zip
 yarn zip:firefox        # Create Firefox distribution zip
 yarn compile            # TypeScript type-check (vue-tsc --noEmit)
+yarn lint               # ESLint on what changed since HEAD, in one run: prints only the problems the change adds
 ```
 
 No test framework is configured — testing is manual on autodarts.com across Chrome and Firefox.
@@ -127,7 +128,9 @@ watch(config, async (_, old) => {
 
 ### ESLint
 
-Uses `@creazy231/eslint-config` with enforced Vue component ordering and import grouping. Run linting implicitly via the editor — no standalone lint script is defined.
+Uses `@creazy231/eslint-config` with enforced Vue component ordering and import grouping.
+
+Check a change with `yarn lint`: one ESLint run over the files that differ from HEAD (`--base main` for a branch, or name the files) and over their HEAD versions, printing only the problems the change adds. Most files already carry warnings, so ESLint's own exit code says little. Start ESLint once per check, never once per file: loading this config takes it 1.5–2 s, and a ten-file check run file by file, twice over, took half a minute or more. For the same reason `import/default` is off — TypeScript checks default imports, and the rule parsed all 9 MB of `typescript.js` to lint `scripts/i18n-check.ts`.
 
 ## Release Process
 
