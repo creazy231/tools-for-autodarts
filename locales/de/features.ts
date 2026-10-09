@@ -23,6 +23,7 @@ export default {
   qrCode: "QR-Code",
   quickCorrection: "Schnellkorrektur",
   recentLocalPlayers: "Letzte lokale Spieler",
+  roundCounter: "Rundenzähler",
   smallerScores: "Kleinere Scores",
   soundFx: "Sound FX",
   streamingMode: "Streaming-Modus",

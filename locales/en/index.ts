@@ -24,6 +24,7 @@ import nextPlayerOnTakeoutStuck from "./nextPlayerOnTakeoutStuck";
 import qrCode from "./qrCode";
 import quickCorrection from "./quickCorrection";
 import recentLocalPlayers from "./recentLocalPlayers";
+import roundCounter from "./roundCounter";
 import settings from "./settings";
 import site from "./site";
 import smallerScores from "./smallerScores";
@@ -65,6 +66,7 @@ export default {
   qrCode,
   quickCorrection,
   recentLocalPlayers,
+  roundCounter,
   settings,
   site,
   smallerScores,

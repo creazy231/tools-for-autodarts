@@ -221,7 +221,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - Paste either the board's ID or a link containing it; the ID is picked out for you
   - Autodarts removed the per-board stats page in the site rebuild, so **Follow** is the only action left
 - **Features While Following a Board**: Everything that describes a match also works while you watch one at `/boards/<id>/follow`
-  - Colours, smaller inactive scores, larger names, legs/sets and match data, Gotcha Helper, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Board Skins, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
+  - Colours, smaller inactive scores, larger names, legs/sets and match data, Gotcha Helper, Round Counter, Enhanced Scoring Display, Gameshot Animation, Darts Zoom, Board View, Board Skins, Instant Replay, Animations, Caller, Sound FX, WLED and Takeout Visualization all run there
   - **Automatic Next Player**, **Automatic Next Leg/Set** and **Quick Correction** stay off: they press the site's own controls, which belong to whoever is throwing rather than to whoever is watching
   - Nothing starts until the board is actually in a match, and it starts by itself when one begins — you can sit on the page and wait
 - **Fancy Gameshot Animation**: Celebratory animation when a player wins
@@ -250,6 +250,9 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - Marks every player ahead of whoever is throwing with the single dart that lands exactly on their score and resets them — `T20`, `D11`, `BULL`
   - A gap no single dart can cover is shown as the gap itself, e.g. `+37`
   - Sits beside the score, in the spot the site keeps for checkout suggestions
+- **Round Counter**: Puts the round counter back in the match header, which the rebuilt match screen no longer shows
+  - Reads *Round 7/15* — the current round and the match's round limit — centred between *Exit* and the icons, in the site's own words
+  - Shows just *Round 7* in a game played without a round limit, and nothing during the bull-off
 
 ### 🔊 Audio Features
 - **Caller**: Voice announcements for scores, checkouts, and each dart thrown during gameplay
