@@ -84,7 +84,7 @@
               :triggers="entry.triggers"
             >
               <template #lead>
-                <PlayButton @click="setEffect(config.wledFx.effects[entry.index])" :label="entry.name" :title="t('wled.list.send')" />
+                <PlayButton @click="sendEffect(config.wledFx.effects[entry.index])" :label="entry.name" :title="t('wled.list.send')" />
               </template>
               <template #meta>
                 <span class="shrink-0 text-sm" :class="[TYPE_ICONS[config.wledFx.effects[entry.index].type]]" />
@@ -146,7 +146,7 @@
           </p>
           <AppRadioGroup v-model="newEffect.type" :options="EFFECT_TYPES" button-size="sm" />
           <p class="adt-field-hint">
-            {{ TYPE_HINTS[newEffect.type] }}
+            <AppTrans :params="PLACEHOLDERS" :path="TYPE_HINTS[newEffect.type]" />
           </p>
         </div>
 
@@ -309,8 +309,10 @@ import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
 
 import { useNotification } from "@/composables/useNotification";
-import { setEffect } from "@/entrypoints/match.content/wled";
+import { tryEffect } from "@/entrypoints/match.content/wled";
+import { getAuthToken } from "@/utils/helpers";
 import { type IWled } from "@/utils/storage";
+import { tokenAccount } from "@/utils/team-room";
 import { WledType } from "#imports";
 
 const emit = defineEmits([ "toggle" ]);
@@ -325,11 +327,15 @@ const EFFECT_TYPES = computed(() => [
   { label: t("wled.type.options.api"), value: WledType.API },
 ]);
 
-const TYPE_HINTS = computed<Record<WledType, string>>(() => ({
-  [WledType.PRESET]: t("wled.type.hints.preset"),
-  [WledType.URL]: t("wled.type.hints.url"),
-  [WledType.API]: t("wled.type.hints.api"),
-}));
+/** The line under the type picker. The URL and JSON API lines name the placeholders, as they are typed. */
+const TYPE_HINTS: Record<WledType, MessageKey> = {
+  [WledType.PRESET]: "wled.type.hints.preset",
+  [WledType.URL]: "wled.type.hints.url",
+  [WledType.API]: "wled.type.hints.api",
+};
+
+/** The placeholders as they are typed: the same in every language. */
+const PLACEHOLDERS = { player: "{player}", player_ascii: "{player_ascii}" };
 
 const TYPE_ICONS: Record<WledType, string> = {
   [WledType.PRESET]: "icon-[material-symbols--lightbulb-outline-rounded]",
@@ -627,9 +633,17 @@ function editEffect(index: number) {
   showEffectModal.value = true;
 }
 
+/**
+ * Sends an effect from here, with its play button or Test. Its `{player}` is
+ * the account signed in, as on their own turn, or "Player" signed out.
+ */
+async function sendEffect(effect: IWled) {
+  await tryEffect(effect, tokenAccount(await getAuthToken())?.name ?? t("wled.samplePlayer"));
+}
+
 /** The effect as the dialog holds it, to try it before it is saved. */
 function testDraft() {
-  setEffect({ ...newEffect.value, url: newEffect.value.url.trim(), triggers: [ ...effectTriggers.value ] });
+  sendEffect({ ...newEffect.value, url: newEffect.value.url.trim(), triggers: [ ...effectTriggers.value ] });
 }
 
 async function saveEffect() {

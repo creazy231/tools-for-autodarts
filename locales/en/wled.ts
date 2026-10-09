@@ -97,12 +97,15 @@ export default {
       url: "URL",
       api: "JSON API",
     },
+    /** `player` and `player_ascii` are the placeholders as they are typed: params, so no translation can change them. */
     hints: {
       preset: "Plays a preset saved on your WLED device, picked from its own list.",
-      url: "Calls a link: a WLED API call such as /win/PL=1, or anything else.",
-      api: "Sends a JSON body to WLED's /json endpoint.",
+      url: "Calls a link: a WLED API call such as /win/PL=1, or anything else. <code>{player}</code> in it becomes the name of the player whose turn it is, and <code>{player_ascii}</code> the same name in plain letters.",
+      api: "Sends a JSON body to WLED's /json endpoint. <code>{player}</code> in it becomes the name of the player whose turn it is, and <code>{player_ascii}</code> the same name in plain letters, which a matrix's font can draw.",
     },
   },
+  /** What {player} stands for when an effect is sent from here (its play button, Test) while nobody is signed in. It is shown on the lights. */
+  samplePlayer: "Player",
   address: {
     label: "WLED address",
     /** Two example addresses: the same in every language. */

@@ -54,6 +54,7 @@ export default {
   },
   wled: {
     gameon: "Zu Beginn jedes Zugs und wenn nichts anderes passt",
+    nextPlayer: "Der nächste Spieler ist dran und hat keinen eigenen Effekt",
     takeout: "Während die Darts abgezogen werden",
     gameshot: "Ein Spieler gewinnt das Leg",
     matchshot: "Ein Spieler gewinnt das Match",

@@ -91,6 +91,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
   ],
   wled: [
     { trigger: "gameon", descriptionKey: "triggers.wled.gameon" },
+    { trigger: "next_player", descriptionKey: "triggers.wled.nextPlayer" },
     { trigger: "takeout", descriptionKey: "triggers.wled.takeout" },
     { trigger: "gameshot", descriptionKey: "triggers.wled.gameshot" },
     { trigger: "matchshot", descriptionKey: "triggers.wled.matchshot" },

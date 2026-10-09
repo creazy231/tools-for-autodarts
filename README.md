@@ -522,6 +522,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Effect Management**: Add, edit, enable/disable, and reorder lighting effects. **Add** holds a new effect and the CSV import, **⋯** sorting by trigger and deleting everything, and each effect has a play button to send it, as its editor has **Test**
 - **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
 - **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
+- **Don't restart a running effect**: An effect isn't sent again while the lights show it, so they don't start over. What counts is what is sent: the same effect with another player's name in it is sent again. The play button and **Test** always send
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
@@ -543,7 +544,8 @@ Effects can be triggered by various game events using these triggers:
 - **calibration_finished**: when calibration has finished
 
 ##### Game Events
-- **`gameon`**: At the start of each player's turn (default fallback effect)
+- **`gameon`**: At the start of each player's turn when there is neither an effect for the player nor a `next_player` effect, and whenever nothing else matches (the default fallback effect)
+- **`next_player`**: At the start of a player's turn, when there is no effect for the player. With `{player}` or `{player_ascii}` in it, it shows whose turn it is: see [The player's name in an effect](#the-players-name-in-an-effect)
 - **`takeout`**: When takeout is in progress
 - **`gameshot`**: When a player wins a game/leg
 - **`gameshot+[throwName]`**: When a player wins a game/leg with the specified throw (e.g. `gameshot+d10`)
@@ -581,7 +583,7 @@ Effects can be triggered by various game events using these triggers:
 - **`tournament_ready`**: When a tournament match of yours is ready and autodarts asks you to *Mark Ready*, the same moment Sound FX plays `ambient_tournament_ready` on: once for each of your matches, while the tournament's page is open
 
 ##### Player-Specific Effects
-- **Player Names**: Use the exact player name as it appears in Autodarts. This is triggered instead of the generic `gameon` effect. In a **Teams** match a team's name works too: the player whose turn it is first, then their team.
+- **Player Names**: Use the exact player name as it appears in Autodarts. This is triggered instead of `next_player` and the generic `gameon` effect. In a **Teams** match a team's name works too: the player whose turn it is first, then their team.
 - **Spaces**: Player names with spaces are supported (e.g., `john doe`)
 - **Underscores**: Alternative format with whitespaces replaced by underscores (e.g., `john_doe`)
 - **`bot_throw`**: Triggered when a CPU/bot player throws
@@ -598,11 +600,12 @@ Effects can be triggered by various game events using these triggers:
 #### Smart Effect Selection
 - **Multiple Effects**: If multiple effects share the same trigger, one is randomly selected
 - **Priority System**: More specific effects take precedence over general ones
+- **A turn's first effect**: A bot's turn starts with `bot_throw`, anyone else's with their own effect, then their team's, then `next_player`, then `gameon`
 - **Fallback Logic**: Falls back to `gameon` effect if no specific trigger matches
 
 #### Technical Implementation
 - **HTTP Requests**: Effects trigger HTTP GET requests to the specified URLs
-- **JSON API**: Effects trigger HTTP POST requests to the specified URLs with the specified JSON body
+- **JSON API**: Effects trigger HTTP POST requests to the specified URLs with the specified JSON body. Browsers send the body as `text/plain`, which WLED reads as JSON all the same; another server may need to accept that type too
 - **HTTPS Only**: All URLs must use HTTPS protocol for security (HTTP may work in the local network)
 - **Debouncing**: Game events are debounced to prevent rapid-fire triggers
 - **Error Handling**: Failed requests are silently ignored to prevent interrupting gameplay
@@ -625,14 +628,34 @@ WLED API Endpoint: http://wled-device.local/json
 The current state of the WLED leds can be fetched at http://wled-device.local/json/state. Refer to
 https://kno.wled.ge/interfaces/json-api/ for further informations about the json API.
 
+#### The player's name in an effect
+A JSON API effect can carry the name of the player whose turn it is. In its JSON:
+- **`{player}`** becomes the name as autodarts shows it. In a **Teams** match it is the player's own name, not the team's
+- **`{player_ascii}`** becomes the same name in plain letters, for a matrix: WLED's fonts draw only ASCII. Umlauts and ß are spelled out (Jürgen becomes Juergen), other accents are dropped (José becomes Jose), emoji are left out, and the name is cut at 32 characters
+
+Put them inside a JSON string, as in `"n":"{player_ascii}"`: the name is escaped for it, so a quote in a name can't break the JSON. A URL effect takes them in its link too, encoded for a link. In a lobby, on a board page and once the match is left there is nobody's turn, and they are empty. The play button and **Test** fill in the name of the account you're signed in with.
+
+The `next_player` trigger is made for this. It plays at the start of the turn of every player who has no effect of their own, and the name stays up until the first dart's effect, or `gameon`, takes over. On a matrix, WLED's **Scrolling Text** effect (122) shows a segment's name: a name that fits stands still, and a longer one scrolls. This effect, for a 32×8 matrix, imports as it is:
+
+```csv
+Player name;API;http://wled-device.local/json/state;{"on":true,"transition":0,"seg":[{"id":0,"on":true,"frz":false,"fx":122,"n":"{player_ascii}","sx":170,"ix":128,"c1":0,"c2":64,"c3":16,"o1":false,"o2":false,"o3":false,"pal":0,"col":[[255,160,0],[0,0,0],[0,0,0]]}]};next_player
+```
+
+- `fx` 122 is *Scrolling Text*, and `n` is its text
+- `sx` 170 scrolls at about 8–9 pixels a second
+- `ix` 128 centres the text, which stands still when it fits
+- `c1` 0 draws no trail, `c2` 64 picks an 8-pixel proportional font that fits about seven letters into 32 pixels, and `c3` 16 doesn't rotate it
+- `o1`, `o2` and `o3` (gradient, custom font and reverse) are off
+- `frz` false unfreezes the segment, and the first colour in `col` is the text's
 
 #### CSV Import Format
-Import multiple effects at once, one per line. The second field is the effect's type: `URL`, `PRESET` (followed by the preset's number) or `API` (followed by the JSON to send). The address always starts with `http://` or `https://`:
+Import multiple effects at once, one per line. The second field is the effect's type: `URL`, `PRESET` (followed by the preset's number) or `API` (followed by the JSON to send, which can't hold a `;`, since that separates the fields). The address always starts with `http://` or `https://`:
 ```csv
 Effect Name;URL;http://wled-device.local/win/PL=1;gameon
 180 Effect;URL;http://wled-device.local/win/PL=2;180
 Takeout;URL;http://wled-device.local/win/PL=3;takeout;busted
 Bust preset;PRESET;http://wled-device.local;7;busted
+Dim when idle;API;http://wled-device.local/json/state;{"on":true,"bri":40};idle
 ```
 
 #### Board Filtering

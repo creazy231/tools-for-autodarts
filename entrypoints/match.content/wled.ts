@@ -9,9 +9,9 @@ import { triggerPatterns } from "@/utils/helpers";
 import { settleGameData } from "@/utils/settle-game-data";
 import { legWinNames, loadTeamCalls, matchWinNames, turnNames } from "@/utils/team-calls";
 import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
-import { gameDataProcessor } from "@/utils/wled";
+import { gameDataProcessor, turnStartEffect } from "@/utils/wled";
+import { type WledRequest, wledRequest } from "@/utils/wled-request";
 import { winId } from "@/utils/win";
-import { WledType } from "#imports";
 
 let gameDataWatcherUnwatch: any;
 let lobbyDataWatcherUnwatch: any;
@@ -42,6 +42,22 @@ const settled = settleGameData((gameData, oldGameData) => processGameData(gameDa
  * it once more, so going by the winner alone set the effect again each time.
  */
 let announcedWin: string | undefined;
+
+/**
+ * Whose name `{player}` and `{player_ascii}` stand for: the player up in the
+ * last update acted on, so an effect a board event sets between two updates
+ * gets it too. Empty where there is no match (a lobby, a board page), and once
+ * the match is left.
+ */
+let turnPlayer = "";
+
+/**
+ * What was sent last, for *Don't restart a running effect* (`WledRequest.key`).
+ * Forgotten whenever WLED starts on a page: the lights may have changed since,
+ * from the lobby, another tab or the settings, so a page's first effect goes
+ * out even when it is the one this script sent last.
+ */
+let lastRequest: string | undefined;
 
 /** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
 function isOnALobbyPage(): boolean {
@@ -102,6 +118,7 @@ export async function wledFx() {
 
   try {
     config = await AutodartsToolsConfig.getValue();
+    lastRequest = undefined;
     await loadTeamCalls();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
@@ -215,6 +232,7 @@ export function wledFxOnRemove() {
   // matchshot once Finish had left the match.
   settled.cancel();
   announcedWin = undefined;
+  turnPlayer = "";
 
   setEffectByTrigger("idle");
 }
@@ -228,6 +246,9 @@ async function processGameData(
   fromWebSocket: boolean = false,
 ): Promise<void> {
   if (!gameData.match || !gameData.match.turns?.length) return;
+
+  const names = turnNames(gameData.match);
+  turnPlayer = names[0] ?? "";
 
   const editMode: boolean = gameData.match.activated !== undefined && gameData.match.activated >= 0;
   if (editMode) return;
@@ -247,33 +268,12 @@ async function processGameData(
   // gameon is the default effect to play when no other event happened
   let nextEffect: string | IWled = "gameon";
 
-  // Play player effect when it's the next players turn
+  // A visit that has just started: the player's own effect, or the one that
+  // shows whoever is up. With Teams, `names` is the player's and then their
+  // team's (utils/team-calls.ts).
   if (gameData.match.turns[0].throws.length === 0) {
     const currentPlayer = gameData.match.players?.[gameData.match.player];
-    const isBot = currentPlayer?.cpuPPR !== null;
-
-    if (isBot) {
-      console.log("Autodarts Tools: WLED: Bot player detected");
-      nextEffect = "bot_throw";
-    } else {
-      // The first name with an effect: with Teams, the player's and then their
-      // team's (utils/team-calls.ts); each as typed and with underscores.
-      for (const name of turnNames(gameData.match)) {
-        const lower = name.toLowerCase();
-        const underscored = lower.replace(/\s+/g, "_");
-        const nameEffects = config.wledFx.effects?.filter(
-          effect =>
-            effect.enabled
-            && effect.triggers
-            && (effect.triggers.includes(lower)
-              || effect.triggers.includes(underscored)),
-        ) ?? [];
-        if (!nameEffects.length) continue;
-        console.log(`Autodarts Tools: WLED: Found player name effect for ${underscored}`);
-        nextEffect = nameEffects[Math.floor(Math.random() * nameEffects.length)];
-        break;
-      }
-    }
+    nextEffect = turnStartEffect(names, currentPlayer?.cpuPPR !== null, config.wledFx.effects, isTriggerPresent);
   }
 
   const effect: string | null = await gameDataProcessor(gameData, oldGameData, fromWebSocket, isTriggerPresent, {
@@ -339,7 +339,7 @@ export async function setEffectByTrigger(trigger: string, wait: boolean = false)
   // A trigger lights nothing while WLED is switched off. The lobby and match
   // scripts tear WLED down on every page they leave, whether it ever started or
   // not, and that teardown sends `idle`: it lit the lights with WLED off. The
-  // settings' send and Test buttons go to setEffect directly, so they still work.
+  // settings' send and Test buttons go to tryEffect, so they still work.
   if (!config.wledFx?.enabled) return;
 
   // Find all effects that match the trigger
@@ -381,47 +381,45 @@ export async function setEffectByTrigger(trigger: string, wait: boolean = false)
   await setEffect(nextEffect, wait);
 }
 
-let currentEffect: IWled;
 export async function setEffect(effect: IWled, wait: boolean = false) {
   if (!config)
     config = await AutodartsToolsConfig.getValue();
 
-  if (config.wledFx.onlyOnce && effect === currentEffect) {
-    console.info("Autodarts Tools: WLED: didn't fetch", effect.url, "because the effect is already active");
-    return;
-  }
   if (!effect.url) {
     console.info("Autodarts Tools: WLED: effect", effect.name, "doesn't have an url");
     return;
   }
-  currentEffect = effect;
-  console.info("Autodarts Tools: WLED: fetching", effect.url);
+  const request = wledRequest(effect, turnPlayer);
+  if (config.wledFx.onlyOnce && request.key === lastRequest) {
+    console.info("Autodarts Tools: WLED: didn't fetch", request.url, "because the effect is already active");
+    return;
+  }
+  lastRequest = request.key;
+  await send(request, wait);
+}
+
+/**
+ * An effect tried in the settings, with its play button or Test. There is no
+ * turn there, so `player` stands in for the placeholders, and it is sent on
+ * every press: *Don't restart a running effect* is about the effects a game
+ * sets off.
+ */
+export async function tryEffect(effect: IWled, player: string): Promise<void> {
+  if (!effect.url) return;
+  await send(wledRequest(effect, player));
+}
+
+async function send(request: WledRequest, wait: boolean = false): Promise<void> {
+  console.info("Autodarts Tools: WLED: fetching", request.url);
 
   const controller = new AbortController();
-  const data = {
-    mode: "no-cors",
-    method: effect.type === WledType.URL ? "GET" : "POST",
-    signal: controller.signal,
-    cache: "no-cache",
-    credentials: "omit",
-    ...(effect.type === WledType.API && {
-      headers: { 'Content-Type': 'application/json' },
-      body: effect.json_api
-    }),
-  };
-  let url = effect.url;
-  if (effect.type === WledType.PRESET) {
-    url = (effect.url.startsWith('http') ? '' : 'http://')
-      + effect.url
-      + (effect.url.endsWith('/') ? '' : '/')
-      + 'win/PL=' + effect.preset;
-  }
+  const init: RequestInit = { ...request.init, signal: controller.signal };
   if (wait) {
     try {
       // Use setTimeout to ensure the fetch doesn't block or interfere with page state
       // This makes it truly fire-and-forget
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      await fetch(url, data);
+      await fetch(request.url, init);
       clearTimeout(timeoutId);
     } catch (e) {
       const error = e as Error;
@@ -432,7 +430,7 @@ export async function setEffect(effect: IWled, wait: boolean = false) {
   } else {
     setTimeout(() => {
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      fetch(url, data)
+      fetch(request.url, init)
         .then(() => {
           clearTimeout(timeoutId);
           // Success - no need to do anything with no-cors response

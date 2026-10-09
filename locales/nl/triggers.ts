@@ -54,6 +54,7 @@ export default {
   },
   wled: {
     gameon: "Aan het begin van elke beurt en wanneer niets anders past",
+    nextPlayer: "De volgende speler is aan de beurt en heeft geen eigen effect",
     takeout: "Terwijl de darts worden verwijderd",
     gameshot: "Een speler wint de leg",
     matchshot: "Een speler wint de wedstrijd",
