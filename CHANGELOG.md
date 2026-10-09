@@ -7,6 +7,15 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **Online Teams**: players on their own board join a team themselves. With own scores, the captains add their teams, and each player taps **Play for TEAM RED** in the invitation, which seats them on their own board first if they need a seat. **Leave team**, a person with a minus on their own row, takes them off again. Four players on four boards can now play two against two. Every Tools in the lobby needs this version: the invitation and the chip name any account whose Tools is older. The team server speaks a new protocol for it, and still takes 3.3.0's
+- **WLED** shows whose turn it is. A new trigger, `next_player`, plays at the start of a turn for a player who has no effect of their own, ahead of `gameon`, and a JSON API effect can carry that player's name: `{player}` in its JSON becomes the name as autodarts shows it, and `{player_ascii}` the same name in plain letters that a matrix's font can draw, Jürgen as Juergen. A URL effect takes both in its link. With WLED's *Scrolling Text* on a matrix, a name that fits stands still and a longer one scrolls, and the README has an effect for a 32×8 matrix to import as it is. In a Teams match it is the player's own name, not the team's, and the play button and **Test** fill in the name of the account you're signed in with. Checked in Chrome, in a match of two guests against a stand-in that answers the way WLED's own code does: each turn sent its player's name, and the first dart of a turn brought `gameon` back. A 32×8 matrix on WLED 16.0.1 took a JSON body sent the way the browser sends it, as plain text
+
+### Changed
+
+- **WLED**'s *Don't restart a running effect* compares what is sent, not which effect sends it. `next_player` is sent again for the next player, where comparing the effect skipped it whenever nothing else had been sent between two turns, and two effects that send the very same request no longer restart the lights
+
+### Fixed
+
+- **WLED**'s play button sends its effect on every press. With *Don't restart a running effect* on, a second press of the same effect sent nothing
 
 ## [3.3.0] - 2026-10-04
 
