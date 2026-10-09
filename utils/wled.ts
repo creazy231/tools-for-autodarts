@@ -1,4 +1,5 @@
 import { type IGameData } from "@/utils/game-data-storage";
+import { type IWled } from "@/utils/storage";
 
 /**
  * Whose names a win's effects are looked up under, in order: a leg's the player
@@ -74,6 +75,42 @@ export async function gameDataProcessor(
     trigger = await processX01Data(gameData, oldGameData, fromWebSocket, triggerPresentCB);
 
   return trigger;
+}
+
+/**
+ * What a visit starts with, before its first dart: `bot_throw` for a bot;
+ * otherwise the effect of the first of `names` that has one (the player's,
+ * then their team's, each as typed and with underscores for its spaces); then
+ * `next_player`, which can show whoever is up; and `gameon` when there is
+ * none of those.
+ */
+export function turnStartEffect(
+  names: readonly string[],
+  isBot: boolean,
+  effects: readonly IWled[] | undefined,
+  triggerPresentCB: (trigger: string) => boolean,
+): string | IWled {
+  if (isBot) {
+    console.log("Autodarts Tools: WLED: Bot player detected");
+    return "bot_throw";
+  }
+
+  for (const name of names) {
+    const lower = name.toLowerCase();
+    const underscored = lower.replace(/\s+/g, "_");
+    const nameEffects = effects?.filter(
+      effect =>
+        effect.enabled
+        && effect.triggers
+        && (effect.triggers.includes(lower)
+          || effect.triggers.includes(underscored)),
+    ) ?? [];
+    if (!nameEffects.length) continue;
+    console.log(`Autodarts Tools: WLED: Found player name effect for ${underscored}`);
+    return nameEffects[Math.floor(Math.random() * nameEffects.length)];
+  }
+
+  return triggerPresentCB("next_player") ? "next_player" : "gameon";
 }
 
 async function processX01Data(
