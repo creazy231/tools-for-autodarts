@@ -81,10 +81,11 @@ export default {
     },
     hints: {
       preset: "Spielt ein auf deinem WLED-Gerät gespeichertes Preset ab, ausgewählt aus der Liste des Geräts.",
-      url: "Ruft einen Link auf: einen WLED-API-Aufruf wie /win/PL=1 oder etwas ganz anderes.",
-      api: "Sendet einen JSON-Body an den /json-Endpunkt von WLED.",
+      url: "Ruft einen Link auf: einen WLED-API-Aufruf wie /win/PL=1 oder etwas ganz anderes. <code>{player}</code> darin wird zum Namen des Spielers, der dran ist, und <code>{player_ascii}</code> zum selben Namen in einfachen Buchstaben.",
+      api: "Sendet einen JSON-Body an den /json-Endpunkt von WLED. <code>{player}</code> darin wird zum Namen des Spielers, der dran ist, und <code>{player_ascii}</code> zum selben Namen in einfachen Buchstaben, die die Schrift einer Matrix zeichnen kann.",
     },
   },
+  samplePlayer: "Spieler",
   address: {
     label: "WLED-Adresse",
     placeholder: "wled-device.local oder 192.168.0.69",

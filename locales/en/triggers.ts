@@ -66,6 +66,7 @@ export default {
   },
   wled: {
     gameon: "At the start of each turn, and when nothing else matches",
+    nextPlayer: "The next player is up and has no effect of their own",
     takeout: "While takeout is in progress",
     gameshot: "A player wins the leg",
     matchshot: "A player wins the match",

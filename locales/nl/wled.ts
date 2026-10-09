@@ -81,10 +81,11 @@ export default {
     },
     hints: {
       preset: "Speelt een preset af die op je WLED-apparaat is opgeslagen, gekozen uit de lijst van het apparaat zelf.",
-      url: "Roept een link aan: een WLED-API-aanroep zoals /win/PL=1, of iets heel anders.",
-      api: "Stuurt een JSON-body naar het /json-eindpunt van WLED.",
+      url: "Roept een link aan: een WLED-API-aanroep zoals /win/PL=1, of iets heel anders. <code>{player}</code> daarin wordt de naam van de speler die aan de beurt is, en <code>{player_ascii}</code> dezelfde naam in gewone letters.",
+      api: "Stuurt een JSON-body naar het /json-eindpunt van WLED. <code>{player}</code> daarin wordt de naam van de speler die aan de beurt is, en <code>{player_ascii}</code> dezelfde naam in gewone letters, die het lettertype van een matrix kan tekenen.",
     },
   },
+  samplePlayer: "Speler",
   address: {
     label: "WLED-adres",
     placeholder: "wled-device.local of 192.168.0.69",
