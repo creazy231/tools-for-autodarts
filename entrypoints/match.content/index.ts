@@ -26,6 +26,7 @@ import QuickCorrection from "./QuickCorrection.vue";
 import { discordStream, discordStreamOnRemove } from "./discord-stream";
 import { enhancedScoringDisplay, enhancedScoringDisplayOnRemove } from "./enhanced-scoring-display";
 import { quietOwnDarts, quietOwnDartsOnRemove } from "./quiet-own-darts";
+import { roundCounter, roundCounterOnRemove } from "./round-counter";
 
 import type { IConfig } from "@/utils/storage";
 
@@ -85,6 +86,7 @@ const PORTED_TO_V2 = new Set<keyof IConfig>([
   "instantReplay",
   "streamingMode",
   "teams",
+  "roundCounter",
 ]);
 
 /**
@@ -352,6 +354,10 @@ async function initMatch(ctx, url: string, matchId?: string) {
     await initScript(enhancedScoringDisplay, url).catch(e => console.error(e));
   }
 
+  if (isOn(config, "roundCounter")) {
+    await initScript(roundCounter, url).catch(e => console.error(e));
+  }
+
   // ****************************************************************
 
   if (isOn(config, "animations")) {
@@ -412,6 +418,7 @@ function clearMatch(fromBullOff: boolean = false) {
   discordStreamOnRemove();
   automaticNextLegOnRemove();
   enhancedScoringDisplayOnRemove();
+  roundCounterOnRemove();
   gotchaOnRemove();
   takeoutOnRemove();
   zoomOnRemove();

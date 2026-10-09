@@ -262,6 +262,7 @@ import QuickCorrection from "./Settings/QuickCorrection.vue";
 import EnhancedScoringDisplay from "./Settings/EnhancedScoringDisplay.vue";
 import InstantReplay from "./Settings/InstantReplay.vue";
 import Gotcha from "./Settings/Gotcha.vue";
+import RoundCounter from "./Settings/RoundCounter.vue";
 
 import packageConfig from "../package.json";
 
@@ -364,6 +365,7 @@ const featureGroups: FeatureGroup[] = [
       { id: "enhanced-scoring-display", nameKey: "features.enhancedScoringDisplay", component: EnhancedScoringDisplay, hasSettings: false, v2Ready: true },
       { id: "instant-replay", nameKey: "features.instantReplay", component: InstantReplay, hasSettings: true, v2Ready: true, wideSettings: true },
       { id: "gotcha", nameKey: "features.gotcha", component: Gotcha, hasSettings: false, v2Ready: true },
+      { id: "round-counter", nameKey: "features.roundCounter", component: RoundCounter, hasSettings: false, v2Ready: true },
     ],
     settingIds: [ "colors", "next-player-on-takeout-stuck", "automatic-next-leg", "streaming-mode", "larger-legs-sets", "larger-player-names", "larger-player-match-data", "automatic-fullscreen", "zoom", "board-view", "board-skins", "quick-correction", "instant-replay" ],
   },
