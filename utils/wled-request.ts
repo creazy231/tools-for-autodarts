@@ -20,9 +20,29 @@ const ASCII_NAME_LENGTH = 32;
  * way German spells them without dots, and the ones NFKD doesn't take apart.
  */
 const SPELLED_OUT: Record<string, string> = {
-  ä: "ae", ö: "oe", ü: "ue", Ä: "Ae", Ö: "Oe", Ü: "Ue", ß: "ss", ẞ: "SS",
-  æ: "ae", Æ: "Ae", œ: "oe", Œ: "Oe", ø: "o", Ø: "O",
-  ł: "l", Ł: "L", đ: "d", Đ: "D", ð: "d", Ð: "D", þ: "th", Þ: "Th", ı: "i",
+  ä: "ae",
+  ö: "oe",
+  ü: "ue",
+  Ä: "Ae",
+  Ö: "Oe",
+  Ü: "Ue",
+  ß: "ss",
+  ẞ: "SS",
+  æ: "ae",
+  Æ: "Ae",
+  œ: "oe",
+  Œ: "Oe",
+  ø: "o",
+  Ø: "O",
+  ł: "l",
+  Ł: "L",
+  đ: "d",
+  Đ: "D",
+  ð: "d",
+  Ð: "D",
+  þ: "th",
+  Þ: "Th",
+  ı: "i",
 };
 
 /** `{player}` and `{player_ascii}`, the names an effect can carry. */
@@ -70,10 +90,8 @@ export function wledRequest(effect: IWled, player: string): WledRequest {
   let url = effect.url;
   let body: string | undefined;
   if (effect.type === WledType.PRESET) {
-    url = (effect.url.startsWith("http") ? "" : "http://")
-      + effect.url
-      + (effect.url.endsWith("/") ? "" : "/")
-      + "win/PL=" + effect.preset;
+    const address = effect.url.startsWith("http") ? effect.url : `http://${effect.url}`;
+    url = `${address}${address.endsWith("/") ? "" : "/"}win/PL=${effect.preset}`;
   } else if (effect.type === WledType.URL) {
     url = fillPlaceholders(effect.url, player, encodeURIComponent);
   } else if (effect.type === WledType.API) {
