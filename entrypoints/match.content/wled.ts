@@ -51,6 +51,14 @@ let announcedWin: string | undefined;
  */
 let turnPlayer = "";
 
+/**
+ * What was sent last, for *Don't restart a running effect* (`WledRequest.key`).
+ * Forgotten whenever WLED starts on a page: the lights may have changed since,
+ * from the lobby, another tab or the settings, so a page's first effect goes
+ * out even when it is the one this script sent last.
+ */
+let lastRequest: string | undefined;
+
 /** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
 function isOnALobbyPage(): boolean {
   return /\/lobb(?:y|ies)\//.test(window.location.href);
@@ -110,6 +118,7 @@ export async function wledFx() {
 
   try {
     config = await AutodartsToolsConfig.getValue();
+    lastRequest = undefined;
     await loadTeamCalls();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
@@ -371,9 +380,6 @@ export async function setEffectByTrigger(trigger: string, wait: boolean = false)
   console.log(`Autodarts Tools: WLED: Found matching effect ${nextEffect.name}`);
   await setEffect(nextEffect, wait);
 }
-
-/** What was sent last, for *Don't restart a running effect* (`WledRequest.key`). */
-let lastRequest: string | undefined;
 
 export async function setEffect(effect: IWled, wait: boolean = false) {
   if (!config)
