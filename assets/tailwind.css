@@ -184,6 +184,28 @@ body {
   padding: 0 22px;
 }
 
+/*
+ * Labels that can outgrow their share of the row, such as one naming a set:
+ * each wraps, centred, within it, a long word too, rather than run out of the
+ * track. Use with is-fill. A label on one line keeps its size's height. After
+ * the sizes, which it overrides.
+ */
+.adt-segment.is-wrap > .adt-segment-item {
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  padding-block: 8px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.adt-segment.is-wrap.is-sm > .adt-segment-item {
+  min-height: 36px;
+  padding-block: 6px;
+}
+
 /* ------------------------------------------------------------- nav tabs ---
  * Navigation/NavTabs, `page` variant: underline row for switching views inside
  * a page. No pill background — the active tab is bold, full-contrast, with a

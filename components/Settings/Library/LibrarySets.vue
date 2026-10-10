@@ -71,8 +71,8 @@
         <p class="adt-field-label">
           {{ t("library.sets.dialog.startLabel") }}
         </p>
-        <!-- Stacked: the copy option carries a set's name, which a phone's row has no room for beside the other. -->
-        <AppRadioGroup v-model="startWith" :options="startOptions" button-size="sm" vertical />
+        <!-- Side by side, half the row each: the copy option names a set, so a label that outgrows its half wraps within it. -->
+        <AppRadioGroup v-model="startWith" :options="startOptions" button-size="sm" class-name="is-fill is-wrap" />
       </div>
     </div>
     <template #footer>
