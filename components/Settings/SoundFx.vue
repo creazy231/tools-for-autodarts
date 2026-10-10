@@ -17,13 +17,25 @@
           </OptionRow>
         </section>
 
+        <LibrarySets
+          @create="createSet"
+          @delete="deleteSet"
+          @rename="renameSet"
+          @use="useSet"
+          v-model="viewedId"
+          :sets="sets"
+          feature="soundFx"
+        />
+
+        <!-- Keyed by the set it shows, so each set opens unsearched. -->
         <LibrarySection
           @reorder="moveSound"
+          :key="viewed?.id"
           :empty-text="t('soundFx.list.emptyText')"
           :empty-title="t('library.sounds.emptyTitle')"
           :entries="entries"
           :search-placeholder="t('library.sounds.searchPlaceholder')"
-          :title="t('library.sounds.title')"
+          :title="libraryTitle"
           empty-icon="icon-[material-symbols--graphic-eq-rounded]"
         >
           <template #actions>
@@ -51,9 +63,9 @@
             <LibraryItem
               @delete="removeSound(entry.index)"
               @edit="editAny(entry.index)"
-              @toggle="config.soundFx.sounds[entry.index].enabled = $event"
+              @toggle="sounds[entry.index].enabled = $event"
               v-for="entry in shown"
-              :key="stableKey(config.soundFx.sounds[entry.index])"
+              :key="stableKey(sounds[entry.index])"
               :data-index="entry.index"
               :draggable="!filtering"
               :enabled="entry.enabled"
@@ -62,11 +74,11 @@
               :triggers="entry.triggers"
             >
               <template #lead>
-                <PlayButton @click="togglePlay(entry.index)" :label="entry.name" :playing="playingKey === stableKey(config.soundFx.sounds[entry.index])" />
+                <PlayButton @click="togglePlay(entry.index)" :label="entry.name" :playing="playingKey === stableKey(sounds[entry.index])" />
               </template>
               <template #meta>
-                <SoundSource :sound="config.soundFx.sounds[entry.index]" :voices="voices" />
-                <VolumeBadge :sound="config.soundFx.sounds[entry.index]" />
+                <SoundSource :sound="sounds[entry.index]" :voices="voices" />
+                <VolumeBadge :sound="sounds[entry.index]" />
               </template>
             </LibraryItem>
           </template>
@@ -135,7 +147,7 @@
       feature="soundFx"
     />
 
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('library.sounds.deleteAll.title', { count: config?.soundFx.sounds.length ?? 0 })" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('library.sounds.deleteAll.title', { count: sounds.length })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
         {{ t("library.sounds.deleteAll.body") }}
       </p>
@@ -173,12 +185,17 @@
             {{ t("soundFx.card") }}
           </p>
         </div>
-        <div class="flex">
+        <div class="flex items-center gap-3">
           <div @click="$emit('toggle', 'sound-fx')" class="absolute inset-y-0 left-12 right-0 cursor-pointer" />
           <AppToggle
             @update:model-value="toggleFeature"
             v-model="config.soundFx.enabled"
           />
+          <p v-if="several" class="flex min-w-0 max-w-[45%] items-center gap-1.5 text-sm font-semibold text-white/80">
+            <span class="icon-[material-symbols--library-music-outline-rounded] shrink-0 text-base" aria-hidden="true" />
+            <span class="sr-only">{{ t("library.sets.soundFx.cardLabel") }}</span>
+            <span class="truncate">{{ inUseLabel }}</span>
+          </p>
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
@@ -209,6 +226,7 @@ import TtsDialog from "./Library/TtsDialog.vue";
 import UploadDialog from "./Library/UploadDialog.vue";
 import VolumeBadge from "./Library/VolumeBadge.vue";
 import { stableKey } from "./Library/stable-key";
+import LibrarySets from "./Library/LibrarySets.vue";
 
 import type { MessageKey } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
@@ -263,6 +281,21 @@ let ignoreSpeechEnd = false;
 const copies = soundCopies();
 
 const { notification, showNotification, hideNotification } = useNotification();
+/**
+ * The sound sets (composables/useLibrarySets.ts). `sounds` is the list the
+ * library edits, in place: the stored list of the set being viewed, which for
+ * the set in use is `soundFx.sounds` itself. A recording another set still
+ * plays is kept when its sound is deleted here.
+ */
+const {
+  viewedId, sets, several, viewed, items: sounds, viewedLabel, inUseLabel,
+  useSet, createSet, renameSet, deleteSet, releaseFiles,
+} = useLibrarySets("soundFx", {
+  notify: showNotification,
+  fileOf: sound => sound.soundId,
+  deleteFile: deleteSoundFxFromIndexedDB,
+  closeDialogs,
+});
 
 // TTS related
 const { voices, isTTSAvailable, isSpeaking, lastVoiceURI, lastRate, lastPitch, preview, stopPreview, saveDefaults } = useTTS();
@@ -279,7 +312,9 @@ const ttsForm = ref({
   triggers: [] as string[],
 });
 
-const entries = computed<LibraryEntry[]>(() => (config.value?.soundFx.sounds ?? []).map((sound, index) => {
+const libraryTitle = computed(() => (several.value ? t("library.sets.soundFx.listTitle", { set: viewedLabel.value }) : t("library.sounds.title")));
+
+const entries = computed<LibraryEntry[]>(() => sounds.value.map((sound, index) => {
   const triggers = Array.isArray(sound.triggers) ? sound.triggers : [];
   return {
     index,
@@ -297,7 +332,7 @@ const urlErrorText = computed(() => (urlError.value ? t(urlError.value) : ""));
 const draftHasFile = computed(() => {
   if (newSound.value.base64) return true;
   if (!isEditMode.value || editingIndex.value === null) return false;
-  return !!config.value?.soundFx.sounds[editingIndex.value]?.soundId;
+  return !!sounds.value[editingIndex.value]?.soundId;
 });
 
 /** A link set above 100% that the extension cannot read, so the editor can say it plays at 100% at most. */
@@ -325,7 +360,7 @@ const moreActions = computed(() => [
     label: t("library.sounds.menu.sort.label"),
     hint: t("library.sounds.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
-    disabled: (config.value?.soundFx.sounds.length ?? 0) < 2,
+    disabled: sounds.value.length < 2,
     action: sortSoundsByTriggers,
   },
   {
@@ -333,7 +368,7 @@ const moreActions = computed(() => [
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
-    disabled: !config.value?.soundFx.sounds.length,
+    disabled: !sounds.value.length,
     action: openDeleteAllModal,
   },
 ]);
@@ -354,20 +389,19 @@ onBeforeUnmount(() => {
 });
 
 function moveSound(from: number, to: number) {
-  const sounds = config.value?.soundFx.sounds;
-  if (!sounds) return;
-  const [ moved ] = sounds.splice(from, 1);
-  sounds.splice(to, 0, moved);
+  const list = sounds.value;
+  const [ moved ] = list.splice(from, 1);
+  list.splice(to, 0, moved);
 }
 
 function editAny(index: number) {
-  const sound = config.value!.soundFx.sounds[index];
+  const sound = sounds.value[index];
   if (sound.tts) openTTSModal(sound, index);
   else editSound(index);
 }
 
 function togglePlay(index: number) {
-  const sound = config.value!.soundFx.sounds[index];
+  const sound = sounds.value[index];
   if (playingKey.value === stableKey(sound)) stopPlayback();
   else playSound(sound, stableKey(sound));
 }
@@ -379,7 +413,7 @@ function previewDraft() {
     return;
   }
   const { url, base64, name, volume } = newSound.value;
-  const stored = isEditMode.value && editingIndex.value !== null ? config.value?.soundFx.sounds[editingIndex.value] : undefined;
+  const stored = isEditMode.value && editingIndex.value !== null ? sounds.value[editingIndex.value] : undefined;
   playSound({ name, url: url.trim(), base64, soundId: base64 ? undefined : stored?.soundId, enabled: true, triggers: [], volume }, DRAFT_KEY);
 }
 
@@ -412,7 +446,7 @@ function closeSoundModal() {
 }
 
 function editSound(index: number) {
-  const sound = config.value!.soundFx.sounds[index];
+  const sound = sounds.value[index];
 
   // Set up base form values
   newSound.value = {
@@ -453,6 +487,7 @@ function editSound(index: number) {
 }
 
 async function saveSound() {
+  if (!showSoundModal.value) return;
   if (!config.value) {
     showNotification(t("soundFx.notifications.configNotLoaded"), "error");
     return;
@@ -509,17 +544,14 @@ async function saveSound() {
 
   if (isEditMode.value && editingIndex.value !== null) {
     // Update existing sound
-    const existingSound = config.value.soundFx.sounds[editingIndex.value];
+    const existingSound = sounds.value[editingIndex.value];
     sound.enabled = existingSound.enabled; // Preserve enabled state when editing
+    sounds.value[editingIndex.value] = sound;
 
-    // Delete old sound from IndexedDB if exists and different
-    if (existingSound.soundId && existingSound.soundId !== sound.soundId) {
-      await deleteSoundFxFromIndexedDB(existingSound.soundId);
-    }
-
-    config.value.soundFx.sounds[editingIndex.value] = sound;
+    // The old recording goes, unless another set still plays it
+    if (existingSound.soundId !== sound.soundId) await releaseFiles([ existingSound ]);
   } else {
-    config.value.soundFx.sounds.unshift(sound);
+    sounds.value.unshift(sound);
   }
 
   // Reset form and close modal
@@ -527,20 +559,14 @@ async function saveSound() {
 }
 
 async function removeSound(index: number) {
-  const sounds = config.value?.soundFx.sounds;
-  if (!sounds) return;
-
-  const sound = sounds[index];
+  const list = sounds.value;
+  const sound = list[index];
+  if (!sound) return;
   if (playingKey.value === stableKey(sound)) stopPlayback();
 
-  // If sound is stored in IndexedDB, delete it
-  if (sound.soundId && isIndexedDBAvailable()) {
-    await deleteSoundFxFromIndexedDB(sound.soundId);
-  }
-
-  // Found again after the wait, in case another delete moved it.
-  const at = sounds.indexOf(sound);
-  if (at !== -1) sounds.splice(at, 1);
+  list.splice(index, 1);
+  // Its recording goes too, unless another set still plays it
+  await releaseFiles([ sound ]);
 }
 
 async function playSound(sound: ISound, key: number) {
@@ -698,7 +724,9 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 async function processFiles({ files, fromNames, triggers: shared }: { files: File[]; fromNames: boolean; triggers: string[] }) {
-  if (!config.value || !files.length) return;
+  if (!config.value || !files.length || !showUploadModal.value) return;
+  // The set being viewed now: the files land in it, even if the view moves while they are read.
+  const target = sounds.value;
 
   isProcessing.value = true;
   let added = 0;
@@ -716,7 +744,7 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
           soundId = await saveSoundFxToIndexedDB(nameWithoutExt, base64Data);
         }
 
-        config.value.soundFx.sounds.unshift({
+        target.unshift({
           name: nameWithoutExt,
           url: "",
           base64: soundId ? "" : base64Data, // Only store in config if not in IndexedDB
@@ -741,12 +769,12 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
 }
 
 function sortSoundsByTriggers() {
-  if (!config.value || !config.value.soundFx.sounds || config.value.soundFx.sounds.length <= 1) {
+  if (sounds.value.length <= 1) {
     return;
   }
 
   // Sort sounds by their first trigger alphabetically
-  config.value.soundFx.sounds.sort((a, b) => {
+  sounds.value.sort((a, b) => {
     // Get first trigger from each sound, or empty string if no triggers
     const triggerA = Array.isArray(a.triggers) && a.triggers.length > 0 ? a.triggers[0] : "";
     const triggerB = Array.isArray(b.triggers) && b.triggers.length > 0 ? b.triggers[0] : "";
@@ -772,22 +800,27 @@ function closeDeleteAllModal() {
   showDeleteAllModal.value = false;
 }
 
+/**
+ * The set being viewed was deleted elsewhere (another tab): the dialogs open on
+ * it close, rather than act on the set shown in its place, which is the one in
+ * use. Says whether one was open, so useLibrarySets can say why.
+ */
+function closeDialogs(): boolean {
+  const open = showSoundModal.value || showUploadModal.value || showTTSModal.value || showDeleteAllModal.value;
+  if (showSoundModal.value) closeSoundModal();
+  if (showUploadModal.value) closeUploadModal();
+  if (showTTSModal.value) closeTTSModal();
+  if (showDeleteAllModal.value) closeDeleteAllModal();
+  return open;
+}
+
 async function deleteAllSounds() {
-  if (!config.value) return;
+  if (!config.value || !showDeleteAllModal.value) return;
   stopPlayback();
 
-  // Delete all sounds from IndexedDB
-  if (isIndexedDBAvailable()) {
-    // Delete individual sounds with their IDs to ensure cleanup
-    for (const sound of config.value.soundFx.sounds) {
-      if (sound.soundId) {
-        await deleteSoundFxFromIndexedDB(sound.soundId);
-      }
-    }
-  }
-
-  // Clear all sounds from the config
-  config.value.soundFx.sounds = [];
+  // Empty the set being viewed, then let go of the recordings no other set plays
+  const removed = sounds.value.splice(0);
+  await releaseFiles(removed);
 
   // Close modal and show notification
   closeDeleteAllModal();
@@ -840,7 +873,7 @@ function prelistenTTS() {
 }
 
 function saveTTSSound() {
-  if (!config.value || !ttsForm.value.text || !ttsForm.value.triggers.length) return;
+  if (!config.value || !showTTSModal.value || !ttsForm.value.text || !ttsForm.value.triggers.length) return;
 
   stopPlayback();
   saveDefaults(ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
@@ -869,12 +902,12 @@ function saveTTSSound() {
   const editing = ttsEditingIndex.value;
   if (editing !== null) {
     // Update existing
-    const existing = config.value.soundFx.sounds[editing];
+    const existing = sounds.value[editing];
     sound.enabled = existing.enabled;
-    config.value.soundFx.sounds[editing] = sound;
+    sounds.value[editing] = sound;
   } else {
     // Add new
-    config.value.soundFx.sounds.unshift(sound);
+    sounds.value.unshift(sound);
   }
 
   closeTTSModal();
