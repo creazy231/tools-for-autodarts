@@ -576,6 +576,16 @@ async function exportSettings() {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Whether `sound`, in an imported config, is the one that plays the exported recording `recording`:
+ * by the recording's id alone, which the import keeps. Matched by name as well, a link, an inline or a
+ * text-to-speech sound would take the recording of another set's sound of the same name, and stop
+ * playing its own.
+ */
+function keepsRecording(sound: ISound, recording: { soundId?: string; id?: string }): boolean {
+  return Boolean(sound.soundId) && (sound.soundId === recording.soundId || sound.soundId === recording.id);
+}
+
 function importSettings() {
   if (!importFileInput.value) {
     importFileInput.value = document.createElement("input");
@@ -648,10 +658,8 @@ function importSettings() {
                   if (soundId) {
                     callerImportCount++;
 
-                    // Update the sound in config to reference the soundId
-                    const soundInConfig = newConfig.caller.sounds.find(
-                      s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                    );
+                    // The sound that plays this recording, found by the recording's id
+                    const soundInConfig = newConfig.caller.sounds.find(s => keepsRecording(s, sound));
 
                     if (soundInConfig) {
                       soundInConfig.soundId = soundId;
@@ -674,10 +682,8 @@ function importSettings() {
                   if (soundId) {
                     soundFxImportCount++;
 
-                    // Update the sound in config to reference the soundId
-                    const soundInConfig = newConfig.soundFx.sounds.find(
-                      s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                    );
+                    // The sound that plays this recording, found by the recording's id
+                    const soundInConfig = newConfig.soundFx.sounds.find(s => keepsRecording(s, sound));
 
                     if (soundInConfig) {
                       soundInConfig.soundId = soundId;
@@ -912,10 +918,8 @@ function pasteFromClipboard() {
                 if (soundId) {
                   callerImportCount++;
 
-                  // Update the sound in config to reference the soundId
-                  const soundInConfig = newConfig.caller.sounds.find(
-                    s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                  );
+                  // The sound that plays this recording, found by the recording's id
+                  const soundInConfig = newConfig.caller.sounds.find(s => keepsRecording(s, sound));
 
                   if (soundInConfig) {
                     soundInConfig.soundId = soundId;
@@ -938,10 +942,8 @@ function pasteFromClipboard() {
                 if (soundId) {
                   soundFxImportCount++;
 
-                  // Update the sound in config to reference the soundId
-                  const soundInConfig = newConfig.soundFx.sounds.find(
-                    s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                  );
+                  // The sound that plays this recording, found by the recording's id
+                  const soundInConfig = newConfig.soundFx.sounds.find(s => keepsRecording(s, sound));
 
                   if (soundInConfig) {
                     soundInConfig.soundId = soundId;
