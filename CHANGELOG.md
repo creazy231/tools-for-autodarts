@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - **WLED**'s play button sends its effect on every press. With *Don't restart a running effect* on, a second press of the same effect sent nothing
+- **Settings import** no longer swaps a sound's own source for another sound's recording. A Caller or Sound FX sound on a link, on text-to-speech or with its recording kept in the settings took the uploaded recording of any sound with the same name, which with sets is often another set's: the set in use came back speaking in another set's voice
 
 ## [3.3.0] - 2026-10-04
 
