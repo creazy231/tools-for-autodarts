@@ -73,7 +73,17 @@ export function useLibrarySets<F extends SetFeature>(feature: F, options: Option
     return set ? labelOf(set.id) : "";
   });
 
-  watch(() => viewed.value?.id, () => {
+  watch([ () => viewed.value?.id, viewedId ], ([ now, picked ], [ before, pickedBefore ]) => {
+    // The first load, or a view this tab picked (a pill, a new set).
+    if (!before || now === before || picked !== pickedBefore) return;
+    // Following the set in use when another tab used another: the view stays on the set it
+    // showed, and so do its dialogs. Set before this panel renders again, so the sets section
+    // never sees the view move.
+    if (sets.value.some(set => set.id === before)) {
+      viewedId.value = before;
+      return;
+    }
+    // The set shown was deleted elsewhere.
     if (options.closeDialogs?.()) options.notify(t("library.sets.notifications.goneElsewhere"), "error");
   });
 
