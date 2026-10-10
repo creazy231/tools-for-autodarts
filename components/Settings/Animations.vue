@@ -55,14 +55,26 @@
           </OptionRow>
         </section>
 
+        <LibrarySets
+          @create="createSet"
+          @delete="deleteSet"
+          @rename="renameSet"
+          @use="useSet"
+          v-model="viewedId"
+          :sets="sets"
+          feature="animations"
+        />
+
+        <!-- Keyed by the set it shows, so each set opens unsearched. -->
         <LibrarySection
           @reorder="moveAnimation"
+          :key="viewed?.id"
           :category-labels="{ players: t('animations.categoryOther') }"
           :empty-text="t('animations.list.emptyText')"
           :empty-title="t('animations.list.emptyTitle')"
           :entries="entries"
           :search-placeholder="t('animations.list.searchPlaceholder')"
-          :title="t('features.animations')"
+          :title="libraryTitle"
           empty-icon="icon-[material-symbols--animated-images-outline-rounded]"
           list-class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         >
@@ -90,7 +102,7 @@
           <template #default="{ entries: shown, filtering, query }">
             <div
               v-for="entry in shown"
-              :key="stableKey(config.animations.data[entry.index])"
+              :key="stableKey(animations[entry.index])"
               :ref="observeTile"
               :data-index="entry.index"
               class="flex flex-col overflow-hidden rounded-[var(--ad-radius-lg)] bg-[var(--ad-surface-sunken)] ring-1 ring-inset ring-[var(--ad-border-subtle)]"
@@ -100,7 +112,7 @@
                   :alt="t('animations.tile.alt', { triggers: entry.triggers.join(', ') || t('animations.tile.noTrigger') })"
                   class="size-full object-cover transition"
                   :class="[{ 'opacity-30 grayscale': !entry.enabled }]"
-                  :src="getAnimationSource(config.animations.data[entry.index])"
+                  :src="getAnimationSource(animations[entry.index])"
                   loading="lazy"
                 >
                 <span v-if="!filtering" class="adt-drag-handle is-glass absolute left-2 top-2" :title="t('library.dragToReorder')">
@@ -126,7 +138,7 @@
               <div class="flex items-center gap-2 p-2.5">
                 <TriggerChips :max="2" :query="query" :triggers="entry.triggers" :wrap="false" class="flex-1" />
                 <AppSwitch
-                  @update:model-value="config.animations.data[entry.index].enabled = $event"
+                  @update:model-value="animations[entry.index].enabled = $event"
                   :label="t('animations.tile.switchLabel', { name: entry.name, state: t(entry.enabled ? 'library.state.on' : 'library.state.off') })"
                   :model-value="entry.enabled"
                 />
@@ -237,7 +249,7 @@
       :title="t('animations.add.upload.label')"
     />
 
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('animations.deleteAll.title', { count: config?.animations.data.length ?? 0 })" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('animations.deleteAll.title', { count: animations.length })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
         {{ t("animations.deleteAll.body") }}
       </p>
@@ -270,12 +282,17 @@
             {{ t("animations.card") }}
           </p>
         </div>
-        <div class="flex">
+        <div class="flex items-center gap-3">
           <div @click="$emit('toggle', 'animations')" class="absolute inset-y-0 left-12 right-0 cursor-pointer" />
           <AppToggle
             @update:model-value="toggleFeature"
             v-model="config.animations.enabled"
           />
+          <p v-if="several" class="flex min-w-0 max-w-[45%] items-center gap-1.5 text-sm font-semibold text-white/80">
+            <span class="icon-[material-symbols--animated-images-outline-rounded] shrink-0 text-base" aria-hidden="true" />
+            <span class="sr-only">{{ t("library.sets.animations.cardLabel") }}</span>
+            <span class="truncate">{{ inUseLabel }}</span>
+          </p>
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
@@ -305,6 +322,7 @@ import TriggerChips from "./Library/TriggerChips.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import UploadDialog from "./Library/UploadDialog.vue";
 import { stableKey } from "./Library/stable-key";
+import LibrarySets from "./Library/LibrarySets.vue";
 
 import type { ComponentPublicInstance } from "vue";
 import type { MessageKey } from "@/utils/i18n";
@@ -342,6 +360,21 @@ const LENGTH_ERRORS: Record<"link" | "upload" | "notAnimated", MessageKey> = {
 };
 
 const { config } = useConfig();
+/**
+ * The animation sets (composables/useLibrarySets.ts). `animations` is the list
+ * the library edits, in place: the stored list of the set being viewed, which
+ * for the set in use is `animations.data` itself. An uploaded GIF another set
+ * still shows is kept when its animation is deleted here.
+ */
+const {
+  viewedId, sets, several, viewed, items: animations, viewedLabel, inUseLabel,
+  useSet, createSet, renameSet, deleteSet, addToSet, releaseFiles,
+} = useLibrarySets("animations", {
+  notify: showNotification,
+  fileOf: animation => animation.animationId,
+  deleteFile: deleteAnimation,
+  closeDialogs,
+});
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
@@ -386,7 +419,7 @@ const intersectionObserver = typeof IntersectionObserver === "undefined"
   : new IntersectionObserver((observed) => {
     for (const entry of observed) {
       if (!entry.isIntersecting) continue;
-      const animation = config.value?.animations.data[Number((entry.target as HTMLElement).dataset.index)];
+      const animation = animations.value[Number((entry.target as HTMLElement).dataset.index)];
       if (animation) visibleAnimations.value.add(visibilityKey(animation));
     }
   }, { rootMargin: "200px", threshold: 0.1 });
@@ -405,7 +438,9 @@ const viewMode = computed({
   },
 });
 
-const entries = computed<LibraryEntry[]>(() => (config.value?.animations.data ?? []).map((animation, index) => {
+const libraryTitle = computed(() => (several.value ? t("library.sets.animations.listTitle", { set: viewedLabel.value }) : t("features.animations")));
+
+const entries = computed<LibraryEntry[]>(() => animations.value.map((animation, index) => {
   const triggers = Array.isArray(animation.triggers) ? animation.triggers : [];
   return {
     index,
@@ -429,7 +464,7 @@ const showForText = computed(() => formatSeconds(config.value?.animations.durati
 const uploadedGifName = computed(() => uploadedGifFilename.value || t("animations.dialog.unknownFile"));
 
 /** "2.37 s" for each animation with a length of its own, for its tile. */
-const ownLengthLabels = computed(() => (config.value?.animations.data ?? []).map((animation) => {
+const ownLengthLabels = computed(() => animations.value.map((animation) => {
   const seconds = ownDuration(animation);
   return seconds === undefined ? undefined : `${formatSeconds(seconds)} s`;
 }));
@@ -444,7 +479,7 @@ const moreActions = computed(() => [
     label: t("animations.menu.sort.label"),
     hint: t("animations.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
-    disabled: (config.value?.animations.data.length ?? 0) < 2,
+    disabled: animations.value.length < 2,
     action: sortAnimationsByTriggers,
   },
   {
@@ -452,7 +487,7 @@ const moreActions = computed(() => [
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
-    disabled: !config.value?.animations.data.length,
+    disabled: !animations.value.length,
     action: openDeleteAllModal,
   },
 ]);
@@ -492,10 +527,9 @@ function validateAnimationTrigger(trigger: string): string {
 }
 
 function moveAnimation(from: number, to: number) {
-  const data = config.value?.animations.data;
-  if (!data) return;
-  const [ moved ] = data.splice(from, 1);
-  data.splice(to, 0, moved);
+  const list = animations.value;
+  const [ moved ] = list.splice(from, 1);
+  list.splice(to, 0, moved);
 }
 
 // Helper to get the proper URL source for an animation
@@ -563,9 +597,8 @@ async function gifBytes(source: string): Promise<Uint8Array | null> {
 }
 
 async function editAnimation(index: number) {
-  if (!config.value || !config.value.animations.data[index]) return;
-
-  const animation = config.value.animations.data[index];
+  const animation = animations.value[index];
+  if (!animation) return;
 
   isUploadedGif.value = !!animation.animationId;
   uploadedGifFilename.value = "";
@@ -592,7 +625,7 @@ async function editAnimation(index: number) {
 }
 
 function saveAnimation() {
-  if (!config.value) return;
+  if (!config.value || !showAnimationModal.value) return;
 
   // Either url (remote gif) or animationId (uploaded gif) is required
   if (!newAnimation.value.url && !newAnimation.value.animationId) {
@@ -629,12 +662,12 @@ function saveAnimation() {
 
   if (isEditMode.value && editingIndex.value !== null) {
     // Update existing animation
-    const existingAnimation = config.value.animations.data[editingIndex.value];
+    const existingAnimation = animations.value[editingIndex.value];
     animation.enabled = existingAnimation.enabled; // Preserve enabled state when editing
-    config.value.animations.data[editingIndex.value] = animation;
+    animations.value[editingIndex.value] = animation;
   } else {
-    // Add to animations data array
-    config.value.animations.data.unshift(animation);
+    // Add to the set being viewed
+    animations.value.unshift(animation);
   }
 
   closeAnimationModal();
@@ -651,18 +684,21 @@ function closeAnimationModal() {
   uploadedGifFilename.value = "";
 }
 
-function removeAnimation(index: number) {
-  if (config.value?.animations.data) {
-    // If animation is stored in OPFS, delete it
-    const animation = config.value.animations.data[index];
-    if (animation.animationId && isOPFSAvailable()) {
-      deleteAnimationFromOPFS(animation.animationId).catch(e => console.error(e));
-      // Also remove from sources cache
-      if (animationSources.value[animation.animationId]) URL.revokeObjectURL(animationSources.value[animation.animationId]);
-      delete animationSources.value[animation.animationId];
-    }
-    config.value.animations.data.splice(index, 1);
-  }
+async function removeAnimation(index: number) {
+  const list = animations.value;
+  const animation = list[index];
+  if (!animation) return;
+
+  list.splice(index, 1);
+  // Its uploaded GIF goes too, unless another set still shows it
+  await releaseFiles([ animation ]);
+}
+
+/** Deletes an uploaded GIF that no set shows any more, and the picture the tiles kept of it. */
+async function deleteAnimation(id: string) {
+  if (animationSources.value[id]) URL.revokeObjectURL(animationSources.value[id]);
+  delete animationSources.value[id];
+  if (isOPFSAvailable()) await deleteAnimationFromOPFS(id);
 }
 
 function openAddAnimationModal() {
@@ -711,7 +747,9 @@ function fileToBlob(file: File): Blob {
 }
 
 async function processGifFiles({ files, fromNames, triggers: shared }: { files: File[]; fromNames: boolean; triggers: string[] }) {
-  if (!config.value || !files.length) return;
+  // The set being viewed now, by id: the GIFs land in it, even if the view moves or another tab writes while they are stored.
+  const into = viewed.value?.id;
+  if (!config.value || !into || !files.length || !showGifUploadModal.value) return;
   isGifProcessing.value = true;
 
   if (!isOPFSAvailable()) {
@@ -744,8 +782,8 @@ async function processGifFiles({ files, fromNames, triggers: shared }: { files: 
         const objectURL = await getAnimationFromOPFS(animationId);
         if (objectURL) animationSources.value[animationId] = objectURL;
 
-        // Add to animations list
-        config.value.animations.data.unshift(animation);
+        // Add to the set the upload started in
+        await addToSet(into, [ animation ]);
         successCount++;
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
@@ -773,39 +811,37 @@ function closeDeleteAllModal() {
 }
 
 async function deleteAllAnimations() {
-  if (!config.value) return;
+  if (!config.value || !showDeleteAllModal.value) return;
 
-  // Delete all animations from OPFS
-  if (isOPFSAvailable()) {
-    // Delete individual animations with their IDs to ensure cleanup
-    for (const animation of config.value.animations.data) {
-      if (animation.animationId) {
-        await deleteAnimationFromOPFS(animation.animationId);
-      }
-    }
-  }
-
-  // Clear all animations from the config
-  config.value.animations.data = [];
+  // Empty the set being viewed, then let go of the uploaded GIFs no other set shows, and their pictures
+  const removed = animations.value.splice(0);
+  await releaseFiles(removed);
 
   // Close modal and show notification
   closeDeleteAllModal();
   showNotification(t("animations.notifications.allDeleted"), "error");
+}
 
-  // Reset animations cache
-  for (const url of Object.values(animationSources.value)) {
-    URL.revokeObjectURL(url);
-  }
-  animationSources.value = {};
+/**
+ * The set being viewed was deleted elsewhere (another tab): the dialogs open on
+ * it close, rather than act on the set shown in its place, which is the one in
+ * use. Says whether one was open, so useLibrarySets can say why.
+ */
+function closeDialogs(): boolean {
+  const open = showAnimationModal.value || showGifUploadModal.value || showDeleteAllModal.value;
+  if (showAnimationModal.value) closeAnimationModal();
+  if (showGifUploadModal.value) closeGifUploadModal();
+  if (showDeleteAllModal.value) closeDeleteAllModal();
+  return open;
 }
 
 function sortAnimationsByTriggers() {
-  if (!config.value || !config.value.animations.data || config.value.animations.data.length <= 1) {
+  if (animations.value.length <= 1) {
     return;
   }
 
   // Sort animations by their first trigger alphabetically
-  config.value.animations.data.sort((a, b) => {
+  animations.value.sort((a, b) => {
     // Get first trigger from each animation, or empty string if no triggers
     const triggerA = Array.isArray(a.triggers) && a.triggers.length > 0 ? a.triggers[0] : "";
     const triggerB = Array.isArray(b.triggers) && b.triggers.length > 0 ? b.triggers[0] : "";

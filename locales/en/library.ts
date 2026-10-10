@@ -181,4 +181,115 @@ export default {
       ttsUpdated: "TTS sound updated",
     },
   },
+  /**
+   * Sets of a library: lists of items kept for an occasion, one of which plays (components/Settings/Library/LibrarySets.vue,
+   * composables/useLibrarySets.ts). The words every feature shares come first, and each feature's own follow under its config
+   * name. A set's items are effects, animations or sounds.
+   */
+  sets: {
+    /** Under the heading once there are two or more. */
+    intro: "One set plays at a time. Pick a set to edit it; it plays once you use it.",
+    /** The first set's name until it is renamed. It is stored as nothing, so it follows the language. */
+    defaultName: "Default",
+    new: "New set",
+    /** Spoken after the name of the set in use, in its pill. */
+    inUse: "In use",
+    /** The line under the pills, about the set being viewed. */
+    status: {
+      inUse: "This is the set that plays.",
+      /** `set` is the name of the set in use. */
+      notInUse: "Not in use. The set that plays is {set}.",
+    },
+    use: "Use this set",
+    menu: {
+      rename: "Rename set",
+      delete: "Delete set",
+      /** Under Delete set while it can't be pressed: the set being viewed is the one in use. */
+      deleteInUse: "Use another set first",
+    },
+    dialog: {
+      renameTitle: "Rename set",
+      nameLabel: "Name",
+      /** Example names. */
+      namePlaceholder: "Halloween, Christmas, a birthday…",
+      startLabel: "Start with",
+      /** `set` is the name of the set being viewed, cut short when long. */
+      copy: "A copy of {set}",
+      create: "Create set",
+    },
+    /** Said under the name field when Create or Save refuses. */
+    errors: {
+      nameMissing: "Give the set a name.",
+      nameTaken: "There's already a set with that name.",
+    },
+    deleteDialog: {
+      /** `set` is the set's name. */
+      title: "Delete {set}?",
+      confirm: "Delete set",
+    },
+    notifications: {
+      created: "{set} created. It plays once you use it.",
+      inUse: "{set} plays now.",
+      renamed: "Set renamed",
+      deleted: "{set} deleted",
+      /** Said when a dialog closes because its set was deleted in another tab while it was open. */
+      goneElsewhere: "The set you were editing was deleted in another tab.",
+    },
+    wledFx: {
+      title: "Effect sets",
+      /** Under the heading while there is one set. */
+      introSingle: "Keep another list of effects for an occasion, such as Halloween or a birthday, and switch to it when the day comes.",
+      newTitle: "New effect set",
+      empty: "No effects",
+      deleteBody: {
+        one: "The set and its {count} effect are deleted for good. This can't be undone.",
+        other: "The set and its {count} effects are deleted for good. This can't be undone.",
+      },
+      deleteBodyEmpty: "The set has no effects. This can't be undone.",
+      /** Spoken before the name of the set in use, on the card. */
+      cardLabel: "Effect set in use:",
+      /** The library's heading once there are two or more sets: `set` is the name of the set it shows. */
+      listTitle: "Effects in {set}",
+    },
+    animations: {
+      title: "Animation sets",
+      introSingle: "Keep another list of animations for an occasion, such as Halloween or a birthday, and switch to it when the day comes.",
+      newTitle: "New animation set",
+      empty: "No animations",
+      deleteBody: {
+        one: "The set and its {count} animation are deleted for good. This can't be undone.",
+        other: "The set and its {count} animations are deleted for good. This can't be undone.",
+      },
+      deleteBodyEmpty: "The set has no animations. This can't be undone.",
+      cardLabel: "Animation set in use:",
+      listTitle: "Animations in {set}",
+    },
+    /** "Sound sets", not "caller sets": a caller set is a voice pack that Import a caller set brings in. */
+    caller: {
+      title: "Sound sets",
+      introSingle: "Keep another list of sounds, such as a second caller set or one for Halloween, and switch to it when you like.",
+      newTitle: "New sound set",
+      empty: "No sounds",
+      deleteBody: {
+        one: "The set and its {count} sound are deleted for good. This can't be undone.",
+        other: "The set and its {count} sounds are deleted for good. This can't be undone.",
+      },
+      deleteBodyEmpty: "The set has no sounds. This can't be undone.",
+      cardLabel: "Sound set in use:",
+      listTitle: "Sounds in {set}",
+    },
+    soundFx: {
+      title: "Sound sets",
+      introSingle: "Keep another list of sounds for an occasion, such as Halloween or a birthday, and switch to it when the day comes.",
+      newTitle: "New sound set",
+      empty: "No sounds",
+      deleteBody: {
+        one: "The set and its {count} sound are deleted for good. This can't be undone.",
+        other: "The set and its {count} sounds are deleted for good. This can't be undone.",
+      },
+      deleteBodyEmpty: "The set has no sounds. This can't be undone.",
+      cardLabel: "Sound set in use:",
+      listTitle: "Sounds in {set}",
+    },
+  },
 };

@@ -2,7 +2,8 @@
   <!--
     Delete in two clicks: the bin turns into a red "Delete" laid over its
     neighbours for four seconds. No dialog to get through, but no loss from a
-    stray click either. A delete also takes the stored file with it.
+    stray click either. A delete also takes the stored file with it, once no
+    set of the library keeps it.
 
     Pressing the red button keeps focus where it is. Safari and Firefox on
     macOS take focus off a clicked button on mousedown, and that blur would

@@ -1,5 +1,6 @@
 import type { BoardStatus } from "@/utils/types";
 import type { RoomStore } from "@/utils/team-room";
+import type { LibrarySet } from "@/utils/library-sets";
 
 import { defaultColors, normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
@@ -141,7 +142,16 @@ export interface IConfig {
     delayStart?: number;
     objectFit?: "cover" | "contain";
     viewMode?: "full-page" | "board-only";
+    /** The animations that play: the set in use's. */
     data: IAnimation[];
+    /**
+     * Every set of this list in the user's order, the set in use by its id and
+     * name only (utils/library-sets.ts). Absent until a second set is made:
+     * until then the list above is the one set there is.
+     */
+    sets?: LibrarySet<"data", IAnimation>[];
+    /** The id of the set in use, whose list is the one above. */
+    activeSet?: string;
   };
   caller: {
     enabled: boolean;
@@ -150,13 +160,31 @@ export interface IConfig {
     callEveryDart: boolean;
     callCheckout: boolean;
     preferCombinedThrows: boolean;
+    /** The sounds that play: the set in use's. */
     sounds: ISound[];
+    /**
+     * Every set of this list in the user's order, the set in use by its id and
+     * name only (utils/library-sets.ts). Absent until a second set is made:
+     * until then the list above is the one set there is.
+     */
+    sets?: LibrarySet<"sounds", ISound>[];
+    /** The id of the set in use, whose list is the one above. */
+    activeSet?: string;
   };
   soundFx: {
     enabled: boolean;
     /** As `animations.disabledGameModes`. */
     disabledGameModes?: GameMode[];
+    /** The sounds that play: the set in use's. */
     sounds: ISound[];
+    /**
+     * Every set of this list in the user's order, the set in use by its id and
+     * name only (utils/library-sets.ts). Absent until a second set is made:
+     * until then the list above is the one set there is.
+     */
+    sets?: LibrarySet<"sounds", ISound>[];
+    /** The id of the set in use, whose list is the one above. */
+    activeSet?: string;
   };
   /**
    * Autodarts' own dart-landed sound, kept for throws you cannot already hear.
@@ -245,12 +273,12 @@ export interface IConfig {
     disabledGameModes?: GameMode[];
     onlyOnce: boolean;
     boardIds: string[];
-    /** The effects that play: the set in use's (utils/wled-sets.ts). */
+    /** The effects that play: the set in use's (utils/library-sets.ts). */
     effects: IWled[];
     /**
-     * Every effect set in the user's order, the set in use by its id and name
-     * only. Absent until a second set is made: until then `effects` is the one
-     * set there is.
+     * Every set of this list in the user's order, the set in use by its id and
+     * name only (utils/library-sets.ts). Absent until a second set is made:
+     * until then the list above is the one set there is.
      */
     sets?: IWledSet[];
     /** The id of the set in use, whose effects are `effects`. */
@@ -467,15 +495,9 @@ export interface IWled {
 
 /**
  * A list of WLED effects kept for an occasion, such as Halloween. One set is in
- * use at a time, and its effects are `wledFx.effects`: see utils/wled-sets.ts.
+ * use at a time, and its effects are `wledFx.effects`: see utils/library-sets.ts.
  */
-export interface IWledSet {
-  id: string;
-  /** As typed. "" is the first set, which the settings call "Default" in their language. */
-  name: string;
-  /** Left out on the set in use, whose effects are `wledFx.effects`. */
-  effects?: IWled[];
-}
+export type IWledSet = LibrarySet<"effects", IWled>;
 
 export type TBoardStatus = BoardStatus | undefined;
 

@@ -9,56 +9,6 @@ export default {
   sections: {
     options: "Opties",
   },
-  // "In gebruik" as the site says it (account.email.errors.emailInUse), and "hernoemen" as its myDevices.link.rename.
-  sets: {
-    title: "Effectensets",
-    introSingle: "Maak voor een gelegenheid zoals Halloween of een verjaardag een extra lijst met effecten, en schakel ernaar over als de dag aanbreekt.",
-    intro: "Er wordt steeds één set afgespeeld. Kies een set om de effecten ervan te bewerken; hij wordt pas afgespeeld als je hem gebruikt.",
-    defaultName: "Standaard",
-    new: "Nieuwe set",
-    inUse: "In gebruik",
-    cardLabel: "Effectenset in gebruik:",
-    status: {
-      inUse: "Dit is de set die wordt afgespeeld.",
-      notInUse: "Niet in gebruik. De set die wordt afgespeeld, is {set}.",
-    },
-    use: "Deze set gebruiken",
-    menu: {
-      rename: "Set hernoemen",
-      delete: "Set verwijderen",
-      deleteInUse: "Gebruik eerst een andere set",
-    },
-    dialog: {
-      newTitle: "Nieuwe effectenset",
-      renameTitle: "Set hernoemen",
-      nameLabel: "Naam",
-      namePlaceholder: "Halloween, Kerst, een verjaardag…",
-      startLabel: "Beginnen met",
-      copy: "Een kopie van {set}",
-      empty: "Geen effecten",
-      create: "Set maken",
-    },
-    errors: {
-      nameMissing: "Geef de set een naam.",
-      nameTaken: "Er is al een set met die naam.",
-    },
-    deleteDialog: {
-      title: "{set} verwijderen?",
-      body: {
-        one: "De set en het effect erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
-        other: "De set en de {count} effecten erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
-      },
-      bodyEmpty: "De set heeft geen effecten. Dit kan niet ongedaan worden gemaakt.",
-      confirm: "Set verwijderen",
-    },
-    notifications: {
-      created: "{set} gemaakt. Hij wordt afgespeeld zodra je hem gebruikt.",
-      inUse: "Nu wordt {set} afgespeeld.",
-      renamed: "Set hernoemd",
-      deleted: "{set} verwijderd",
-      goneElsewhere: "De set die je aan het bewerken was, is in een ander tabblad verwijderd.",
-    },
-  },
   boards: {
     title: "Borden",
     description: "Effecten worden alleen afgespeeld bij worpen op deze borden, en op elk bord zolang de lijst leeg is. Een effect op <code>{trigger}</code> wordt afgespeeld bij worpen op borden die niet in de lijst staan.",
@@ -75,7 +25,6 @@ export default {
   },
   list: {
     title: "Effecten",
-    titleInSet: "Effecten in {set}",
     searchPlaceholder: "Effecten zoeken op naam, trigger of adres",
     emptyTitle: "Nog geen effecten",
     emptyText: "Voeg een effect toe voor elk moment dat je verlichting moet laten zien, of importeer er een lijst van.",

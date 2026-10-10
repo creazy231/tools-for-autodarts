@@ -6,7 +6,7 @@ import { canonicalJson } from "@/utils/canonical-json";
 import { normalizeColors } from "@/utils/colors";
 import { normalizeInstantReplay } from "@/utils/instant-replay";
 import { AutodartsToolsConfig, defaultConfig } from "@/utils/storage";
-import { normalizeWledSets } from "@/utils/wled-sets";
+import { normalizeLibrarySets } from "@/utils/library-sets";
 
 /**
  * The settings page's config, as one object that everything shares.
@@ -56,8 +56,9 @@ function adopt(value: IConfig): void {
  * need saying out loud. Colors and Instant Replay go through their own
  * normalisers, which also bring a config of the old shape up to date — an
  * import, or the old settings the migration dialog writes back as they were.
- * WLED's effect sets go through normalizeWledSets, so the WLED panel always
- * edits a list that is stored (utils/wled-sets.ts).
+ * Every library's sets (WLED, Animations, the Caller, Sound FX) go through
+ * normalizeLibrarySets, so a panel always edits a list that is stored
+ * (utils/library-sets.ts).
  *
  * Applied before the ref is filled, so backfilling does not itself count as an
  * edit. It reaches storage with the first real change, exactly as it did when
@@ -67,7 +68,10 @@ function withDefaults(stored: IConfig): IConfig {
   const merged: IConfig = { ...JSON.parse(JSON.stringify(defaultConfig)), ...stored };
   merged.colors = normalizeColors(merged.colors);
   merged.instantReplay = normalizeInstantReplay(merged.instantReplay);
-  merged.wledFx = normalizeWledSets(merged.wledFx);
+  merged.wledFx = normalizeLibrarySets(merged.wledFx, "effects");
+  merged.animations = normalizeLibrarySets(merged.animations, "data");
+  merged.caller = normalizeLibrarySets(merged.caller, "sounds");
+  merged.soundFx = normalizeLibrarySets(merged.soundFx, "sounds");
   merged.discord = { ...merged.discord };
   merged.discord.autoStartAfterTimer ??= { ...defaultConfig.discord.autoStartAfterTimer! };
   return merged;

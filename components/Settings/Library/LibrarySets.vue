@@ -3,7 +3,7 @@
     <div class="flex min-h-12 items-center justify-between gap-3">
       <!-- One run of text, as LibrarySection's heading, so a wrapped heading keeps its count after its last word. -->
       <h3 class="adt-section-title">
-        <span>{{ t("wled.sets.title") }}<span v-if="several" class="adt-section-count">&nbsp;·&nbsp;{{ sets.length }}</span></span>
+        <span>{{ t(words("title")) }}<span v-if="several" class="adt-section-count">&nbsp;·&nbsp;{{ sets.length }}</span></span>
       </h3>
       <div class="flex items-center gap-2">
         <AppMenu v-if="several" :items="moreActions">
@@ -16,17 +16,17 @@
         <AppButton @click="openCreate" auto size="sm">
           <span class="flex items-center gap-1">
             <span class="icon-[material-symbols--add-rounded] text-lg" />
-            {{ t("wled.sets.new") }}
+            {{ t("library.sets.new") }}
           </span>
         </AppButton>
       </div>
     </div>
     <p class="mt-1 max-w-3xl text-sm text-[var(--ad-text-muted)]">
-      {{ several ? t("wled.sets.intro") : t("wled.sets.introSingle") }}
+      {{ several ? t("library.sets.intro") : t(words("introSingle")) }}
     </p>
 
     <template v-if="several && viewed">
-      <div :aria-label="t('wled.sets.title')" class="adt-pills mt-4" role="group">
+      <div :aria-label="t(words('title'))" class="adt-pills mt-4" role="group">
         <button
           @click="emit('update:modelValue', set.id)"
           v-for="set in sets"
@@ -38,20 +38,20 @@
         >
           <span v-if="set.active" class="size-2 shrink-0 rounded-full bg-[var(--ad-action-primary)]" aria-hidden="true" />
           <span class="min-w-0 truncate">{{ label(set) }}</span>
-          <span class="adt-pill-count">{{ set.effects.length }}</span>
-          <span v-if="set.active" class="sr-only">{{ t("wled.sets.inUse") }}</span>
+          <span class="adt-pill-count">{{ set.items.length }}</span>
+          <span v-if="set.active" class="sr-only">{{ t("library.sets.inUse") }}</span>
         </button>
       </div>
       <div class="mt-3 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2 text-sm">
         <p v-if="viewed.active" class="text-[var(--ad-text-secondary)]">
-          {{ t("wled.sets.status.inUse") }}
+          {{ t("library.sets.status.inUse") }}
         </p>
         <template v-else>
           <p class="text-[var(--ad-text-muted)]">
-            {{ t("wled.sets.status.notInUse", { set: label(active) }) }}
+            {{ t("library.sets.status.notInUse", { set: label(active) }) }}
           </p>
           <AppButton @click="emit('use', viewed.id)" auto size="sm">
-            {{ t("wled.sets.use") }}
+            {{ t("library.sets.use") }}
           </AppButton>
         </template>
       </div>
@@ -59,17 +59,17 @@
   </section>
 
   <!-- New set, or the set viewed renamed -->
-  <AppModal @close="closeNameDialog" :show="nameDialog !== null" :title="nameDialog === 'rename' ? t('wled.sets.dialog.renameTitle') : t('wled.sets.dialog.newTitle')" ghost-close size="sm">
+  <AppModal @close="closeNameDialog" :show="nameDialog !== null" :title="nameDialog === 'rename' ? t('library.sets.dialog.renameTitle') : t(words('newTitle'))" ghost-close size="sm">
     <div ref="nameForm" class="space-y-5">
       <div>
-        <AppInput @keydown.enter="submitName" id="wled-set-name" v-model="draftName" :label="t('wled.sets.dialog.nameLabel')" :placeholder="t('wled.sets.dialog.namePlaceholder')" />
+        <AppInput @keydown.enter="submitName" id="wled-set-name" v-model="draftName" :label="t('library.sets.dialog.nameLabel')" :placeholder="t('library.sets.dialog.namePlaceholder')" />
         <p v-if="nameError" class="adt-field-hint !text-[var(--ad-rose-500)]">
           {{ t(nameError) }}
         </p>
       </div>
-      <div v-if="nameDialog === 'create' && viewed?.effects.length">
+      <div v-if="nameDialog === 'create' && viewed?.items.length">
         <p class="adt-field-label">
-          {{ t("wled.sets.dialog.startLabel") }}
+          {{ t("library.sets.dialog.startLabel") }}
         </p>
         <!-- Stacked: the copy option carries a set's name, which a phone's row has no room for beside the other. -->
         <AppRadioGroup v-model="startWith" :options="startOptions" button-size="sm" vertical />
@@ -80,22 +80,22 @@
         {{ t("common.cancel") }}
       </AppButton>
       <AppButton @click="submitName" auto type="primary">
-        {{ nameDialog === "rename" ? t("common.save") : t("wled.sets.dialog.create") }}
+        {{ nameDialog === "rename" ? t("common.save") : t("library.sets.dialog.create") }}
       </AppButton>
     </template>
   </AppModal>
 
   <!-- The set viewed deleted -->
-  <AppModal @close="showDelete = false" :show="showDelete" :title="t('wled.sets.deleteDialog.title', { set: label(viewed) })" ghost-close size="sm">
+  <AppModal @close="showDelete = false" :show="showDelete" :title="t('library.sets.deleteDialog.title', { set: label(viewed) })" ghost-close size="sm">
     <p class="text-sm text-[var(--ad-text-muted)]">
-      {{ viewed?.effects.length ? t("wled.sets.deleteDialog.body", { count: viewed.effects.length }) : t("wled.sets.deleteDialog.bodyEmpty") }}
+      {{ viewed?.items.length ? t(words("deleteBody"), { count: viewed.items.length }) : t(words("deleteBodyEmpty")) }}
     </p>
     <template #footer>
       <AppButton @click="showDelete = false" auto>
         {{ t("common.cancel") }}
       </AppButton>
       <AppButton @click="confirmDelete" auto type="danger">
-        {{ t("wled.sets.deleteDialog.confirm") }}
+        {{ t("library.sets.deleteDialog.confirm") }}
       </AppButton>
     </template>
   </AppModal>
@@ -109,19 +109,23 @@ import AppModal from "../../AppModal.vue";
 import AppRadioGroup from "../../AppRadioGroup.vue";
 
 import type { MessageKey } from "@/utils/i18n";
-import type { WledSetView } from "@/utils/wled-sets";
+import type { LibrarySetView, SetFeature } from "@/utils/library-sets";
 
-import { setLabel, setNameTaken } from "@/utils/wled-sets";
+import { librarySetLabel, librarySetNameTaken } from "@/utils/library-sets";
 
 /**
- * WLED's effect sets (utils/wled-sets.ts): a pill for each, the set being
+ * A library's sets (utils/library-sets.ts): a pill for each, the set being
  * viewed picked out and the set in use dotted, a line on whether the set being
- * viewed is in use, and the dialogs that make, rename and delete one. It
- * changes nothing itself: the panel does what it emits.
+ * viewed is in use, and the dialogs that make, rename and delete one. Its words
+ * are the feature's own (library.sets.<feature>) where it names the items, and
+ * shared otherwise. It changes nothing itself: the panel does what it emits,
+ * through composables/useLibrarySets.ts.
  */
 const props = defineProps<{
-  /** Every set, in order, as listSets gives them. */
-  sets: WledSetView[];
+  /** Whose sets: picks the words that name the feature's items. */
+  feature: SetFeature;
+  /** Every set, in order, as listLibrarySets gives them. */
+  sets: LibrarySetView<unknown>[];
   /** The id of the set being viewed. */
   modelValue: string;
 }>();
@@ -138,6 +142,8 @@ const { t } = useI18n();
 
 /** A name longer than this is cut short in the copy option, a button that doesn't wrap: 20 fits a 360px phone. */
 const LABEL_LENGTH = 20;
+/** The words of the feature's own that the section shows. */
+type Words = "title" | "introSingle" | "newTitle" | "empty" | "deleteBody" | "deleteBodyEmpty";
 const ELLIPSIS = "…";
 
 const nameDialog = ref<"create" | "rename" | null>(null);
@@ -153,14 +159,14 @@ const several = computed(() => props.sets.length > 1);
 const viewed = computed(() => props.sets.find(set => set.id === props.modelValue) ?? props.sets.find(set => set.active));
 const active = computed(() => props.sets.find(set => set.active));
 const startOptions = computed(() => [
-  { label: t("wled.sets.dialog.copy", { set: short(label(viewed.value)) }), value: "copy" },
-  { label: t("wled.sets.dialog.empty"), value: "empty" },
+  { label: t("library.sets.dialog.copy", { set: short(label(viewed.value)) }), value: "copy" },
+  { label: t(words("empty")), value: "empty" },
 ]);
 const moreActions = computed(() => [
-  { label: t("wled.sets.menu.rename"), icon: "icon-[material-symbols--edit-outline-rounded]", action: openRename },
+  { label: t("library.sets.menu.rename"), icon: "icon-[material-symbols--edit-outline-rounded]", action: openRename },
   {
-    label: t("wled.sets.menu.delete"),
-    hint: viewed.value?.active ? t("wled.sets.menu.deleteInUse") : undefined,
+    label: t("library.sets.menu.delete"),
+    hint: viewed.value?.active ? t("library.sets.menu.deleteInUse") : undefined,
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
@@ -182,15 +188,21 @@ watch(() => viewed.value?.id, () => {
   showDelete.value = false;
 });
 
-function label(set: { name: string } | undefined): string {
-  return set ? setLabel(set, t("wled.sets.defaultName")) : "";
+/** The key of one of the feature's own words. */
+function words(key: Words) {
+  return `library.sets.${props.feature}.${key}` as const;
 }
 
-/** A long name cut before the word the limit falls in, or at the limit when it is one long word. */
+function label(set: { name: string } | undefined): string {
+  return set ? librarySetLabel(set, t("library.sets.defaultName")) : "";
+}
+
+/** A long name cut before the word the limit falls in, or at the limit when it is one long word; never inside an emoji. */
 function short(name: string): string {
-  if (name.length <= LABEL_LENGTH) return name;
-  const cut = name.slice(0, LABEL_LENGTH - 1);
-  const whole = /\s/.test(name[LABEL_LENGTH - 1]) ? cut : cut.replace(/\s+\S*$/, "");
+  const chars = Array.from(name);
+  if (chars.length <= LABEL_LENGTH) return name;
+  const cut = chars.slice(0, LABEL_LENGTH - 1).join("");
+  const whole = /\s/.test(chars[LABEL_LENGTH - 1]) ? cut : cut.replace(/\s+\S*$/, "");
   return (whole || cut).trimEnd() + ELLIPSIS;
 }
 
@@ -223,7 +235,7 @@ function submitName() {
   const renaming = nameDialog.value === "rename";
   const name = draftName.value.trim();
   if (!name) {
-    nameError.value = "wled.sets.errors.nameMissing";
+    nameError.value = "library.sets.errors.nameMissing";
     return;
   }
   // Saved as it was: the first set keeps no name of its own, and goes on following the language.
@@ -231,12 +243,12 @@ function submitName() {
     closeNameDialog();
     return;
   }
-  if (setNameTaken(props.sets, name, t("wled.sets.defaultName"), renaming ? set?.id : undefined)) {
-    nameError.value = "wled.sets.errors.nameTaken";
+  if (librarySetNameTaken(props.sets, name, t("library.sets.defaultName"), renaming ? set?.id : undefined)) {
+    nameError.value = "library.sets.errors.nameTaken";
     return;
   }
   if (renaming && set) emit("rename", set.id, name);
-  else emit("create", name, startWith.value === "copy" && Boolean(set?.effects.length));
+  else emit("create", name, startWith.value === "copy" && Boolean(set?.items.length));
   closeNameDialog();
 }
 

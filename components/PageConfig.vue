@@ -273,7 +273,7 @@ import { normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
 import { normalizeInstantReplay } from "@/utils/instant-replay";
 import { normalizeTeams } from "@/utils/teams";
-import { normalizeWledSets } from "@/utils/wled-sets";
+import { normalizeLibrarySets } from "@/utils/library-sets";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
 import AppMenu from "@/components/AppMenu.vue";
@@ -576,6 +576,16 @@ async function exportSettings() {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Whether `sound`, in an imported config, is the one that plays the exported recording `recording`:
+ * by the recording's id alone, which the import keeps. Matched by name as well, a link, an inline or a
+ * text-to-speech sound would take the recording of another set's sound of the same name, and stop
+ * playing its own.
+ */
+function keepsRecording(sound: ISound, recording: { soundId?: string; id?: string }): boolean {
+  return Boolean(sound.soundId) && (sound.soundId === recording.soundId || sound.soundId === recording.id);
+}
+
 function importSettings() {
   if (!importFileInput.value) {
     importFileInput.value = document.createElement("input");
@@ -603,16 +613,19 @@ function importSettings() {
             ...renameSettings(JSON.parse(JSON.stringify(importedData.config))),
           };
           // An export from before a change of shape is merged as it is, so
-          // Colors, Instant Replay, Teams and WLED's effect sets are brought
+          // Colors, Instant Replay, Teams and the libraries' sets are brought
           // up to date here, and a renamed setting (Team Lobby, now Local
           // Lobby) is carried over before the merge, which would otherwise
           // shadow it with the new name's default; see renameSettings,
           // normalizeColors, normalizeInstantReplay, normalizeTeams and
-          // normalizeWledSets.
+          // normalizeLibrarySets.
           newConfig.colors = normalizeColors(newConfig.colors);
           newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
           newConfig.teams = normalizeTeams(newConfig.teams);
-          newConfig.wledFx = normalizeWledSets(newConfig.wledFx);
+          newConfig.wledFx = normalizeLibrarySets(newConfig.wledFx, "effects");
+          newConfig.animations = normalizeLibrarySets(newConfig.animations, "data");
+          newConfig.caller = normalizeLibrarySets(newConfig.caller, "sounds");
+          newConfig.soundFx = normalizeLibrarySets(newConfig.soundFx, "sounds");
 
           // Set the local ref
           config.value = newConfig;
@@ -645,10 +658,8 @@ function importSettings() {
                   if (soundId) {
                     callerImportCount++;
 
-                    // Update the sound in config to reference the soundId
-                    const soundInConfig = newConfig.caller.sounds.find(
-                      s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                    );
+                    // The sound that plays this recording, found by the recording's id
+                    const soundInConfig = newConfig.caller.sounds.find(s => keepsRecording(s, sound));
 
                     if (soundInConfig) {
                       soundInConfig.soundId = soundId;
@@ -671,10 +682,8 @@ function importSettings() {
                   if (soundId) {
                     soundFxImportCount++;
 
-                    // Update the sound in config to reference the soundId
-                    const soundInConfig = newConfig.soundFx.sounds.find(
-                      s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                    );
+                    // The sound that plays this recording, found by the recording's id
+                    const soundInConfig = newConfig.soundFx.sounds.find(s => keepsRecording(s, sound));
 
                     if (soundInConfig) {
                       soundInConfig.soundId = soundId;
@@ -864,16 +873,19 @@ function pasteFromClipboard() {
           ...renameSettings(JSON.parse(JSON.stringify(importedData.config))),
         };
         // An export from before a change of shape is merged as it is, so
-        // Colors, Instant Replay, Teams and WLED's effect sets are brought
+        // Colors, Instant Replay, Teams and the libraries' sets are brought
         // up to date here, and a renamed setting (Team Lobby, now Local
         // Lobby) is carried over before the merge, which would otherwise
         // shadow it with the new name's default; see renameSettings,
         // normalizeColors, normalizeInstantReplay, normalizeTeams and
-        // normalizeWledSets.
+        // normalizeLibrarySets.
         newConfig.colors = normalizeColors(newConfig.colors);
         newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
         newConfig.teams = normalizeTeams(newConfig.teams);
-        newConfig.wledFx = normalizeWledSets(newConfig.wledFx);
+        newConfig.wledFx = normalizeLibrarySets(newConfig.wledFx, "effects");
+        newConfig.animations = normalizeLibrarySets(newConfig.animations, "data");
+        newConfig.caller = normalizeLibrarySets(newConfig.caller, "sounds");
+        newConfig.soundFx = normalizeLibrarySets(newConfig.soundFx, "sounds");
 
         // Set the local ref
         config.value = newConfig;
@@ -906,10 +918,8 @@ function pasteFromClipboard() {
                 if (soundId) {
                   callerImportCount++;
 
-                  // Update the sound in config to reference the soundId
-                  const soundInConfig = newConfig.caller.sounds.find(
-                    s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                  );
+                  // The sound that plays this recording, found by the recording's id
+                  const soundInConfig = newConfig.caller.sounds.find(s => keepsRecording(s, sound));
 
                   if (soundInConfig) {
                     soundInConfig.soundId = soundId;
@@ -932,10 +942,8 @@ function pasteFromClipboard() {
                 if (soundId) {
                   soundFxImportCount++;
 
-                  // Update the sound in config to reference the soundId
-                  const soundInConfig = newConfig.soundFx.sounds.find(
-                    s => s.name === sound.name && (!s.soundId || s.soundId === sound.soundId || s.soundId === sound.id),
-                  );
+                  // The sound that plays this recording, found by the recording's id
+                  const soundInConfig = newConfig.soundFx.sounds.find(s => keepsRecording(s, sound));
 
                   if (soundInConfig) {
                     soundInConfig.soundId = soundId;
