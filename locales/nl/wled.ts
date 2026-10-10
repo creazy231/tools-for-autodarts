@@ -56,6 +56,7 @@ export default {
       inUse: "Nu wordt {set} afgespeeld.",
       renamed: "Set hernoemd",
       deleted: "{set} verwijderd",
+      goneElsewhere: "De set die je aan het bewerken was, is in een ander tabblad verwijderd.",
     },
   },
   boards: {

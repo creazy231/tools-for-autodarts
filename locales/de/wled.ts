@@ -57,6 +57,7 @@ export default {
       inUse: "Jetzt wird {set} abgespielt.",
       renamed: "Set umbenannt",
       deleted: "{set} gelöscht",
+      goneElsewhere: "Das Set, das du bearbeitet hast, wurde in einem anderen Tab gelöscht.",
     },
   },
   boards: {

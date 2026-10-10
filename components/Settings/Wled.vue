@@ -486,6 +486,16 @@ watch(() => [ newEffect.value.url, newEffect.value.type ], async () => {
   if (newEffect.value.type === WledType.PRESET && newEffect.value.url) await fetchPresets();
 });
 
+// The set being viewed deleted elsewhere (another tab): a dialog open on it closes
+// and says so, rather than act on the set shown in its place, which is the one in use.
+watch(() => viewed.value?.id, () => {
+  if (!showEffectModal.value && !showImportCSVModal.value && !showDeleteAllModal.value) return;
+  closeEffectModal();
+  closeImportCSVModal();
+  closeDeleteAllModal();
+  showNotification(t("wled.sets.notifications.goneElsewhere"), "error");
+});
+
 /** Stored triggers are an array, or a newline-separated string in configs from before. */
 function triggerList(triggers: string | string[]): string[] {
   return Array.isArray(triggers)
@@ -581,7 +591,7 @@ function parseCSV(csv: string): IWled[] {
 }
 
 async function processCSV() {
-  if (!config.value) return;
+  if (!config.value || !showImportCSVModal.value) return;
 
   csvError.value = null;
   const csvEntries = parseCSV(csvData.value);
@@ -683,6 +693,7 @@ function testDraft() {
 }
 
 async function saveEffect() {
+  if (!showEffectModal.value) return;
   if (!config.value) {
     showNotification(t("wled.notifications.configNotLoaded"), "error");
     return;
@@ -844,7 +855,7 @@ function closeDeleteAllModal() {
 }
 
 async function deleteAllEffects() {
-  if (!config.value) return;
+  if (!config.value || !showDeleteAllModal.value) return;
 
   const effectCount = effects.value.length;
 

@@ -76,6 +76,8 @@ export default {
       inUse: "{set} plays now.",
       renamed: "Set renamed",
       deleted: "{set} deleted",
+      /** Said when a dialog closes because its set was deleted in another tab while it was open. */
+      goneElsewhere: "The set you were editing was deleted in another tab.",
     },
   },
   boards: {

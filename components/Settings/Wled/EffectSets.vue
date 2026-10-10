@@ -175,6 +175,13 @@ watch(draftName, () => {
   nameError.value = "";
 });
 
+// The set being viewed deleted elsewhere (another tab): its dialogs close rather
+// than act on the set in use, shown in its place.
+watch(() => viewed.value?.id, () => {
+  closeNameDialog();
+  showDelete.value = false;
+});
+
 function label(set: { name: string } | undefined): string {
   return set ? setLabel(set, t("wled.sets.defaultName")) : "";
 }
@@ -211,6 +218,7 @@ function closeNameDialog() {
 }
 
 function submitName() {
+  if (!nameDialog.value) return;
   const set = viewed.value;
   const renaming = nameDialog.value === "rename";
   const name = draftName.value.trim();
@@ -233,6 +241,7 @@ function submitName() {
 }
 
 function confirmDelete() {
+  if (!showDelete.value) return;
   showDelete.value = false;
   if (viewed.value && !viewed.value.active) emit("delete", viewed.value.id);
 }
