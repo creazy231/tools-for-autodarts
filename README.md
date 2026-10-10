@@ -258,7 +258,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
 - **Sound FX**: Ambient sound effects for different game events
 - **Sound Upload**: Add your own custom sounds for personalized feedback
 - **Text-to-Speech (TTS)**: Generate custom caller and sound FX audio directly from text using your device's built-in voices
-- **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events
+- **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events, from sets of effects you switch between, such as one for Halloween
 - **Quiet Own Darts**: Silences autodarts' own *Dart landed* sound for the darts thrown at your board, which you can already hear
 
 ### 🤫 Quiet Own Darts
@@ -519,14 +519,25 @@ The WLED feature allows you to trigger lighting effects and other HTTP requests 
 WLED is a popular open-source firmware for controlling addressable LED strips (WS2812B, SK6812, etc.) with ESP8266/ESP32 microcontrollers. It provides a web interface and HTTP API for controlling lighting effects, making it perfect for integrating with Tools for Autodarts.
 
 #### Configuration Options
-- **Effect Management**: Add, edit, enable/disable, and reorder lighting effects. **Add** holds a new effect and the CSV import, **⋯** sorting by trigger and deleting everything, and each effect has a play button to send it, as its editor has **Test**
+- **Effect Management**: Add, edit, enable/disable, and reorder lighting effects. **Add** holds a new effect and the CSV import, **⋯** sorting by trigger and deleting every effect, and each effect has a play button to send it, as its editor has **Test**. With more than one set, all of it works on the set you're looking at
 - **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
 - **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
 - **Don't restart a running effect**: An effect isn't sent again while the lights show it, so they don't start over. What counts is what is sent: the same effect with another player's name in it is sent again. The play button and **Test** always send
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
+- **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
 - **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
+
+#### Effect sets
+Effects come in sets, and one set plays at a time. Your effects are the set *Default*, and a set of your own for Halloween, Christmas or a birthday is a click away:
+- **New set**, under *Effect sets*, starts a set as a copy of the set you're looking at, or with no effects. Every set needs a name of its own
+- Each set has a pill with its number of effects. Picking a pill shows that set's effects, and adding, editing, importing, sorting and deleting effects work on that set. The lights don't change while you do: a set plays once you press **Use this set**, and the set that plays carries a dot. The play button and **Test** send an effect from any set, so you can try a set out first
+- **⋯** beside **New set** renames the set you're looking at, or deletes it along with its effects. The set that plays can't be deleted: use another one first
+- **Boards**, **Don't restart a running effect**, **Game modes** and the switch on the card are the same for every set
+- With two or more sets, the card names the set that plays
+- A match, lobby or board page that is already open keeps the effects it started with until it loads again
+- A settings export carries every set. A version of Tools from before effect sets plays the set in use
 
 #### Supported Triggers
 Effects can be triggered by various game events using these triggers:
