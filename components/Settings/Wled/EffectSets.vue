@@ -1,9 +1,9 @@
 <template>
   <section class="mb-10">
     <div class="flex min-h-12 items-center justify-between gap-3">
+      <!-- One run of text, as LibrarySection's heading, so a wrapped heading keeps its count after its last word. -->
       <h3 class="adt-section-title">
-        {{ t("wled.sets.title") }}
-        <span v-if="several" class="adt-section-count">· {{ sets.length }}</span>
+        <span>{{ t("wled.sets.title") }}<span v-if="several" class="adt-section-count">&nbsp;·&nbsp;{{ sets.length }}</span></span>
       </h3>
       <div class="flex items-center gap-2">
         <AppMenu v-if="several" :items="moreActions">
@@ -71,7 +71,8 @@
         <p class="adt-field-label">
           {{ t("wled.sets.dialog.startLabel") }}
         </p>
-        <AppRadioGroup v-model="startWith" :options="startOptions" button-size="sm" />
+        <!-- Stacked: the copy option carries a set's name, which a phone's row has no room for beside the other. -->
+        <AppRadioGroup v-model="startWith" :options="startOptions" button-size="sm" vertical />
       </div>
     </div>
     <template #footer>
@@ -135,8 +136,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-/** A name longer than this is cut short in the copy option, a button that doesn't wrap. */
-const LABEL_LENGTH = 24;
+/** A name longer than this is cut short in the copy option, a button that doesn't wrap: 20 fits a 360px phone. */
+const LABEL_LENGTH = 20;
 const ELLIPSIS = "…";
 
 const nameDialog = ref<"create" | "rename" | null>(null);
@@ -178,8 +179,12 @@ function label(set: { name: string } | undefined): string {
   return set ? setLabel(set, t("wled.sets.defaultName")) : "";
 }
 
+/** A long name cut before the word the limit falls in, or at the limit when it is one long word. */
 function short(name: string): string {
-  return name.length > LABEL_LENGTH ? name.slice(0, LABEL_LENGTH - 1).trimEnd() + ELLIPSIS : name;
+  if (name.length <= LABEL_LENGTH) return name;
+  const cut = name.slice(0, LABEL_LENGTH - 1);
+  const whole = /\s/.test(name[LABEL_LENGTH - 1]) ? cut : cut.replace(/\s+\S*$/, "");
+  return (whole || cut).trimEnd() + ELLIPSIS;
 }
 
 async function openCreate() {
