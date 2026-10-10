@@ -39,13 +39,24 @@
           </OptionRow>
         </section>
 
+        <EffectSets
+          @create="createSet"
+          @delete="deleteEffectSet"
+          @rename="renameEffectSet"
+          @use="useSet"
+          v-model="viewedId"
+          :sets="sets"
+        />
+
+        <!-- Keyed by the set it shows, so each set opens unsearched. -->
         <LibrarySection
           @reorder="moveEffect"
+          :key="viewed?.id"
           :empty-text="t('wled.list.emptyText')"
           :empty-title="t('wled.list.emptyTitle')"
           :entries="entries"
           :search-placeholder="t('wled.list.searchPlaceholder')"
-          :title="t('wled.list.title')"
+          :title="libraryTitle"
           empty-icon="icon-[material-symbols--lightbulb-outline-rounded]"
         >
           <template #actions>
@@ -73,9 +84,9 @@
             <LibraryItem
               @delete="removeEffect(entry.index)"
               @edit="editEffect(entry.index)"
-              @toggle="config.wledFx.effects[entry.index].enabled = $event"
+              @toggle="effects[entry.index].enabled = $event"
               v-for="entry in shown"
-              :key="stableKey(config.wledFx.effects[entry.index])"
+              :key="stableKey(effects[entry.index])"
               :data-index="entry.index"
               :draggable="!filtering"
               :enabled="entry.enabled"
@@ -84,11 +95,11 @@
               :triggers="entry.triggers"
             >
               <template #lead>
-                <PlayButton @click="sendEffect(config.wledFx.effects[entry.index])" :label="entry.name" :title="t('wled.list.send')" />
+                <PlayButton @click="sendEffect(effects[entry.index])" :label="entry.name" :title="t('wled.list.send')" />
               </template>
               <template #meta>
-                <span class="shrink-0 text-sm" :class="[TYPE_ICONS[config.wledFx.effects[entry.index].type]]" />
-                <span class="truncate">{{ describe(config.wledFx.effects[entry.index]) }}</span>
+                <span class="shrink-0 text-sm" :class="[TYPE_ICONS[effects[entry.index].type]]" />
+                <span class="truncate">{{ describe(effects[entry.index]) }}</span>
               </template>
             </LibraryItem>
           </template>
@@ -231,7 +242,7 @@
     </AppModal>
 
     <!-- Delete all -->
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('wled.deleteAll.title', { count: config?.wledFx.effects.length ?? 0 })" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('wled.deleteAll.title', { count: effects.length })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
         {{ t("wled.deleteAll.body") }}
       </p>
@@ -266,12 +277,17 @@
             {{ t("wled.card") }}
           </p>
         </div>
-        <div class="flex">
+        <div class="flex items-center gap-3">
           <div
             @click="$emit('toggle', 'wled-fx')"
             class="absolute inset-y-0 left-12 right-0 cursor-pointer"
           />
           <AppToggle @update:model-value="toggleFeature" v-model="config.wledFx.enabled" />
+          <p v-if="several" class="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white/80">
+            <span class="icon-[material-symbols--lightbulb-outline-rounded] shrink-0 text-base" aria-hidden="true" />
+            <span class="sr-only">{{ t("wled.sets.cardLabel") }}</span>
+            <span class="truncate">{{ inUseLabel }}</span>
+          </p>
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
@@ -304,15 +320,18 @@ import OptionRow from "./Library/OptionRow.vue";
 import PlayButton from "./Library/PlayButton.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import { stableKey } from "./Library/stable-key";
+import EffectSets from "./Wled/EffectSets.vue";
 
 import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
+import type { WledSetView } from "@/utils/wled-sets";
 
 import { useNotification } from "@/composables/useNotification";
 import { tryEffect } from "@/entrypoints/match.content/wled";
 import { getAuthToken } from "@/utils/helpers";
 import { type IWled } from "@/utils/storage";
 import { tokenAccount } from "@/utils/team-room";
+import { activateSet, addSet, deleteSet, listSets, renameSet, setLabel } from "@/utils/wled-sets";
 import { WledType } from "#imports";
 
 const emit = defineEmits([ "toggle" ]);
@@ -347,6 +366,8 @@ const BOARD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
 
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/ad_wled_logo.png");
+/** The set the effects library shows, by id: "" or an id that has gone is the set in use. */
+const viewedId = ref("");
 const showEffectModal = ref(false);
 const isEditMode = ref(false);
 const newEffect = ref<IWled>({
@@ -394,6 +415,22 @@ const showDeleteAllModal = ref(false);
 
 const { notification, showNotification, hideNotification } = useNotification();
 
+const sets = computed<WledSetView[]>(() => (config.value ? listSets(config.value.wledFx) : []));
+const several = computed(() => sets.value.length > 1);
+const viewed = computed(() => sets.value.find(set => set.id === viewedId.value) ?? sets.value.find(set => set.active));
+/**
+ * The list the library edits, in place: the stored list of the set being
+ * viewed, which for the set in use is `wledFx.effects` itself.
+ */
+const effects = computed<IWled[]>(() => viewed.value?.effects ?? []);
+const libraryTitle = computed(() => (several.value && viewed.value
+  ? t("wled.list.titleInSet", { set: setLabel(viewed.value, t("wled.sets.defaultName")) })
+  : t("wled.list.title")));
+const inUseLabel = computed(() => {
+  const set = sets.value.find(candidate => candidate.active);
+  return set ? setLabel(set, t("wled.sets.defaultName")) : "";
+});
+
 const boardIds = computed<string[]>({
   get: () => config.value?.wledFx.boardIds ?? [],
   set: (ids) => {
@@ -401,7 +438,7 @@ const boardIds = computed<string[]>({
   },
 });
 
-const entries = computed<LibraryEntry[]>(() => (config.value?.wledFx.effects ?? []).map((effect, index) => {
+const entries = computed<LibraryEntry[]>(() => effects.value.map((effect, index) => {
   const triggers = triggerList(effect.triggers);
   return {
     index,
@@ -432,7 +469,7 @@ const moreActions = computed(() => [
     label: t("wled.menu.sort.label"),
     hint: t("wled.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
-    disabled: (config.value?.wledFx.effects.length ?? 0) < 2,
+    disabled: effects.value.length < 2,
     action: sortEffectsByTriggers,
   },
   {
@@ -440,7 +477,7 @@ const moreActions = computed(() => [
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
-    disabled: !config.value?.wledFx.effects.length,
+    disabled: !effects.value.length,
     action: openDeleteAllModal,
   },
 ]);
@@ -468,10 +505,9 @@ function validateBoardId(id: string): string {
 }
 
 function moveEffect(from: number, to: number) {
-  const effects = config.value?.wledFx.effects;
-  if (!effects) return;
-  const [ moved ] = effects.splice(from, 1);
-  effects.splice(to, 0, moved);
+  const list = effects.value;
+  const [ moved ] = list.splice(from, 1);
+  list.splice(to, 0, moved);
 }
 
 // Modal handling
@@ -553,7 +589,7 @@ async function processCSV() {
   if (csvError.value) return;
 
   csvEntries.forEach((effect) => {
-    config.value?.wledFx.effects.unshift(effect);
+    effects.value.unshift(effect);
   });
 
   closeImportCSVModal();
@@ -612,7 +648,7 @@ function closeEffectModal() {
 }
 
 function editEffect(index: number) {
-  const effect = config.value!.wledFx.effects[index];
+  const effect = effects.value[index];
 
   newEffect.value = {
     name: effect.name || "",
@@ -703,12 +739,12 @@ async function saveEffect() {
 
   if (isEditMode.value && editingIndex.value !== null) {
     // Update existing effect
-    const existingEffect = config.value.wledFx.effects[editingIndex.value];
+    const existingEffect = effects.value[editingIndex.value];
     effect.enabled = existingEffect.enabled;
-    config.value.wledFx.effects[editingIndex.value] = effect;
+    effects.value[editingIndex.value] = effect;
   } else {
     // Add new effect
-    config.value.wledFx.effects.unshift(effect);
+    effects.value.unshift(effect);
   }
 
   // Reset form and close modal
@@ -717,10 +753,9 @@ async function saveEffect() {
 }
 
 async function removeEffect(index: number) {
-  if (config.value?.wledFx.effects) {
-    config.value.wledFx.effects.splice(index, 1);
-    showNotification(t("wled.notifications.removed"), "success");
-  }
+  if (!config.value) return;
+  effects.value.splice(index, 1);
+  showNotification(t("wled.notifications.removed"), "success");
 }
 
 async function toggleFeature() {
@@ -737,13 +772,52 @@ async function toggleFeature() {
   }
 }
 
+// Effect sets (utils/wled-sets.ts). The set functions build plain objects from
+// what they are given, so they get the raw config: a reactive proxy kept inside
+// one would reach chrome.storage.
+
+/** Makes the set the one that plays. */
+function useSet(id: string) {
+  if (!config.value) return;
+  const name = labelOf(id);
+  config.value.wledFx = activateSet(toRaw(config.value.wledFx), id);
+  showNotification(t("wled.sets.notifications.inUse", { set: name }), "success");
+}
+
+/** A new set, a copy of the set being viewed or empty, shown and not used. */
+function createSet(name: string, copy: boolean) {
+  if (!config.value) return;
+  const added = addSet(toRaw(config.value.wledFx), name, copy ? effects.value : []);
+  config.value.wledFx = added.wledFx;
+  viewedId.value = added.id;
+  showNotification(t("wled.sets.notifications.created", { set: name }), "success");
+}
+
+function renameEffectSet(id: string, name: string) {
+  if (!config.value) return;
+  config.value.wledFx = renameSet(toRaw(config.value.wledFx), id, name);
+  showNotification(t("wled.sets.notifications.renamed"), "success");
+}
+
+function deleteEffectSet(id: string) {
+  if (!config.value) return;
+  const name = labelOf(id);
+  config.value.wledFx = deleteSet(toRaw(config.value.wledFx), id);
+  showNotification(t("wled.sets.notifications.deleted", { set: name }), "success");
+}
+
+function labelOf(id: string): string {
+  const set = sets.value.find(candidate => candidate.id === id);
+  return set ? setLabel(set, t("wled.sets.defaultName")) : "";
+}
+
 function sortEffectsByTriggers() {
-  if (!config.value?.wledFx.effects || config.value.wledFx.effects.length <= 1) {
+  if (effects.value.length <= 1) {
     return;
   }
 
   // Sort effects by their first trigger alphabetically
-  config.value.wledFx.effects.sort((a, b) => {
+  effects.value.sort((a, b) => {
     // Get first trigger from each effect, or empty string if no triggers
     const triggerA = Array.isArray(a.triggers) && a.triggers.length > 0 ? a.triggers[0] : "";
     const triggerB = Array.isArray(b.triggers) && b.triggers.length > 0 ? b.triggers[0] : "";
@@ -772,10 +846,10 @@ function closeDeleteAllModal() {
 async function deleteAllEffects() {
   if (!config.value) return;
 
-  const effectCount = config.value.wledFx.effects.length;
+  const effectCount = effects.value.length;
 
-  // Clear all effects from the config
-  config.value.wledFx.effects = [];
+  // Empty the list of the set being viewed, in place
+  effects.value.splice(0);
 
   // Close modal and show notification
   closeDeleteAllModal();

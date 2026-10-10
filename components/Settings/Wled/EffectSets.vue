@@ -62,7 +62,7 @@
   <AppModal @close="closeNameDialog" :show="nameDialog !== null" :title="nameDialog === 'rename' ? t('wled.sets.dialog.renameTitle') : t('wled.sets.dialog.newTitle')" ghost-close size="sm">
     <div ref="nameForm" class="space-y-5">
       <div>
-        <AppInput id="wled-set-name" v-model="draftName" @keydown.enter="submitName" :label="t('wled.sets.dialog.nameLabel')" :placeholder="t('wled.sets.dialog.namePlaceholder')" />
+        <AppInput @keydown.enter="submitName" id="wled-set-name" v-model="draftName" :label="t('wled.sets.dialog.nameLabel')" :placeholder="t('wled.sets.dialog.namePlaceholder')" />
         <p v-if="nameError" class="adt-field-hint !text-[var(--ad-rose-500)]">
           {{ t(nameError) }}
         </p>
