@@ -11,9 +11,11 @@
         <!--
           One run of text: a title too long for its line, a set's name in it on a
           phone, wraps with the count after its last word, not beside the lines.
+          It may break inside a word, so a long one ("Weihnachtsbeleuchtung")
+          can't push the actions out of the row.
         -->
-        <h3 class="adt-section-title">
-          <span>{{ title }}<span v-if="entries.length" class="adt-section-count">&nbsp;·&nbsp;{{ entries.length }}</span></span>
+        <h3 class="adt-section-title min-w-0 [overflow-wrap:anywhere]">
+          <span>{{ title }}<span v-if="entries.length" class="adt-section-count whitespace-nowrap">&nbsp;·&nbsp;{{ entries.length }}</span></span>
         </h3>
         <div class="flex items-center gap-2">
           <slot name="actions" />
