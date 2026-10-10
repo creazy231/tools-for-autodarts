@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - **WLED, Animations, the Caller and Sound FX** keep more than one set, and you choose which one plays: a set of effects, GIFs or sounds for Halloween, another for a birthday, and *Default* again when the day is over. **New set** starts a set as a copy of the one you're looking at, or empty. Picking a set's pill shows its list to edit without changing what plays, until you press **Use this set**, and the play buttons try an effect or a sound from any set. Each feature's options are the same for all its sets, the card names the set that plays, and the set that plays can't be deleted. Your lists so far are each feature's set *Default*, and nothing about them changes
   - The Caller's sets are sound sets: a new empty set and *Import a caller set* make a second voice to switch to
   - A copied set shares its recordings and uploaded GIFs with the set it came from. Deleting a sound or an animation, *Delete all* or a whole set keeps a file another set still uses, and a recording changed in one set stays as it was in the others
-  - Checked in Chrome against a stand-in for WLED: a set made, edited and used from the settings, then a lobby and a match lit with its effects, and the first set's again once it was back in use
+  - Checked in Chrome. In each of the four settings, a set was made as a copy, edited, used, renamed and deleted, with every step read back from storage, and for the sounds and GIFs from the stored files too: a file another set still used stayed, and one only the deleted set kept went with it. In a lobby and a match, WLED lit the set in use's effects on a stand-in for WLED, and Sound FX played the set in use's sound for a player joining the lobby
 
 ### Changed
 
