@@ -106,6 +106,7 @@
     "wled.link.placeholder",
     "wled.list.preset",
     "wled.preset.label",
+    "wled.sets.dialog.nameLabel",
     "wled.type.options.preset",
     "wled.type.options.url",
     "zoom.position.title",

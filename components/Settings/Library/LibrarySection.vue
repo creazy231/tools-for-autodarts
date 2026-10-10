@@ -8,9 +8,14 @@
     -->
     <div class="sticky -top-px z-20 border-b border-[var(--ad-border-subtle)] bg-[var(--ad-surface-overlay)] pb-3 pt-px">
       <div class="flex min-h-12 items-center justify-between gap-3 pt-2">
-        <h3 class="adt-section-title">
-          {{ title }}
-          <span v-if="entries.length" class="adt-section-count">· {{ entries.length }}</span>
+        <!--
+          One run of text: a title too long for its line, a set's name in it on a
+          phone, wraps with the count after its last word, not beside the lines.
+          It may break inside a word, so a long one ("Weihnachtsbeleuchtung")
+          can't push the actions out of the row.
+        -->
+        <h3 class="adt-section-title min-w-0 [overflow-wrap:anywhere]">
+          <span>{{ title }}<span v-if="entries.length" class="adt-section-count whitespace-nowrap">&nbsp;·&nbsp;{{ entries.length }}</span></span>
         </h3>
         <div class="flex items-center gap-2">
           <slot name="actions" />
