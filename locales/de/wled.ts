@@ -9,6 +9,56 @@ export default {
   sections: {
     options: "Optionen",
   },
+  // "In Benutzung" and "benutzen" after the site's own "bereits in Benutzung" (account.email.errors.emailInUse).
+  sets: {
+    title: "Effekt-Sets",
+    introSingle: "Lege für einen Anlass wie Halloween oder einen Geburtstag eine weitere Liste mit Effekten an und wechsle zu ihr, wenn der Tag gekommen ist.",
+    intro: "Es wird immer ein Set abgespielt. Wähle ein Set, um seine Effekte zu bearbeiten; abgespielt wird es erst, wenn du es benutzt.",
+    defaultName: "Standard",
+    new: "Neues Set",
+    inUse: "In Benutzung",
+    cardLabel: "Effekt-Set in Benutzung:",
+    status: {
+      inUse: "Das ist das Set, das abgespielt wird.",
+      notInUse: "Nicht in Benutzung. Abgespielt wird {set}.",
+    },
+    use: "Dieses Set benutzen",
+    menu: {
+      rename: "Set umbenennen",
+      delete: "Set löschen",
+      deleteInUse: "Benutze zuerst ein anderes Set",
+    },
+    dialog: {
+      newTitle: "Neues Effekt-Set",
+      renameTitle: "Set umbenennen",
+      nameLabel: "Name",
+      namePlaceholder: "Halloween, Weihnachten, ein Geburtstag …",
+      // Over two buttons, "Kopie von …" and "Keine Effekte": "Beginnen mit" would want the dative in both.
+      startLabel: "Inhalt",
+      copy: "Kopie von {set}",
+      empty: "Keine Effekte",
+      create: "Set erstellen",
+    },
+    errors: {
+      nameMissing: "Gib dem Set einen Namen.",
+      nameTaken: "Es gibt schon ein Set mit diesem Namen.",
+    },
+    deleteDialog: {
+      title: "{set} löschen?",
+      body: {
+        one: "Das Set und sein Effekt werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+        other: "Das Set und seine {count} Effekte werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      },
+      bodyEmpty: "Das Set hat keine Effekte. Dies kann nicht rückgängig gemacht werden.",
+      confirm: "Set löschen",
+    },
+    notifications: {
+      created: "{set} erstellt. Abgespielt wird es, sobald du es benutzt.",
+      inUse: "Jetzt wird {set} abgespielt.",
+      renamed: "Set umbenannt",
+      deleted: "{set} gelöscht",
+    },
+  },
   boards: {
     title: "Boards",
     description: "Effekte werden nur bei Würfen auf diesen Boards abgespielt, bei leerer Liste auf jedem Board. Ein Effekt auf <code>{trigger}</code> wird bei Würfen auf Boards abgespielt, die nicht in der Liste stehen.",
@@ -25,6 +75,7 @@ export default {
   },
   list: {
     title: "Effekte",
+    titleInSet: "Effekte in {set}",
     searchPlaceholder: "Effekte nach Name, Trigger oder Adresse suchen",
     emptyTitle: "Noch keine Effekte",
     emptyText: "Füge für jeden Moment, den deine Lichter zeigen sollen, einen Effekt hinzu oder importiere eine Liste davon.",

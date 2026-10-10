@@ -14,6 +14,70 @@ export default {
   sections: {
     options: "Options",
   },
+  /**
+   * Effect sets (components/Settings/Wled/EffectSets.vue): lists of effects kept for an occasion, of which one plays.
+   * "Effect set" in the heading and a dialog's title, so it isn't read as a darts set; "set" where that's clear.
+   */
+  sets: {
+    title: "Effect sets",
+    /** Under the heading while there is one set. */
+    introSingle: "Keep another list of effects for an occasion, such as Halloween or a birthday, and switch to it when the day comes.",
+    /** Under the heading once there are two or more. */
+    intro: "One set plays at a time. Pick a set to edit its effects; it plays once you use it.",
+    /** The first set's name until it is renamed. It is stored as nothing, so it follows the language. */
+    defaultName: "Default",
+    new: "New set",
+    /** Spoken after the name of the set in use, in its pill. */
+    inUse: "In use",
+    /** Spoken before the name of the set in use, on the card. */
+    cardLabel: "Effect set in use:",
+    /** The line under the pills, about the set being viewed. */
+    status: {
+      inUse: "This is the set that plays.",
+      /** `set` is the name of the set in use. */
+      notInUse: "Not in use. The set that plays is {set}.",
+    },
+    use: "Use this set",
+    menu: {
+      rename: "Rename set",
+      delete: "Delete set",
+      /** Under Delete set while it can't be pressed: the set being viewed is the one in use. */
+      deleteInUse: "Use another set first",
+    },
+    dialog: {
+      newTitle: "New effect set",
+      renameTitle: "Rename set",
+      nameLabel: "Name",
+      /** Example names. */
+      namePlaceholder: "Halloween, Christmas, a birthday…",
+      startLabel: "Start with",
+      /** `set` is the name of the set being viewed, cut short when long. */
+      copy: "A copy of {set}",
+      empty: "No effects",
+      create: "Create set",
+    },
+    /** Said under the name field when Create or Save refuses. */
+    errors: {
+      nameMissing: "Give the set a name.",
+      nameTaken: "There's already a set with that name.",
+    },
+    deleteDialog: {
+      /** `set` is the set's name. */
+      title: "Delete {set}?",
+      body: {
+        one: "The set and its {count} effect are deleted for good. This can't be undone.",
+        other: "The set and its {count} effects are deleted for good. This can't be undone.",
+      },
+      bodyEmpty: "The set has no effects. This can't be undone.",
+      confirm: "Delete set",
+    },
+    notifications: {
+      created: "{set} created. It plays once you use it.",
+      inUse: "{set} plays now.",
+      renamed: "Set renamed",
+      deleted: "{set} deleted",
+    },
+  },
   boards: {
     title: "Boards",
     /** `trigger` is `other`, the trigger of the boards that aren't listed. It is what is typed, so it is a param and no translation can change it. */
@@ -33,6 +97,8 @@ export default {
   },
   list: {
     title: "Effects",
+    /** The heading once there are two or more sets: `set` is the name of the set it shows. */
+    titleInSet: "Effects in {set}",
     searchPlaceholder: "Search effects by name, trigger or address",
     emptyTitle: "No effects yet",
     emptyText: "Add an effect for each moment you want your lights to show, or import a list of them.",
