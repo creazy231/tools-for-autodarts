@@ -293,11 +293,18 @@ The Caller feature provides voice announcements during your darts gameplay, simi
   - Covers **Gotcha** too, which autodarts works out no route for: the number left to reach the target score is announced the same way
 - **Prefer Combined Throws**: When enabled and a sound for the exact dart combination (e.g. `s20_s5_s1`) exists, the generic points sound (e.g. `26`) is skipped for that throw
 - **Custom Sound Library**: Add, edit, and organize voice clips for different game events. Everything that adds sounds is under **Add**: a predefined caller set, uploaded files, text-to-speech, or a link. Sorting by trigger and deleting everything are under **⋯**
+- **Sound sets**: Keep more than one list of sounds, such as a second voice or one for Halloween, and choose which one plays. See [Sound sets (Caller)](#sound-sets-caller)
 - **Search and Filters**: Find a sound by its name or trigger with the search above the list. A number also finds the ranges that cover it, so `150` finds a sound on `100-180`. The pills narrow the list to scores, throws, events, board status, player names, or the sounds you have switched off. Drag a sound by its handle to reorder the list, while no search or filter narrows it
 - **Text-to-Speech (TTS) Generation**: Generate caller sounds directly from text under **Add › Generate a sound**, with no external files needed. Select from any voice installed on your device, adjust speed and pitch, and preview before saving. Your last-used voice, speed, and pitch settings are remembered across sessions.
 - **Volume per Sound**: Each sound's editor has a volume from 0 to 200%. 100% plays the file as it is, so a quiet recording can be turned up and a loud one down, and the list shows any sound that is set to something else. Text-to-speech sounds go up to 100%, since a voice can't be made louder than it speaks. A sound on a link can only be turned up when its site lets the extension read the file; the editor says when it can't, and uploading the file works instead
 - **Bulk Upload with Trigger Assignment**: When uploading multiple files, each file shows the trigger its name gives before anything is saved, or choose **The same for all** to give every file the same triggers. That makes it easy to set up larger sound sets without assigning triggers to each file individually
 - **Triggers as chips**: Type a trigger and press Enter; the named ones are suggested as you type, with what each does. A pasted list becomes one trigger per line
+
+#### Sound sets (Caller)
+The Caller's sounds come in sets, and one set plays at a time. Your sounds are the set *Default*, and **New set**, under *Sound sets*, starts another as a copy of the set you're looking at, or with no sounds. **Add › Import a caller set** fills the set you're looking at, so a new empty set and an import make a second voice to switch to. The pills, **Use this set**, renaming and deleting work as WLED's do: see [Effect sets](#effect-sets).
+- A copied set shares its recordings with the set it came from. Deleting a sound, **Delete all** or a whole set keeps a recording another set still plays, and a recording changed in one set stays as it was in the others
+- The options above the sounds and the switch on the card are the same for every set. With two or more sets, the card names the set that plays
+- A page that is already open keeps the sounds it started with until it loads again
 
 #### Supported Triggers
 You can assign sounds to be played based on these triggers:
@@ -455,7 +462,7 @@ The Sound FX feature distinguishes between winning a single game (gameshot) and 
   - In a **Teams** match the team's name comes first, then the player's who checked out
 
 #### Ambient Sound Prefix
-- Use the `ambient_` prefix (e.g., `ambient_180`, `ambient_t20`) to create separate sound sets for caller and ambient sounds
+- Use the `ambient_` prefix (e.g., `ambient_180`, `ambient_t20`) to keep ambient sounds apart from the Caller's
 - This allows you to have professional voice announcements via the Caller while also having fun sound effects via Sound FX
 
 #### Dual Audio Channels
@@ -505,6 +512,12 @@ Generate sound effects directly from text without needing external audio files:
 - **Filters**: The pills narrow the list to scores, throws, events, board status, player names, or the sounds you have switched off
 - **Reorder**: Drag a sound by its handle, while no search or filter narrows the list
 
+#### Sound sets (Sound FX)
+Sound FX's sounds come in sets too, and one set plays at a time: keep more than one list, such as one for Halloween or a birthday, and choose which one plays. Your sounds are the set *Default*, and **New set**, under *Sound sets*, starts another as a copy of the set you're looking at, or with no sounds. The pills, **Use this set**, renaming and deleting work as WLED's do: see [Effect sets](#effect-sets).
+- A copied set shares its recordings with the set it came from. Deleting a sound, **Delete all** or a whole set keeps a recording another set still plays
+- **Game modes** and the switch on the card are the same for every set. With two or more sets, the card names the set that plays
+- A page that is already open keeps the sounds it started with until it loads again
+
 #### Technical Features
 - **Queue Management**: Enhanced sound queue management to prevent overlapping and ensure proper playback order (improved in v2.0.3)
 - **Format Support**: Plays both URL-based sounds, base64-encoded audio, and TTS (text-to-speech) sounds
@@ -538,6 +551,7 @@ Effects come in sets, and one set plays at a time. Your effects are the set *Def
 - With two or more sets, the card names the set that plays
 - A match, lobby or board page that is already open keeps the effects it started with until it loads again
 - A settings export carries every set. A version of Tools from before effect sets plays the set in use
+- Animations, the Caller and Sound FX keep sets the same way: see [Animation sets](#animation-sets), [Sound sets (Caller)](#sound-sets-caller) and [Sound sets (Sound FX)](#sound-sets-sound-fx)
 
 #### Supported Triggers
 Effects can be triggered by various game events using these triggers:
@@ -705,11 +719,18 @@ The Animations feature allows you to display custom GIF animations for special e
 - **Covers**: Choose between **Board only** (the animation covers the dartboard) or **Full page** (it covers the whole page, over a blurred background)
 - **Game modes**: The games animations show in, such as everything but Round the World, where a visit scores little and an animation on low scores would go off all the time. Every game is on until you switch one off
 - **Add**: Upload GIFs, or add one from a link, whose editor previews it. Sorting by trigger and deleting everything are under **⋯**
+- **Animation sets**: Keep more than one list of animations, such as one for Halloween, and choose which one plays. See [Animation sets](#animation-sets)
 - **Search and Filters**: Find an animation by its trigger or link, and narrow the grid with the pills to scores, throws, events, other triggers, or the animations you have switched off. Drag an animation by its handle to reorder the grid, while no search or filter narrows it
 - **Bulk Upload with Trigger Assignment**: When uploading multiple GIF files, each file shows the triggers its name gives before anything is saved, or choose **The same for all** to give every file the same triggers, making it easy to set up larger animation sets
 - **Trigger checking**: A trigger animations don't know is marked as soon as it is added, rather than when saving
 
 Clicking an animation dismisses it early, so a long GIF never has to be waited out mid-leg. A GIF loads during the start delay and its time on screen starts once it has, so a slow download doesn't cut its end off, and a GIF that can't be loaded isn't shown.
+
+#### Animation sets
+Animations come in sets, and one set shows at a time. Your animations are the set *Default*, and **New set**, under *Animation sets*, starts another as a copy of the set you're looking at, or with no animations. The pills, **Use this set**, renaming and deleting work as WLED's do: see [Effect sets](#effect-sets).
+- A copied set shares its uploaded GIFs with the set it came from. Deleting an animation, **Delete all** or a whole set keeps a GIF another set still shows
+- **Start delay**, **Show for**, **Fit**, **Covers**, **Game modes** and the switch on the card are the same for every set. With two or more sets, the card names the set in use
+- A match page that is already open keeps the animations it started with until it loads again
 
 #### Supported Triggers
 Animations can be triggered by various game events using these tags:
