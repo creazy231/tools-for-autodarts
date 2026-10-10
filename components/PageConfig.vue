@@ -273,7 +273,7 @@ import { normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
 import { normalizeInstantReplay } from "@/utils/instant-replay";
 import { normalizeTeams } from "@/utils/teams";
-import { normalizeWledSets } from "@/utils/wled-sets";
+import { normalizeLibrarySets } from "@/utils/library-sets";
 import { clearCallerSoundsFromIndexedDB, clearSoundFxFromIndexedDB, getAllCallerSoundsFromIndexedDB, getAllSoundFxFromIndexedDB, isIndexedDBAvailable, saveSoundFxToIndexedDB, saveSoundToIndexedDB } from "@/utils/helpers";
 import AppButton from "@/components/AppButton.vue";
 import AppMenu from "@/components/AppMenu.vue";
@@ -603,16 +603,19 @@ function importSettings() {
             ...renameSettings(JSON.parse(JSON.stringify(importedData.config))),
           };
           // An export from before a change of shape is merged as it is, so
-          // Colors, Instant Replay, Teams and WLED's effect sets are brought
+          // Colors, Instant Replay, Teams and the libraries' sets are brought
           // up to date here, and a renamed setting (Team Lobby, now Local
           // Lobby) is carried over before the merge, which would otherwise
           // shadow it with the new name's default; see renameSettings,
           // normalizeColors, normalizeInstantReplay, normalizeTeams and
-          // normalizeWledSets.
+          // normalizeLibrarySets.
           newConfig.colors = normalizeColors(newConfig.colors);
           newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
           newConfig.teams = normalizeTeams(newConfig.teams);
-          newConfig.wledFx = normalizeWledSets(newConfig.wledFx);
+          newConfig.wledFx = normalizeLibrarySets(newConfig.wledFx, "effects");
+          newConfig.animations = normalizeLibrarySets(newConfig.animations, "data");
+          newConfig.caller = normalizeLibrarySets(newConfig.caller, "sounds");
+          newConfig.soundFx = normalizeLibrarySets(newConfig.soundFx, "sounds");
 
           // Set the local ref
           config.value = newConfig;
@@ -864,16 +867,19 @@ function pasteFromClipboard() {
           ...renameSettings(JSON.parse(JSON.stringify(importedData.config))),
         };
         // An export from before a change of shape is merged as it is, so
-        // Colors, Instant Replay, Teams and WLED's effect sets are brought
+        // Colors, Instant Replay, Teams and the libraries' sets are brought
         // up to date here, and a renamed setting (Team Lobby, now Local
         // Lobby) is carried over before the merge, which would otherwise
         // shadow it with the new name's default; see renameSettings,
         // normalizeColors, normalizeInstantReplay, normalizeTeams and
-        // normalizeWledSets.
+        // normalizeLibrarySets.
         newConfig.colors = normalizeColors(newConfig.colors);
         newConfig.instantReplay = normalizeInstantReplay(newConfig.instantReplay);
         newConfig.teams = normalizeTeams(newConfig.teams);
-        newConfig.wledFx = normalizeWledSets(newConfig.wledFx);
+        newConfig.wledFx = normalizeLibrarySets(newConfig.wledFx, "effects");
+        newConfig.animations = normalizeLibrarySets(newConfig.animations, "data");
+        newConfig.caller = normalizeLibrarySets(newConfig.caller, "sounds");
+        newConfig.soundFx = normalizeLibrarySets(newConfig.soundFx, "sounds");
 
         // Set the local ref
         config.value = newConfig;

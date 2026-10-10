@@ -38,7 +38,7 @@
         >
           <span v-if="set.active" class="size-2 shrink-0 rounded-full bg-[var(--ad-action-primary)]" aria-hidden="true" />
           <span class="min-w-0 truncate">{{ label(set) }}</span>
-          <span class="adt-pill-count">{{ set.effects.length }}</span>
+          <span class="adt-pill-count">{{ set.items.length }}</span>
           <span v-if="set.active" class="sr-only">{{ t("wled.sets.inUse") }}</span>
         </button>
       </div>
@@ -67,7 +67,7 @@
           {{ t(nameError) }}
         </p>
       </div>
-      <div v-if="nameDialog === 'create' && viewed?.effects.length">
+      <div v-if="nameDialog === 'create' && viewed?.items.length">
         <p class="adt-field-label">
           {{ t("wled.sets.dialog.startLabel") }}
         </p>
@@ -88,7 +88,7 @@
   <!-- The set viewed deleted -->
   <AppModal @close="showDelete = false" :show="showDelete" :title="t('wled.sets.deleteDialog.title', { set: label(viewed) })" ghost-close size="sm">
     <p class="text-sm text-[var(--ad-text-muted)]">
-      {{ viewed?.effects.length ? t("wled.sets.deleteDialog.body", { count: viewed.effects.length }) : t("wled.sets.deleteDialog.bodyEmpty") }}
+      {{ viewed?.items.length ? t("wled.sets.deleteDialog.body", { count: viewed.items.length }) : t("wled.sets.deleteDialog.bodyEmpty") }}
     </p>
     <template #footer>
       <AppButton @click="showDelete = false" auto>
@@ -109,19 +109,19 @@ import AppModal from "../../AppModal.vue";
 import AppRadioGroup from "../../AppRadioGroup.vue";
 
 import type { MessageKey } from "@/utils/i18n";
-import type { WledSetView } from "@/utils/wled-sets";
+import type { LibrarySetView } from "@/utils/library-sets";
 
-import { setLabel, setNameTaken } from "@/utils/wled-sets";
+import { librarySetLabel, librarySetNameTaken } from "@/utils/library-sets";
 
 /**
- * WLED's effect sets (utils/wled-sets.ts): a pill for each, the set being
+ * WLED's effect sets (utils/library-sets.ts): a pill for each, the set being
  * viewed picked out and the set in use dotted, a line on whether the set being
  * viewed is in use, and the dialogs that make, rename and delete one. It
  * changes nothing itself: the panel does what it emits.
  */
 const props = defineProps<{
-  /** Every set, in order, as listSets gives them. */
-  sets: WledSetView[];
+  /** Every set, in order, as listLibrarySets gives them. */
+  sets: LibrarySetView<unknown>[];
   /** The id of the set being viewed. */
   modelValue: string;
 }>();
@@ -183,7 +183,7 @@ watch(() => viewed.value?.id, () => {
 });
 
 function label(set: { name: string } | undefined): string {
-  return set ? setLabel(set, t("wled.sets.defaultName")) : "";
+  return set ? librarySetLabel(set, t("wled.sets.defaultName")) : "";
 }
 
 /** A long name cut before the word the limit falls in, or at the limit when it is one long word. */
@@ -231,12 +231,12 @@ function submitName() {
     closeNameDialog();
     return;
   }
-  if (setNameTaken(props.sets, name, t("wled.sets.defaultName"), renaming ? set?.id : undefined)) {
+  if (librarySetNameTaken(props.sets, name, t("wled.sets.defaultName"), renaming ? set?.id : undefined)) {
     nameError.value = "wled.sets.errors.nameTaken";
     return;
   }
   if (renaming && set) emit("rename", set.id, name);
-  else emit("create", name, startWith.value === "copy" && Boolean(set?.effects.length));
+  else emit("create", name, startWith.value === "copy" && Boolean(set?.items.length));
   closeNameDialog();
 }
 
