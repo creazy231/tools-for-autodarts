@@ -41,8 +41,8 @@
 
         <LibrarySets
           @create="createSet"
-          @delete="deleteEffectSet"
-          @rename="renameEffectSet"
+          @delete="deleteSet"
+          @rename="renameSet"
           @use="useSet"
           v-model="viewedId"
           :sets="sets"
@@ -325,14 +325,12 @@ import LibrarySets from "./Library/LibrarySets.vue";
 
 import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
-import type { LibrarySetView } from "@/utils/library-sets";
 
 import { useNotification } from "@/composables/useNotification";
 import { tryEffect } from "@/entrypoints/match.content/wled";
 import { getAuthToken } from "@/utils/helpers";
 import { type IWled } from "@/utils/storage";
 import { tokenAccount } from "@/utils/team-room";
-import { activateLibrarySet, addLibrarySet, deleteLibrarySet, librarySetLabel, listLibrarySets, renameLibrarySet } from "@/utils/library-sets";
 import { WledType } from "#imports";
 
 const emit = defineEmits([ "toggle" ]);
@@ -367,8 +365,6 @@ const BOARD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
 
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/ad_wled_logo.png");
-/** The set the effects library shows, by id: "" or an id that has gone is the set in use. */
-const viewedId = ref("");
 const showEffectModal = ref(false);
 const isEditMode = ref(false);
 const newEffect = ref<IWled>({
@@ -415,22 +411,17 @@ const csvImportPlaceholder = ref(
 const showDeleteAllModal = ref(false);
 
 const { notification, showNotification, hideNotification } = useNotification();
-
-const sets = computed<LibrarySetView<IWled>[]>(() => (config.value ? listLibrarySets(config.value.wledFx, "effects") : []));
-const several = computed(() => sets.value.length > 1);
-const viewed = computed(() => sets.value.find(set => set.id === viewedId.value) ?? sets.value.find(set => set.active));
 /**
- * The list the library edits, in place: the stored list of the set being
- * viewed, which for the set in use is `wledFx.effects` itself.
+ * The effect sets (composables/useLibrarySets.ts). `effects` is the list the
+ * library edits, in place: the stored list of the set being viewed, which for
+ * the set in use is `wledFx.effects` itself.
  */
-const effects = computed<IWled[]>(() => viewed.value?.items ?? []);
-const libraryTitle = computed(() => (several.value && viewed.value
-  ? t("library.sets.wledFx.listTitle", { set: librarySetLabel(viewed.value, t("library.sets.defaultName")) })
-  : t("wled.list.title")));
-const inUseLabel = computed(() => {
-  const set = sets.value.find(candidate => candidate.active);
-  return set ? librarySetLabel(set, t("library.sets.defaultName")) : "";
-});
+const {
+  viewedId, sets, several, viewed, items: effects, viewedLabel, inUseLabel,
+  useSet, createSet, renameSet, deleteSet,
+} = useLibrarySets("wledFx", { notify: showNotification, closeDialogs });
+
+const libraryTitle = computed(() => (several.value ? t("library.sets.wledFx.listTitle", { set: viewedLabel.value }) : t("wled.list.title")));
 
 const boardIds = computed<string[]>({
   get: () => config.value?.wledFx.boardIds ?? [],
@@ -485,16 +476,6 @@ const moreActions = computed(() => [
 
 watch(() => [ newEffect.value.url, newEffect.value.type ], async () => {
   if (newEffect.value.type === WledType.PRESET && newEffect.value.url) await fetchPresets();
-});
-
-// The set being viewed deleted elsewhere (another tab): a dialog open on it closes
-// and says so, rather than act on the set shown in its place, which is the one in use.
-watch(() => viewed.value?.id, () => {
-  if (!showEffectModal.value && !showImportCSVModal.value && !showDeleteAllModal.value) return;
-  closeEffectModal();
-  closeImportCSVModal();
-  closeDeleteAllModal();
-  showNotification(t("library.sets.notifications.goneElsewhere"), "error");
 });
 
 /** Stored triggers are an array, or a newline-separated string in configs from before. */
@@ -784,43 +765,17 @@ async function toggleFeature() {
   }
 }
 
-// Effect sets (utils/library-sets.ts). The set functions build plain objects from
-// what they are given, so they get the raw config: a reactive proxy kept inside
-// one would reach chrome.storage.
-
-/** Makes the set the one that plays. */
-function useSet(id: string) {
-  if (!config.value) return;
-  const name = labelOf(id);
-  config.value.wledFx = activateLibrarySet(toRaw(config.value.wledFx), "effects", id);
-  showNotification(t("library.sets.notifications.inUse", { set: name }), "success");
-}
-
-/** A new set, a copy of the set being viewed or empty, shown and not used. */
-function createSet(name: string, copy: boolean) {
-  if (!config.value) return;
-  const added = addLibrarySet(toRaw(config.value.wledFx), "effects", name, copy ? effects.value : []);
-  config.value.wledFx = added.section;
-  viewedId.value = added.id;
-  showNotification(t("library.sets.notifications.created", { set: name }), "success");
-}
-
-function renameEffectSet(id: string, name: string) {
-  if (!config.value) return;
-  config.value.wledFx = renameLibrarySet(toRaw(config.value.wledFx), "effects", id, name);
-  showNotification(t("library.sets.notifications.renamed"), "success");
-}
-
-function deleteEffectSet(id: string) {
-  if (!config.value) return;
-  const name = labelOf(id);
-  config.value.wledFx = deleteLibrarySet(toRaw(config.value.wledFx), "effects", id);
-  showNotification(t("library.sets.notifications.deleted", { set: name }), "success");
-}
-
-function labelOf(id: string): string {
-  const set = sets.value.find(candidate => candidate.id === id);
-  return set ? librarySetLabel(set, t("library.sets.defaultName")) : "";
+/**
+ * The set being viewed was deleted elsewhere (another tab): the dialogs open on
+ * it close, rather than act on the set shown in its place, which is the one in
+ * use. Says whether one was open, so the composable can say why.
+ */
+function closeDialogs(): boolean {
+  const open = showEffectModal.value || showImportCSVModal.value || showDeleteAllModal.value;
+  if (showEffectModal.value) closeEffectModal();
+  if (showImportCSVModal.value) closeImportCSVModal();
+  if (showDeleteAllModal.value) closeDeleteAllModal();
+  return open;
 }
 
 function sortEffectsByTriggers() {
