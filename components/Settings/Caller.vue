@@ -29,13 +29,25 @@
           </OptionRow>
         </section>
 
+        <LibrarySets
+          @create="createSet"
+          @delete="deleteSet"
+          @rename="renameSet"
+          @use="useSet"
+          v-model="viewedId"
+          :sets="sets"
+          feature="caller"
+        />
+
+        <!-- Keyed by the set it shows, so each set opens unsearched. -->
         <LibrarySection
           @reorder="moveSound"
+          :key="viewed?.id"
           :empty-text="t('caller.list.emptyText')"
           :empty-title="t('library.sounds.emptyTitle')"
           :entries="entries"
           :search-placeholder="t('library.sounds.searchPlaceholder')"
-          :title="t('library.sounds.title')"
+          :title="libraryTitle"
           empty-icon="icon-[material-symbols--record-voice-over-outline-rounded]"
         >
           <template #actions>
@@ -63,9 +75,9 @@
             <LibraryItem
               @delete="removeSound(entry.index)"
               @edit="editAny(entry.index)"
-              @toggle="config.caller.sounds[entry.index].enabled = $event"
+              @toggle="sounds[entry.index].enabled = $event"
               v-for="entry in shown"
-              :key="stableKey(config.caller.sounds[entry.index])"
+              :key="stableKey(sounds[entry.index])"
               :data-index="entry.index"
               :draggable="!filtering"
               :enabled="entry.enabled"
@@ -74,11 +86,11 @@
               :triggers="entry.triggers"
             >
               <template #lead>
-                <PlayButton @click="togglePlay(entry.index)" :label="entry.name" :playing="playingKey === stableKey(config.caller.sounds[entry.index])" />
+                <PlayButton @click="togglePlay(entry.index)" :label="entry.name" :playing="playingKey === stableKey(sounds[entry.index])" />
               </template>
               <template #meta>
-                <SoundSource :sound="config.caller.sounds[entry.index]" :voices="voices" />
-                <VolumeBadge :sound="config.caller.sounds[entry.index]" />
+                <SoundSource :sound="sounds[entry.index]" :voices="voices" />
+                <VolumeBadge :sound="sounds[entry.index]" />
               </template>
             </LibraryItem>
           </template>
@@ -150,7 +162,7 @@
       feature="caller"
     />
 
-    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('library.sounds.deleteAll.title', { count: config?.caller.sounds.length ?? 0 })" ghost-close size="sm">
+    <AppModal @close="closeDeleteAllModal" :show="showDeleteAllModal" :title="t('library.sounds.deleteAll.title', { count: sounds.length })" ghost-close size="sm">
       <p class="text-sm text-[var(--ad-text-muted)]">
         {{ t("library.sounds.deleteAll.body") }}
       </p>
@@ -268,12 +280,17 @@
             {{ t("caller.card") }}
           </p>
         </div>
-        <div class="flex">
+        <div class="flex items-center gap-3">
           <div @click="$emit('toggle', 'caller')" class="absolute inset-y-0 left-12 right-0 cursor-pointer" />
           <AppToggle
             @update:model-value="toggleFeature"
             v-model="config.caller.enabled"
           />
+          <p v-if="several" class="flex min-w-0 max-w-[45%] items-center gap-1.5 text-sm font-semibold text-white/80">
+            <span class="icon-[material-symbols--library-music-outline-rounded] shrink-0 text-base" aria-hidden="true" />
+            <span class="sr-only">{{ t("library.sets.caller.cardLabel") }}</span>
+            <span class="truncate">{{ inUseLabel }}</span>
+          </p>
         </div>
       </div>
       <div class="gradient-mask-left absolute inset-y-0 right-0 w-2/3">
@@ -308,6 +325,7 @@ import TtsDialog from "./Library/TtsDialog.vue";
 import UploadDialog from "./Library/UploadDialog.vue";
 import VolumeBadge from "./Library/VolumeBadge.vue";
 import { stableKey } from "./Library/stable-key";
+import LibrarySets from "./Library/LibrarySets.vue";
 
 import type { MessageKey } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
@@ -373,6 +391,21 @@ const isImporting = ref(false);
 /** Triggers always come from the file names on import: the old dialog's box for it could not be unticked. */
 const generateTriggersFromURLFilenames = ref(true);
 const { notification, showNotification, hideNotification } = useNotification();
+/**
+ * The sound sets (composables/useLibrarySets.ts). `sounds` is the list the
+ * library edits, in place: the stored list of the set being viewed, which for
+ * the set in use is `caller.sounds` itself. A recording another set still
+ * plays is kept when its sound is deleted here, and never overwritten.
+ */
+const {
+  viewedId, sets, several, viewed, items: sounds, viewedLabel, inUseLabel,
+  useSet, createSet, renameSet, deleteSet, addToSet, releaseFiles, fileShared,
+} = useLibrarySets("caller", {
+  notify: showNotification,
+  fileOf: sound => sound.soundId,
+  deleteFile: deleteSoundFromIndexedDB,
+  closeDialogs,
+});
 
 // TTS related
 const { voices, isTTSAvailable, isSpeaking, lastVoiceURI, lastRate, lastPitch, preview, stopPreview, saveDefaults } = useTTS();
@@ -443,7 +476,9 @@ const CALLER_SETS: { value: string; region: string; voice: string; gender: "fema
   { value: "https://darts-downloads.peschi.org/soundfiles/en-US-Gregory-Male-v6.zip", region: "US", voice: "Gregory", gender: "male" },
 ];
 
-const entries = computed<LibraryEntry[]>(() => (config.value?.caller.sounds ?? []).map((sound, index) => {
+const libraryTitle = computed(() => (several.value ? t("library.sets.caller.listTitle", { set: viewedLabel.value }) : t("library.sounds.title")));
+
+const entries = computed<LibraryEntry[]>(() => sounds.value.map((sound, index) => {
   const triggers = Array.isArray(sound.triggers) ? sound.triggers : [];
   return {
     index,
@@ -470,7 +505,7 @@ const urlErrorText = computed(() => (urlError.value ? t(urlError.value) : ""));
 const draftHasFile = computed(() => {
   if (newSound.value.base64) return true;
   if (!isEditMode.value || editingIndex.value === null) return false;
-  return !!config.value?.caller.sounds[editingIndex.value]?.soundId;
+  return !!sounds.value[editingIndex.value]?.soundId;
 });
 
 /** A link set above 100% that the extension cannot read, so the editor can say it plays at 100% at most. */
@@ -499,7 +534,7 @@ const moreActions = computed(() => [
     label: t("library.sounds.menu.sort.label"),
     hint: t("library.sounds.menu.sort.hint"),
     icon: "icon-[material-symbols--sort-by-alpha-rounded]",
-    disabled: (config.value?.caller.sounds.length ?? 0) < 2,
+    disabled: sounds.value.length < 2,
     action: sortSoundsByTriggers,
   },
   {
@@ -507,7 +542,7 @@ const moreActions = computed(() => [
     icon: "icon-[material-symbols--delete-outline-rounded]",
     danger: true,
     separated: true,
-    disabled: !config.value?.caller.sounds.length,
+    disabled: !sounds.value.length,
     action: openDeleteAllModal,
   },
 ]);
@@ -535,20 +570,19 @@ onBeforeUnmount(() => {
 });
 
 function moveSound(from: number, to: number) {
-  const sounds = config.value?.caller.sounds;
-  if (!sounds) return;
-  const [ moved ] = sounds.splice(from, 1);
-  sounds.splice(to, 0, moved);
+  const list = sounds.value;
+  const [ moved ] = list.splice(from, 1);
+  list.splice(to, 0, moved);
 }
 
 function editAny(index: number) {
-  const sound = config.value!.caller.sounds[index];
+  const sound = sounds.value[index];
   if (sound.tts) openTTSModal(sound, index);
   else editSound(index);
 }
 
 function togglePlay(index: number) {
-  const sound = config.value!.caller.sounds[index];
+  const sound = sounds.value[index];
   if (playingKey.value === stableKey(sound)) stopPlayback();
   else playSound(sound, stableKey(sound));
 }
@@ -560,7 +594,7 @@ function previewDraft() {
     return;
   }
   const { url, base64, name, volume } = newSound.value;
-  const stored = isEditMode.value && editingIndex.value !== null ? config.value?.caller.sounds[editingIndex.value] : undefined;
+  const stored = isEditMode.value && editingIndex.value !== null ? sounds.value[editingIndex.value] : undefined;
   playSound({ name, url: url.trim(), base64, soundId: base64 ? undefined : stored?.soundId, enabled: true, triggers: [], volume }, DRAFT_KEY);
 }
 
@@ -584,7 +618,7 @@ function openAddSoundModal() {
 }
 
 function editSound(index: number) {
-  const sound = config.value!.caller.sounds[index];
+  const sound = sounds.value[index];
 
   // Set up base form values
   newSound.value = {
@@ -625,11 +659,11 @@ function editSound(index: number) {
 }
 
 async function saveSound() {
-  if (!config.value) return;
+  if (!config.value || !showSoundModal.value) return;
 
   // Check if we're in edit mode with an existing sound
   const existingSound = isEditMode.value && editingIndex.value !== null
-    ? config.value.caller.sounds[editingIndex.value]
+    ? sounds.value[editingIndex.value]
     : null;
 
   // Different validation when editing vs adding new sound
@@ -656,14 +690,18 @@ async function saveSound() {
   // Store base64 data in IndexedDB if available
   let soundId: string | null = null;
   if (newSound.value.base64 && isIndexedDBAvailable()) {
-    if (existingSound?.soundId) {
-      // Update existing sound in IndexedDB
+    if (existingSound?.soundId && !fileShared(existingSound)) {
+      // Update existing sound in IndexedDB: no other set plays this file
       soundId = await saveSoundToIndexedDB(
         newSound.value.name.trim() || t("library.sounds.unnamed"),
         newSound.value.base64,
         existingSound.soundId, // Pass existing soundId to update instead of creating new
       );
+    } else if (existingSound?.soundId && await getSoundFromIndexedDB(existingSound.soundId) === newSound.value.base64) {
+      // Another set plays this file too, and the recording is unchanged: keep sharing it
+      soundId = existingSound.soundId;
     } else {
+      // A new file: also when another set plays the old one, which stays as it is
       // Create new sound in IndexedDB
       soundId = await saveSoundToIndexedDB(
         newSound.value.name.trim() || t("library.sounds.unnamed"),
@@ -697,14 +735,12 @@ async function saveSound() {
     // Update existing sound
     sound.enabled = existingSound.enabled; // Preserve enabled state when editing
 
-    // Only delete old sound from IndexedDB if we didn't reuse the soundId and there's a new one
-    if (existingSound.soundId && existingSound.soundId !== soundId && soundId !== null) {
-      await deleteSoundFromIndexedDB(existingSound.soundId);
-    }
+    sounds.value[editingIndex.value] = sound;
 
-    config.value.caller.sounds[editingIndex.value] = sound;
+    // The old recording goes if it was replaced, unless another set still plays it
+    if (existingSound.soundId && existingSound.soundId !== soundId && soundId !== null) await releaseFiles([ existingSound ]);
   } else {
-    config.value.caller.sounds.unshift(sound);
+    sounds.value.unshift(sound);
   }
 
   // Reset form and close modal
@@ -720,20 +756,14 @@ function closeSoundModal() {
 }
 
 async function removeSound(index: number) {
-  const sounds = config.value?.caller.sounds;
-  if (!sounds) return;
-
-  const sound = sounds[index];
+  const list = sounds.value;
+  const sound = list[index];
+  if (!sound) return;
   if (playingKey.value === stableKey(sound)) stopPlayback();
 
-  // If sound is stored in IndexedDB, delete it
-  if (sound.soundId && isIndexedDBAvailable()) {
-    await deleteSoundFromIndexedDB(sound.soundId);
-  }
-
-  // Found again after the wait, in case another delete moved it.
-  const at = sounds.indexOf(sound);
-  if (at !== -1) sounds.splice(at, 1);
+  list.splice(index, 1);
+  // Its recording goes too, unless another set still plays it
+  await releaseFiles([ sound ]);
 }
 
 // File upload related functions
@@ -770,20 +800,14 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 async function processFiles({ files, fromNames, triggers: shared }: { files: File[]; fromNames: boolean; triggers: string[] }) {
-  if (!config.value || !files.length) return;
+  // The set being viewed now, by id: the files land in it, even if the view moves or another tab writes while they are read.
+  const into = viewed.value?.id;
+  if (!config.value || !into || !files.length || !showUploadModal.value) return;
 
   isProcessing.value = true;
   let added = 0;
 
   try {
-    // Ensure config.value.caller.sounds is an array
-    if (!config.value.caller || !Array.isArray(config.value.caller.sounds)) {
-      config.value.caller = {
-        ...config.value.caller,
-        sounds: [],
-      };
-    }
-
     for (const file of files) {
       try {
         const base64Data = await fileToBase64(file);
@@ -796,14 +820,14 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
           soundId = await saveSoundToIndexedDB(nameWithoutExt, base64Data);
         }
 
-        config.value.caller.sounds.unshift({
+        await addToSet(into, [ {
           name: nameWithoutExt,
           url: "",
           base64: soundId ? "" : base64Data, // Only store in config if not in IndexedDB
           soundId: soundId || "", // Store the IndexedDB ID if available
           enabled: true,
           triggers,
-        });
+        } ]);
         added++;
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
@@ -823,12 +847,12 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
 }
 
 function sortSoundsByTriggers() {
-  if (!config.value || !config.value.caller.sounds || config.value.caller.sounds.length <= 1) {
+  if (sounds.value.length <= 1) {
     return;
   }
 
   // Sort sounds by their first trigger alphabetically
-  config.value.caller.sounds.sort((a, b) => {
+  sounds.value.sort((a, b) => {
     // Get first trigger from each sound, or empty string if no triggers
     const triggerA = Array.isArray(a.triggers) && a.triggers.length > 0 ? a.triggers[0] : "";
     const triggerB = Array.isArray(b.triggers) && b.triggers.length > 0 ? b.triggers[0] : "";
@@ -854,22 +878,30 @@ function closeDeleteAllModal() {
   showDeleteAllModal.value = false;
 }
 
+/**
+ * The set being viewed was deleted elsewhere (another tab): the dialogs open on
+ * it close, rather than act on the set shown in its place, which is the one in
+ * use. An import that runs carries on into the set it started in. Says whether
+ * one was open, so useLibrarySets can say why.
+ */
+function closeDialogs(): boolean {
+  const importing = showImportURLModal.value && !isImporting.value;
+  const open = showSoundModal.value || showUploadModal.value || showTTSModal.value || showDeleteAllModal.value || importing;
+  if (showSoundModal.value) closeSoundModal();
+  if (showUploadModal.value) closeUploadModal();
+  if (showTTSModal.value) closeTTSModal();
+  if (showDeleteAllModal.value) closeDeleteAllModal();
+  if (importing) closeImportURLModal();
+  return open;
+}
+
 async function deleteAllSounds() {
-  if (!config.value) return;
+  if (!config.value || !showDeleteAllModal.value) return;
   stopPlayback();
 
-  // Delete all sounds from IndexedDB
-  if (isIndexedDBAvailable()) {
-    // Delete individual sounds with their IDs to ensure cleanup
-    for (const sound of config.value.caller.sounds) {
-      if (sound.soundId) {
-        await deleteSoundFromIndexedDB(sound.soundId);
-      }
-    }
-  }
-
-  // Clear all sounds from the config
-  config.value.caller.sounds = [];
+  // Empty the set being viewed, then let go of the recordings no other set plays
+  const removed = sounds.value.splice(0);
+  await releaseFiles(removed);
 
   // Close modal and show notification
   closeDeleteAllModal();
@@ -1272,7 +1304,9 @@ async function extractZipWithProgress(zipData: ArrayBuffer): Promise<Map<string,
 
 // Enhanced fetchSoundsFromURL function to handle ZIP files
 async function fetchSoundsFromURL() {
-  if (!config.value) return;
+  // The set being viewed now, by id: the import lands in it, even if the view moves or another tab writes while it downloads.
+  const into = viewed.value?.id;
+  if (!config.value || !into || !showImportURLModal.value) return;
 
   // Validate URL
   try {
@@ -1295,14 +1329,6 @@ async function fetchSoundsFromURL() {
   } catch (error) {
     urlError.value = "caller.import.errors.invalid";
     return;
-  }
-
-  // Ensure config.value.caller.sounds is an array
-  if (!config.value.caller || !Array.isArray(config.value.caller.sounds)) {
-    config.value.caller = {
-      ...config.value.caller,
-      sounds: [],
-    };
   }
 
   // Check if URL points to a ZIP file
@@ -1340,8 +1366,8 @@ async function fetchSoundsFromURL() {
           return;
         }
 
-        // Add the sounds to the config
-        config.value.caller.sounds = [ ...sounds, ...config.value.caller.sounds ];
+        // Add the sounds to the set the import started in
+        await addToSet(into, sounds);
         importedCount.value = sounds.length;
 
         // Show success notification
@@ -1392,8 +1418,8 @@ async function fetchSoundsFromURL() {
           return;
         }
 
-        // Add the sounds to the config
-        config.value.caller.sounds = [ ...sounds, ...config.value.caller.sounds ];
+        // Add the sounds to the set the import started in
+        await addToSet(into, sounds);
         importedCount.value = sounds.length;
 
         // Show success notification
@@ -1473,8 +1499,8 @@ async function fetchSoundsFromURL() {
               triggers: specialSound.triggers,
             };
 
-            // Add to sounds array
-            config.value.caller.sounds.unshift(sound);
+            // Add to the set the import started in
+            await addToSet(into, [ sound ]);
             importedCount.value++;
 
             // Found a sound with this name, no need to try other extensions
@@ -1539,8 +1565,8 @@ async function fetchSoundsFromURL() {
               triggers,
             };
 
-            // Add to sounds array
-            config.value.caller.sounds.unshift(sound);
+            // Add to the set the import started in
+            await addToSet(into, [ sound ]);
             importedCount.value++;
 
             // Found a sound with this number, no need to try other extensions
@@ -1639,7 +1665,7 @@ function prelistenTTS() {
 }
 
 function saveTTSSound() {
-  if (!config.value || !ttsForm.value.text || !ttsForm.value.triggers.length) return;
+  if (!config.value || !showTTSModal.value || !ttsForm.value.text || !ttsForm.value.triggers.length) return;
 
   stopPlayback();
   saveDefaults(ttsForm.value.voiceURI, ttsForm.value.rate, ttsForm.value.pitch);
@@ -1668,12 +1694,12 @@ function saveTTSSound() {
   const editing = ttsEditingIndex.value;
   if (editing !== null) {
     // Update existing
-    const existing = config.value.caller.sounds[editing];
+    const existing = sounds.value[editing];
     sound.enabled = existing.enabled;
-    config.value.caller.sounds[editing] = sound;
+    sounds.value[editing] = sound;
   } else {
     // Add new
-    config.value.caller.sounds.unshift(sound);
+    sounds.value.unshift(sound);
   }
 
   closeTTSModal();
