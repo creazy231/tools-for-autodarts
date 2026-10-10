@@ -382,7 +382,7 @@ Its comment names "every library's sets", and it imports `normalizeLibrarySets` 
 - `activateSet(x, id)` becomes `activateLibrarySet(x, "effects", id)`;
 - `addSet(x, n, l)` becomes `addLibrarySet(x, "effects", n, l)`, read as `added.section` where it was `added.wledFx`;
 - `renameSet`, `deleteSet`, `setLabel` and `setNameTaken` become `renameLibrarySet`, `deleteLibrarySet`, `librarySetLabel` and `librarySetNameTaken`, with `"effects"` where they take a section;
-- `WledSetView` becomes `LibrarySetView<IWled>`.
+- `WledSetView` becomes `LibrarySetView<IWled>`, and a view's list is `items` where it was `effects`: `set.effects.length` and `viewed.effects` in `EffectSets.vue`, `viewed.value?.effects` in `Wled.vue`, and `effects:` in `effect-sets.test.mts`'s `SETS()`.
 
 Then `git rm utils/wled-sets.ts`.
 
@@ -426,7 +426,8 @@ git commit -m "feat: one module keeps every library's sets, and counts the files
 
 Copy `effect-sets.test.mts` to `library-sets-section.test.mts`:
 - it loads `components/Settings/Library/LibrarySets.vue`;
-- `mount(modelValue, sets, feature = "wledFx")` passes `feature`.
+- `mount(modelValue, sets, feature = "wledFx")` passes `feature`;
+- its `SETS()` already uses `items`, since Task 1.
 
 New cases:
 ```ts
@@ -953,7 +954,7 @@ export const deleteAnimationFromOPFS = async (id) => { files.log.push([ "delete"
      - Halloween is empty, and `soundFx.sounds` is unchanged;
      - the `fx-…` file from step 4 is deleted, because no list keeps it, and `fx-b` is not.
   6. `useSet(halloween)`: `soundFx.sounds` is `[]` (Halloween's), and Default's list is back on its slot.
-  7. `deleteSet("default")` is refused while Default isn't in use? No: Default isn't in use any more, so it is deleted. Its `fx-a` and `fx-b` are deleted with it (nothing else keeps them), and `t` has no file.
+  7. With Halloween in use, `deleteSet("default")` deletes Default and, with it, `fx-a` and `fx-b`, which no other list keeps; `t` has no file.
   8. Every save could be stored (no `DataCloneError`).
 
 Run it. Expected: FAIL (the panel has no `items`, `createSet` or the rest).
@@ -1040,11 +1041,11 @@ git commit -m "feat: Sound FX keeps sets of sounds, sharing their recordings, an
 The cases:
 1. In Halloween (a copy), edit `a`: `editSound(0)`, wait for its base64, replace `newSound.base64` with a new recording, and `saveSound()`.
    - The file is saved under a **new** id (no `existingId`), and `files.caller` still holds `caller-a` with the old recording, for Default.
-2. In Default, edit `b`, which nothing else shares now? It isn't: Halloween still has `b`. First remove `b` from Halloween, then edit Default's `b` with a new recording.
+2. Remove `b` from Halloween, so Default's `b` is the only item keeping `caller-b`; then edit Default's `b` with a new recording.
    - It is saved in place, under `caller-b`: the file is overwritten, as before sets.
 3. In Halloween, `removeSound` of `a`: Halloween's own new file is deleted, and `caller-a` stays.
 4. In Halloween, `deleteAllSounds`: Default's files stay.
-5. Importing a caller set from a ZIP lands in the set viewed when it started. Call the import's last step directly: `fetchSoundsFromURL` with `checkIfZipURL` and the download stubbed is too wide, so the test covers the two lines that join the lists, through `importSounds(target, sounds)` (below).
+5. `importSounds(target, sounds)` (below), given the list of the set viewed when an import started, puts the sounds at its top even after the view has moved to another set. Driving `fetchSoundsFromURL` itself needs the download and the ZIP stubbed; the browser check covers it.
 6. `deleteSet` of a set not in use deletes its own files only.
 
 Run it. Expected: FAIL.
