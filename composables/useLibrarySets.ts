@@ -43,8 +43,9 @@ interface Options<T> {
 /**
  * A settings panel's sets (utils/library-sets.ts), for LibrarySets.vue and the
  * panel's own library: the set being viewed, the list the library edits in
- * place, using, making, renaming and deleting a set, and the stored files that
- * items share between sets. A file is deleted only when no list keeps it.
+ * place, using, making, renaming and deleting a set, adding an upload to the set
+ * it started in, and the stored files that items share between sets. A file is
+ * deleted only when no list keeps it.
  */
 export function useLibrarySets<F extends SetFeature>(feature: F, options: Options<SetItems[F]>) {
   type T = SetItems[F];
@@ -152,11 +153,24 @@ export function useLibrarySets<F extends SetFeature>(feature: F, options: Option
     }
   }
 
+  /**
+   * Puts `added` at the top of set `id`'s list as it is stored now. An upload or
+   * import holds the id of the set it started in, never its list: a write from
+   * another tab replaces the whole config, and a list held from before that is
+   * stored no more. If the set was deleted meanwhile, `added` goes, with the
+   * files no list keeps.
+   */
+  async function addToSet(id: string, added: T[]) {
+    const list = sets.value.find(set => set.id === id)?.items;
+    if (list) list.unshift(...added);
+    else await releaseFiles(added);
+  }
+
   /** Whether another item, in any list, keeps the same file: an editor replacing it writes a new one. */
   function fileShared(item: T): boolean {
     const fx = raw();
     return Boolean(options.fileOf && fx && libraryFileUses(fx, key, options.fileOf, options.fileOf(item)) > 1);
   }
 
-  return { viewedId, sets, several, viewed, items, viewedLabel, inUseLabel, useSet, createSet, renameSet, deleteSet, releaseFiles, fileShared };
+  return { viewedId, sets, several, viewed, items, viewedLabel, inUseLabel, useSet, createSet, renameSet, deleteSet, addToSet, releaseFiles, fileShared };
 }

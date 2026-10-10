@@ -289,7 +289,7 @@ const { notification, showNotification, hideNotification } = useNotification();
  */
 const {
   viewedId, sets, several, viewed, items: sounds, viewedLabel, inUseLabel,
-  useSet, createSet, renameSet, deleteSet, releaseFiles,
+  useSet, createSet, renameSet, deleteSet, addToSet, releaseFiles,
 } = useLibrarySets("soundFx", {
   notify: showNotification,
   fileOf: sound => sound.soundId,
@@ -724,9 +724,9 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 async function processFiles({ files, fromNames, triggers: shared }: { files: File[]; fromNames: boolean; triggers: string[] }) {
-  if (!config.value || !files.length || !showUploadModal.value) return;
-  // The set being viewed now: the files land in it, even if the view moves while they are read.
-  const target = sounds.value;
+  // The set being viewed now, by id: the files land in it, even if the view moves or another tab writes while they are read.
+  const into = viewed.value?.id;
+  if (!config.value || !into || !files.length || !showUploadModal.value) return;
 
   isProcessing.value = true;
   let added = 0;
@@ -744,14 +744,14 @@ async function processFiles({ files, fromNames, triggers: shared }: { files: Fil
           soundId = await saveSoundFxToIndexedDB(nameWithoutExt, base64Data);
         }
 
-        target.unshift({
+        await addToSet(into, [ {
           name: nameWithoutExt,
           url: "",
           base64: soundId ? "" : base64Data, // Only store in config if not in IndexedDB
           soundId: soundId || "", // Store the IndexedDB ID if available
           enabled: true,
           triggers,
-        });
+        } ]);
         added++;
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
