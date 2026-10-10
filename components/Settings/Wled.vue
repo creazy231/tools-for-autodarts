@@ -39,13 +39,14 @@
           </OptionRow>
         </section>
 
-        <EffectSets
+        <LibrarySets
           @create="createSet"
           @delete="deleteEffectSet"
           @rename="renameEffectSet"
           @use="useSet"
           v-model="viewedId"
           :sets="sets"
+          feature="wledFx"
         />
 
         <!-- Keyed by the set it shows, so each set opens unsearched. -->
@@ -283,9 +284,9 @@
             class="absolute inset-y-0 left-12 right-0 cursor-pointer"
           />
           <AppToggle @update:model-value="toggleFeature" v-model="config.wledFx.enabled" />
-          <p v-if="several" class="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white/80">
+          <p v-if="several" class="flex min-w-0 max-w-[45%] items-center gap-1.5 text-sm font-semibold text-white/80">
             <span class="icon-[material-symbols--lightbulb-outline-rounded] shrink-0 text-base" aria-hidden="true" />
-            <span class="sr-only">{{ t("wled.sets.cardLabel") }}</span>
+            <span class="sr-only">{{ t("library.sets.wledFx.cardLabel") }}</span>
             <span class="truncate">{{ inUseLabel }}</span>
           </p>
         </div>
@@ -320,7 +321,7 @@ import OptionRow from "./Library/OptionRow.vue";
 import PlayButton from "./Library/PlayButton.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import { stableKey } from "./Library/stable-key";
-import EffectSets from "./Wled/EffectSets.vue";
+import LibrarySets from "./Library/LibrarySets.vue";
 
 import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
@@ -424,11 +425,11 @@ const viewed = computed(() => sets.value.find(set => set.id === viewedId.value) 
  */
 const effects = computed<IWled[]>(() => viewed.value?.items ?? []);
 const libraryTitle = computed(() => (several.value && viewed.value
-  ? t("wled.list.titleInSet", { set: librarySetLabel(viewed.value, t("wled.sets.defaultName")) })
+  ? t("library.sets.wledFx.listTitle", { set: librarySetLabel(viewed.value, t("library.sets.defaultName")) })
   : t("wled.list.title")));
 const inUseLabel = computed(() => {
   const set = sets.value.find(candidate => candidate.active);
-  return set ? librarySetLabel(set, t("wled.sets.defaultName")) : "";
+  return set ? librarySetLabel(set, t("library.sets.defaultName")) : "";
 });
 
 const boardIds = computed<string[]>({
@@ -493,7 +494,7 @@ watch(() => viewed.value?.id, () => {
   closeEffectModal();
   closeImportCSVModal();
   closeDeleteAllModal();
-  showNotification(t("wled.sets.notifications.goneElsewhere"), "error");
+  showNotification(t("library.sets.notifications.goneElsewhere"), "error");
 });
 
 /** Stored triggers are an array, or a newline-separated string in configs from before. */
@@ -792,7 +793,7 @@ function useSet(id: string) {
   if (!config.value) return;
   const name = labelOf(id);
   config.value.wledFx = activateLibrarySet(toRaw(config.value.wledFx), "effects", id);
-  showNotification(t("wled.sets.notifications.inUse", { set: name }), "success");
+  showNotification(t("library.sets.notifications.inUse", { set: name }), "success");
 }
 
 /** A new set, a copy of the set being viewed or empty, shown and not used. */
@@ -801,25 +802,25 @@ function createSet(name: string, copy: boolean) {
   const added = addLibrarySet(toRaw(config.value.wledFx), "effects", name, copy ? effects.value : []);
   config.value.wledFx = added.section;
   viewedId.value = added.id;
-  showNotification(t("wled.sets.notifications.created", { set: name }), "success");
+  showNotification(t("library.sets.notifications.created", { set: name }), "success");
 }
 
 function renameEffectSet(id: string, name: string) {
   if (!config.value) return;
   config.value.wledFx = renameLibrarySet(toRaw(config.value.wledFx), "effects", id, name);
-  showNotification(t("wled.sets.notifications.renamed"), "success");
+  showNotification(t("library.sets.notifications.renamed"), "success");
 }
 
 function deleteEffectSet(id: string) {
   if (!config.value) return;
   const name = labelOf(id);
   config.value.wledFx = deleteLibrarySet(toRaw(config.value.wledFx), "effects", id);
-  showNotification(t("wled.sets.notifications.deleted", { set: name }), "success");
+  showNotification(t("library.sets.notifications.deleted", { set: name }), "success");
 }
 
 function labelOf(id: string): string {
   const set = sets.value.find(candidate => candidate.id === id);
-  return set ? librarySetLabel(set, t("wled.sets.defaultName")) : "";
+  return set ? librarySetLabel(set, t("library.sets.defaultName")) : "";
 }
 
 function sortEffectsByTriggers() {

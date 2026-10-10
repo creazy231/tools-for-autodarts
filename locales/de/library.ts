@@ -146,4 +146,98 @@ export default {
       ttsUpdated: "Text-to-Speech-Sound aktualisiert",
     },
   },
+  // "In Benutzung" and "benutzen" after the site's own "bereits in Benutzung" (account.email.errors.emailInUse).
+  sets: {
+    intro: "Es wird immer nur ein Set abgespielt. Wähle ein Set, um es zu bearbeiten; abgespielt wird es erst, wenn du es benutzt.",
+    defaultName: "Standard",
+    new: "Neues Set",
+    inUse: "In Benutzung",
+    status: {
+      inUse: "Das ist das Set, das abgespielt wird.",
+      notInUse: "Nicht in Benutzung. Abgespielt wird {set}.",
+    },
+    use: "Dieses Set benutzen",
+    menu: {
+      rename: "Set umbenennen",
+      delete: "Set löschen",
+      deleteInUse: "Benutze zuerst ein anderes Set",
+    },
+    dialog: {
+      renameTitle: "Set umbenennen",
+      nameLabel: "Name",
+      namePlaceholder: "Halloween, Weihnachten, ein Geburtstag …",
+      // Over two buttons, "Kopie von …" and "Keine …": "Beginnen mit" would want the dative in both.
+      startLabel: "Inhalt",
+      copy: "Kopie von {set}",
+      create: "Set erstellen",
+    },
+    errors: {
+      nameMissing: "Gib dem Set einen Namen.",
+      nameTaken: "Es gibt schon ein Set mit diesem Namen.",
+    },
+    deleteDialog: {
+      title: "{set} löschen?",
+      confirm: "Set löschen",
+    },
+    notifications: {
+      created: "{set} erstellt. Abgespielt wird es, sobald du es benutzt.",
+      inUse: "Jetzt wird {set} abgespielt.",
+      renamed: "Set umbenannt",
+      deleted: "{set} gelöscht",
+      goneElsewhere: "Das Set, das du bearbeitet hast, wurde in einem anderen Tab gelöscht.",
+    },
+    wledFx: {
+      title: "Effekt-Sets",
+      introSingle: "Lege für einen Anlass wie Halloween oder einen Geburtstag eine weitere Liste mit Effekten an und wechsle zu ihr, wenn der Tag gekommen ist.",
+      newTitle: "Neues Effekt-Set",
+      empty: "Keine Effekte",
+      deleteBody: {
+        one: "Das Set und sein Effekt werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+        other: "Das Set und seine {count} Effekte werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      },
+      deleteBodyEmpty: "Das Set hat keine Effekte. Dies kann nicht rückgängig gemacht werden.",
+      cardLabel: "Effekt-Set in Benutzung:",
+      listTitle: "Effekte in {set}",
+    },
+    animations: {
+      title: "Animations-Sets",
+      introSingle: "Lege für einen Anlass wie Halloween oder einen Geburtstag eine weitere Liste mit Animationen an und wechsle zu ihr, wenn der Tag gekommen ist.",
+      newTitle: "Neues Animations-Set",
+      empty: "Keine Animationen",
+      deleteBody: {
+        one: "Das Set und seine Animation werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+        other: "Das Set und seine {count} Animationen werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      },
+      deleteBodyEmpty: "Das Set hat keine Animationen. Dies kann nicht rückgängig gemacht werden.",
+      cardLabel: "Animations-Set in Benutzung:",
+      listTitle: "Animationen in {set}",
+    },
+    // Sound-Sets, not Caller-Sets: a Caller-Set is a voice pack, which "Caller-Set importieren" brings in.
+    caller: {
+      title: "Sound-Sets",
+      introSingle: "Lege eine weitere Liste mit Sounds an, etwa für ein zweites Caller-Set oder für Halloween, und wechsle zu ihr, wann du willst.",
+      newTitle: "Neues Sound-Set",
+      empty: "Keine Sounds",
+      deleteBody: {
+        one: "Das Set und sein Sound werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+        other: "Das Set und seine {count} Sounds werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      },
+      deleteBodyEmpty: "Das Set hat keine Sounds. Dies kann nicht rückgängig gemacht werden.",
+      cardLabel: "Sound-Set in Benutzung:",
+      listTitle: "Sounds in {set}",
+    },
+    soundFx: {
+      title: "Sound-Sets",
+      introSingle: "Lege für einen Anlass wie Halloween oder einen Geburtstag eine weitere Liste mit Sounds an und wechsle zu ihr, wenn der Tag gekommen ist.",
+      newTitle: "Neues Sound-Set",
+      empty: "Keine Sounds",
+      deleteBody: {
+        one: "Das Set und sein Sound werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+        other: "Das Set und seine {count} Sounds werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      },
+      deleteBodyEmpty: "Das Set hat keine Sounds. Dies kann nicht rückgängig gemacht werden.",
+      cardLabel: "Sound-Set in Benutzung:",
+      listTitle: "Sounds in {set}",
+    },
+  },
 } satisfies Translation<typeof en>;

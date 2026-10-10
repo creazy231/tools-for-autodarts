@@ -146,4 +146,97 @@ export default {
       ttsUpdated: "Geluid met tekst-naar-spraak bijgewerkt",
     },
   },
+  // "In gebruik" as the site says it (account.email.errors.emailInUse), and "hernoemen" as its myDevices.link.rename.
+  sets: {
+    intro: "Er wordt steeds maar één set afgespeeld. Kies een set om hem te bewerken; hij wordt pas afgespeeld als je hem gebruikt.",
+    defaultName: "Standaard",
+    new: "Nieuwe set",
+    inUse: "In gebruik",
+    status: {
+      inUse: "Dit is de set die wordt afgespeeld.",
+      notInUse: "Niet in gebruik. De set die wordt afgespeeld, is {set}.",
+    },
+    use: "Deze set gebruiken",
+    menu: {
+      rename: "Set hernoemen",
+      delete: "Set verwijderen",
+      deleteInUse: "Gebruik eerst een andere set",
+    },
+    dialog: {
+      renameTitle: "Set hernoemen",
+      nameLabel: "Naam",
+      namePlaceholder: "Halloween, Kerst, een verjaardag…",
+      startLabel: "Beginnen met",
+      copy: "Een kopie van {set}",
+      create: "Set maken",
+    },
+    errors: {
+      nameMissing: "Geef de set een naam.",
+      nameTaken: "Er is al een set met die naam.",
+    },
+    deleteDialog: {
+      title: "{set} verwijderen?",
+      confirm: "Set verwijderen",
+    },
+    notifications: {
+      created: "{set} gemaakt. Hij wordt afgespeeld zodra je hem gebruikt.",
+      inUse: "Nu wordt {set} afgespeeld.",
+      renamed: "Set hernoemd",
+      deleted: "{set} verwijderd",
+      goneElsewhere: "De set die je aan het bewerken was, is in een ander tabblad verwijderd.",
+    },
+    wledFx: {
+      title: "Effectensets",
+      introSingle: "Maak voor een gelegenheid zoals Halloween of een verjaardag een extra lijst met effecten, en schakel ernaar over als de dag aanbreekt.",
+      newTitle: "Nieuwe effectenset",
+      empty: "Geen effecten",
+      deleteBody: {
+        one: "De set en het effect erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+        other: "De set en de {count} effecten erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+      },
+      deleteBodyEmpty: "De set heeft geen effecten. Dit kan niet ongedaan worden gemaakt.",
+      cardLabel: "Effectenset in gebruik:",
+      listTitle: "Effecten in {set}",
+    },
+    animations: {
+      title: "Animatiesets",
+      introSingle: "Maak voor een gelegenheid zoals Halloween of een verjaardag een extra lijst met animaties, en schakel ernaar over als de dag aanbreekt.",
+      newTitle: "Nieuwe animatieset",
+      empty: "Geen animaties",
+      deleteBody: {
+        one: "De set en de animatie erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+        other: "De set en de {count} animaties erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+      },
+      deleteBodyEmpty: "De set heeft geen animaties. Dit kan niet ongedaan worden gemaakt.",
+      cardLabel: "Animatieset in gebruik:",
+      listTitle: "Animaties in {set}",
+    },
+    // Geluidensets, not caller-sets: a caller-set is a voice pack, which "Caller-set importeren" brings in.
+    caller: {
+      title: "Geluidensets",
+      introSingle: "Maak een extra lijst met geluiden, bijvoorbeeld voor een tweede caller-set of voor Halloween, en schakel ernaar over wanneer je wilt.",
+      newTitle: "Nieuwe geluidenset",
+      empty: "Geen geluiden",
+      deleteBody: {
+        one: "De set en het geluid erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+        other: "De set en de {count} geluiden erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+      },
+      deleteBodyEmpty: "De set heeft geen geluiden. Dit kan niet ongedaan worden gemaakt.",
+      cardLabel: "Geluidenset in gebruik:",
+      listTitle: "Geluiden in {set}",
+    },
+    soundFx: {
+      title: "Geluidensets",
+      introSingle: "Maak voor een gelegenheid zoals Halloween of een verjaardag een extra lijst met geluiden, en schakel ernaar over als de dag aanbreekt.",
+      newTitle: "Nieuwe geluidenset",
+      empty: "Geen geluiden",
+      deleteBody: {
+        one: "De set en het geluid erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+        other: "De set en de {count} geluiden erin worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+      },
+      deleteBodyEmpty: "De set heeft geen geluiden. Dit kan niet ongedaan worden gemaakt.",
+      cardLabel: "Geluidenset in gebruik:",
+      listTitle: "Geluiden in {set}",
+    },
+  },
 } satisfies Translation<typeof en>;

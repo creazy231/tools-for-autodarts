@@ -402,6 +402,17 @@ Settled in WLED (`locales/*/wled.ts`), for whatever else speaks of a light effec
 
 The card's sentence is the infinitive in both languages, as the Caller's and Sound FX's are, and lists the three events without *for events like* (*bei gameon, takeout und Matchgewinn*, *bij gameon, takeout en een gewonnen wedstrijd*, the last as Sound FX's card says it): *gameon* and *takeout* are trigger names and stay as typed. The longer forms take one line more than the English in columns of 150 to 290 px, and these are never longer in lines at 14, 15 and 16 px. *Wähle „URL“ oder „API“* and *Kies 'URL' of 'API'* say what the English says: the English leaves *PRESET* out of the types a CSV line may name, and the translations stay with it until it is fixed (and then all three change together). The effect dialog's footer holds three buttons, as the text-to-speech dialog's does, and its *Test* button says *Test* in German and Dutch: *Testen* is 18 px wider at 15 px, and the English word is theirs too. At 15 px, with 36 px of padding to a button and 12 px between, that footer is 315 px in English, 352 in German and 345 in Dutch (the text-to-speech one: 328, 380 and 395), and a 390 px phone leaves 310 px, so Checkpoint D measures it where it counts. The primary button is the shared short word, as in the other dialogs: *Hinzufügen* and *Toevoegen*.
 
+Settled in the libraries' sets (`locales/*/library.ts` under `sets`), for whatever else speaks of a list of effects, animations or sounds kept for an occasion, one of which plays:
+
+| English | Where it is from | Deutsch | Nederlands |
+|---|---|---|---|
+| an effect set, an animation set, a sound set | not the site's; *set* as the glossary's *Caller-Set* writes it, the feature's word in front so it isn't read as a darts set (Legs/Sets). German hyphenates (*Effekt-Set*, *Animations-Set*, *Sound-Set*), Dutch writes one word (*effectenset*, *animatieset*, *geluidenset*) | Effekt-Set, Animations-Set, Sound-Set (*das*) | effectenset, animatieset, geluidenset (*de*) |
+| the Caller's sets | *sound sets*, never *caller sets*: a caller set (*Caller-Set*, *caller-set*) is the voice pack *Import a caller set* brings in, which can fill a sound set of its own | Sound-Sets | geluidensets |
+| in use | the site's own *bereits in Benutzung* and *al in gebruik* (`account.email.errors.emailInUse`); the verb follows it (*benutzen*, *gebruiken*) | in Benutzung, benutzen | in gebruik, gebruiken |
+| Default (the first set) | a word of the UI, as *Default (a pair)* above: it is stored as nothing, so it follows the language until the set is renamed | Standard | Standaard |
+| to rename | the site's *Gerät umbenennen*, *Apparaat hernoemen* (`myDevices.link.rename`) | umbenennen | hernoemen |
+| to create (a set) | the site's *Match erstellen*, *Wedstrijd maken* (`errorPage.lobby.expired.createMatch`) | erstellen | maken |
+
 Settled in Quiet Own Darts' row (`locales/*/site.ts`, `site.quietOwnDarts`), which Tools writes into the site's own sound settings, under the site's *Dart landed* (*Dart geworfen*, *Dart geland*). The feature's name is in the table above (*Eigene Darts stummschalten*, *Eigen darts dempen*). The row's note, "Tools for Autodarts", is a brand and stays as it is.
 
 | English | Where it is from | Deutsch | Nederlands |
