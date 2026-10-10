@@ -245,7 +245,16 @@ export interface IConfig {
     disabledGameModes?: GameMode[];
     onlyOnce: boolean;
     boardIds: string[];
+    /** The effects that play: the set in use's (utils/wled-sets.ts). */
     effects: IWled[];
+    /**
+     * Every effect set in the user's order, the set in use by its id and name
+     * only. Absent until a second set is made: until then `effects` is the one
+     * set there is.
+     */
+    sets?: IWledSet[];
+    /** The id of the set in use, whose effects are `effects`. */
+    activeSet?: string;
   };
   gotcha: {
     enabled: boolean;
@@ -454,6 +463,18 @@ export interface IWled {
   json_api: string;
   enabled: boolean;
   triggers: string|string[];
+}
+
+/**
+ * A list of WLED effects kept for an occasion, such as Halloween. One set is in
+ * use at a time, and its effects are `wledFx.effects`: see utils/wled-sets.ts.
+ */
+export interface IWledSet {
+  id: string;
+  /** As typed. "" is the first set, which the settings call "Default" in their language. */
+  name: string;
+  /** Left out on the set in use, whose effects are `wledFx.effects`. */
+  effects?: IWled[];
 }
 
 export type TBoardStatus = BoardStatus | undefined;
