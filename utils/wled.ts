@@ -120,7 +120,14 @@ async function processX01Data(
   if (triggerPresentCB(throwName)) return throwName;
   // After the exact segment, so an effect set up on `m17` or `miss` keeps it.
   if (missed && triggerPresentCB("outside")) return "outside";
-
+  
+  const seatName = gameData.match.players?.[gameData.match.player]?.name;
+  if (seatName) {
+    const playerNameTrigger = seatName.toLowerCase().replace(/\s+/g, "_");
+    if (triggerPresentCB(playerNameTrigger)) {
+      return playerNameTrigger; // Sendet den Spielernamen als Effekt, wenn kein Wurf-Event greift
+    }
+  }
   return null;
 }
 
