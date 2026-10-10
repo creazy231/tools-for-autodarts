@@ -144,13 +144,13 @@ These are the calls made without the user, for review:
 - **Options per set.**
 - **Switching sets from the match page**, or picking up a switch in a match that is already open.
 - **Exporting or importing one set** as CSV or as a file. The settings export carries all of them.
-- **Sets for Sound FX, the Caller or Animations.** `utils/wled-sets.ts` and the picker are written so they could be generalised, but nothing asks for it yet.
+- **Sets for Sound FX, the Caller or Animations.** `utils/wled-sets.ts` knows nothing of the settings and could be generalised, but nothing asks for it yet.
 
 ## Parts
 
 - New:
   - `utils/wled-sets.ts`;
-  - `components/Settings/Library/SetPicker.vue`: the section, its pills and its three dialogs (new, rename, delete).
+  - `components/Settings/Wled/EffectSets.vue`: the section, its pills and its three dialogs (new, rename, delete). Like Colors' parts in `Settings/Colors/`, it is a part of one feature, in a folder named after it.
 - Changed:
   - `utils/storage.ts`: `IWledSet` and the two optional fields;
   - `components/Settings/Wled.vue`: the editor follows the set being viewed, and the card names the set in use;
