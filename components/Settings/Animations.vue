@@ -50,6 +50,18 @@
           <OptionRow :description="t('animations.covers.description')" :title="t('animations.covers.title')">
             <AppRadioGroup v-model="viewMode" :options="VIEW_MODES" button-size="sm" />
           </OptionRow>
+          <OptionRow stacked :title="t('animations.boards.title')">
+            <template #description>
+              {{ t("animations.boards.description") }}
+            </template>
+            <AppTokenInput
+              id="animation-boards"
+              v-model="boardIds"
+              :lowercase="false"
+              :validate="validateBoardId"
+              :placeholder="t('animations.boards.placeholder')"
+            />
+          </OptionRow>
           <OptionRow :description="t('animations.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.animations.disabledGameModes" :intro="t('animations.gameModes.intro')" feature="animations" />
           </OptionRow>
@@ -296,6 +308,7 @@ import AppNotification from "../AppNotification.vue";
 import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSwitch from "../AppSwitch.vue";
 import AppToggle from "../AppToggle.vue";
+import AppTokenInput from "../AppTokenInput.vue";
 
 import ConfirmDeleteButton from "./Library/ConfirmDeleteButton.vue";
 import GameModesField from "./Library/GameModesField.vue";
@@ -328,6 +341,7 @@ const VIEW_MODES = computed(() => [
   { label: t("animations.covers.options.boardOnly"), value: "board-only" },
   { label: t("animations.covers.options.fullPage"), value: "full-page" },
 ]);
+const BOARD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** Drawn until a GIF comes near the view. */
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
 /**
@@ -342,6 +356,12 @@ const LENGTH_ERRORS: Record<"link" | "upload" | "notAnimated", MessageKey> = {
 };
 
 const { config } = useConfig();
+const boardIds = computed<string[]>({
+  get: () => config.value?.animations.boardIds ?? [],
+  set: (ids) => {
+    if (config.value) config.value.animations.boardIds = ids;
+  },
+});
 const imageUrl = browser.runtime.getURL("/images/animations.png");
 const showAnimationModal = ref(false);
 const isEditMode = ref(false);
@@ -485,6 +505,10 @@ function setSeconds(key: "delayStart" | "duration", value: string, min: number) 
   const seconds = Number(value);
   if (!config.value || value === "" || Number.isNaN(seconds)) return;
   config.value.animations[key] = Math.max(min, seconds);
+}
+
+function validateBoardId(id: string): string {
+  return BOARD_ID.test(id) ? "" : t("animations.boards.invalid");
 }
 
 function validateAnimationTrigger(trigger: string): string {

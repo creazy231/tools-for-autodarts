@@ -7,7 +7,7 @@ export default {
     caller: "Außerdem möglich: Punkte 0–180, Bereiche wie 100-180, s1–s20, d1–d20, t1–t20, Kombinationen wie s20_s5_s1 und der Name eines Spielers oder Teams.",
     soundFx: "Außerdem möglich: Punkte 0–180, Bereiche wie 100-180, s/d/t1–20, Kombinationen wie s20_t19_d12 und der Name eines Spielers oder Teams, jeweils mit oder ohne ambient_.",
     wled: "Außerdem möglich: Punkte 0–180, range_100_180, s/d/t1–20, m1–m20, Kombinationen wie t20_t20_t20, target7 und der Name eines Spielers oder Teams.",
-    animations: "Außerdem möglich: Punkte 0–180, Bereiche wie 100-180, s0–s20, d1–d20, t1–t20 und Kombinationen wie s20_s5_d20.",
+    animations: "Außerdem möglich: Punkte 0–180, Bereiche wie 100-180, s0–s20, d1–d20, t1–t20 und Kombinationen wie s20_s5_d20 oder miss_s20_d20, wobei miss für jeden Fehlwurf steht.",
   },
   board: {
     boardStarted: "Das Board wurde gestartet",
@@ -76,6 +76,7 @@ export default {
   },
   animations: {
     gameshot: "Ein Spieler gewinnt das Leg",
+    matchshot: "Ein Spieler gewinnt das Match",
     busted: "Bei einem Spieler ist es ein Bust",
     bull: "Ein Bullseye",
     s25: "Das Single Bull",

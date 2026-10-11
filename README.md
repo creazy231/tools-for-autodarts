@@ -667,6 +667,7 @@ The Animations feature allows you to display custom GIF animations for special e
 - **A length for one animation**: An animation's editor has its own **Show for**, which overrides the option for that GIF; leave it empty to use the option. **Use the GIF's length** fills in how long one run of the GIF takes, read from the file, so it plays exactly once. An animation with a length of its own shows it on its picture
 - **Fit**: Choose between **Cover** (fill the space, cropping the GIF if needed) or **Contain** (show all of it)
 - **Covers**: Choose between **Board only** (the animation covers the dartboard) or **Full page** (it covers the whole page, over a blurred background)
+- **Boards**: Limit animations to specific board IDs. Leave the list empty to allow every board. This is useful in online matches so throws from a remote opponent's board do not trigger your local GIFs
 - **Game modes**: The games animations show in, such as everything but Round the World, where a visit scores little and an animation on low scores would go off all the time. Every game is on until you switch one off
 - **Add**: Upload GIFs, or add one from a link, whose editor previews it. Sorting by trigger and deleting everything are under **⋯**
 - **Search and Filters**: Find an animation by its trigger or link, and narrow the grid with the pills to scores, throws, events, other triggers, or the animations you have switched off. Drag an animation by its handle to reorder the grid, while no search or filter narrows it
@@ -688,11 +689,37 @@ Animations can be triggered by various game events using these tags:
   - `outside`: When a dart lands outside the scoring area
   - `busted`: When a player busts (scores more than needed)
   - `gameshot`: When a player wins the game or leg
+  - `matchshot`: When a player wins the complete match
 
 #### Combination Tags
 You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`
 
 Example: `s20_s5_d20` would trigger when a player throws single 20, then single 5, then double 20. Use `s25` for a single bull and `bull` for a bullseye — e.g. `s25_s25_bull`.
+
+Concrete misses can be used inside combinations as `m1` to `m20`. Use `miss` as a wildcard for any missed dart in that position: `miss_s20_d20`, `s20_miss_d20`, `s20_d20_miss` and `miss_miss_d20` are all valid. If an exact combination and a `miss` wildcard match at the same player-specificity level, the exact combination wins.
+
+#### Player-specific Triggers
+Append a player's stable slot (`player1`, `player2`, ...) or their name to an ordinary trigger. Player names are matched case-insensitively and spaces may be written as spaces or underscores.
+
+Examples:
+- `180_player1`
+- `180_playername`
+- `s20_s5_d20_player2`
+- `miss_s20_d20_player1`
+
+Player-specificity is resolved as **player name → player slot → generic trigger**. Inside the same level, an exact combination takes priority over a `miss` wildcard.
+
+#### Game- and Match-winning Triggers
+`gameshot` fires when a player wins a leg. `matchshot` fires when the complete match is won. Both can be personalized and can target the winning dart or the complete winning visit.
+
+Examples:
+- `gameshot_player1`
+- `gameshot_playername_d20`
+- `gameshot_player1_s25_bull`
+- `matchshot_playername_d1`
+- `matchshot_player2_t20_t15_d20`
+
+Within one winner family, a complete winning visit is checked before the winning dart and the plain winner trigger. At each level, the player name is checked before the stable player slot and the generic trigger. A match win tries the `matchshot` chain first and falls back to the equivalent `gameshot` chain if no `matchshot` animation is configured.
 
 You can add multiple triggers for the same animation by entering each trigger on a new line in the animation settings.
 

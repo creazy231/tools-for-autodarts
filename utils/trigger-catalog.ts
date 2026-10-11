@@ -114,6 +114,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
   ],
   animations: [
     { trigger: "gameshot", descriptionKey: "triggers.animations.gameshot" },
+    { trigger: "matchshot", descriptionKey: "triggers.animations.matchshot" },
     { trigger: "busted", descriptionKey: "triggers.animations.busted" },
     { trigger: "bull", descriptionKey: "triggers.animations.bull" },
     { trigger: "s25", descriptionKey: "triggers.animations.s25" },
