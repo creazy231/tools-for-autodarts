@@ -312,9 +312,14 @@ async function processGameData(
   // A visit that has just started: the player's own effect, or the one that
   // shows whoever is up. With Teams, `names` is the player's and then their
   // team's (utils/team-calls.ts). With *Keep the player's effect between
-  // darts* it also stands in for gameon after a dart with no effect of its own.
-  if (gameData.match.turns[0].throws.length === 0 || config.wledFx.keepTurnEffect) {
+  // darts* it also stands in for gameon after a dart with no effect of its
+  // own, as long as it is an effect: a bot's turn starts with `bot_throw`
+  // whether or not an effect has that trigger.
+  if (gameData.match.turns[0].throws.length === 0) {
     nextEffect = effectOfTheTurn(gameData.match, names);
+  } else if (config.wledFx.keepTurnEffect) {
+    const kept = effectOfTheTurn(gameData.match, names);
+    if (typeof kept !== "string") nextEffect = kept;
   }
 
   const effect: string | null = await gameDataProcessor(gameData, oldGameData, fromWebSocket, isTriggerPresent, {
