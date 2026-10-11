@@ -39,7 +39,9 @@ export interface LedPainter {
 }
 
 /** The biggest panel for `layout` that fits `box`, at a whole number of pixels per LED. */
-export function ledGeometry(layout: Layout, box: { width: number; height: number }): LedGeometry {
+export function ledGeometry(layout: Layout, area: { width: number; height: number }): LedGeometry {
+  // At least one LED at the least pitch with its margin, however little the line measured.
+  const box = { width: Math.max(2 * PITCH.min, area.width), height: Math.max(2 * PITCH.min, area.height) };
   let step = 1;
   while ((Math.ceil(layout.width / step) + 1) * PITCH.min > box.width || (Math.ceil(layout.height / step) + 1) * PITCH.min > box.height) step++;
   const cols = Math.ceil(layout.width / step);

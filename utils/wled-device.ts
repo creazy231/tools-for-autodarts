@@ -159,7 +159,11 @@ export function createDeviceReader(read: ReadUrl, now: () => number = Date.now) 
  * which it refuses; those come through the file editor's path instead.
  */
 function filePath(name: string): string {
-  return /win|sec/.test(name) ? `/edit?func=edit&path=${encodeURIComponent(`/${name}`)}` : `/${encodeURI(name)}`;
+  const file = name.replace(/^\/+/, "");
+  if (/win|sec/.test(file)) return `/edit?func=edit&path=${encodeURIComponent(`/${file}`)}`;
+  // Each part encoded whole, so "?", "#" and "&" in a name stay in the name:
+  // a segment named like a request can't become one.
+  return `/${file.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 /** The bytes of a data URL's base64 body. */
