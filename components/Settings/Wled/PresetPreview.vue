@@ -7,13 +7,15 @@
       {{ state.name ? t("wled.preview.name", { name: state.name, preset: state.target.preset }) : t("wled.preview.unnamed", { preset: state.target.preset }) }}
     </span>
   </span>
-  <span v-else-if="state.status === 'loading' && variant === 'row'" aria-hidden="true" class="block h-[26px] w-[98px] shrink-0 animate-pulse rounded-[3px] bg-white/5" />
+  <!-- While it loads: a spinner the size of the icon a row shows when its device doesn't answer. -->
+  <span v-else-if="state.status === 'loading' && variant === 'row'" :aria-label="message" class="icon-[material-symbols--progress-activity] shrink-0 text-sm motion-safe:animate-spin" role="img" :title="message" />
   <template v-else-if="variant === 'row'">
     <span v-if="state.status === 'unreachable'" :aria-label="t('wled.preview.unreachableShort', { address: host })" class="icon-[material-symbols--wifi-off-rounded] shrink-0 text-sm" role="img" :title="t('wled.preview.unreachableShort', { address: host })" />
     <span v-else-if="state.status === 'missing'" class="min-w-0 truncate text-[var(--ad-warning)]" :title="message">{{ message }}</span>
     <span v-else-if="state.status === 'effects' && state.effects.length" class="min-w-0 truncate" :title="state.effects.join(', ')">{{ state.effects.join(", ") }}</span>
   </template>
-  <span v-else-if="state.status !== 'none'" class="block text-sm" :class="[state.status === 'missing' ? 'text-[var(--ad-warning)]' : 'text-[var(--ad-text-muted)]']">
+  <span v-else-if="state.status !== 'none'" class="flex items-center gap-1.5 text-sm" :class="[state.status === 'missing' ? 'text-[var(--ad-warning)]' : 'text-[var(--ad-text-muted)]']">
+    <span v-if="state.status === 'loading'" aria-hidden="true" class="icon-[material-symbols--progress-activity] shrink-0 motion-safe:animate-spin" />
     {{ message }}
   </span>
 </template>
@@ -57,6 +59,7 @@ const box = computed(() => {
 });
 const host = computed(() => (props.target ? new URL(props.target.address).host : ""));
 const label = computed(() => (props.target ? t("wled.preview.alt", { preset: props.target.preset, address: host.value }) : ""));
+/** What the preview says instead of a picture: also the loading spinner's name. */
 const message = computed(() => {
   const now = state.value;
   if (now.status === "loading") return t("wled.preview.loading");
