@@ -186,8 +186,17 @@ async function processGameData(gameData: IGameData): Promise<void> {
   const combination: string = turn.throws.map(dartName).join("_");
 
   const currentPlayer = findTurnPlayer(match.players, turn.playerId, match.player);
-  const gameWinnerPlayer = findGameWinnerPlayer(match.players, match.gameWinner) ?? currentPlayer;
-  const matchWinnerPlayer = findMatchWinnerPlayer(match.players, match.winner) ?? gameWinnerPlayer;
+  // The player who threw the winning dart is the authoritative winner.
+  // `match.players` can rotate between legs, while turn.playerId stays tied
+  // to the actual checkout visit. gameWinner is only a fallback.
+  const winnerPlayer = currentPlayer ?? findGameWinnerPlayer(match.players, match.gameWinner);
+
+  // A bust invalidates the dart as a scoring event. Do not play its normal
+  // segment, score, combination or outside animation; only the busted trigger.
+  if (busted) {
+    void play("busted", currentPlayer);
+    return;
+  }
 
   // `25` is what setups have always used for the single bull, so it goes on
   // meaning that; `s25` takes over only when an applicable animation waits on it.
@@ -199,16 +208,14 @@ async function processGameData(gameData: IGameData): Promise<void> {
   if (winner) {
     playWinner(
       winnerMatch,
-      winnerMatch ? matchWinnerPlayer : gameWinnerPlayer,
+      winnerPlayer,
       combination,
       throwName,
       currentPlayer,
     );
   }
 
-  if (busted) void play("busted", currentPlayer);
-
-  if (isLastThrow && !busted) {
+  if (isLastThrow) {
     // Cricket counts points only on numbers already closed, so nearly every visit
     // totals 0 however many marks it took, and an animation on `0` played after
     // almost all of them. Like Sound FX, leave Cricket's visit totals out.
@@ -257,14 +264,6 @@ function findGameWinnerPlayer(
   return players[gameWinner];
 }
 
-/** `winner` is the stable match slot exposed by `player.index`. */
-function findMatchWinnerPlayer(
-  players: IPlayer[] | undefined,
-  winner: number,
-): IPlayer | undefined {
-  if (!players || winner < 0) return undefined;
-  return players.find(player => player.index === winner);
-}
 
 interface TriggerScope {
   suffixes: string[];
