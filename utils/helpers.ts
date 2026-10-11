@@ -512,8 +512,9 @@ async function migrateSoundsToIndexedDB(
   return migrated;
 }
 
-// Utility function to fetch resources through the background script (bypassing CORS)
-export async function backgroundFetch(url: string, options: RequestInit = {}): Promise<{
+// Utility function to fetch resources through the background script (bypassing CORS).
+// `timeoutMs` has the background give up on a host that doesn't answer.
+export async function backgroundFetch(url: string, options: RequestInit = {}, { timeoutMs }: { timeoutMs?: number } = {}): Promise<{
   ok: boolean;
   status?: number;
   statusText?: string;
@@ -528,6 +529,7 @@ export async function backgroundFetch(url: string, options: RequestInit = {}): P
       type: "fetch",
       url,
       options,
+      timeoutMs,
     });
 
     // Check if response is undefined (communication issue)

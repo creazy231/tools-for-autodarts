@@ -41,7 +41,7 @@ export default defineBackground({
       if (message.type === "fetch") {
         try {
           // Extract the URL and options from the message
-          const { url, options = {} } = message;
+          const { url, options = {}, timeoutMs } = message;
           console.log("Background fetch:", url);
 
           // For chunked downloads of large files (like ZIP)
@@ -138,8 +138,11 @@ export default defineBackground({
             }
           }
 
-          // For regular (non-chunked) fetches
-          return fetch(url, options)
+          // For regular (non-chunked) fetches. A `timeoutMs` gives up on a host
+          // that doesn't answer, such as a WLED that is switched off.
+          const controller = typeof timeoutMs === "number" && timeoutMs > 0 ? new AbortController() : undefined;
+          const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
+          return fetch(url, controller ? { ...options, signal: controller.signal } : options)
             .then(async (response) => {
               if (response.ok) {
                 // If the response size is too large (>10MB), suggest chunked download
@@ -181,7 +184,8 @@ export default defineBackground({
                 ok: false,
                 error: error instanceof Error ? error.message : String(error),
               };
-            });
+            })
+            .finally(() => clearTimeout(timer));
         } catch (error) {
           console.error("Error in background fetch:", error);
           return {
