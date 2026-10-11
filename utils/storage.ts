@@ -272,6 +272,13 @@ export interface IConfig {
     /** As `animations.disabledGameModes`. */
     disabledGameModes?: GameMode[];
     onlyOnce: boolean;
+    /**
+     * After a dart that sets off no effect of its own, the effect its turn
+     * started with plays again rather than `gameon`: the player's, their
+     * team's, `next_player` or `bot_throw`. Missing is off, as before there
+     * was the option.
+     */
+    keepTurnEffect?: boolean;
     /** The effects that play: the set in use's (utils/library-sets.ts). */
     effects: IWled[];
     /**

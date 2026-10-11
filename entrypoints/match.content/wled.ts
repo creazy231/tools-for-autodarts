@@ -63,6 +63,15 @@ let turnPlayer = "";
  */
 let lastRequest: string | undefined;
 
+/**
+ * The effect the turn up started with, and the turn it was chosen for, for
+ * *Keep the player's effect between darts* (`wledFx.keepTurnEffect`). Chosen
+ * once a turn and settled on one effect, so a player with more than one, or
+ * more than one `next_player` effect, keeps the one their turn started with.
+ * Forgotten whenever WLED starts on a page, as the effects may have changed.
+ */
+let turnEffect: { turn: string; effect: string | IWled } | undefined;
+
 /** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
 function isOnALobbyPage(): boolean {
   return /\/lobb(?:y|ies)\//.test(window.location.href);
@@ -130,6 +139,7 @@ export async function wledFx() {
   try {
     config = await AutodartsToolsConfig.getValue();
     lastRequest = undefined;
+    turnEffect = undefined;
     await loadTeamCalls();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
@@ -244,9 +254,26 @@ export function wledFxOnRemove() {
   settled.cancel();
   announcedWin = undefined;
   turnPlayer = "";
+  turnEffect = undefined;
   playerUpHere = true;
 
   setEffectByTrigger("idle");
+}
+
+/**
+ * What the turn up started with (see {@link turnEffect}): `bot_throw`, the
+ * player's or their team's effect, `next_player` or `gameon`, as
+ * turnStartEffect chooses. A trigger is settled on one of its effects here.
+ * With Teams, a change of who throws is a change of `names`, and chooses again.
+ */
+function effectOfTheTurn(match: IMatch, names: readonly string[]): string | IWled {
+  const turn = [ match.id, match.set, match.leg, match.round, match.player, match.turns[0]?.id, ...names ].join("\n");
+  if (turnEffect?.turn !== turn) {
+    const isBot = match.players?.[match.player]?.cpuPPR !== null;
+    const effect = turnStartEffect(names, isBot, config.wledFx.effects, isTriggerPresent);
+    turnEffect = { turn, effect: typeof effect === "string" ? pickEffect(effect) ?? effect : effect };
+  }
+  return turnEffect.effect;
 }
 
 /**
@@ -284,10 +311,10 @@ async function processGameData(
 
   // A visit that has just started: the player's own effect, or the one that
   // shows whoever is up. With Teams, `names` is the player's and then their
-  // team's (utils/team-calls.ts).
-  if (gameData.match.turns[0].throws.length === 0) {
-    const currentPlayer = gameData.match.players?.[gameData.match.player];
-    nextEffect = turnStartEffect(names, currentPlayer?.cpuPPR !== null, config.wledFx.effects, isTriggerPresent);
+  // team's (utils/team-calls.ts). With *Keep the player's effect between
+  // darts* it also stands in for gameon after a dart with no effect of its own.
+  if (gameData.match.turns[0].throws.length === 0 || config.wledFx.keepTurnEffect) {
+    nextEffect = effectOfTheTurn(gameData.match, names);
   }
 
   const effect: string | null = await gameDataProcessor(gameData, oldGameData, fromWebSocket, isTriggerPresent, {
@@ -337,23 +364,10 @@ function isTriggerPresent(trigger: string): boolean {
 }
 
 /**
- * Set an effect based on the trigger
+ * One of the switched-on effects on `trigger`, picked at random when there are
+ * more; a number also finds the ranges that take it in.
  */
-export async function setEffectByTrigger(trigger: string, wait: boolean = false): Promise<void> {
-  if (!config) {
-    config = await AutodartsToolsConfig.getValue();
-    if (!config.wledFx.effects.length) {
-      console.log("Autodarts Tools: WLED: No effects configured");
-      return;
-    }
-  }
-
-  // A trigger lights nothing while WLED is switched off. The lobby and match
-  // scripts tear WLED down on every page they leave, whether it ever started or
-  // not, and that teardown sends `idle`: it lit the lights with WLED off. The
-  // settings' send and Test buttons go to tryEffect, so they still work.
-  if (!config.wledFx?.enabled) return;
-
+function pickEffect(trigger: string): IWled | undefined {
   // Find all effects that match the trigger
   const matchingEffects = config.wledFx.effects.filter(
     effect => effect.enabled && effect.triggers && effect.triggers.includes(trigger),
@@ -380,14 +394,35 @@ export async function setEffectByTrigger(trigger: string, wait: boolean = false)
     }
   }
 
-  if (!matchingEffects.length) {
+  if (!matchingEffects.length) return undefined;
+
+  // If multiple effects match the trigger, pick a random one
+  return matchingEffects[Math.floor(Math.random() * matchingEffects.length)];
+}
+
+/**
+ * Set an effect based on the trigger
+ */
+export async function setEffectByTrigger(trigger: string, wait: boolean = false): Promise<void> {
+  if (!config) {
+    config = await AutodartsToolsConfig.getValue();
+    if (!config.wledFx.effects.length) {
+      console.log("Autodarts Tools: WLED: No effects configured");
+      return;
+    }
+  }
+
+  // A trigger lights nothing while WLED is switched off. The lobby and match
+  // scripts tear WLED down on every page they leave, whether it ever started or
+  // not, and that teardown sends `idle`: it lit the lights with WLED off. The
+  // settings' send and Test buttons go to tryEffect, so they still work.
+  if (!config.wledFx?.enabled) return;
+
+  const nextEffect = pickEffect(trigger);
+  if (!nextEffect) {
     console.log(`Autodarts Tools: WLED: No effect found for trigger "${trigger}"`);
     return;
   }
-
-  // If multiple effects match the trigger, pick a random one
-  const randomIndex = Math.floor(Math.random() * matchingEffects.length);
-  const nextEffect = matchingEffects[randomIndex];
 
   console.log(`Autodarts Tools: WLED: Found matching effect ${nextEffect.name}`);
   await setEffect(nextEffect, wait);
