@@ -29,7 +29,7 @@ export type SetSection<K extends string, T> = { [P in K]: T[] } & { sets?: Libra
 /**
  * What section `S`'s list `K` holds. Read from that one list: inferred from the
  * section as a whole, it would take every other list in it too (WLED's
- * `boardIds`, say).
+ * `disabledGameModes`, say).
  */
 export type LibraryItem<S, K extends PropertyKey> = K extends keyof S ? (S[K] extends readonly (infer T)[] ? T : never) : never;
 

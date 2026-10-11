@@ -73,7 +73,7 @@ export default {
     lobbyIn: "Een speler neemt deel aan de lobby",
     lobbyOut: "Een speler verlaat de lobby",
     tournamentReady: "Een toernooiwedstrijd van jou kan gereed worden gemeld",
-    otherBoards: "Worpen op een bord dat niet in je lijst Borden staat",
+    otherBoards: "In plaats van elk ander effect zolang iemand aan een ander bord aan de beurt is, zoals een online tegenstander",
   },
   animations: {
     gameshot: "Een speler wint de leg",

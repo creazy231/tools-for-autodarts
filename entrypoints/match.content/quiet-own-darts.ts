@@ -5,6 +5,8 @@ import type { IMatch, IPlayer } from "@/utils/websocket-helpers";
 import { AutodartsToolsGameData } from "@/utils/game-data-storage";
 import { AutodartsToolsConfig } from "@/utils/storage";
 import { getUserIdFromToken } from "@/utils/helpers";
+import { selectedBoard } from "@/utils/lobby-guests";
+import { isPlayerUpInTheRoom } from "@/utils/own-board";
 
 /**
  * Quiet Own Darts — autodarts' dart-landed sound, for the darts you cannot
@@ -120,55 +122,21 @@ function send(quiet: boolean): void {
  *
  * Your own throws are the obvious case, but not the only one: a friend sitting
  * next to you with an account of their own, or a guest typed into the lobby,
- * throws at the same board and is every bit as audible.
+ * throws at the same board and is every bit as audible. Who throws in this
+ * room is utils/own-board.ts's to say, which WLED and Sound FX ask as well: a
+ * player at your board, or one with no board whom you put in the lobby.
  *
- * Who counts as you is decided the way autodarts decides whose turn it is: a
- * player is yours if the account is yours, or if you are the one who put them
- * in the lobby — `hostId`, which is what a guest carries in place of an
- * account. It is also all a guest carries. A guest has no board in the match
- * data, not even an empty field, so going by the board alone left every
- * guest's dart sounding from the board in front of you. The board still
- * settles the friend with an account of their own, who shares your board and
- * nothing else; your own account is the one case that needs no board at all,
- * since a match played without one still knows who you are.
- *
- * A bot is hosted by you as well, and throws nowhere: nothing lands in the
- * room when it throws, so its darts keep the sound.
+ * Unlike the other two, this leaves out a bot. You added it, but it throws
+ * nowhere: nothing lands in the room when it throws, so its darts keep the
+ * sound. Nor does it drop the sound for a player that can't be told yet.
  */
 function isWithinEarshot(match: IMatch): boolean {
   const current = match.players?.[match.player];
   if (!current || isBot(current)) return false;
-  if (isMine(current)) return true;
-
-  const board = ownBoardId(match);
-  return !!board && current.boardId === board;
-}
-
-/** Your own account, or a player you put into the lobby yourself. */
-function isMine(player: IPlayer): boolean {
-  return !!localUserId && (player.userId === localUserId || player.hostId === localUserId);
+  return isPlayerUpInTheRoom(match, localUserId, { url: window.location.href, selected: selectedBoard() }) === true;
 }
 
 /** The site reads a bot off its PPR, and so does this. */
 function isBot(player: IPlayer): boolean {
   return !!player.cpuPPR;
-}
-
-/** The board whose darts this browser is sitting in front of. */
-function ownBoardId(match: IMatch): string | undefined {
-  // Watching a board directly names it in the URL, and that is the board being
-  // watched whoever happens to be signed in.
-  const watched = window.location.href.match(/\/boards\/([0-9a-f-]+)/)?.[1];
-  if (watched) return watched;
-
-  // The first of your players that names a board — your own seat, or a friend
-  // you added who plays on your board with an account of their own. Guests
-  // name none, which is why the field is asked for.
-  const mine = match.players?.find(player => isMine(player) && !isBot(player) && !!player.boardId)?.boardId;
-  if (mine) return mine;
-
-  // Nobody in the match is you — someone else is playing on your board while
-  // you watch. `selectedBoard` is the site's own note of which board this
-  // browser is pointed at.
-  return localStorage.getItem("selectedBoard") ?? undefined;
 }

@@ -16,18 +16,6 @@
           <h3 class="adt-section-title">
             {{ t("wled.sections.options") }}
           </h3>
-          <OptionRow :title="t('wled.boards.title')" stacked>
-            <template #description>
-              <AppTrans :params="{ trigger: 'other' }" path="wled.boards.description" />
-            </template>
-            <AppTokenInput
-              id="wled-boards"
-              v-model="boardIds"
-              :lowercase="false"
-              :placeholder="t('wled.boards.placeholder')"
-              :validate="validateBoardId"
-            />
-          </OptionRow>
           <OptionRow
             :description="t('wled.onlyOnce.description')"
             :title="t('wled.onlyOnce.title')"
@@ -311,7 +299,6 @@ import AppRadioGroup from "../AppRadioGroup.vue";
 import AppSelect from "../AppSelect.vue";
 import AppTextarea from "../AppTextarea.vue";
 import AppToggle from "../AppToggle.vue";
-import AppTokenInput from "../AppTokenInput.vue";
 import AppTrans from "../AppTrans.vue";
 
 import GameModesField from "./Library/GameModesField.vue";
@@ -360,8 +347,6 @@ const TYPE_ICONS: Record<WledType, string> = {
   [WledType.URL]: "icon-[material-symbols--link-rounded]",
   [WledType.API]: "icon-[material-symbols--data-object-rounded]",
 };
-
-const BOARD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const { config } = useConfig();
 const imageUrl = browser.runtime.getURL("/images/ad_wled_logo.png");
@@ -423,13 +408,6 @@ const {
 
 const libraryTitle = computed(() => (several.value ? t("library.sets.wledFx.listTitle", { set: viewedLabel.value }) : t("wled.list.title")));
 
-const boardIds = computed<string[]>({
-  get: () => config.value?.wledFx.boardIds ?? [],
-  set: (ids) => {
-    if (config.value) config.value.wledFx.boardIds = ids;
-  },
-});
-
 const entries = computed<LibraryEntry[]>(() => effects.value.map((effect, index) => {
   const triggers = triggerList(effect.triggers);
   return {
@@ -489,11 +467,6 @@ function describe(effect: IWled): string {
   if (effect.type === WledType.PRESET) return t("wled.list.preset", { n: effect.preset, url: effect.url });
   if (effect.type === WledType.API) return t("wled.list.api", { url: effect.url });
   return effect.url;
-}
-
-/** What the board field says under a chip that is no board ID, said as it validates; "" for a board ID. */
-function validateBoardId(id: string): string {
-  return BOARD_ID.test(id) ? "" : t("wled.boards.invalid");
 }
 
 function moveEffect(from: number, to: number) {

@@ -15,6 +15,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- **WLED** no longer asks for board IDs. The **Boards** list is gone, and WLED tells for itself who throws in your room, the way **Quiet Own Darts** does: you, a guest or a bot you added, and anyone at your board. An effect on `other` plays instead of every other effect while anybody else is up, an online opponent or a guest of theirs, and their board events leave it on; without an effect on `other`, everybody's throws play their own effects, as they did with an empty list. A list you had is removed from your settings
+  - Your guests without a board and your bots no longer count as another board, and a lobby's board events no longer go by whoever was up when the last match ended
+  - With a list but no effect on `other`, an online opponent's takeouts now light up too. Give an effect the trigger `other` to keep them dark
+  - With more than one board on one account, the board autodarts autoscores with in this browser is yours
+  - Checked in Chrome, in a local match of a guest and a bot you added, with an effect on `other`, against a stand-in for WLED: neither turn played `other`, and a frame with an online opponent up did. Headless, WLED, Sound FX and Quiet Own Darts went through every kind of player, before and after the change
+- **Sound FX**'s `opponent_throw` plays for an online opponent's guests too. It goes by the same rule as WLED and Quiet Own Darts, and plays before your account is known for anybody at another board
+- **Quiet Own Darts**, with more than one board on one account: the board autodarts autoscores with in this browser is the one within earshot, and your own darts at your other board keep the sound
 - **WLED**'s *Don't restart a running effect* compares what is sent, not which effect sends it. `next_player` is sent again for the next player, where comparing the effect skipped it whenever nothing else had been sent between two turns, and two effects that send the very same request no longer restart the lights
 
 ### Fixed

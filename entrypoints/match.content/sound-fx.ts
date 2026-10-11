@@ -4,6 +4,8 @@ import { AutodartsToolsConfig, type IConfig, type ISound, type ISoundTTS } from 
 import { getSoundFxFromIndexedDB, getUserIdFromToken, isIndexedDBAvailable, triggerPatterns } from "@/utils/helpers";
 import { onLanguageChange, t } from "@/utils/i18n";
 import { LAYERS } from "@/utils/layers";
+import { selectedBoard } from "@/utils/lobby-guests";
+import { isPlayerUpInTheRoom } from "@/utils/own-board";
 import { settleGameData } from "@/utils/settle-game-data";
 import { elementVolumeWorks, soundCopies } from "@/utils/sound-copies";
 import { DEFAULT_VOLUME, cappedVolume, planVolume, soundVolume } from "@/utils/sound-volume";
@@ -16,7 +18,7 @@ let lobbyDataWatcherUnwatch: any;
 let boardDataWatcherUnwatch: any;
 let tournamentReadyUnwatch: (() => void) | null = null;
 let config: IConfig;
-// Cached id of the local user (decoded from the auth token), used to tell own throws from opponent throws
+// Cached id of the local user (decoded from the auth token), which tells your guests and bots from an opponent's
 let localUserId: string | null = null;
 
 // Audio player for Safari compatibility
@@ -846,20 +848,14 @@ async function processGameData(gameData: IGameData, oldGameData: IGameData, from
     playSound("bot_throw", 2);
   }
 
-  // Play the opponent_throw sound when a remote opponent (a real player that isn't you) throws a dart.
-  // Bots are covered by bot_throw above, and your own throws are intentionally skipped so this doesn't
-  // double up with the throw sound coming from your physical board.
-  if (isNewThrow && !isBot && currentPlayer?.userId) {
+  // Play the opponent_throw sound for a dart thrown somewhere else: an online opponent, or a guest of
+  // theirs (utils/own-board.ts). Bots are covered by bot_throw above, and a dart thrown in this room,
+  // yours, your guest's or a visiting friend's, is skipped: your physical board already makes the noise.
+  if (isNewThrow && !isBot && currentPlayer) {
     if (!localUserId) localUserId = await getUserIdFromToken();
-    if (localUserId && currentPlayer.userId !== localUserId) {
-      // A guest with their own account playing on your board (e.g. a friend visiting) throws on the
-      // same physical board as you, so that board already makes the throw noise. Only fire for a truly
-      // remote opponent on a different board — compare the thrower's board to the local user's board.
-      const localBoardId = gameData.match.players?.find(player => player.userId === localUserId)?.boardId;
-      const isSameBoardAsLocalUser = !!localBoardId && currentPlayer.boardId === localBoardId;
-      if (!isSameBoardAsLocalUser) {
-        playSound("opponent_throw", 2);
-      }
+    const here = isPlayerUpInTheRoom(gameData.match, localUserId, { url: window.location.href, selected: selectedBoard() });
+    if (here === false) {
+      playSound("opponent_throw", 2);
     }
   }
 

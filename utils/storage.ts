@@ -272,7 +272,6 @@ export interface IConfig {
     /** As `animations.disabledGameModes`. */
     disabledGameModes?: GameMode[];
     onlyOnce: boolean;
-    boardIds: string[];
     /** The effects that play: the set in use's (utils/library-sets.ts). */
     effects: IWled[];
     /**
@@ -847,7 +846,6 @@ export const defaultConfig: IConfig = {
   wledFx: {
     enabled: false,
     onlyOnce: true,
-    boardIds: [],
     effects: [
       {
         name: "gameon",
@@ -892,7 +890,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 17;
+const CONFIG_VERSION = 18;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -906,6 +904,17 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * WLED's Boards list is gone, and its saved board IDs with it. WLED tells
+       * for itself who throws in your room now (utils/own-board.ts).
+       */
+      18: (config: any) => {
+        if (!config.wledFx) return config;
+        const wledFx = { ...config.wledFx };
+        delete wledFx.boardIds;
+        return { ...config, wledFx };
+      },
+
       /**
        * How long Darts Zoom's camera close-ups wait for their dart's picture is
        * a setting now. Saved configs start at the second and a half it has

@@ -73,7 +73,7 @@ export default {
     lobbyIn: "Ein Spieler tritt der Lobby bei",
     lobbyOut: "Ein Spieler verlässt die Lobby",
     tournamentReady: "Ein Turnier-Match von dir kann als bereit markiert werden",
-    otherBoards: "Würfe auf einem Board, das nicht in deiner Boards-Liste steht",
+    otherBoards: "Statt jedes anderen Effekts, solange jemand an einem anderen Board dran ist, etwa ein Online-Gegner",
   },
   animations: {
     gameshot: "Ein Spieler gewinnt das Leg",

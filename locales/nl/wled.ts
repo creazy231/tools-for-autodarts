@@ -9,12 +9,6 @@ export default {
   sections: {
     options: "Opties",
   },
-  boards: {
-    title: "Borden",
-    description: "Effecten worden alleen afgespeeld bij worpen op deze borden, en op elk bord zolang de lijst leeg is. Een effect op <code>{trigger}</code> wordt afgespeeld bij worpen op borden die niet in de lijst staan.",
-    placeholder: "Plak een bord-ID en druk op Enter",
-    invalid: "Dat lijkt niet op een bord-ID. Een bord-ID ziet er zo uit: 6a501a61-53a5-468a-a56a-17134ace3099.",
-  },
   onlyOnce: {
     title: "Een lopend effect niet opnieuw starten",
     description: "Een effect dat al actief is, wordt niet nog eens verzonden, zodat de verlichting niet opnieuw begint.",

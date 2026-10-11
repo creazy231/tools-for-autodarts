@@ -89,10 +89,10 @@ export default {
     /** "Mark ready" is the tournament page's own button. */
     tournamentReady: "A tournament match of yours is ready to mark ready",
     /**
-     * "Boards" is the name of the WLED panel's list of boards. The trigger is `other`,
-     * but a key called `other` would make this whole group look like a plural.
+     * The trigger is `other`, but a key called `other` would make this whole group look like a
+     * plural. "Another board" takes in an online opponent's guests too: they throw at their host's.
      */
-    otherBoards: "Throws on a board that isn't in your Boards list",
+    otherBoards: "Instead of every other effect while someone at another board is up, such as an online opponent",
   },
   animations: {
     gameshot: "A player wins the leg",
