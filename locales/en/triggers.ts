@@ -17,9 +17,14 @@ export default {
   },
   /** The board's events, one set for every feature: Sound FX offers them with `ambient_` in front. */
   board: {
+    boardStarting: "The board is about to start",
     boardStarted: "The board has started",
+    boardStopping: "The board is about to stop",
     boardStopped: "The board has stopped or disconnected",
     manualResetDone: "After a manual reset, and when a new round starts",
+    throw: "A dart is detected",
+    lastThrow: "The last dart of a visit is detected",
+    takeout: "While takeout is in progress",
     takeoutFinished: "Takeout has finished",
     calibrationStarted: "Calibration has started",
     calibrationFinished: "Calibration has finished",
@@ -29,9 +34,17 @@ export default {
     hit: "Cricket: a hit on a target that is still open",
     miss: "Cricket: any other number, or a target everyone has closed",
   },
+  /** The other games' triggers, offered by the Caller, Sound FX (with `ambient_` in front) and WLED. */
+  variants: {
+    luckynumber: "A visit that scored leaves a number of one repeated digit, such as 111",
+    gotcha: "Gotcha: a dart sends another player's score back to zero",
+    killerBecameKiller: "Killer: a player becomes a killer",
+    killerKilled: "Killer: a player is out",
+  },
   caller: {
-    gameon: "At the start of a new game",
+    gameon: "At the start of each leg",
     gameshot: "A player wins the leg",
+    matchshot: "A player wins the match (gameshot when there is no sound for it)",
     busted: "A player busts",
     /** `busted` is a trigger name: it stays as it is. */
     partnerRule: "Teams' partner rule takes a checkout back (busted when there is no sound for it)",
@@ -45,7 +58,7 @@ export default {
     triple: "Said before a triple",
   },
   soundFx: {
-    ambientGameon: "At the start of a new game",
+    ambientGameon: "At the start of each leg",
     ambientGameshot: "A player wins the leg",
     ambientMatchshot: "A player wins the match",
     ambientBusted: "A player busts",
@@ -67,7 +80,6 @@ export default {
   wled: {
     gameon: "At the start of each turn, and when nothing else matches",
     nextPlayer: "The next player is up and has no effect of their own",
-    takeout: "While takeout is in progress",
     gameshot: "A player wins the leg",
     matchshot: "A player wins the match",
     busted: "A player busts",
@@ -79,10 +91,6 @@ export default {
     outside: "Any missed dart, when there is no effect on the miss itself",
     /** "Miss" is the site's keypad button, "bouncer" its correction. */
     miss: "A dart entered with Miss, or corrected to a bouncer",
-    throw: "A dart is detected",
-    lastThrow: "The last dart of a visit is detected",
-    boardStarting: "The board is about to start",
-    boardStopping: "The board is about to stop",
     botThrow: "A bot throws a dart",
     lobbyIn: "A player joins the lobby",
     lobbyOut: "A player leaves the lobby",
@@ -96,9 +104,12 @@ export default {
   },
   animations: {
     gameshot: "A player wins the leg",
+    matchshot: "A player wins the match (gameshot when there is no animation for it)",
     busted: "A player busts",
+    partnerRule: "Teams' partner rule takes a checkout back (busted when there is no animation for it)",
     bull: "A bullseye",
     s25: "The single bull",
     outside: "A dart outside the scoring area",
+    miss: "A missed dart, when there is no animation on the miss itself (m20)",
   },
 };

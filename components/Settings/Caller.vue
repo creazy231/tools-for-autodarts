@@ -27,6 +27,9 @@
           <OptionRow :description="t('caller.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.caller.disabledGameModes" :intro="t('caller.gameModes.intro')" feature="caller" />
           </OptionRow>
+          <OptionRow :description="t('caller.priority.description')" :title="t('triggerPriorities.title')">
+            <PriorityOrderField v-model="config.caller.priorityOrder" :intro="t('caller.priority.intro')" feature="caller" />
+          </OptionRow>
         </section>
 
         <LibrarySets
@@ -319,6 +322,7 @@ import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";
 import PlayButton from "./Library/PlayButton.vue";
+import PriorityOrderField from "./Library/PriorityOrderField.vue";
 import SoundDialog from "./Library/SoundDialog.vue";
 import SoundSource from "./Library/SoundSource.vue";
 import TtsDialog from "./Library/TtsDialog.vue";

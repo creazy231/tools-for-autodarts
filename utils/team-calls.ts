@@ -5,11 +5,11 @@ import type { CallContext, LineupStore, ShiftStore } from "@/utils/teams";
 import { getUserIdFromToken } from "@/utils/helpers";
 import { AutodartsToolsConfig, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom, AutodartsToolsTeamShifts } from "@/utils/storage";
 import { roomOf, screenTeams } from "@/utils/team-room";
-import { legWinCallNames, lineupOf, matchWinCallNames, normalizeTeams, shiftsOf, turnCallNames } from "@/utils/teams";
+import { lineupOf, matchWinCallNames, normalizeTeams, shiftsOf, turnCallNames } from "@/utils/teams";
 
 /**
  * The names the Caller, Sound FX and WLED call a seat by. The rules are
- * utils/teams.ts's (`turnCallNames` and the two for wins); this keeps what
+ * utils/teams.ts's (`turnCallNames`, and `matchWinCallNames` for a match won); this keeps what
  * they need current for the page: the saved teams, whose guests the shared
  * seats are, the tap-to-correct shifts and the own-score lineups. With Teams
  * off, every seat is only its own name, as it always was.
@@ -63,11 +63,6 @@ function context(match: IMatch): CallContext {
 /** Whoever is up: the player, then their team. */
 export function turnNames(match: IMatch): string[] {
   return turnCallNames(match, context(match));
-}
-
-/** A leg won: the player who checked out, then their team. */
-export function legWinNames(match: IMatch): string[] {
-  return legWinCallNames(match, context(match));
 }
 
 /** A match won: the team, then the player who checked out. */

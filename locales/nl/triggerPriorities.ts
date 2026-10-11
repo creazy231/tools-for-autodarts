@@ -1,0 +1,45 @@
+import type en from "../en/triggerPriorities";
+import type { Translation } from "../../utils/i18n/types";
+
+export default {
+  title: "Prioriteit",
+  buttonLabel: "Prioriteit: {summary}",
+  summary: {
+    standard: "Standaard",
+    custom: "Aangepast",
+  },
+  howTo: "Hoger in de lijst wint als meerdere triggers bij hetzelfde moment passen. Sleep een rij of gebruik de pijlen.",
+  moveUp: "{level} omhoog",
+  moveDown: "{level} omlaag",
+  reset: "Standaard herstellen",
+  levels: {
+    matchshot: "Gewonnen wedstrijd",
+    gameshot: "Game shot",
+    busted: "Bust",
+    playerName: "Naam van de speler",
+    nextPlayer: "Volgende speler",
+    gameon: "Begin van een leg",
+    combo: "Darts van de beurt",
+    total: "Totaal van de beurt",
+    checkout: "Checkout afroepen",
+    checkoutCommon: "Checkout in delen afroepen",
+    variant: "Per spel",
+    dart: "Losse dart",
+    thrower: "Dart van een bot of tegenstander",
+  },
+  hints: {
+    matchshot: "De dart die de wedstrijd wint",
+    gameshot: "De dart die een leg wint",
+    busted: "Een bust, of een checkout die de partnerregel van Teams terugneemt",
+    playerName: "Wie aan de beurt is, bij naam, en na een gewonnen wedstrijd de winnaar",
+    nextPlayer: "Een nieuwe beurt als er niets is voor de naam",
+    gameon: "Het begin van een leg en van de bull-off",
+    combo: "De drie darts van een beurt samen",
+    total: "Wat een beurt heeft gescoord",
+    checkout: "Wat er nog uit te gooien is, in één afroep",
+    checkoutCommon: "Wat er nog over is, in twee delen afgeroepen",
+    variant: "Een getal van gelijke cijfers als rest (111, 333), raak of mis in Cricket, het doel van een trainingsspel, Gotcha, Killer",
+    dart: "Elke dart, en wat er invalt voor een dart waar niets voor is",
+    thrower: "Een dart van een bot, of van een tegenstander op een ander bord",
+  },
+} satisfies Translation<typeof en>;

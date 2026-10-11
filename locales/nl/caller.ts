@@ -26,6 +26,10 @@ export default {
     description: "De spellen waarin wordt afgeroepen.",
     intro: "De Caller roept alleen af in de spellen die hier aan staan.",
   },
+  priority: {
+    description: "Welke afroep wint als er meerdere passen, en in welke volgorde wordt afgeroepen.",
+    intro: "De Caller roept de triggers van een moment van boven naar beneden af, één van elke soort.",
+  },
   list: {
     emptyText: "Importeer een kant-en-klare Caller-set, upload eigen opnamen of genereer ze uit tekst.",
   },

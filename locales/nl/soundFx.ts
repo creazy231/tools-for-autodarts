@@ -14,6 +14,10 @@ export default {
     description: "De spellen waarin geluiden worden afgespeeld. Lobby- en toernooigeluiden worden in elk spel afgespeeld.",
     intro: "Sound FX speelt alleen geluiden af in de spellen die hier aan staan.",
   },
+  priority: {
+    description: "Welk geluid wint als er meerdere passen, en in welke volgorde ze worden afgespeeld.",
+    intro: "Sound FX speelt de triggers van een moment van boven naar beneden af, één van elke soort.",
+  },
   list: {
     emptyText: "Upload eigen geluiden, voeg er een toe via een link of genereer er een uit tekst.",
   },

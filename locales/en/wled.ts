@@ -27,6 +27,11 @@ export default {
     description: "The games it lights up in. Lobby and tournament effects play in any game.",
     intro: "WLED only lights up in the games switched on here.",
   },
+  /** The row is headed triggerPriorities.title. */
+  priority: {
+    description: "Which effect wins when several fit.",
+    intro: "WLED lights the effect of the highest trigger in this list that has one.",
+  },
   list: {
     title: "Effects",
     searchPlaceholder: "Search effects by name, trigger or address",

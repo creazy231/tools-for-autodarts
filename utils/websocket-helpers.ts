@@ -5,6 +5,7 @@ import { AutodartsToolsLobbyData } from "./lobby-data-storage";
 
 import type { RoomStore } from "@/utils/team-room";
 import type { AdtTeams, LineupStore, TeamViewContext } from "@/utils/teams";
+import type { IGameEvent, IGameEventBatch } from "@/utils/game-events/types";
 
 import { AutodartsToolsConfig, AutodartsToolsGlobalStatus, AutodartsToolsTeamLineups, AutodartsToolsTeamRoom } from "@/utils/storage";
 import { roomOf, screenTeams, tokenAccount } from "@/utils/team-room";
@@ -367,7 +368,93 @@ function flagVoidedVisit(match: IMatch | undefined = lastSeen): void {
   else document.documentElement.removeAttribute(VOID_CHECKOUT_ATTR);
 }
 
-export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string) {
+/**
+ * A match's game events (utils/game-events/types.ts), held back for the state
+ * frame they belong to. The server sends them a moment before that frame, so
+ * they are stored with it, as `IGameData.batch`, and whoever reads the state
+ * reads what happened in the same update.
+ */
+const pendingEvents = new Map<string, IGameEvent[]>();
+/** Events older than this when a state comes were for a state that never came. */
+const EVENT_MAX_AGE_MS = 5000;
+/** A new id for every frame stored, unique to this page: a reload starts the count again. */
+const batchPage = Math.random().toString(36).slice(2, 8);
+let batchCount = 0;
+/** The match whose state was stored last, for events on a board page, whose address names no match. */
+let lastStateMatchId: string | undefined;
+/**
+ * A match's frames are stored one after the other. Each waits on storage, and
+ * two in quick succession used to land in either order; with the events going
+ * with them, the order is what says which dart they were about.
+ */
+let matchFrames: Promise<unknown> = Promise.resolve();
+
+/** `<matchId>.<kind>`: the frame's match and what sort of frame it is. */
+function matchTopic(topic: string | undefined): { matchId?: string; kind?: string } {
+  const dot = topic?.indexOf(".") ?? -1;
+  return topic && dot > 0 ? { matchId: topic.slice(0, dot), kind: topic.slice(dot + 1) } : {};
+}
+
+function bufferGameEvent(matchId: string | undefined, data: IGameEvent): void {
+  if (!matchId || !data?.event) return;
+  const pageMatch = window.location.href.match(/matches\/([0-9a-f-]+)/)?.[1];
+  if (matchId !== pageMatch && matchId !== lastStateMatchId) return;
+
+  const events = pendingEvents.get(matchId) ?? [];
+  events.push({ event: data.event, matchId, body: data.body, receivedAt: Date.now() });
+  pendingEvents.set(matchId, events.slice(-20));
+}
+
+function takeGameEvents(matchId: string): IGameEvent[] {
+  const events = pendingEvents.get(matchId) ?? [];
+  pendingEvents.delete(matchId);
+  const now = Date.now();
+  return events.filter(event => now - (event.receivedAt ?? now) <= EVENT_MAX_AGE_MS);
+}
+
+async function storeMatchFrame(data: IMatch, events: IGameEvent[]): Promise<void> {
+  if (data.body) return;
+
+  const id = window.location.href.match(/matches\/([0-9a-f-]+)/)?.[1];
+  const playersBoard = data.players?.find(player => player.boardId === window.location.href.match(/boards\/([0-9a-f-]+)/)?.[1]);
+  if ((id !== data.id && !playersBoard) && data.activated === undefined) return;
+
+  const gameData = await AutodartsToolsGameData.getValue();
+  await loadTeamsContext();
+  const batch: IGameEventBatch = { id: `${batchPage}:${++batchCount}`, events };
+  if (data.activated !== undefined) {
+    // Merge activated state with existing match data
+    await AutodartsToolsGameData.setValue({
+      ...gameData,
+      match: gameData.match
+        ? {
+            ...gameData.match,
+            activated: data.activated,
+          }
+        : {
+            ...data,
+          },
+      batch,
+    });
+  } else {
+    // Replace entire match data
+    lastStateMatchId = data.id;
+    const seen = asTeamsSee(data);
+    await AutodartsToolsGameData.setValue({
+      ...gameData,
+      match: seen,
+      batch,
+    });
+    flagVoidedVisit(seen);
+  }
+}
+
+/**
+ * A frame from the site's socket, by its channel. `topic` is the frame's
+ * `<id>.<kind>`; without one (the match state fetched at page load) a match
+ * frame is taken as a state.
+ */
+export async function processWebSocketMessage(channel: string, data: ILobbies | IMatch | IBoard | string, topic?: string) {
   // Frames that only name their topic, as some at a match's start do, carry nothing to act on.
   if (data == null) return;
   // do a switch on the channel
@@ -385,37 +472,21 @@ export async function processWebSocketMessage(channel: string, data: ILobbies | 
       break;
     }
     case "autodarts.matches": {
-      data = data as IMatch;
-      if (data.body) return;
+      const { matchId, kind } = matchTopic(topic);
 
-      const id = window.location.href.match(/matches\/([0-9a-f-]+)/)?.[1];
-      const playersBoard = data.players?.find(player => player.boardId === window.location.href.match(/boards\/([0-9a-f-]+)/)?.[1]);
-      if ((id !== data.id && !playersBoard) && (data as IMatch).activated === undefined) return;
-
-      const gameData = await AutodartsToolsGameData.getValue();
-      await loadTeamsContext();
-      if ((data as IMatch).activated !== undefined) {
-        // Merge activated state with existing match data
-        AutodartsToolsGameData.setValue({
-          ...gameData,
-          match: gameData.match
-            ? {
-                ...gameData.match,
-                activated: (data as IMatch).activated,
-              }
-            : {
-                ...data as IMatch,
-              },
-        });
-      } else {
-        // Replace entire match data
-        const seen = asTeamsSee(data as IMatch);
-        AutodartsToolsGameData.setValue({
-          ...gameData,
-          match: seen,
-        });
-        flagVoidedVisit(seen);
+      if (kind === "game-events") {
+        bufferGameEvent(matchId ?? (data as unknown as IGameEvent).matchId, data as unknown as IGameEvent);
+        break;
       }
+      // `.events`, `.referee` and the like carry nothing stored.
+      if (kind && kind !== "state" && kind !== "corrections") break;
+
+      // Taken now, before anything waits: the next visit's events can arrive
+      // while this frame is still being stored, and must not go with it.
+      const events = kind === "state" && matchId ? takeGameEvents(matchId) : [];
+      const stored = matchFrames.then(() => storeMatchFrame(data as IMatch, events));
+      matchFrames = stored.catch(() => undefined);
+      await stored;
 
       break;
     }

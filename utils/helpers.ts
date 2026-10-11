@@ -3,6 +3,7 @@ import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 import type { IConfig, ISound } from "@/utils/storage";
 
 import { GameMode } from "@/utils/game-modes";
+import { triggerPatterns } from "@/utils/game-events/patterns";
 
 export const isX01 = () => document.getElementById("ad-ext-game-variant")?.textContent === GameMode.X01;
 export const isBullOff = () => document.getElementById("ad-ext-game-variant")?.textContent === "Bull-off";
@@ -960,32 +961,8 @@ export async function getAllAnimationsFromIndexedDB(): Promise<Array<{ id: strin
   }
 }
 
-/**
- * Define regex patterns for each trigger type
- */
-export const triggerPatterns = {
-  // Points: 0 to 180
-  points: /^(180|1[0-7][0-9]|[1-9][0-9]|[0-9])$/,
-
-  // Ranges: 100-140 or range_100_140
-  ranges: /^(?:range_)?(180|1[0-7][0-9]|[1-9][0-9]|[0-9])[-_](180|1[0-7][0-9]|[1-9][0-9]|[0-9])$/,
-
-  // Singles: s0 to s20 and 25
-  singles: /^s(1[0-9]|20|[0-9]|25)$/,
-
-  // Doubles: d1 to d20
-  doubles: /^d(1[0-9]|20|[1-9])$/,
-
-  // Triples: t1 to t20
-  triples: /^t(1[0-9]|20|[1-9])$/,
-
-  // Special events
-  specialEvents: /^(bull|outside|busted|gameshot)$/,
-
-  // Combination tags: Format: [first dart]_[second dart]_[third dart]
-  // Each dart can be a single, double, triple, or bull
-  dartPattern: /^(s(1[0-9]|20|[0-9]|25)|d(1[0-9]|20|[1-9])|t(1[0-9]|20|[1-9])|bull)$/,
-};
+/** The shapes a trigger can take, kept with the matcher that reads them. */
+export { triggerPatterns };
 
 /**
  * Validates animation triggers according to the supported formats
@@ -1027,6 +1004,21 @@ export function validateAnimationTriggers(triggers: string[]): {
       continue;
     }
 
+    // Triggers joined with `+` (utils/game-events/match.ts): at least one part
+    // must be a trigger of its own, and the others may be whoever is up, their
+    // seat or the game (`t20+alice`, `gameshot+player2`, `gameshot+x01`), which
+    // only ever count joined. A name may hold underscores: `+` is what joins.
+    if (trimmedTrigger.includes("+")) {
+      const parts = trimmedTrigger.split("+").map(part => part.trim());
+      const ownParts = parts.filter(part => part && validateAnimationTriggers([ part ]).validTriggers.length);
+      if (parts.every(Boolean) && ownParts.length) {
+        validTriggers.push(trimmedTrigger);
+      } else {
+        invalidTriggers.push(trimmedTrigger);
+      }
+      continue;
+    }
+
     // Check if it's a valid combination
     if (trimmedTrigger.includes("_")) {
       if (isValidCombination(trimmedTrigger)) {
@@ -1043,6 +1035,7 @@ export function validateAnimationTriggers(triggers: string[]): {
       || triggerPatterns.singles.test(trimmedTrigger)
       || triggerPatterns.doubles.test(trimmedTrigger)
       || triggerPatterns.triples.test(trimmedTrigger)
+      || triggerPatterns.misses.test(trimmedTrigger)
       || triggerPatterns.specialEvents.test(trimmedTrigger)
       || triggerPatterns.ranges.test(trimmedTrigger)
     ) {

@@ -242,6 +242,27 @@ qsa(SELECTORS.lobby.playerRows)           // querySelectorAll with fallback
 detectSiteVersion()                       // "v1" | "v2"
 ```
 
+## Game Events Replay
+
+`replay-game-events.ts` runs a recorded autodarts WebSocket log through the
+derivation the Caller, Sound FX, WLED and Animations share
+(`utils/game-events/derive.ts`), the way the extension feeds it: game events
+held back for the next state frame of their match, a state without events
+compared with the one before, a correction merged as `activated`. It prints
+every update with its triggers and sums them up at the end, so a change to the
+derivation can be checked against real games without a board.
+
+```bash
+npx tsx scripts/replay-game-events.ts <log> [--quiet]
+```
+
+Run it from the repo root, so `@/` resolves. The log is one frame per line,
+`<ISO time> TEXT <frame JSON>`, as the WebSocket capture of
+`darts-board-controler-py` writes it (`ws-messages*.log`). Names are the seats'
+own, nobody is signed in, and once-only triggers are marked `*` but not
+filtered. Design and what to compare the counts with:
+[`docs/superpowers/specs/2026-10-11-game-event-processor-design.md`](../docs/superpowers/specs/2026-10-11-game-event-processor-design.md).
+
 ## Firefox for Android XPI
 
 `scripts/android-xpi.ts` turns the Firefox store zip into

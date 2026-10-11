@@ -35,6 +35,11 @@ export default {
     description: "The games it calls in.",
     intro: "The Caller only calls in the games switched on here.",
   },
+  /** The row is headed triggerPriorities.title. */
+  priority: {
+    description: "Which call wins when several fit, and the order they are called in.",
+    intro: "The Caller calls a moment's triggers from the top of this list down, one of each kind.",
+  },
   list: {
     emptyText: "Import a ready-made caller set, upload recordings of your own, or generate them from text.",
   },

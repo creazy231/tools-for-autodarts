@@ -1,12 +1,13 @@
 import type { BoardStatus } from "@/utils/types";
 import type { RoomStore } from "@/utils/team-room";
 import type { LibrarySet } from "@/utils/library-sets";
+import type { TriggerLevel } from "@/utils/game-events/priorities";
+import type { GameMode } from "@/utils/game-modes";
 
 import { defaultColors, normalizeColors } from "@/utils/colors";
 import { renameSettings } from "@/utils/config-renames";
 import { defaultInstantReplay, normalizeInstantReplay } from "@/utils/instant-replay";
 import { type LineupStore, type SavedTeam, type ShiftStore, normalizeTeams, withOnlineTeams } from "@/utils/teams";
-import type { GameMode } from "@/utils/game-modes";
 
 export interface IConfig {
   version: number;
@@ -138,6 +139,13 @@ export interface IConfig {
      * mode is switched off.
      */
     disabledGameModes?: GameMode[];
+    /**
+     * Which triggers count for more, most important first: see
+     * utils/game-events/priorities.ts, the only reader. Missing is the
+     * feature's default order, so nothing was migrated; it is only stored
+     * while the order differs from it.
+     */
+    priorityOrder?: TriggerLevel[];
     duration?: number;
     delayStart?: number;
     objectFit?: "cover" | "contain";
@@ -157,6 +165,8 @@ export interface IConfig {
     enabled: boolean;
     /** As `animations.disabledGameModes`. */
     disabledGameModes?: GameMode[];
+    /** As `animations.priorityOrder`. */
+    priorityOrder?: TriggerLevel[];
     callEveryDart: boolean;
     callCheckout: boolean;
     preferCombinedThrows: boolean;
@@ -175,6 +185,8 @@ export interface IConfig {
     enabled: boolean;
     /** As `animations.disabledGameModes`. */
     disabledGameModes?: GameMode[];
+    /** As `animations.priorityOrder`. */
+    priorityOrder?: TriggerLevel[];
     /** The sounds that play: the set in use's. */
     sounds: ISound[];
     /**
@@ -271,6 +283,8 @@ export interface IConfig {
     enabled: boolean;
     /** As `animations.disabledGameModes`. */
     disabledGameModes?: GameMode[];
+    /** As `animations.priorityOrder`. */
+    priorityOrder?: TriggerLevel[];
     onlyOnce: boolean;
     /**
      * After a dart that sets off no effect of its own, the effect its turn
@@ -905,7 +919,7 @@ export const defaultConfig: IConfig = {
  * Migrations run once, as soon as this item is defined, and `getValue` waits
  * for them, so no caller has to know about them.
  */
-const CONFIG_VERSION = 18;
+const CONFIG_VERSION = 19;
 
 export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.defineItem(
   "local:config-2-0-0",
@@ -919,6 +933,14 @@ export const AutodartsToolsConfig: WxtStorageItem<IConfig, any> = storage.define
      * current type at all — so these are typed loosely on purpose.
      */
     migrations: {
+      /**
+       * A win for one player or team is `gameshot+<name>` now, not
+       * `gameshot_<name>`, which a name with underscores made ambiguous; see
+       * renameTrigger in utils/config-renames.ts. The sets not in use are
+       * carried over as well.
+       */
+      19: (config: any) => renameSettings(config),
+
       /**
        * WLED's Boards list is gone, and its saved board IDs with it. WLED tells
        * for itself who throws in your room now (utils/own-board.ts).
