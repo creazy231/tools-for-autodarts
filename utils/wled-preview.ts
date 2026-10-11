@@ -6,10 +6,13 @@ import { type IWled, WledType } from "@/utils/storage";
  * WLED previews: which preset an effect plays, and that preset drawn the way
  * the device draws it, from the device's own presets.json and GIFs.
  *
- * Only what files hold is drawn: a GIF on *Image* (effect 53), a copy of
- * another segment (*Copy Segment*, 77), a plain colour (*Solid*, 0), and dark
- * segments. Every other effect WLED computes as it goes, so a preset with one
- * of those is named rather than drawn (isDrawable, ownEffects).
+ * Only what files hold is drawn: a GIF on *Image*, a copy of another segment
+ * (*Copy Segment*), a plain colour (*Solid*), and dark segments. Every other
+ * effect WLED computes as it goes, so a preset with one of those is named
+ * rather than drawn (isDrawable, ownEffects). Effects are told by their names
+ * in the device's /json/eff, as ids move between versions: Image is 53 and
+ * Copy Segment 77 on WLED 16, while on 0.15 53 is unused and 77 is Meteor
+ * Smooth. Without the names, 16's ids are taken.
  *
  * Nothing here reads or draws: utils/wled-device.ts reads the device, and
  * utils/led-canvas.ts draws the pictures this makes.
@@ -71,6 +74,9 @@ export const FX_SOLID = 0;
 export const FX_IMAGE = 53;
 export const FX_COPY = 77;
 
+/** The drawn effects' names by their WLED 16 ids, for a device whose /json/eff couldn't be read. */
+const DEFAULT_NAMES: Record<number, string> = { [FX_SOLID]: "Solid", [FX_IMAGE]: "Image", [FX_COPY]: "Copy Segment" };
+
 /** WLED's colour for a segment that names none. */
 const DEFAULT_COLOR: Rgb = [ 255, 160, 0 ];
 
@@ -112,7 +118,9 @@ export function presetRef(effect: Pick<IWled, "type" | "url" | "preset" | "json_
   if (effect.type === WledType.PRESET) preset = Number(effect.preset);
   else if (effect.type === WledType.URL) preset = Number(effect.url.match(PL_PARAM)?.[1]);
   else if (effect.type === WledType.API) preset = jsonPreset(effect.json_api ?? "");
-  if (!Number.isInteger(preset) || preset < PRESETS.first || preset > PRESETS.last) return undefined;
+  // A number past what WLED keeps is the effect's all the same: its preview
+  // says the device has no such preset, which is what the effect finds there.
+  if (!Number.isInteger(preset) || preset < PRESETS.first) return undefined;
   return { address, preset };
 }
 
@@ -144,12 +152,12 @@ export function presetNames(presets: Record<string, unknown>): [number, string][
     .sort((a, b) => a[0] - b[0]);
 }
 
-/** What preset `id` shows, segment by segment. */
-export function planPreset(presets: Record<string, unknown>, id: number, layout: Layout): PresetPlan {
-  return plan(presets, id, layout, 0);
+/** What preset `id` shows, segment by segment, `effectNames` being the device's /json/eff. */
+export function planPreset(presets: Record<string, unknown>, id: number, layout: Layout, effectNames: readonly string[] = []): PresetPlan {
+  return plan(presets, id, layout, effectNames, 0);
 }
 
-function plan(presets: Record<string, unknown>, id: number, layout: Layout, depth: number): PresetPlan {
+function plan(presets: Record<string, unknown>, id: number, layout: Layout, effectNames: readonly string[], depth: number): PresetPlan {
   const preset = presets[String(id)];
   if (!isRecord(preset) || !Object.keys(preset).length) return { ok: false, reason: "missing" };
   const name = typeof preset.n === "string" ? preset.n : "";
@@ -158,7 +166,7 @@ function plan(presets: Record<string, unknown>, id: number, layout: Layout, dept
     // A preset that only starts a playlist shows that playlist's first preset first.
     const first = isRecord(preset.playlist) && Array.isArray(preset.playlist.ps) ? preset.playlist.ps[0] : undefined;
     if (typeof first === "number" && first !== id && depth < PLAYLIST_DEPTH) {
-      const next = plan(presets, first, layout, depth + 1);
+      const next = plan(presets, first, layout, effectNames, depth + 1);
       return next.ok ? { ...next, name: name || next.name } : next;
     }
     return preset.on === false ? { ok: true, name, segments: [] } : { ok: false, reason: "empty" };
@@ -170,12 +178,12 @@ function plan(presets: Record<string, unknown>, id: number, layout: Layout, dept
     segments: segments
       .filter(isRecord)
       .filter(segment => segment.stop !== 0)
-      .map((segment, index) => planSegment(segment, index, layout, allOff))
+      .map((segment, index) => planSegment(segment, index, layout, effectNames, allOff))
       .sort((a, b) => a.id - b.id),
   };
 }
 
-function planSegment(segment: Record<string, unknown>, index: number, layout: Layout, allOff: boolean): SegmentPlan {
+function planSegment(segment: Record<string, unknown>, index: number, layout: Layout, effectNames: readonly string[], allOff: boolean): SegmentPlan {
   const strip = layout.height === 1;
   const x = numberOr(segment.start, 0);
   const y = strip ? 0 : numberOr(segment.startY, 0);
@@ -183,16 +191,17 @@ function planSegment(segment: Record<string, unknown>, index: number, layout: La
   const shape: SegmentShape = { id: numberOr(segment.id, index), rect, reverse: segment.rev === true, reverseY: segment.rY === true, transpose: segment.tp === true };
   if (allOff || segment.on === false || segment.bri === 0) return { ...shape, kind: "dark" };
   const fx = numberOr(segment.fx, FX_SOLID);
-  if (fx === FX_IMAGE && typeof segment.n === "string" && /\.gif$/i.test(segment.n)) {
+  const effect = effectNames.length ? effectNames[fx] : DEFAULT_NAMES[fx];
+  if (effect === "Image" && typeof segment.n === "string" && /\.gif$/i.test(segment.n)) {
     return { ...shape, kind: "image", gif: segment.n, speed: numberOr(segment.sx, NORMAL_SPEED) };
   }
-  if (fx === FX_COPY) return { ...shape, kind: "copy", source: numberOr(segment.c3, 0) };
-  if (fx === FX_SOLID) return { ...shape, kind: "solid", color: colorOf(Array.isArray(segment.col) ? segment.col[0] : undefined) };
+  if (effect === "Copy Segment") return { ...shape, kind: "copy", source: numberOr(segment.c3, 0) };
+  if (effect === "Solid") return { ...shape, kind: "solid", color: colorOf(Array.isArray(segment.col) ? segment.col[0] : undefined) };
   return { ...shape, kind: "effect", fx };
 }
 
 /** Whether every segment of `plan` can be drawn: none runs an effect WLED computes itself. */
-export function isDrawable(plan: PresetPlan): plan is Extract<PresetPlan, { ok: true }> {
+export function isDrawable(plan: PresetPlan): boolean {
   return plan.ok && plan.segments.every(segment => segment.kind !== "effect");
 }
 
