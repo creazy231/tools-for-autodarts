@@ -13,6 +13,10 @@ export default {
     title: "Een lopend effect niet opnieuw starten",
     description: "Een effect dat al actief is, wordt niet nog eens verzonden, zodat de verlichting niet opnieuw begint.",
   },
+  keepTurnEffect: {
+    title: "Het effect van de speler tussen de darts vasthouden",
+    description: "Een dart zonder eigen effect haalt het effect terug waarmee de beurt begon, zoals dat van de speler, in plaats van gameon.",
+  },
   gameModes: {
     description: "De spellen waarin WLED oplicht. Lobby- en toernooi-effecten worden in elk spel afgespeeld.",
     intro: "WLED licht alleen op in de spellen die hier aan staan.",

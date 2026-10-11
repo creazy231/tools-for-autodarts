@@ -18,6 +18,10 @@ export default {
     title: "Don't restart a running effect",
     description: "An effect that is already showing isn't sent again, so the lights don't start over.",
   },
+  keepTurnEffect: {
+    title: "Keep the player's effect between darts",
+    description: "A dart that sets off no effect of its own brings back the effect the turn started with, such as the player's own, instead of gameon.",
+  },
   /** The row is headed gameModes.title. */
   gameModes: {
     description: "The games it lights up in. Lobby and tournament effects play in any game.",

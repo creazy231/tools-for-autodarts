@@ -22,6 +22,12 @@
           >
             <AppToggle v-model="config.wledFx.onlyOnce" size="sm" />
           </OptionRow>
+          <OptionRow
+            :description="t('wled.keepTurnEffect.description')"
+            :title="t('wled.keepTurnEffect.title')"
+          >
+            <AppToggle @update:model-value="config.wledFx.keepTurnEffect = $event" :model-value="config.wledFx.keepTurnEffect ?? false" size="sm" />
+          </OptionRow>
           <OptionRow :description="t('wled.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.wledFx.disabledGameModes" :intro="t('wled.gameModes.intro')" feature="wledFx" />
           </OptionRow>

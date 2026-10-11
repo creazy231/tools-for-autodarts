@@ -13,6 +13,10 @@ export default {
     title: "Laufenden Effekt nicht neu starten",
     description: "Ein Effekt, der schon läuft, wird nicht noch einmal gesendet, damit die Lichter nicht von vorn beginnen.",
   },
+  keepTurnEffect: {
+    title: "Effekt des Spielers zwischen den Darts halten",
+    description: "Ein Dart ohne eigenen Effekt holt den Effekt zurück, mit dem die Aufnahme begann, etwa den des Spielers, statt gameon.",
+  },
   gameModes: {
     description: "Die Spiele, in denen WLED leuchtet. Lobby- und Turniereffekte werden in jedem Spiel abgespielt.",
     intro: "WLED leuchtet nur in den hier eingeschalteten Spielen.",
