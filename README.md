@@ -547,7 +547,7 @@ Effects come in sets, and one set plays at a time. Your effects are the set *Def
 - **New set**, under *Effect sets*, starts a set as a copy of the set you're looking at, or with no effects. Every set needs a name of its own
 - Each set has a pill with its number of effects. Picking a pill shows that set's effects, and adding, editing, importing, sorting and deleting effects work on that set. The lights don't change while you do: a set plays once you press **Use this set**, and the set that plays carries a dot. The play button and **Test** send an effect from any set, so you can try a set out first
 - **⋯** beside **New set** renames the set you're looking at, or deletes it along with its effects. The set that plays can't be deleted: use another one first
-- **Boards**, **Don't restart a running effect**, **Game modes** and the switch on the card are the same for every set
+- **Don't restart a running effect**, **Game modes** and the switch on the card are the same for every set
 - With two or more sets, the card names the set that plays
 - A match, lobby or board page that is already open keeps the effects it started with until it loads again
 - A settings export carries every set. A version of Tools from before effect sets plays the set in use
