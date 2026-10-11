@@ -1,11 +1,13 @@
-import type { ILobbies } from "@/utils/websocket-helpers";
+import type { ILobbies, IMatch } from "@/utils/websocket-helpers";
 
 import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
 import { pageVariant, playsIn } from "@/utils/game-modes";
 import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
+import { selectedBoard } from "@/utils/lobby-guests";
 import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage";
+import { isPlayerUpInTheRoom } from "@/utils/own-board";
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
-import { triggerPatterns } from "@/utils/helpers";
+import { getUserIdFromToken, triggerPatterns } from "@/utils/helpers";
 import { settleGameData } from "@/utils/settle-game-data";
 import { legWinNames, loadTeamCalls, matchWinNames, turnNames } from "@/utils/team-calls";
 import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
@@ -20,16 +22,18 @@ let tournamentReadyUnwatch: (() => void) | null = null;
 let config: IConfig;
 
 /**
- * The board the effects are being filtered against, when Board IDs narrows them.
+ * Whether the player up throws in this room (utils/own-board.ts): you, a guest
+ * or a bot you added, anyone at your board. While somebody elsewhere is up, an
+ * online opponent say, an effect on `other` stands in for every effect, board
+ * events included.
  *
- * This used to be assigned in one place only — from game data, part-way through
- * processGameData — so board-status effects were dropped until the first game
- * message of the match arrived, and dropped forever on a `/boards/<id>` page,
- * where no game data is addressed to this tab. Someone who had listed their own
- * board got no board events at all there. It is now seeded at startup as well,
- * from whichever of the two sources the page has.
+ * Settled by every game message, and from the stored match as the page opens,
+ * since board events can come first. True until a match says otherwise.
  */
-let currentBoardId: string | undefined;
+let playerUpHere = true;
+
+/** Your account, which tells your guests and bots: asked for until the access token has landed. */
+let localUserId: string | null = null;
 
 // Each game-data update settles before its effect is set, without a finished
 // visit ever being lost to the next one — see utils/settle-game-data.ts.
@@ -64,19 +68,26 @@ function isOnALobbyPage(): boolean {
   return /\/lobb(?:y|ies)\//.test(window.location.href);
 }
 
-/** A board page names its board in the URL: `/boards/<id>`. */
-function boardIdFromUrl(): string | undefined {
-  return window.location.href.match(/\/boards\/([0-9a-f-]+)/i)?.[1];
+/**
+ * Whether the player up in `match` throws in this room. One who can't be told
+ * yet, a guest with no board before the access token has landed, counts as
+ * here: `other` is for somebody known to be elsewhere.
+ */
+async function isPlayerUpHere(match: IMatch | undefined): Promise<boolean> {
+  if (!localUserId) localUserId = await getUserIdFromToken();
+  return isPlayerUpInTheRoom(match, localUserId, { url: window.location.href, selected: selectedBoard() }) !== false;
 }
 
-/** Whether effects should play here — an empty Board IDs list means everywhere. */
-function isConfiguredBoard(): boolean {
-  if (!config.wledFx.boardIds.length) return true;
-  return currentBoardId !== undefined && config.wledFx.boardIds.includes(currentBoardId);
-}
-
+/**
+ * A board event's effect. Board frames don't say which board sent them, so an
+ * event belongs to whoever is up: while that is somebody elsewhere, `other` is
+ * showing, and their takeout leaves it there. A lobby or a tournament page has
+ * nobody up, whatever the last match left behind, so its events are yours.
+ */
 function eventTrigger(trigger: string) {
-  if (isTriggerPresent(trigger) && isConfiguredBoard()) setEffectByTrigger(trigger);
+  if (!isTriggerPresent(trigger)) return;
+  if (!playerUpHere && isTriggerPresent("other") && !isOnALobbyPage() && !isTournamentPage()) return;
+  setEffectByTrigger(trigger);
 }
 
 async function checkStatus(boardData: IBoard): Promise<void> {
@@ -123,11 +134,11 @@ export async function wledFx() {
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
 
-    // Board events start arriving before the first game message, and on a board
-    // page instead of one — so settle which board this is up front rather than
-    // waiting for processGameData to get to it.
-    currentBoardId = boardIdFromUrl()
-      ?? gameData.match?.players?.[gameData.match.player]?.boardId;
+    // Board events can arrive before the first game message, so who is up is
+    // settled up front: from the stored match on its own page, and nobody
+    // elsewhere anywhere else. A lobby's stored match is the last one played.
+    playerUpHere = pageVariant(gameData.match, window.location.href) === undefined
+      || await isPlayerUpHere(gameData.match);
 
     if (!gameDataWatcherUnwatch) {
       gameDataWatcherUnwatch = AutodartsToolsGameData.watch(
@@ -233,6 +244,7 @@ export function wledFxOnRemove() {
   settled.cancel();
   announcedWin = undefined;
   turnPlayer = "";
+  playerUpHere = true;
 
   setEffectByTrigger("idle");
 }
@@ -249,6 +261,8 @@ async function processGameData(
 
   const names = turnNames(gameData.match);
   turnPlayer = names[0] ?? "";
+  // Before anything below returns: the board events in between go by it.
+  playerUpHere = await isPlayerUpHere(gameData.match);
 
   const editMode: boolean = gameData.match.activated !== undefined && gameData.match.activated >= 0;
   if (editMode) return;
@@ -285,11 +299,9 @@ async function processGameData(
     nextEffect = effect;
   }
 
-  // A board page is pinned to the board it names; a match page follows whoever
-  // is throwing.
-  currentBoardId = boardIdFromUrl() ?? gameData.match.players?.[gameData.match.player]?.boardId;
-
-  if (!isConfiguredBoard() && isTriggerPresent("other")) {
+  // Somebody elsewhere is up, an online opponent say: an effect on `other`
+  // stands in for theirs. Without one, everybody's effects play.
+  if (!playerUpHere && isTriggerPresent("other")) {
     nextEffect = "other";
   }
 

@@ -14,14 +14,6 @@ export default {
   sections: {
     options: "Options",
   },
-  boards: {
-    title: "Boards",
-    /** `trigger` is `other`, the trigger of the boards that aren't listed. It is what is typed, so it is a param and no translation can change it. */
-    description: "Effects play only for throws on these boards, and on every board while the list is empty. An effect on <code>{trigger}</code> plays for throws on boards that aren't listed.",
-    placeholder: "Paste a board ID and press Enter",
-    /** Said under a chip that is no board ID. The example shows what one looks like: the same in every language. */
-    invalid: "That doesn't look like a board ID. They look like 6a501a61-53a5-468a-a56a-17134ace3099.",
-  },
   onlyOnce: {
     title: "Don't restart a running effect",
     description: "An effect that is already showing isn't sent again, so the lights don't start over.",

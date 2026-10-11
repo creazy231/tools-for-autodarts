@@ -9,12 +9,6 @@ export default {
   sections: {
     options: "Optionen",
   },
-  boards: {
-    title: "Boards",
-    description: "Effekte werden nur bei Würfen auf diesen Boards abgespielt, bei leerer Liste auf jedem Board. Ein Effekt auf <code>{trigger}</code> wird bei Würfen auf Boards abgespielt, die nicht in der Liste stehen.",
-    placeholder: "Board-ID einfügen und Enter drücken",
-    invalid: "Das sieht nicht nach einer Board-ID aus. Eine Board-ID sieht so aus: 6a501a61-53a5-468a-a56a-17134ace3099.",
-  },
   onlyOnce: {
     title: "Laufenden Effekt nicht neu starten",
     description: "Ein Effekt, der schon läuft, wird nicht noch einmal gesendet, damit die Lichter nicht von vorn beginnen.",

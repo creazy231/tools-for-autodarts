@@ -278,7 +278,7 @@ It is **off by default**, so the site sounds exactly as autodarts built it until
 - A guest player typed into the lobby, playing on your board
 - A friend with an account of their own, throwing at your board
 
-Everyone else — a remote opponent, a bot — keeps the sound. When you are only watching a board rather than playing, that board's darts count as within earshot too.
+Everyone else — a remote opponent, a bot — keeps the sound. When you are only watching a board rather than playing, that board's darts count as within earshot too. With more than one board on one account, the board autodarts autoscores with in this browser is the one within earshot. WLED's `other` and Sound FX's `opponent_throw` go by the same rule, except that a bot you added counts as in your room for them.
 
 > [!NOTE]  
 > This only affects autodarts' own dart-landed sound. The extension's Sound FX and Caller are configured separately, and its `opponent_throw` trigger already covers the same ground for anyone who prefers a sound of their own.
@@ -425,7 +425,7 @@ Add sound effects for various game events:
   - `ambient_next_player`: Plays when switching to the next player (fallback if no player name sound exists)
   - `ambient_bot`: Plays when switching to a CPU/bot player
   - `bot_throw`: Plays when a bot player throws a dart
-  - `opponent_throw`: Plays when a remote opponent (any real player other than you, on a different board) throws a dart — useful as throw feedback when playing online without looking at the screen. Your own throws and bot throws are excluded (bots use `bot_throw`), and so are players sharing your board (e.g. a friend visiting to play on your board with their own account) since that board already makes the throw noise
+  - `opponent_throw`: Plays when a remote opponent, or a guest of theirs, throws a dart — useful as throw feedback when playing online without looking at the screen. Your own throws and bot throws are excluded (bots use `bot_throw`), and so are your guests and anyone sharing your board (e.g. a friend visiting to play on your board with their own account), since that board already makes the throw noise. It counts who is in your room the way [WLED](#your-board-and-the-others) does
   - Player-specific sounds using format: `ambient_playername` or `ambient_player_name`. In a **Teams** match a team's name works too: the player whose turn it is first, then their team
 - **Lobby Sounds**:
   - `ambient_lobby_in`: Plays when a player joins the lobby
@@ -534,7 +534,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 #### Configuration Options
 - **Effect Management**: Add, edit, enable/disable, and reorder lighting effects. **Add** holds a new effect and the CSV import, **⋯** sorting by trigger and deleting every effect, and each effect has a play button to send it, as its editor has **Test**. With more than one set, all of it works on the set you're looking at
 - **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
-- **Board Filtering**: Restrict effects to specific board IDs, with an "other" effect for non-matching boards
+- **Your board and the others**: WLED tells for itself who throws in your room, with nothing to enter. An effect on `other` plays while anybody else is up, such as an online opponent. See [Your board and the others](#your-board-and-the-others)
 - **Don't restart a running effect**: An effect isn't sent again while the lights show it, so they don't start over. What counts is what is sent: the same effect with another player's name in it is sent again. The play button and **Test** always send
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
@@ -616,11 +616,9 @@ Effects can be triggered by various game events using these triggers:
 - **`matchshot_[player name]`**: player specific matchshot trigger
 - In a **Teams** match both take a team's name too: a leg the player who checked out first, a match the team first
 
-##### Board-Specific Effects
-- **Board IDs**: Configure specific board IDs to limit effects to certain boards. Leave the list empty and effects play everywhere
-- **`other`**: Special trigger for throws on boards not in the configured board ID list
-- **Format**: Board IDs are UUIDs (e.g., `6a501a61-53a5-468a-a56a-17134ace3099`)
-- The board is worked out from the page you are on — the board page names it in its own URL, a match page follows whoever is throwing
+##### Throws elsewhere
+- **`other`**: Plays instead of every other effect while somebody who isn't in your room is up: an online opponent, a guest of theirs, or anyone in a match you only watch. Without an effect on `other`, everybody's throws play their own effects
+- See [Your board and the others](#your-board-and-the-others) for who counts as in your room
 
 #### Smart Effect Selection
 - **Multiple Effects**: If multiple effects share the same trigger, one is randomly selected
@@ -683,10 +681,13 @@ Bust preset;PRESET;http://wled-device.local;7;busted
 Dim when idle;API;http://wled-device.local/json/state;{"on":true,"bri":40};idle
 ```
 
-#### Board Filtering
-- **Enable Filtering**: Paste each board ID under **Boards** and press Enter to restrict effects to those boards; an entry that isn't a board ID is marked
-- **Other Effect**: Create an effect with trigger `other` for throws on non-matching boards
-- **Use Cases**: Different effects for different dart boards in multi-board setups
+#### Your board and the others
+In an online match both screens show every throw, so your lights would celebrate your opponent's 180 as well. Give an effect the trigger `other`, and it plays instead while anybody outside your room is up; your own throws keep their effects. There is nothing to enter: WLED works out who throws in your room the way **Quiet Own Darts** and Sound FX's `opponent_throw` do.
+
+- **In your room**: your own throws, a guest or a bot you added to the lobby, and anyone throwing at your board, such as a friend with an account of their own
+- **Your board**: the board a board page names (`/boards/<id>`), otherwise the board autodarts autoscores with in this browser, otherwise the board of your seat in the match. With more than one board on one account, each browser counts the board it autoscores with
+- **Board events** (`throw`, `takeout`, `board_started` …) belong to whoever is up: while somebody outside your room is up, `other` stays on through their takeout. In a lobby they are always yours
+- **Unchanged**: `bulloff`, the lobby and tournament triggers and `idle` play whoever is up
 
 #### Game Mode Support
 - **X01 Games**: Full support for all triggers and point combinations
@@ -704,7 +705,7 @@ Dim when idle;API;http://wled-device.local/json/state;{"on":true,"bri":40};idle
 #### Troubleshooting
 - **Effect Not Triggering**: Check that the trigger spelling matches exactly
 - **HTTPS Errors**: Ensure your WLED device supports HTTPS
-- **Board Filtering**: Verify board IDs are correctly formatted UUIDs
+- **`other` Plays on Your Own Throws**: Check the board autodarts autoscores with in this browser. A board page always counts its own board as yours
 - **URL Format**: Confirm WLED URLs follow the correct API format
 
 ### 🎬 Animations
