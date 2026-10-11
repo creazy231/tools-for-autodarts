@@ -87,6 +87,7 @@
                 <PlayButton @click="sendEffect(effects[entry.index])" :label="entry.name" :title="t('wled.list.send')" />
               </template>
               <template #meta>
+                <PresetPreview :still="!entry.enabled" :target="previewTargets[entry.index]" variant="row" />
                 <span class="shrink-0 text-sm" :class="[TYPE_ICONS[effects[entry.index].type]]" />
                 <span class="truncate">{{ describe(effects[entry.index]) }}</span>
               </template>
@@ -211,6 +212,13 @@
           </div>
         </template>
 
+        <div v-if="draftTarget">
+          <p class="adt-field-label">
+            {{ t("wled.preview.title") }}
+          </p>
+          <PresetPreview :target="draftTarget" variant="dialog" />
+        </div>
+
         <TriggerField id="effect-triggers" v-model="effectTriggers" feature="wled" />
       </div>
 
@@ -309,6 +317,7 @@ import PlayButton from "./Library/PlayButton.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import { stableKey } from "./Library/stable-key";
 import LibrarySets from "./Library/LibrarySets.vue";
+import PresetPreview from "./Wled/PresetPreview.vue";
 
 import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
@@ -318,6 +327,8 @@ import { tryEffect } from "@/entrypoints/match.content/wled";
 import { getAuthToken } from "@/utils/helpers";
 import { type IWled } from "@/utils/storage";
 import { tokenAccount } from "@/utils/team-room";
+import { wledDevices } from "@/utils/wled-device";
+import { type PresetRef, deviceOrigin, presetNames, presetRef } from "@/utils/wled-preview";
 import { WledType } from "#imports";
 
 const emit = defineEmits([ "toggle" ]);
@@ -364,6 +375,8 @@ const newEffect = ref<IWled>({
 /** The dialog's triggers, as chips; `newEffect.triggers` is left unused while it is open. */
 const effectTriggers = ref<string[]>([]);
 const editingIndex = ref<number | null>(null);
+/** The preset the dialog's effect plays, once the typing has stopped: its preview's. */
+const draftTarget = ref<PresetRef>();
 /**
  * What the dialog's fields refuse, as the key of the line said under each: it follows a language picked while it
  * shows. "" is nothing to say.
@@ -407,6 +420,9 @@ const {
 } = useLibrarySets("wledFx", { notify: showNotification, closeDialogs });
 
 const libraryTitle = computed(() => (several.value ? t("library.sets.wledFx.listTitle", { set: viewedLabel.value }) : t("wled.list.title")));
+
+/** The preset each listed effect plays, for its preview: none for a link to anything but a preset. */
+const previewTargets = computed(() => effects.value.map(effect => presetRef(effect)));
 
 const entries = computed<LibraryEntry[]>(() => effects.value.map((effect, index) => {
   const triggers = triggerList(effect.triggers);
@@ -452,9 +468,14 @@ const moreActions = computed(() => [
   },
 ]);
 
-watch(() => [ newEffect.value.url, newEffect.value.type ], async () => {
+// Once the typing has stopped, not on every key: each read goes to the device.
+watchDebounced(() => [ newEffect.value.url, newEffect.value.type ], async () => {
   if (newEffect.value.type === WledType.PRESET && newEffect.value.url) await fetchPresets();
-});
+}, { debounce: 400 });
+
+watchDebounced(() => [ newEffect.value.type, newEffect.value.url, newEffect.value.preset, newEffect.value.json_api ], () => {
+  draftTarget.value = presetRef(newEffect.value);
+}, { debounce: 400 });
 
 /** Stored triggers are an array, or a newline-separated string in configs from before. */
 function triggerList(triggers: string | string[]): string[] {
@@ -561,38 +582,28 @@ async function processCSV() {
   showNotification(t("wled.csv.imported", { count: csvEntries.length }), "success");
 }
 
+/**
+ * The preset picker's options: the device's presets by number and name. Read
+ * through the background (utils/wled-device.ts), which Firefox needs: a
+ * content script there can send to a device on the LAN but not read its
+ * answer. A device is read once a page, and its previews read the same copy.
+ */
 async function fetchPresets() {
-  console.log("Autodarts Tools: WLED: fetchPresets");
-  try {
-    const presetUrl = `${(newEffect.value.url.startsWith("http") ? "" : "http://")
-      + newEffect.value.url
-      + (newEffect.value.url.endsWith("/") ? "" : "/")
-       }presets.json`;
-    console.log("Autodarts Tools: WLED: loading presets from", presetUrl);
-    presetChoices.value = [ { value: newEffect.value.preset, key: "wled.preset.readFailed" } ];
-    window.fetch(presetUrl)
-      .then(resp => resp.json())
-      .then((data: Record<string, { n: string }>) => {
-        if (data && typeof data === "object") {
-          presetChoices.value = [ { value: "0", key: "wled.preset.pick" } ];
-          Object.entries(data).forEach(([ id, preset ]) => {
-            if (id === "0" || !("n" in preset) || preset.n === undefined) return;
-            presetChoices.value.push({ value: id, label: `[${id}] ${preset.n}` });
-          });
-        } else {
-          console.error("Autodarts Tools: WLED: Invalid response format. Expected an object.", data);
-        }
-      })
-      .catch((error) => {
-        console.error("Autodarts Tools: WLED: Error fetching presets:", error);
-      });
-  } catch (error) {
-    console.error("Autodarts Tools: WLED: Error fetching presets:", error);
-  }
+  const address = deviceOrigin(newEffect.value.url);
+  if (!address) return;
+  presetChoices.value = [ { value: newEffect.value.preset, key: "wled.preset.readFailed" } ];
+  const read = await wledDevices.loadDevice(address);
+  // Typed on meanwhile: the newer address's read decides.
+  if (deviceOrigin(newEffect.value.url) !== address || !read.ok) return;
+  presetChoices.value = [
+    { value: "0", key: "wled.preset.pick" },
+    ...presetNames(read.device.presets).map(([ id, name ]) => ({ value: String(id), label: `[${id}] ${name}` })),
+  ];
 }
 
 function openAddEffectModal() {
   newEffect.value = { name: "", type: WledType.PRESET, url: "", preset: "0", json_api: "", triggers: "", enabled: true };
+  draftTarget.value = undefined;
   effectTriggers.value = [];
   isEditMode.value = false;
   editingIndex.value = null;
@@ -624,6 +635,7 @@ function editEffect(index: number) {
     triggers: "",
     enabled: true,
   };
+  draftTarget.value = presetRef(newEffect.value);
   effectTriggers.value = triggerList(effect.triggers);
 
   isEditMode.value = true;

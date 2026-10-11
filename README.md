@@ -538,6 +538,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Don't restart a running effect**: An effect isn't sent again while the lights show it, so they don't start over. What counts is what is sent: the same effect with another player's name in it is sent again. The play button and **Test** always send
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
+- **Previews**: Each effect that plays a preset shows it the way your lights do, drawn from your own WLED. See [Previews](#previews)
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
 - **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
@@ -552,6 +553,16 @@ Effects come in sets, and one set plays at a time. Your effects are the set *Def
 - A match, lobby or board page that is already open keeps the effects it started with until it loads again
 - A settings export carries every set. A version of Tools from before effect sets plays the set in use
 - Animations, the Caller and Sound FX keep sets the same way: see [Animation sets](#animation-sets), [Sound sets (Caller)](#sound-sets-caller) and [Sound sets (Sound FX)](#sound-sets-sound-fx)
+
+#### Previews
+Each effect that plays a preset shows that preset in its row the way your matrix or strip shows it: round LEDs on a dark panel, moving as the preset moves. The effect's dialog shows it larger, with the preset's name on the device. Nothing changes on your lights. The previews are drawn from what the device holds: its `presets.json`, its LED layout and the GIFs its presets play.
+
+- **No address to enter**: A preview uses the address the effect already holds. A preset effect's preset counts, and so do a link's `PL=5` and a JSON API effect's `"ps": 5`
+- **What is drawn**: GIFs on WLED's *Image* effect, scaled to their segment and played at its speed; *Copy Segment*; and *Solid* colours. Any other effect, such as *Fire 2012*, is computed by WLED as it plays, so the row names it instead, and it shows only on the lights. Effects are told apart by their names on the device, so an older WLED, whose effect numbers differ, isn't drawn wrong
+- **When there is none**: The row says so when the device has no such preset, and shows a crossed-out Wi-Fi icon when the device didn't answer, for instance because it is switched off
+- **When they are read**: While the WLED settings are open, never during a match. A device is read once a page, and an ESP32 can take a few seconds for its presets. A preset you change on the device shows the next time you open the settings
+- **The layout is WLED's**: Two panels side by side show as one matrix, without the gap between them
+- On a narrow screen the previews are smaller. With your system's *reduce motion* setting, and for an effect that is switched off, they stand still
 
 #### Supported Triggers
 Effects can be triggered by various game events using these triggers:
@@ -705,6 +716,7 @@ In an online match both screens show every throw, so your lights would celebrate
 #### Troubleshooting
 - **Effect Not Triggering**: Check that the trigger spelling matches exactly
 - **HTTPS Errors**: Ensure your WLED device supports HTTPS
+- **No Previews**: The settings read the device from the extension's background. Check that `http://<address>/json/info` opens in the browser, and that the effect's address is the device's
 - **`other` Plays on Your Own Throws**: Check the board autodarts autoscores with in this browser. A board page always counts its own board as yours
 - **URL Format**: Confirm WLED URLs follow the correct API format
 
