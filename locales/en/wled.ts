@@ -112,6 +112,24 @@ export default {
     readFailed: "Couldn't read presets from the device",
     pick: "Pick a preset",
   },
+  /** WLED previews: an effect's preset drawn from the user's own WLED (components/Settings/Wled/PresetPreview.vue). */
+  preview: {
+    title: "Preview",
+    /** The preview's accessible name. `address` is the device's, such as 192.168.0.227. */
+    alt: "Preview of preset {preset} on {address}",
+    /** Under the dialog's preview: the preset's name on the device, and its number. */
+    name: "{name} · preset {preset}",
+    unnamed: "Preset {preset}",
+    loading: "Reading the preset from your WLED…",
+    unreachable: "Your WLED at {address} didn't answer, so there's no preview.",
+    /** A row's tooltip on the icon it shows instead. */
+    unreachableShort: "{address} didn't answer",
+    missing: "Your WLED has no preset {preset}.",
+    /** `effects` are WLED's own effect names, such as "Fire 2012". */
+    effects: "{effects}: WLED draws this itself, so it only shows on the lights.",
+    ownEffect: "WLED draws this preset itself, so it only shows on the lights.",
+    empty: "Preset {preset} changes nothing that can be shown.",
+  },
   link: {
     label: "Link",
     /** An example address: the same in every language. */
