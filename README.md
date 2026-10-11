@@ -536,6 +536,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
 - **Your board and the others**: WLED tells for itself who throws in your room, with nothing to enter. An effect on `other` plays while anybody else is up, such as an online opponent. See [Your board and the others](#your-board-and-the-others)
 - **Don't restart a running effect**: An effect isn't sent again while the lights show it, so they don't start over. What counts is what is sent: the same effect with another player's name in it is sent again. The play button and **Test** always send
+- **Keep the player's effect between darts**: A dart that sets off no effect of its own brings back the effect the turn started with, instead of `gameon`: the player's own, their team's, `next_player` or `bot_throw`. A player with an effect on their name keeps it for their whole turn, with their darts' own effects in between. Off by default
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
 - **Previews**: Each effect that plays a preset shows it the way your lights do, drawn from your own WLED. See [Previews](#previews)
@@ -548,7 +549,7 @@ Effects come in sets, and one set plays at a time. Your effects are the set *Def
 - **New set**, under *Effect sets*, starts a set as a copy of the set you're looking at, or with no effects. Every set needs a name of its own
 - Each set has a pill with its number of effects. Picking a pill shows that set's effects, and adding, editing, importing, sorting and deleting effects work on that set. The lights don't change while you do: a set plays once you press **Use this set**, and the set that plays carries a dot. The play button and **Test** send an effect from any set, so you can try a set out first
 - **⋯** beside **New set** renames the set you're looking at, or deletes it along with its effects. The set that plays can't be deleted: use another one first
-- **Don't restart a running effect**, **Game modes** and the switch on the card are the same for every set
+- **Don't restart a running effect**, **Keep the player's effect between darts**, **Game modes** and the switch on the card are the same for every set
 - With two or more sets, the card names the set that plays
 - A match, lobby or board page that is already open keeps the effects it started with until it loads again
 - A settings export carries every set. A version of Tools from before effect sets plays the set in use
@@ -580,7 +581,7 @@ Effects can be triggered by various game events using these triggers:
 - **calibration_finished**: when calibration has finished
 
 ##### Game Events
-- **`gameon`**: At the start of each player's turn when there is neither an effect for the player nor a `next_player` effect, and whenever nothing else matches (the default fallback effect)
+- **`gameon`**: At the start of each player's turn when there is neither an effect for the player nor a `next_player` effect, and whenever nothing else matches (the default fallback effect). With *Keep the player's effect between darts* on, a dart that matches nothing brings back the effect the turn started with instead
 - **`next_player`**: At the start of a player's turn, when there is no effect for the player. With `{player}` or `{player_ascii}` in it, it shows whose turn it is: see [The player's name in an effect](#the-players-name-in-an-effect)
 - **`takeout`**: When takeout is in progress
 - **`gameshot`**: When a player wins a game/leg
@@ -635,7 +636,7 @@ Effects can be triggered by various game events using these triggers:
 - **Multiple Effects**: If multiple effects share the same trigger, one is randomly selected
 - **Priority System**: More specific effects take precedence over general ones
 - **A turn's first effect**: A bot's turn starts with `bot_throw`, anyone else's with their own effect, then their team's, then `next_player`, then `gameon`
-- **Fallback Logic**: Falls back to `gameon` effect if no specific trigger matches
+- **Fallback Logic**: Falls back to `gameon` effect if no specific trigger matches, or, with *Keep the player's effect between darts* on, to the effect the turn started with
 
 #### Technical Implementation
 - **HTTP Requests**: Effects trigger HTTP GET requests to the specified URLs
@@ -669,7 +670,7 @@ A JSON API effect can carry the name of the player whose turn it is. In its JSON
 
 Put them inside a JSON string, as in `"n":"{player_ascii}"`: the name is escaped for it, so a quote in a name can't break the JSON. A URL effect takes them in its link too, encoded for a link. In a lobby, on a board page and once the match is left there is nobody's turn, and they are empty. The play button and **Test** fill in the name of the account you're signed in with.
 
-The `next_player` trigger is made for this. It plays at the start of the turn of every player who has no effect of their own, and the name stays up until the first dart's effect, or `gameon`, takes over. On a matrix, WLED's **Scrolling Text** effect (122) shows a segment's name: a name that fits stands still, and a longer one scrolls. This effect, for a 32×8 matrix, imports as it is:
+The `next_player` trigger is made for this. It plays at the start of the turn of every player who has no effect of their own, and the name stays up until the first dart's effect, or `gameon`, takes over. With *Keep the player's effect between darts* on, it comes back after every dart that has no effect of its own, for the rest of the turn. On a matrix, WLED's **Scrolling Text** effect (122) shows a segment's name: a name that fits stands still, and a longer one scrolls. This effect, for a 32×8 matrix, imports as it is:
 
 ```csv
 Player name;API;http://wled-device.local/json/state;{"on":true,"transition":0,"seg":[{"id":0,"on":true,"frz":false,"fx":122,"n":"{player_ascii}","sx":170,"ix":128,"c1":0,"c2":64,"c3":16,"o1":false,"o2":false,"o3":false,"pal":0,"col":[[255,160,0],[0,0,0],[0,0,0]]}]};next_player
