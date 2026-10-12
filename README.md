@@ -562,7 +562,8 @@ Each effect that plays a preset shows that preset in its row the way your matrix
 - **What is drawn**: GIFs on WLED's *Image* effect, scaled to their segment and played at its speed; *Copy Segment*; and *Solid* colours. Any other effect, such as *Fire 2012*, is computed by WLED as it plays, so the row names it instead, and it shows only on the lights. Effects are told apart by their names on the device, so an older WLED, whose effect numbers differ, isn't drawn wrong
 - **When there is none**: The row says so when the device has no such preset, and shows a crossed-out Wi-Fi icon when the device didn't answer, for instance because it is switched off
 - **When they are read**: While the WLED settings are open, never during a match. A device is read once a page, and an ESP32 can take a few seconds for its presets. A preset you change on the device shows the next time you open the settings
-- **The layout is WLED's**: Two panels side by side show as one matrix, without the gap between them
+- **Only what you look at**: A row's preview is read and drawn once the list stops with the row in view, or just below it. Scrolling through a long list reads nothing on the way, and the rows in view come first, so an older tablet or laptop only does the work for what it shows
+- **Panels**: A matrix of several panels shows each panel apart, with a gap between them, where WLED's 2D settings place them. WLED doesn't know how far apart your panels hang, so the gap is always two LEDs wide, also for panels mounted edge to edge
 - On a narrow screen the previews are smaller. With your system's *reduce motion* setting, and for an effect that is switched off, they stand still
 
 #### Supported Triggers
