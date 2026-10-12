@@ -563,7 +563,7 @@ Each effect that plays a preset shows that preset in its row the way your matrix
 - **When there is none**: The row says so when the device has no such preset, and shows a crossed-out Wi-Fi icon when the device didn't answer, for instance because it is switched off
 - **When they are read**: While the WLED settings are open, never during a match. A device is read once a page, and an ESP32 can take a few seconds for its presets. A preset you change on the device shows the next time you open the settings
 - **Only what you look at**: A row's preview is read and drawn once the list stops with the row in view, or just below it. Scrolling through a long list reads nothing on the way, and the rows in view come first, so an older tablet or laptop only does the work for what it shows
-- **Panels**: A matrix of several panels shows each panel apart, with a gap between them, where WLED's 2D settings place them. WLED doesn't know how far apart your panels hang, so the gap is always two LEDs wide, also for panels mounted edge to edge
+- **Panels**: A matrix of several panels shows each panel on a plate of its own, as WLED's 2D settings place them, with two LEDs' room where two panels meet. WLED doesn't know how far apart your panels hang, so panels mounted edge to edge get that room too, and panels WLED already places apart keep the gap it leaves. Where the room would cost detail, as for stacked panels or many small tiles in a row's few pixels, the matrix shows as one panel
 - On a narrow screen the previews are smaller. With your system's *reduce motion* setting, and for an effect that is switched off, they stand still
 
 #### Supported Triggers
