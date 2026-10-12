@@ -8,14 +8,15 @@
     </span>
   </span>
   <!-- While it loads: a spinner the size of the icon a row shows when its device doesn't answer. -->
-  <span v-else-if="state.status === 'loading' && variant === 'row'" :aria-label="message" class="icon-[material-symbols--progress-activity] shrink-0 text-sm motion-safe:animate-spin" role="img" :title="message" />
+  <!-- Still until the list stops at it, as nothing is read for it until then. -->
+  <span v-else-if="state.status === 'loading' && variant === 'row'" ref="pending" :aria-label="message" class="icon-[material-symbols--progress-activity] shrink-0 text-sm" :class="[{ 'motion-safe:animate-spin': seen }]" role="img" :title="message" />
   <template v-else-if="variant === 'row'">
     <span v-if="state.status === 'unreachable'" :aria-label="t('wled.preview.unreachableShort', { address: host })" class="icon-[material-symbols--wifi-off-rounded] shrink-0 text-sm" role="img" :title="t('wled.preview.unreachableShort', { address: host })" />
     <span v-else-if="state.status === 'missing'" class="min-w-0 truncate text-[var(--ad-warning)]" :title="message">{{ message }}</span>
     <span v-else-if="state.status === 'effects' && state.effects.length" class="min-w-0 truncate" :title="state.effects.join(', ')">{{ state.effects.join(", ") }}</span>
   </template>
-  <span v-else-if="state.status !== 'none'" class="flex items-center gap-1.5 text-sm" :class="[state.status === 'missing' ? 'text-[var(--ad-warning)]' : 'text-[var(--ad-text-muted)]']">
-    <span v-if="state.status === 'loading'" aria-hidden="true" class="icon-[material-symbols--progress-activity] shrink-0 motion-safe:animate-spin" />
+  <span v-else-if="state.status !== 'none'" ref="pending" class="flex items-center gap-1.5 text-sm" :class="[state.status === 'missing' ? 'text-[var(--ad-warning)]' : 'text-[var(--ad-text-muted)]']">
+    <span v-if="state.status === 'loading'" aria-hidden="true" class="icon-[material-symbols--progress-activity] shrink-0" :class="[{ 'motion-safe:animate-spin': seen }]" />
     {{ message }}
   </span>
 </template>
@@ -45,7 +46,15 @@ const ROW_ICON_ROOM = 24;
 const state = shallowRef<PreviewState | { status: "none" }>({ status: "none" });
 const canvas = ref<HTMLCanvasElement>();
 const frame = ref<HTMLElement>();
+/** What shows while it loads, which tells when the list has stopped at it. */
+const pending = ref<HTMLElement>();
 const visible = ref(false);
+/**
+ * Whether the list has stopped at this preview (composables/useSeenAtRest.ts):
+ * until then nothing is read for it, so a long list on an older tablet reads
+ * and decodes only what is looked at.
+ */
+const seen = useSeenAtRest(pending);
 const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 const { width: frameWidth } = useElementSize(frame);
 // A row's: the line under the name it sits in, which the grid sizes.
@@ -80,7 +89,7 @@ useIntersectionObserver(canvas, ([ entry ]) => {
   visible.value = entry?.isIntersecting ?? false;
 });
 
-watch(() => (props.target ? `${props.target.address}#${props.target.preset}` : ""), async () => {
+watch([ () => (props.target ? `${props.target.address}#${props.target.preset}` : ""), seen ], async () => {
   const target = props.target;
   const mine = ++run;
   if (!target) {
@@ -88,6 +97,7 @@ watch(() => (props.target ? `${props.target.address}#${props.target.preset}` : "
     return;
   }
   state.value = { status: "loading", target };
+  if (!seen.value) return;
   const loaded = await wledDevices.loadPreview(target);
   if (mine === run) state.value = loaded;
 }, { immediate: true });
