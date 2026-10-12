@@ -2,7 +2,7 @@
   <!-- Phrasing content only: in a row it sits in the line under the name, a <p>. -->
   <!-- In the dialog it takes the line's width, which the preview is drawn to fit. -->
   <span v-if="state.status === 'ready'" ref="frame" class="min-w-0" :class="[variant === 'dialog' ? 'flex w-full flex-col items-start gap-2' : 'inline-flex shrink-0 items-center']">
-    <canvas ref="canvas" :aria-label="label" class="block shrink-0" role="img" :title="variant === 'row' ? label : undefined" />
+    <canvas ref="canvas" :aria-label="label" class="block shrink-0 rounded-[3px]" role="img" :title="variant === 'row' ? label : undefined" />
     <span v-if="variant === 'dialog'" class="text-sm text-[var(--ad-text-secondary)]">
       {{ state.name ? t("wled.preview.name", { name: state.name, preset: state.target.preset }) : t("wled.preview.unnamed", { preset: state.target.preset }) }}
     </span>
