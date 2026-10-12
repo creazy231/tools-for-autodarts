@@ -68,10 +68,10 @@ const { width: lineWidth } = useElementSize(computed(() => (props.variant === "r
  */
 const box = computed(() => {
   if (props.variant === "dialog") {
-    const width = Math.floor(frameWidth.value) || frame.value?.clientWidth || DIALOG_BOX.width;
+    const width = Math.floor(frameWidth.value) || widthNow(frame.value) || DIALOG_BOX.width;
     return { width: Math.min(DIALOG_BOX.width, width), height: DIALOG_BOX.height };
   }
-  const room = (Math.floor(lineWidth.value) || frame.value?.parentElement?.clientWidth || 0) - ROW_ICON_ROOM;
+  const room = (Math.floor(lineWidth.value) || widthNow(frame.value?.parentElement)) - ROW_ICON_ROOM;
   return { width: room > 0 ? Math.min(ROW_BOX.width, room) : ROW_BOX.width, height: ROW_BOX.height };
 });
 const host = computed(() => (props.target ? new URL(props.target.address).host : ""));
@@ -133,6 +133,11 @@ onBeforeUnmount(() => {
   stop?.();
   run++;
 });
+
+/** An element's width as useElementSize will measure it, rounded down: 0 for none. */
+function widthNow(element?: HTMLElement | null): number {
+  return element ? Math.floor(element.getBoundingClientRect().width) : 0;
+}
 
 /** The frame for `now`, when it differs from the one showing. */
 function draw(now: number) {
