@@ -21,14 +21,14 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Extension
         run: npm run build
 
       - name: Upload Extension Artifact
         uses: actions/upload-artifact@v4
-        if: always() # Lädt das Ergebnis auch bei Teilfehlern hoch
+        if: always()
         with:
           name: tools-for-autodarts-dist
           path: |
