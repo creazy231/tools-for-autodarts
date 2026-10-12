@@ -1,10 +1,11 @@
 name: Build Chrome Extension
 
 on:
-  workflow_dispatch: # Ermöglicht das manuelle Starten per Knopfdruck
+  workflow_dispatch:
   push:
     branches:
-      - main # ODER master (je nachdem wie dein Haupt-Branch heißt)
+      - main
+      - master
 
 jobs:
   build:
@@ -17,16 +18,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci || npm install
 
       - name: Build Extension
         run: npm run build
 
       - name: Upload Extension Artifact
         uses: actions/upload-artifact@v4
+        if: always() # Lädt das Ergebnis auch bei Teilfehlern hoch
         with:
           name: tools-for-autodarts-dist
-          path: .output/chrome-mv3 # Oder 'dist', je nachdem wie WXT den Ordner benennt
+          path: |
+            .output/chrome-mv3
+            dist
