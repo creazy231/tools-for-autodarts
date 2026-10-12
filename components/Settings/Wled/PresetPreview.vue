@@ -46,7 +46,7 @@ const ROW_ICON_ROOM = 24;
 const state = shallowRef<PreviewState | { status: "none" }>({ status: "none" });
 const canvas = ref<HTMLCanvasElement>();
 const frame = ref<HTMLElement>();
-/** What shows while it loads, which tells when the list has stopped at it. */
+/** What shows while it loads: where it is tells when the list has stopped at it. */
 const pending = ref<HTMLElement>();
 const visible = ref(false);
 /**
@@ -60,10 +60,18 @@ const { width: frameWidth } = useElementSize(frame);
 // A row's: the line under the name it sits in, which the grid sizes.
 const { width: lineWidth } = useElementSize(computed(() => (props.variant === "row" ? frame.value?.parentElement ?? undefined : undefined)));
 
-/** What the preview may take: its box, or less on a narrow screen, where a row keeps room for the type's icon. */
+/**
+ * What the preview may take: its box, or less on a narrow screen, where a row
+ * keeps room for the type's icon. Until a width's first measurement arrives,
+ * the width it has now: a first picture at the whole box would overflow a
+ * phone's line, and be drawn again a moment later.
+ */
 const box = computed(() => {
-  if (props.variant === "dialog") return { width: Math.min(DIALOG_BOX.width, Math.floor(frameWidth.value) || DIALOG_BOX.width), height: DIALOG_BOX.height };
-  const room = Math.floor(lineWidth.value) - ROW_ICON_ROOM;
+  if (props.variant === "dialog") {
+    const width = Math.floor(frameWidth.value) || frame.value?.clientWidth || DIALOG_BOX.width;
+    return { width: Math.min(DIALOG_BOX.width, width), height: DIALOG_BOX.height };
+  }
+  const room = (Math.floor(lineWidth.value) || frame.value?.parentElement?.clientWidth || 0) - ROW_ICON_ROOM;
   return { width: room > 0 ? Math.min(ROW_BOX.width, room) : ROW_BOX.width, height: ROW_BOX.height };
 });
 const host = computed(() => (props.target ? new URL(props.target.address).host : ""));
@@ -102,7 +110,8 @@ watch([ () => (props.target ? `${props.target.address}#${props.target.preset}` :
   if (mine === run) state.value = loaded;
 }, { immediate: true });
 
-watch([ canvas, state, box ], () => {
+// By the box's size: a measurement that says what was already read draws nothing again.
+watch([ canvas, state, () => box.value.width, () => box.value.height ], () => {
   const now = state.value;
   painter = undefined;
   if (now.status !== "ready" || !canvas.value) return;

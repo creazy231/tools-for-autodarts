@@ -1,10 +1,10 @@
-import { type Ref, computed, readonly, ref } from "vue";
+import { type Ref, computed, readonly, ref, watch } from "vue";
 import { tryOnScopeDispose, useIntersectionObserver } from "@vueuse/core";
 
 /** How long a list has to stand still before what is in its view counts as seen. */
 const SETTLE_MS = 200;
 
-/** And what is only near it, that much later: a device that serves one read at a time serves the view first. */
+/** And what is only near it, that much later: a device that serves a few reads at a time serves the view first. */
 const BEYOND_MS = 300;
 
 /**
@@ -41,6 +41,11 @@ export function useSeenAtRest(target: Ref<HTMLElement | undefined>, lookAhead = 
     }
     settle();
   }, { root: list, rootMargin: lookAhead, threshold: 0 });
+
+  // Gone mid-wait, the observer goes quietly: no last callback says it left.
+  watch(target, (element) => {
+    if (!element) forget();
+  });
 
   tryOnScopeDispose(forget);
 
