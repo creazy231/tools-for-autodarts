@@ -108,11 +108,12 @@ export function createDeviceReader(read: ReadUrl, now: () => number = Date.now) 
       const layout = layoutOf(info);
       if (!layout) return { ok: false, reason: "not-wled" };
       // A matrix's settings say where its panels sit; read while presets.json,
-      // the slow one, takes the other turn. Without them, it's one panel.
+      // the slow one, takes the other turn. Without them, it's one panel. They
+      // are small, as /json/info is: settings that hang hold no preview long.
       const [ presets, effects, cfg ] = await Promise.all([
         readJson(address, "/presets.json", LIST_TIMEOUT_MS),
         readJson(address, "/json/eff", LIST_TIMEOUT_MS),
-        layout.height > 1 ? readJson(address, "/json/cfg", LIST_TIMEOUT_MS) : undefined,
+        layout.height > 1 ? readJson(address, "/json/cfg", INFO_TIMEOUT_MS) : undefined,
       ]);
       // A presets.json that didn't arrive isn't a device without presets (a
       // 404, `null`): kept as one, every preview would say its preset is gone.
