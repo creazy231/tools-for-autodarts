@@ -8,14 +8,15 @@
     </span>
   </span>
   <!-- While it loads: a spinner the size of the icon a row shows when its device doesn't answer. -->
-  <span v-else-if="state.status === 'loading' && variant === 'row'" :aria-label="message" class="icon-[material-symbols--progress-activity] shrink-0 text-sm motion-safe:animate-spin" role="img" :title="message" />
+  <!-- Still until the list stops at it, as nothing is read for it until then. -->
+  <span v-else-if="state.status === 'loading' && variant === 'row'" ref="pending" :aria-label="message" class="icon-[material-symbols--progress-activity] shrink-0 text-sm" :class="[{ 'motion-safe:animate-spin': seen }]" role="img" :title="message" />
   <template v-else-if="variant === 'row'">
     <span v-if="state.status === 'unreachable'" :aria-label="t('wled.preview.unreachableShort', { address: host })" class="icon-[material-symbols--wifi-off-rounded] shrink-0 text-sm" role="img" :title="t('wled.preview.unreachableShort', { address: host })" />
     <span v-else-if="state.status === 'missing'" class="min-w-0 truncate text-[var(--ad-warning)]" :title="message">{{ message }}</span>
     <span v-else-if="state.status === 'effects' && state.effects.length" class="min-w-0 truncate" :title="state.effects.join(', ')">{{ state.effects.join(", ") }}</span>
   </template>
-  <span v-else-if="state.status !== 'none'" class="flex items-center gap-1.5 text-sm" :class="[state.status === 'missing' ? 'text-[var(--ad-warning)]' : 'text-[var(--ad-text-muted)]']">
-    <span v-if="state.status === 'loading'" aria-hidden="true" class="icon-[material-symbols--progress-activity] shrink-0 motion-safe:animate-spin" />
+  <span v-else-if="state.status !== 'none'" ref="pending" class="flex items-center gap-1.5 text-sm" :class="[state.status === 'missing' ? 'text-[var(--ad-warning)]' : 'text-[var(--ad-text-muted)]']">
+    <span v-if="state.status === 'loading'" aria-hidden="true" class="icon-[material-symbols--progress-activity] shrink-0" :class="[{ 'motion-safe:animate-spin': seen }]" />
     {{ message }}
   </span>
 </template>
@@ -45,16 +46,32 @@ const ROW_ICON_ROOM = 24;
 const state = shallowRef<PreviewState | { status: "none" }>({ status: "none" });
 const canvas = ref<HTMLCanvasElement>();
 const frame = ref<HTMLElement>();
+/** What shows while it loads: where it is tells when the list has stopped at it. */
+const pending = ref<HTMLElement>();
 const visible = ref(false);
+/**
+ * Whether the list has stopped at this preview (composables/useSeenAtRest.ts):
+ * until then nothing is read for it, so a long list on an older tablet reads
+ * and decodes only what is looked at.
+ */
+const seen = useSeenAtRest(pending);
 const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 const { width: frameWidth } = useElementSize(frame);
 // A row's: the line under the name it sits in, which the grid sizes.
 const { width: lineWidth } = useElementSize(computed(() => (props.variant === "row" ? frame.value?.parentElement ?? undefined : undefined)));
 
-/** What the preview may take: its box, or less on a narrow screen, where a row keeps room for the type's icon. */
+/**
+ * What the preview may take: its box, or less on a narrow screen, where a row
+ * keeps room for the type's icon. Until a width's first measurement arrives,
+ * the width it has now: a first picture at the whole box would overflow a
+ * phone's line, and be drawn again a moment later.
+ */
 const box = computed(() => {
-  if (props.variant === "dialog") return { width: Math.min(DIALOG_BOX.width, Math.floor(frameWidth.value) || DIALOG_BOX.width), height: DIALOG_BOX.height };
-  const room = Math.floor(lineWidth.value) - ROW_ICON_ROOM;
+  if (props.variant === "dialog") {
+    const width = Math.floor(frameWidth.value) || widthNow(frame.value) || DIALOG_BOX.width;
+    return { width: Math.min(DIALOG_BOX.width, width), height: DIALOG_BOX.height };
+  }
+  const room = (Math.floor(lineWidth.value) || widthNow(frame.value?.parentElement)) - ROW_ICON_ROOM;
   return { width: room > 0 ? Math.min(ROW_BOX.width, room) : ROW_BOX.width, height: ROW_BOX.height };
 });
 const host = computed(() => (props.target ? new URL(props.target.address).host : ""));
@@ -80,7 +97,7 @@ useIntersectionObserver(canvas, ([ entry ]) => {
   visible.value = entry?.isIntersecting ?? false;
 });
 
-watch(() => (props.target ? `${props.target.address}#${props.target.preset}` : ""), async () => {
+watch([ () => (props.target ? `${props.target.address}#${props.target.preset}` : ""), seen ], async () => {
   const target = props.target;
   const mine = ++run;
   if (!target) {
@@ -88,16 +105,18 @@ watch(() => (props.target ? `${props.target.address}#${props.target.preset}` : "
     return;
   }
   state.value = { status: "loading", target };
+  if (!seen.value) return;
   const loaded = await wledDevices.loadPreview(target);
   if (mine === run) state.value = loaded;
 }, { immediate: true });
 
-watch([ canvas, state, box ], () => {
+// By the box's size: a measurement that says what was already read draws nothing again.
+watch([ canvas, state, () => box.value.width, () => box.value.height ], () => {
   const now = state.value;
   painter = undefined;
   if (now.status !== "ready" || !canvas.value) return;
   const layout = now.preview.layout;
-  painter = ledPainter(canvas.value, layout, ledGeometry(layout, box.value));
+  painter = ledPainter(canvas.value, ledGeometry(layout, box.value));
   startedAt = performance.now();
   shown = "";
   draw(startedAt);
@@ -114,6 +133,11 @@ onBeforeUnmount(() => {
   stop?.();
   run++;
 });
+
+/** An element's width as useElementSize will measure it, rounded down: 0 for none. */
+function widthNow(element?: HTMLElement | null): number {
+  return element ? Math.floor(element.getBoundingClientRect().width) : 0;
+}
 
 /** The frame for `now`, when it differs from the one showing. */
 function draw(now: number) {

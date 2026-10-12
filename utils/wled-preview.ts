@@ -28,6 +28,12 @@ export interface PresetRef {
 export interface Layout {
   width: number;
   height: number;
+  /**
+   * A matrix's panels, where WLED's 2D settings place them (panelsOf). Each is
+   * drawn as a panel of its own, apart from the next, and an LED no panel
+   * covers isn't drawn. Missing: one panel, the whole layout.
+   */
+  panels?: Rect[];
 }
 
 export interface Rect {
@@ -142,6 +148,22 @@ export function layoutOf(info: unknown): Layout | undefined {
   if (matrix && isCount(matrix.w) && isCount(matrix.h)) return { width: matrix.w, height: matrix.h };
   if (isCount(leds.count)) return { width: leds.count, height: 1 };
   return undefined;
+}
+
+/**
+ * A matrix's panels from its `/json/cfg` (`hw.led.matrix.panels`, each `x`,
+ * `y`, `w`, `h` in LEDs), cut to `layout`. None for a strip, or for settings
+ * that aren't a WLED's.
+ */
+export function panelsOf(cfg: unknown, layout: Layout): Rect[] | undefined {
+  const led = isRecord(cfg) && isRecord(cfg.hw) && isRecord(cfg.hw.led) ? cfg.hw.led : undefined;
+  const panels = led && isRecord(led.matrix) && Array.isArray(led.matrix.panels) ? led.matrix.panels : [];
+  const placed = panels
+    .filter(isRecord)
+    .filter(panel => isOffset(panel.x) && isOffset(panel.y) && isCount(panel.w) && isCount(panel.h))
+    .map(panel => clip({ x: panel.x, y: panel.y, w: panel.w, h: panel.h }, layout))
+    .filter(rect => rect.w > 0 && rect.h > 0);
+  return placed.length ? placed : undefined;
 }
 
 /** The presets of a `presets.json` that have a name, by number. */
@@ -343,6 +365,10 @@ function numberOr(value: unknown, fallback: number): number {
 
 function isCount(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value > 0;
+}
+
+function isOffset(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
 function isRecord(value: unknown): value is Record<string, any> {

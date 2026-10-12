@@ -2,11 +2,12 @@ import type { Gif } from "@/utils/gif";
 
 import { decodeGif } from "@/utils/gif";
 import { backgroundFetch } from "@/utils/helpers";
-import { type Layout, type PresetRef, type Preview, isDrawable, layoutOf, makePreview, ownEffects, planPreset } from "@/utils/wled-preview";
+import { type Layout, type PresetRef, type Preview, isDrawable, layoutOf, makePreview, ownEffects, panelsOf, planPreset } from "@/utils/wled-preview";
 
 /**
- * Reading a WLED for its previews (utils/wled-preview.ts): its layout, its
- * presets, its effects' names and the GIFs its presets play.
+ * Reading a WLED for its previews (utils/wled-preview.ts): its layout and a
+ * matrix's panels, its presets, its effects' names and the GIFs its presets
+ * play.
  *
  * Through the background's fetch relay, in every browser: Firefox lets a
  * content script send to the device but not read what it answers, and the
@@ -106,14 +107,22 @@ export function createDeviceReader(read: ReadUrl, now: () => number = Date.now) 
       if (info === undefined) return { ok: false, reason: "unreachable" };
       const layout = layoutOf(info);
       if (!layout) return { ok: false, reason: "not-wled" };
-      const [ presets, effects ] = await Promise.all([ readJson(address, "/presets.json", LIST_TIMEOUT_MS), readJson(address, "/json/eff", LIST_TIMEOUT_MS) ]);
+      // A matrix's settings say where its panels sit; read while presets.json,
+      // the slow one, takes the other turn. Without them, it's one panel. They
+      // are small, as /json/info is: settings that hang hold no preview long.
+      const [ presets, effects, cfg ] = await Promise.all([
+        readJson(address, "/presets.json", LIST_TIMEOUT_MS),
+        readJson(address, "/json/eff", LIST_TIMEOUT_MS),
+        layout.height > 1 ? readJson(address, "/json/cfg", INFO_TIMEOUT_MS) : undefined,
+      ]);
       // A presets.json that didn't arrive isn't a device without presets (a
       // 404, `null`): kept as one, every preview would say its preset is gone.
       if (presets === undefined) return { ok: false, reason: "unreachable" };
+      const panels = panelsOf(cfg, layout);
       return {
         ok: true,
         device: {
-          layout,
+          layout: panels ? { ...layout, panels } : layout,
           presets: presets && typeof presets === "object" && !Array.isArray(presets) ? presets as Record<string, unknown> : {},
           effects: Array.isArray(effects) ? effects.map(name => (typeof name === "string" ? name : "")) : [],
         },
