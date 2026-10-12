@@ -1,0 +1,32 @@
+name: Build Chrome Extension
+
+on:
+  workflow_dispatch: # Ermöglicht das manuelle Starten per Knopfdruck
+  push:
+    branches:
+      - main # ODER master (je nachdem wie dein Haupt-Branch heißt)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Extension
+        run: npm run build
+
+      - name: Upload Extension Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tools-for-autodarts-dist
+          path: .output/chrome-mv3 # Oder 'dist', je nachdem wie WXT den Ordner benennt
