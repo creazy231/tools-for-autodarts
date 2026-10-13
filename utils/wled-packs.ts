@@ -421,6 +421,30 @@ export function updatePackSet(section: WledFx, id: string, pack: IWledSetPack, e
   return view.active ? { ...section, effects: merged, sets } : { ...section, sets };
 }
 
+/**
+ * `section` with `effects` in set `id`: one whose name the set has (its first
+ * of that name) brought up to date where it is, keeping its on/off, and the
+ * others on top, in their order. An id no set has, as when the set was deleted
+ * in another tab meanwhile, is the set in use. The set's id comes back with it.
+ * `section` and `effects` aren't changed.
+ */
+export function addEffectsToSet(section: WledFx, id: string, effects: readonly IWled[]): { section: WledFx; id: string } {
+  const views = listLibrarySets(section, "effects");
+  const target = views.find(set => set.id === id) ?? views.find(set => set.active) ?? views[0];
+  const fresh = new Map<string, IWled>();
+  for (const effect of effects) if (!fresh.has(effect.name)) fresh.set(effect.name, effect);
+  const updated = new Set<string>();
+  const kept = target.items.map((item) => {
+    const effect = fresh.get(item.name);
+    if (!effect || updated.has(item.name)) return item;
+    updated.add(item.name);
+    return { ...copyEffect(effect), enabled: item.enabled };
+  });
+  const list = [ ...[ ...fresh.values() ].filter(effect => !updated.has(effect.name)).map(copyEffect), ...kept ];
+  if (target.active) return { section: { ...section, effects: list }, id: target.id };
+  return { section: { ...section, sets: (section.sets ?? []).map(set => (set.id === target.id ? { ...set, effects: list } : set)) }, id: target.id };
+}
+
 /** A pack preset with its references and effect ids as the device has them. The pack's own copy isn't changed. */
 function renumbered(preset: Record<string, unknown>, slots: ReadonlyMap<number, number>, fxIds: Record<string, number>): Record<string, unknown> {
   const copy = JSON.parse(JSON.stringify(preset)) as Record<string, any>;
@@ -435,6 +459,11 @@ function renumbered(preset: Record<string, unknown>, slots: ReadonlyMap<number, 
     if (isRecord(segment) && typeof segment.fx === "number" && String(segment.fx) in fxIds) segment.fx = fxIds[String(segment.fx)];
   }
   return copy;
+}
+
+/** A copy of an effect, through JSON as addLibrarySet copies, which the settings' reactive proxies don't refuse. */
+function copyEffect(effect: IWled): IWled {
+  return JSON.parse(JSON.stringify(effect));
 }
 
 /** The presets a pack preset plays or ends on: a playlist's entries and its end, and a top-level `ps`. */
