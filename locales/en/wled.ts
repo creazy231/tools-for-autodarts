@@ -42,6 +42,10 @@ export default {
   },
   /** The Add menu and, for the same two labels, the empty list's buttons. */
   add: {
+    packs: {
+      label: "Animation packs",
+      hint: "Ready-made animations for LED matrices",
+    },
     effect: {
       label: "New effect",
       hint: "A preset, a link or a JSON API call",
@@ -133,6 +137,111 @@ export default {
     effects: "{effects}: WLED draws this itself, so it only shows on the lights.",
     ownEffect: "WLED draws this preset itself, so it only shows on the lights.",
     empty: "Preset {preset} changes nothing that can be shown.",
+  },
+  /**
+   * Animation packs: ready-made animations put on the user's WLED and added as an effect set
+   * (components/Settings/Wled/PacksDialog.vue). A pack's name and description come with the pack, in each language.
+   * A size is written "32 × 8", width × height, in every language.
+   */
+  packs: {
+    /** The panel's section, before the effect sets. */
+    section: {
+      title: "Animation packs",
+      intro: "Ready-made animations for LED matrices. Tools puts a pack on your WLED and adds its effects as a set of their own.",
+      browse: "Browse packs",
+    },
+    dialog: {
+      title: "Animation packs",
+      intro: "Pick a pack and the size of your matrix. Tools puts the animations on your WLED as presets and adds their effects to Tools as an effect set.",
+    },
+    /** The address field and the line under it, which says what answered there. */
+    device: {
+      label: "Your WLED",
+      hint: "Type your WLED's address to add a pack.",
+      reading: "Looking for your WLED…",
+      /** `name` is the WLED's own name, `version` its WLED version, `size` its matrix ("64 × 8") and `free` its free space in kB. */
+      found: "{name} · WLED {version} · {size} · {free} kB free",
+      /** The same, for a WLED that doesn't say how much room it has. */
+      foundNoRoom: "{name} · WLED {version} · {size}",
+      /** `address` is what was typed, such as 192.168.0.227. */
+      unreachable: "Nothing answered at {address}. Is your WLED on and on this network?",
+      notWled: "{address} answered, but not as a WLED.",
+      strip: {
+        one: "This WLED drives a strip of {count} LED. The packs are for LED matrices.",
+        other: "This WLED drives a strip of {count} LEDs. The packs are for LED matrices.",
+      },
+    },
+    /** A pack's card. */
+    card: {
+      count: { one: "{count} animation", other: "{count} animations" },
+      /** The size choice's accessible name. */
+      size: "Size",
+      add: "Add",
+      update: "Update",
+      /** `size` is the size picked, such as "64 × 8". */
+      fits: "Made for your WLED ({size})",
+      /** `size` is the size picked, `device` the WLED's matrix. Adding it is still possible. */
+      misfit: "Made for {size}. Your WLED is {device}.",
+      /** `set` is the name of the effect set the pack was added as. */
+      added: "In your effect sets as {set}",
+      newer: "A newer version is here.",
+      show: { one: "Show the animation", other: "Show all {count} animations" },
+      hide: "Hide the animations",
+      /** The cover's accessible name: `pack` is the pack's name, `size` the size shown. */
+      cover: "{pack} at {size}",
+    },
+    /** Under the packs. {discord} and {github} are links named Discord and GitHub, {email} a link named links.email. */
+    otherSizes: "Need a pack in another size, such as 64 × 64? Ask on {discord}, on {github} or by {email}.",
+    links: {
+      email: "email",
+    },
+    loadFailed: "The packs couldn't be loaded. Reload the page and try again.",
+    /** Putting a pack on the WLED. Using the new set afterwards is library.sets.use. */
+    install: {
+      back: "Back to the packs",
+      /** `files` animation files of `kb` kB and `presets` presets go on the WLED at `address`; `effects` effects become the set `set`. */
+      summary: "Puts {files} animation files ({kb} kB) and {presets} presets on your WLED at {address}, and adds {effects} effects to Tools as the effect set {set}.",
+      /** The same, for a pack added before: its set is brought up to date. */
+      summaryUpdate: "Puts {files} animation files ({kb} kB) and {presets} presets on your WLED at {address} again, and brings the {effects} effects of the effect set {set} up to date.",
+      yours: "Your own presets stay as they are. Presets from an earlier install of this pack are brought up to date.",
+      start: "Put it on my WLED",
+      steps: {
+        read: "Reading your WLED…",
+        /** `done` of `count` animation files. */
+        upload: "Putting the animations on your WLED: {done} of {count}",
+        save: "Saving the presets…",
+        check: "Checking…",
+      },
+      keepOpen: "Keep this tab open until it's done.",
+      done: {
+        one: "{pack} is on your WLED, and its effect is in the effect set {set}.",
+        other: "{pack} is on your WLED, and its {count} effects are in the effect set {set}.",
+      },
+      plays: "The set plays from now on.",
+      /** `set` is the name of the set that plays. */
+      waits: "The set that plays is still {set}.",
+      close: "Done",
+      retry: "Try again",
+      saveBackup: "Save your old presets",
+    },
+    /** Why a pack couldn't be put on the WLED. `address` is the WLED's, such as 192.168.0.227. */
+    errors: {
+      unreachable: "Your WLED at {address} didn't answer. Is it on and on this network?",
+      notWled: "{address} isn't a WLED.",
+      notMatrix: "Your WLED drives a strip. The packs are for LED matrices.",
+      /** `effect` is WLED's name of an effect, such as Image. */
+      effectMissing: "Your WLED has no {effect} effect, which the pack needs. It takes WLED 0.15 or newer on an ESP32.",
+      presetsUnreadable: "Your WLED's presets.json can't be read, so nothing was changed.",
+      noSlots: "The pack needs {needed} free preset numbers, and your WLED has {free}.",
+      /** `address` here is the WLED's whole address, such as http://192.168.0.227. */
+      noRoom: "The pack needs {needed} kB, and your WLED has {free} kB free. Delete files you don't need in WLED's file editor ({address}/edit).",
+      locked: "Your WLED is locked with a settings PIN. Unlock it in WLED's settings, then try again.",
+      /** `file` is the file's name, such as ad_180.gif. */
+      uploadFailed: "Putting {file} on your WLED failed. Check the connection and try again.",
+      restored: "Your WLED didn't keep the new presets, so the old ones were put back.",
+      notRestored: "Your WLED's presets may be damaged. Save your old presets and restore them in WLED under Security & Updates.",
+      packUnreadable: "The pack couldn't be read. Reload the page and try again.",
+    },
   },
   link: {
     label: "Link",
