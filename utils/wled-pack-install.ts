@@ -10,16 +10,24 @@ import { layoutOf } from "@/utils/wled-preview";
  * `deviceIo`); in tests a stand-in.
  *
  * Everything is read and checked before anything is written: the device, its
- * effects, its presets and its room. Then every GIF, then presets.json, which
- * is read back. If the device didn't keep it, the old presets.json goes back,
- * and if even that fails it is handed back to be saved. Nothing of the user's
- * is overwritten (utils/wled-packs.ts, planInstall).
+ * effects, its presets and its room. Then every GIF. Then presets.json is read
+ * again, as something may have been saved meanwhile, written, and read back.
+ * What the device holds then decides, not what its answers said. If it didn't
+ * keep the new file, the old one goes back, and if even that fails it is
+ * handed back to be saved. Nothing of the user's is overwritten
+ * (utils/wled-packs.ts, planInstall).
  */
+
+/** An answer: its status, and its body for a 2xx. */
+export interface DeviceAnswer {
+  status: number;
+  body: Uint8Array;
+}
 
 /** What the install asks of a device. */
 export interface DeviceIo {
-  /** GET `path`: its body; `null` for an answer with an error status, such as a 404; `undefined` when nothing answered in time. */
-  read: (path: string, timeoutMs: number) => Promise<Uint8Array | null | undefined>;
+  /** GET `path`: the answer, or `undefined` when nothing answered in time. */
+  read: (path: string, timeoutMs: number) => Promise<DeviceAnswer | undefined>;
   /** POST a file to the device's /upload, stored under `name` ("/ad_180.gif"): a GIF of the catalog by its name, or text. */
   upload: (name: string, file: { gif: string } | { text: string }, timeoutMs: number) => Promise<{ ok: boolean; status?: number }>;
 }
@@ -66,35 +74,46 @@ export const LIST_TIMEOUT_MS = 15_000;
 export const FILES_TIMEOUT_MS = 8000;
 export const GIF_UPLOAD_TIMEOUT_MS = 20_000;
 export const PRESETS_UPLOAD_TIMEOUT_MS = 30_000;
+/** presets.json has just grown when it is read back, and an ESP32 serves 12–19 KB a second. */
+export const CHECK_TIMEOUT_MS = 30_000;
+
+/** A presets.json as read: its text, and its presets. */
+interface PresetsFile {
+  text: string;
+  presets: Record<string, unknown>;
+}
 
 export async function installPack(io: DeviceIo, variant: PackVariant, onProgress: (progress: InstallProgress) => void = () => {}): Promise<InstallResult> {
   const total = variant.gifs.length + 2;
   const report = (step: InstallStep, done: number) => onProgress({ step, done, total });
   report("read", 0);
 
-  const info = parsed(await io.read("/json/info", INFO_TIMEOUT_MS));
-  if (info === undefined) return { ok: false, reason: "unreachable" };
-  const layout = layoutOf(info);
+  const info = await io.read("/json/info", INFO_TIMEOUT_MS);
+  // A device that errors is in trouble: a WLED having a moment, not something else.
+  if (!info || info.status >= 500) return { ok: false, reason: "unreachable" };
+  const layout = layoutOf(json(info));
   if (!layout) return { ok: false, reason: "not-wled" };
   if (layout.height < 2) return { ok: false, reason: "not-matrix" };
 
-  const names = parsed(await io.read("/json/eff", LIST_TIMEOUT_MS));
-  if (names === undefined) return { ok: false, reason: "unreachable" };
-  const fx = deviceEffects(variant.fx, Array.isArray(names) ? names.map(name => (typeof name === "string" ? name : "")) : []);
+  // Every WLED lists its effects: one that doesn't just now is in trouble, not without them.
+  const names = json(await io.read("/json/eff", LIST_TIMEOUT_MS));
+  if (!Array.isArray(names)) return { ok: false, reason: "unreachable" };
+  const fx = deviceEffects(variant.fx, names.map(name => (typeof name === "string" ? name : "")));
   if (!fx.ok) return { ok: false, reason: "effect-missing", effect: fx.missing };
 
-  const raw = await io.read("/presets.json", LIST_TIMEOUT_MS);
-  if (raw === undefined) return { ok: false, reason: "unreachable" };
-  // A 404 is a device without presets.
-  const original = raw === null ? "" : new TextDecoder().decode(raw);
-  const device = parsePresets(original);
-  if (!device) return { ok: false, reason: "presets-unreadable" };
+  const first = await readPresets(io, LIST_TIMEOUT_MS);
+  if (first === undefined) return { ok: false, reason: "unreachable" };
+  if (first === "unreadable") return { ok: false, reason: "presets-unreadable" };
+  const files = fileSizes(json(await io.read("/edit?func=list", FILES_TIMEOUT_MS)));
+  // A device that lists a presets.json with something in it, where the read found none, was read wrong:
+  // going on would replace the presets it has.
+  if (!first.text.trim() && (files?.["/presets.json"] ?? 0) > 0) return { ok: false, reason: "presets-unreadable" };
 
-  const plan = planInstall(device, variant, fx.ids);
+  let device = first;
+  let plan = planInstall(device.presets, variant, fx.ids);
   if (!plan.ok) return { ok: false, reason: "no-slots", needed: plan.needed, free: plan.free };
-  const body = presetsFile(plan.presets);
-  const files = fileSizes(parsed(await io.read("/edit?func=list", FILES_TIMEOUT_MS)));
-  const room = roomFor(info, files, variant.gifs, raw?.length ?? 0, new TextEncoder().encode(body).length);
+  let body = presetsFile(plan.presets);
+  const room = roomFor(json(info), files, variant.gifs, byteLength(device.text), byteLength(body));
   if (!room.ok) return { ok: false, reason: "no-room", neededKb: room.neededKb, freeKb: room.freeKb };
 
   for (const [ at, gif ] of variant.gifs.entries()) {
@@ -105,38 +124,82 @@ export async function installPack(io: DeviceIo, variant: PackVariant, onProgress
   }
 
   report("save", variant.gifs.length);
+  // Read again just before writing: a preset saved while the GIFs went up, in WLED's own app, by a home
+  // automation or by another tab, is planned around rather than lost.
+  const latest = await readPresets(io, LIST_TIMEOUT_MS);
+  if (latest === undefined) return { ok: false, reason: "unreachable" };
+  if (latest === "unreadable") return { ok: false, reason: "presets-unreadable" };
+  if (!samePresets(latest.presets, device.presets)) {
+    device = latest;
+    plan = planInstall(device.presets, variant, fx.ids);
+    if (!plan.ok) return { ok: false, reason: "no-slots", needed: plan.needed, free: plan.free };
+    body = presetsFile(plan.presets);
+    const now = json(await io.read("/json/info", INFO_TIMEOUT_MS));
+    const listed = fileSizes(json(await io.read("/edit?func=list", FILES_TIMEOUT_MS)));
+    const roomNow = roomFor(now, listed, [], byteLength(device.text), byteLength(body));
+    if (!roomNow.ok) return { ok: false, reason: "no-room", neededKb: roomNow.neededKb, freeKb: roomNow.freeKb };
+  }
+
   const saved = await io.upload("/presets.json", { text: body }, PRESETS_UPLOAD_TIMEOUT_MS);
-  // WLED refuses a locked upload before it opens the file.
-  if (saved.status === 401) return { ok: false, reason: "locked" };
   report("check", variant.gifs.length + 1);
-  const written = saved.ok ? await readPresets(io) : undefined;
-  if (written && samePresets(written, plan.presets)) {
+  // What the device holds decides, not the upload's answer: an answer lost on its way can belong to a write that took.
+  const written = await readBack(io);
+  if (written && samePresets(written.presets, plan.presets)) {
     report("check", total);
     return { ok: true, slots: plan.slots, kept: plan.kept, added: plan.added, moved: plan.moved };
   }
+  // Still the old presets: the write was refused before it began. WLED checks a settings PIN that way.
+  if (written && samePresets(written.presets, device.presets)) {
+    return saved.status === 401 ? { ok: false, reason: "locked" } : { ok: false, reason: "upload-failed", file: "presets.json", status: saved.status };
+  }
 
-  // The new presets didn't take. The old ones, unless they are still there, go back.
-  const now = written ?? await readPresets(io);
-  if (now && samePresets(now, device)) return { ok: false, reason: "upload-failed", file: "presets.json", status: saved.status };
-  const backup = original || presetsFile({});
+  // Something else is there, or it can't be read: the old presets go back.
+  const backup = device.text || presetsFile({});
   const restored = await io.upload("/presets.json", { text: backup }, PRESETS_UPLOAD_TIMEOUT_MS);
-  const after = restored.ok ? await readPresets(io) : undefined;
-  if (after && samePresets(after, device)) return { ok: false, reason: "restored" };
+  const after = restored.ok ? await readBack(io) : undefined;
+  if (after && samePresets(after.presets, device.presets)) return { ok: false, reason: "restored" };
   return { ok: false, reason: "not-restored", backup };
 }
 
-async function readPresets(io: DeviceIo): Promise<Record<string, unknown> | undefined> {
-  const raw = await io.read("/presets.json", LIST_TIMEOUT_MS);
-  return raw === undefined ? undefined : parsePresets(raw === null ? "" : new TextDecoder().decode(raw));
+/**
+ * The device's presets.json. A 404 is a device without presets. Another error
+ * status, or bytes that aren't UTF-8 or a JSON object, can't be read: going on
+ * would replace the presets, or write them back changed. `undefined` is no answer.
+ */
+async function readPresets(io: DeviceIo, timeoutMs: number): Promise<PresetsFile | "unreadable" | undefined> {
+  const answer = await io.read("/presets.json", timeoutMs);
+  if (!answer) return undefined;
+  if (answer.status === 404) return { text: "", presets: {} };
+  if (answer.status < 200 || answer.status > 299) return "unreadable";
+  let text: string;
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(answer.body);
+  } catch {
+    return "unreadable";
+  }
+  const presets = parsePresets(text);
+  return presets ? { text, presets } : "unreadable";
 }
 
-/** JSON from a read: `undefined` when nothing answered, `null` for an error status or something that isn't JSON. */
-function parsed(bytes: Uint8Array | null | undefined): unknown {
-  if (bytes === undefined) return undefined;
-  if (bytes === null) return null;
+/** presets.json after a write, asked twice before it counts as unknown. */
+async function readBack(io: DeviceIo): Promise<PresetsFile | undefined> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const read = await readPresets(io, CHECK_TIMEOUT_MS);
+    if (read && read !== "unreadable") return read;
+  }
+  return undefined;
+}
+
+/** The JSON of a 2xx answer; `null` for an error status, nothing at all or something that isn't JSON. */
+function json(answer: DeviceAnswer | undefined): unknown {
+  if (!answer || answer.status < 200 || answer.status > 299) return null;
   try {
-    return JSON.parse(new TextDecoder().decode(bytes));
+    return JSON.parse(new TextDecoder().decode(answer.body));
   } catch {
     return null;
   }
+}
+
+function byteLength(text: string): number {
+  return new TextEncoder().encode(text).length;
 }

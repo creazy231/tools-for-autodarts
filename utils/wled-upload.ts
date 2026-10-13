@@ -38,6 +38,9 @@ const DEFAULT_TIMEOUT_MS = 20_000;
 /** The multipart field WLED's /upload reads the file from, as its own settings page sends it. */
 const UPLOAD_FIELD = "data";
 
+/** The one file an install writes besides its GIFs. */
+const PRESETS_FILE = "/presets.json";
+
 export async function wledUpload(message: WledUploadMessage, deps: WledUploadDeps = defaultDeps()): Promise<{ ok: boolean; status?: number; error?: string }> {
   let origin: string;
   try {
@@ -48,8 +51,13 @@ export async function wledUpload(message: WledUploadMessage, deps: WledUploadDep
     return { ok: false, error: "not an address" };
   }
   if (typeof message.name !== "string" || !NAME.test(message.name) || message.name.includes("..")) return { ok: false, error: "not a file name WLED keeps" };
-  if (message.gif !== undefined && (typeof message.gif !== "string" || !GIF.test(message.gif))) return { ok: false, error: "not a GIF of the catalog" };
-  if (message.gif === undefined && typeof message.text !== "string") return { ok: false, error: "no file" };
+  // Only what an install sends: a GIF of the catalog under its own name, or a presets.json that is a JSON object.
+  // Never a cfg.json, which WLED would apply and reboot with.
+  if (message.gif !== undefined) {
+    if (typeof message.gif !== "string" || !GIF.test(message.gif) || message.name !== `/${message.gif}`) return { ok: false, error: "not a GIF of the catalog" };
+  } else if (message.name !== PRESETS_FILE || !isJsonObject(message.text)) {
+    return { ok: false, error: "not a presets.json" };
+  }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), message.timeoutMs ?? DEFAULT_TIMEOUT_MS);
@@ -70,6 +78,16 @@ export async function wledUpload(message: WledUploadMessage, deps: WledUploadDep
     return { ok: false, error: error instanceof Error ? error.message : String(error) };
   } finally {
     clearTimeout(timer);
+  }
+}
+
+function isJsonObject(text: unknown): boolean {
+  if (typeof text !== "string") return false;
+  try {
+    const value: unknown = JSON.parse(text);
+    return !!value && typeof value === "object" && !Array.isArray(value);
+  } catch {
+    return false;
   }
 }
 

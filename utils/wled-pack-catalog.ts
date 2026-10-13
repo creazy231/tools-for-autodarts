@@ -79,17 +79,22 @@ export async function packPreview(variant: PackVariant, preset: number): Promise
   return { name: plan.name, preview: makePreview(plan, layout, found) };
 }
 
-/** The WLED at `origin`, such as http://192.168.0.227, for an install: reads through the fetch relay, uploads through `wled:upload`. */
+/**
+ * The WLED at `origin`, such as http://192.168.0.227, for an install: reads
+ * through the fetch relay, uploads through `wled:upload`. Only the address's
+ * origin counts, so the reads go where the uploads go whatever was typed.
+ */
 export function deviceIo(origin: string): DeviceIo {
+  const base = originOf(origin);
   return {
     async read(path, timeoutMs) {
-      const response = await backgroundFetch(`${origin}${path}`, { cache: "no-store", credentials: "omit" }, { timeoutMs });
-      if (response.ok && typeof response.data === "string") return dataUrlBytes(response.data);
+      const response = await backgroundFetch(`${base}${path}`, { cache: "no-store", credentials: "omit" }, { timeoutMs });
+      if (response.ok && typeof response.data === "string") return { status: response.status ?? 200, body: dataUrlBytes(response.data) };
       // An answer with an error status, such as a 404, against no answer at all.
-      return typeof response.status === "number" ? null : undefined;
+      return typeof response.status === "number" ? { status: response.status, body: new Uint8Array() } : undefined;
     },
     async upload(name, file, timeoutMs) {
-      const message: WledUploadMessage = { type: "wled:upload", url: origin, name, timeoutMs, ...file };
+      const message: WledUploadMessage = { type: "wled:upload", url: base, name, timeoutMs, ...file };
       const answer: unknown = await browser.runtime.sendMessage(message).catch(() => undefined);
       if (!answer || typeof answer !== "object") return { ok: false, status: undefined };
       const { ok, status } = answer as { ok?: unknown; status?: unknown };
@@ -100,9 +105,10 @@ export function deviceIo(origin: string): DeviceIo {
 
 /** What answers at `origin`: a WLED's name, version, LEDs and free space, read from its /json/info. */
 export async function probeDevice(origin: string): Promise<Probe> {
-  const bytes = await deviceIo(origin).read("/json/info", INFO_TIMEOUT_MS);
-  if (bytes === undefined) return { ok: false, reason: "unreachable" };
-  const device = deviceSummary(parseJson(bytes ?? undefined));
+  const answer = await deviceIo(origin).read("/json/info", INFO_TIMEOUT_MS);
+  // An error is a device in trouble, as the install counts it, not something other than a WLED.
+  if (!answer || answer.status >= 500) return { ok: false, reason: "unreachable" };
+  const device = answer.status >= 200 && answer.status < 300 ? deviceSummary(parseJson(answer.body)) : undefined;
   return device ? { ok: true, device } : { ok: false, reason: "not-wled" };
 }
 
@@ -112,6 +118,15 @@ async function packaged(path: string): Promise<Uint8Array | undefined> {
   const url = (browser.runtime.getURL as (path: string) => string)(`${CATALOG}${path}`);
   const response = await backgroundFetch(url, { cache: "no-cache" });
   return response.ok && typeof response.data === "string" ? dataUrlBytes(response.data) : undefined;
+}
+
+/** An address's origin, such as http://192.168.0.227 for http://192.168.0.227/json; what isn't an address stays as it is. */
+function originOf(address: string): string {
+  try {
+    return new URL(address).origin;
+  } catch {
+    return address;
+  }
 }
 
 /** `load()`'s promise for `key`, kept unless it gave nothing. */

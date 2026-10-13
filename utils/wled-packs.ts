@@ -115,6 +115,9 @@ export const PRESET_RESERVE = 9000;
 /** WLED keeps presets 1 to 250. */
 const PRESETS = { first: 1, last: 250 };
 
+/** WLED's Autosave usermod saves to preset 250 unless it is told otherwise: a pack takes 250 only as its own number. */
+const AUTOSAVE_PRESET = 250;
+
 /** A pack text in `language`, or its English. */
 export function packText(text: PackText, language: Language): string {
   return text[language] || text.en;
@@ -187,8 +190,9 @@ export function deviceEffects(fx: Record<string, string>, names: readonly string
  *    (the lowest, if several have it): it is the same preset from an earlier
  *    install, by Tools or by wled-project's installer, and is brought up to date;
  * 2. the others take their own number when nothing is there (`{}` is nothing);
- * 3. the rest take free numbers from 250 down, away from the low numbers people
- *    save their own presets at.
+ * 3. the rest take free numbers from 249 down, away from the low numbers people
+ *    save their own presets at, and from 250, which WLED's Autosave usermod
+ *    saves to.
  * The pack's references between its presets (a playlist's entries and end, a
  * top-level `ps`) follow them, and effect ids go through `fxIds` (deviceEffects).
  * `"0"`, WLED's placeholder, and keys that aren't preset numbers stay as they are.
@@ -215,9 +219,10 @@ export function planInstall(device: Record<string, unknown>, variant: Pick<PackV
   }
   const kept = slots.size;
 
-  let free = 0;
-  for (let number = PRESETS.first; number <= PRESETS.last; number++) if (!used.has(number)) free++;
   const needed = ids.length - kept;
+  // The numbers the pack can take: 1 to 249 where nothing is, and 250 only as its own number.
+  let free = ids.includes(AUTOSAVE_PRESET) && !slots.has(AUTOSAVE_PRESET) && !used.has(AUTOSAVE_PRESET) ? 1 : 0;
+  for (let number = PRESETS.first; number < AUTOSAVE_PRESET; number++) if (!used.has(number)) free++;
   if (needed > free) return { ok: false, reason: "no-slots", needed, free };
 
   for (const id of ids) {
@@ -226,10 +231,12 @@ export function planInstall(device: Record<string, unknown>, variant: Pick<PackV
     taken.add(id);
   }
   let moved = 0;
-  let next = PRESETS.last;
+  let next = AUTOSAVE_PRESET - 1;
   for (const id of ids) {
     if (slots.has(id)) continue;
     while (used.has(next) || taken.has(next)) next--;
+    // The count above leaves enough; this only guards against a mistake in it.
+    if (next < PRESETS.first) return { ok: false, reason: "no-slots", needed, free };
     slots.set(id, next);
     taken.add(next);
     moved++;
