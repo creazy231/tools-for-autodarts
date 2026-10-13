@@ -69,6 +69,10 @@
     </div>
 
     <template #footer>
+      <!-- A damaged presets.json from an earlier try: its old presets stay on offer until the dialog closes. -->
+      <AppButton @click="saveBackup" v-if="backup && (state.phase === 'confirm' || state.phase === 'failed')" auto>
+        {{ t("wled.packs.install.saveBackup") }}
+      </AppButton>
       <AppButton @click="close" v-if="!chosen" auto>
         {{ t("common.close") }}
       </AppButton>
@@ -92,9 +96,6 @@
         </AppButton>
       </template>
       <template v-else>
-        <AppButton @click="saveBackup" v-if="backup" auto>
-          {{ t("wled.packs.install.saveBackup") }}
-        </AppButton>
         <AppButton @click="back" auto>
           {{ t("wled.packs.install.back") }}
         </AppButton>
@@ -197,7 +198,15 @@ watch(origin, (now) => {
 
 watchDebounced(origin, () => tryAddress(), { debounce: PROBE_DEBOUNCE_MS });
 
-/** Opening: back at the packs, the address of the user's effects when none is typed, and the catalog, once. */
+// An install cut off while presets.json is written can leave it damaged, and the old one is only kept here:
+// leaving the page while one runs asks first.
+useEventListener(window, "beforeunload", (event: BeforeUnloadEvent) => {
+  if (!running.value) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
+
+/** Opening: back at the packs, with no backup of an earlier dialog's, the address of the user's effects when none is typed, and the catalog, once. */
 async function openDialog() {
   chosen.value = undefined;
   state.value = { phase: "confirm" };
@@ -265,7 +274,6 @@ function choose(pack: PackInfo) {
   chosen.value = { pack, size, device, set, update: existing?.id };
   chosenVariant.value = undefined;
   state.value = { phase: "confirm" };
-  backup.value = "";
   loadPackVariant(size.file).then((variant) => {
     if (chosen.value?.size === size) chosenVariant.value = variant;
   });
@@ -276,7 +284,6 @@ async function start() {
   const pick = chosen.value;
   const target = origin.value;
   if (!pick || !target || running.value) return;
-  backup.value = "";
   state.value = { phase: "running", progress: { step: "read", done: 0, total: pick.size.gifs + 2 } };
   const variant = chosenVariant.value ?? await loadPackVariant(pick.size.file);
   if (!variant) {
@@ -288,10 +295,13 @@ async function start() {
   });
   if (!result.ok) {
     const { ok: _ok, ...failure } = result;
-    if (failure.reason === "not-restored") backup.value = failure.backup;
-    state.value = { phase: "failed", failure };
+    // The first copy of the old presets is the one to keep: a later try reads what the failed one left.
+    if (failure.reason === "not-restored" && !backup.value) backup.value = failure.backup;
+    // While one is held, presets.json is damaged from that try, so "nothing was changed" would be wrong.
+    state.value = { phase: "failed", failure: backup.value && failure.reason === "presets-unreadable" ? { reason: "not-restored", backup: backup.value } : failure };
     return;
   }
+  backup.value = "";
   const stored = storeSet(pick, variant, result.slots, target);
   if (!stored) {
     state.value = { phase: "failed", failure: { reason: "pack-unreadable" } };
@@ -345,7 +355,6 @@ function back() {
   if (running.value) return;
   chosen.value = undefined;
   state.value = { phase: "confirm" };
-  backup.value = "";
 }
 
 function close() {
