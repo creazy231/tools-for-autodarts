@@ -152,12 +152,12 @@ export default {
     },
     dialog: {
       title: "Animation packs",
-      intro: "Pick a pack and the size of your matrix. Tools puts the animations on your WLED as presets and adds their effects to Tools as an effect set.",
+      intro: "Pick a pack and the size of your matrix. Tools puts the animations on your WLED as presets and adds their effects to Tools: a whole pack as an effect set of its own, or single animations into the effect set you're editing.",
     },
     /** The address field and the line under it, which says what answered there. */
     device: {
       label: "Your WLED",
-      hint: "Type your WLED's address to add a pack.",
+      hint: "Type your WLED's address to add animations.",
       reading: "Looking for your WLED…",
       /** `name` is the WLED's own name, `version` its WLED version, `size` its matrix ("64 × 8") and `free` its free space in kB. */
       found: "{name} · WLED {version} · {size} · {free} kB free",
@@ -176,7 +176,7 @@ export default {
       count: { one: "{count} animation", other: "{count} animations" },
       /** The size choice's accessible name. */
       size: "Size",
-      add: "Add",
+      add: "Add all",
       update: "Update",
       /** `size` is the size picked, such as "64 × 8". */
       fits: "Made for your WLED ({size})",
@@ -185,10 +185,22 @@ export default {
       /** `set` is the name of the effect set the pack was added as. */
       added: "In your effect sets as {set}",
       newer: "A newer version is here.",
-      show: { one: "Show the animation", other: "Show all {count} animations" },
-      hide: "Hide the animations",
+      /** Opens the pack's page, where single animations can be added. */
+      open: "Show animations",
       /** The cover's accessible name: `pack` is the pack's name, `size` the size shown. */
       cover: "{pack} at {size}",
+    },
+    /** A pack's page: its animations, each of which can be added alone. `set` is the name of the effect set single animations go into. */
+    page: {
+      back: "All packs",
+      intro: "Add single animations to the effect set {set}, or all of them as an effect set of their own.",
+      /** Under library.section.nothingMatches when the search finds none. */
+      noMatch: "No animation has that in its name or triggers.",
+      /** The row's + button: its accessible name and tooltip. `name` is the animation's. */
+      addOne: "Add {name}",
+      adding: "Putting it on your WLED…",
+      added: "Added to {set}",
+      present: "Already in {set}",
     },
     /** Under the packs. {discord} and {github} are links named Discord and GitHub, {email} a link named links.email. */
     otherSizes: "Need a pack in another size, such as 64 × 64? Ask on {discord}, on {github} or by {email}.",
@@ -199,6 +211,8 @@ export default {
     /** Putting a pack on the WLED. Using the new set afterwards is library.sets.use. */
     install: {
       back: "Back to the packs",
+      /** The same, back to the page of the pack being added, by its name. */
+      backTo: "Back to {pack}",
       /** `files` animation files of `kb` kB and `presets` presets go on the WLED at `address`; `effects` effects become the set `set`. */
       summary: "Puts {files} animation files ({kb} kB) and {presets} presets on your WLED at {address}, and adds {effects} effects to Tools as the effect set {set}.",
       /** The same, for a pack added before: its set is brought up to date. */

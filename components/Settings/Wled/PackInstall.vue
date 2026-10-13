@@ -49,6 +49,7 @@
 import AppAlert from "../../AppAlert.vue";
 
 import PackPreview from "./PackPreview.vue";
+import { installFailureText } from "./install-failure";
 
 import type { InstallState } from "@/utils/wled-pack-install";
 import type { PackInfo, PackSize, PackVariant } from "@/utils/wled-packs";
@@ -88,25 +89,7 @@ const stepText = computed(() => {
   if (now.step === "check") return t("wled.packs.install.steps.check");
   return t("wled.packs.install.steps.read");
 });
-const failureText = computed(() => {
-  if (props.state.phase !== "failed") return "";
-  const failure = props.state.failure;
-  switch (failure.reason) {
-    case "unreachable": return t("wled.packs.errors.unreachable", { address: host.value });
-    case "not-wled": return t("wled.packs.errors.notWled", { address: host.value });
-    case "not-matrix": return t("wled.packs.errors.notMatrix");
-    case "effect-missing": return t("wled.packs.errors.effectMissing", { effect: failure.effect });
-    case "presets-unreadable": return t("wled.packs.errors.presetsUnreadable");
-    case "no-slots": return t("wled.packs.errors.noSlots", { needed: failure.needed, free: failure.free });
-    case "no-room": return t("wled.packs.errors.noRoom", { needed: failure.neededKb, free: failure.freeKb, address: props.address });
-    case "locked": return t("wled.packs.errors.locked");
-    case "upload-failed": return t("wled.packs.errors.uploadFailed", { file: failure.file });
-    case "restored": return t("wled.packs.errors.restored");
-    case "not-restored": return t("wled.packs.errors.notRestored");
-    case "pack-unreadable": return t("wled.packs.errors.packUnreadable");
-  }
-  return "";
-});
+const failureText = computed(() => (props.state.phase === "failed" ? installFailureText(props.state.failure, props.address) : ""));
 
 function hostOf(address: string): string {
   try {

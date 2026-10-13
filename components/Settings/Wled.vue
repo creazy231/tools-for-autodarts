@@ -280,7 +280,7 @@
       </template>
     </AppModal>
 
-    <PacksDialog @added="showAddedSet" @close="showPacks = false" :show="showPacks" />
+    <PacksDialog @added="showAddedSet" @close="showPacks = false" :show="showPacks" :target-set="viewed?.id ?? ''" />
 
     <AppNotification
       @close="hideNotification"
