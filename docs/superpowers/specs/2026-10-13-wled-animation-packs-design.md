@@ -77,12 +77,15 @@ Adding a pack later means adding its entry to `scripts/wled-packs.json`, running
 
 1. **Look:** `/json/info` (4 s). Unreachable, not a WLED, or a strip rather than a matrix: stop.
 2. **Effects by name:** `/json/eff`. Each effect the pack uses (`fx`) is looked up by its name. A device without *Image* (no GIF support, e.g. an ESP8266 build) or without *Copy Segment* stops, naming it. Ids that differ from WLED 16's are rewritten in the presets, because WLED's effect ids move between versions.
-3. **Presets:** `/presets.json` (15 s), kept as read. A 404 or an empty file means no presets. Anything that isn't a JSON object stops: replacing it would lose the user's presets.
+3. **Presets:** `/presets.json` (15 s), kept as read. Only a 404 or an empty file means no presets. Stopping cases, since replacing the file would lose the user's presets:
+   - any other error status;
+   - bytes that aren't UTF-8, or aren't a JSON object;
+   - a 404 or empty file while the device's file list shows a `presets.json` with something in it.
 4. **Files:** `/edit?func=list` (WLED 16 lists names and sizes; older versions give nothing, and the check below then assumes every GIF is new).
 5. **Plan the numbers** (`planInstall`, pure). The goal is never to overwrite or delete anything of the user's:
    1. A pack preset whose name a device preset already has takes that preset's number. It is the same preset from an earlier install, by Tools or by `install.py`, and is updated in place.
    2. The others take their own number (wled-project's) when it is free.
-   3. The rest take free numbers from 250 down. Not enough free numbers (WLED keeps 1–250) stops.
+   3. The rest take free numbers from 249 down. Number 250 is taken only as a pack's own number, as WLED's Autosave usermod saves to it by default. Not enough free numbers stops.
 
    A number holding `{}` counts as free. `"0"`, WLED's placeholder, is never a number to use and is kept as it is, as are keys beyond 250. Then every reference is renumbered: playlist `ps` and `end`, top-level `ps`. The merged file is written in WLED's own layout: one preset per line, a newline before each top-level comma, `"0"` first, the rest in number order.
 6. **Room:** the same rule as `install.py`, in 4 KB blocks.
@@ -92,8 +95,12 @@ Adding a pack later means adding its entry to `scripts/wled-packs.json`, running
    - Afterwards, the new `presets.json` + 9,000 bytes + one block must stay free, or WLED can no longer save a preset.
 
    Short of room stops, giving both numbers. Nothing has been written up to here.
-7. **Write:** each GIF to `/upload` (multipart, field `data`, file name `/<name>`), one at a time, 20 s each, with progress; then `presets.json` (30 s). A 401 means a settings PIN is set: stop and say so.
-8. **Check:** read `presets.json` back. Every planned number must hold its preset's name, and every preset the user had must still be there. If not, the original bytes are uploaded again. If even that fails, the result offers the original as a file download ("restore it in WLED under Security & Updates"). The original stays in memory until the dialog closes.
+7. **Write:** each GIF to `/upload` (multipart, field `data`, file name `/<name>`), one at a time, 20 s each, with progress. A 401 means a settings PIN is set: stop and say so. Then `presets.json` is read again; if anything was saved meanwhile (in WLED's app, by a home automation, from another tab), the numbers are planned again around it and room re-checked. Then it is written (30 s).
+8. **Check:** read `presets.json` back (30 s, asked twice). What the device holds decides, not the upload's answer:
+   - the planned file means success, even if the upload's answer was lost;
+   - the old file means the write was refused before it began (a 401 is a settings PIN), so nothing is restored;
+   - anything else, or no read at all, means the original bytes are uploaded again;
+   - if even that fails, the result offers the original as a file download ("restore it in WLED under Security & Updates"). The original stays in memory until the dialog closes.
 
 **Transport.** Reads use `backgroundFetch` with timeouts, as the previews do. Uploads use a new background message, `wled:upload` (`{ url, name, gif | text, timeoutMs }`). `utils/wled-upload.ts` handles it:
 - the GIF is read from the extension's own package (`wled-packs/gifs/<name>`, the name checked against `[A-Za-z0-9._-]+\.gif`), so only text crosses the message channel;
@@ -171,7 +178,11 @@ The dialog's texts are under `wled.packs` in `locales/{en,de,nl}/wled.ts`. Pack 
 - **Bundled, not fetched** (approach 1). The format keeps fetching open for later.
 - **Sizes are width × height, "32 × 8"**, as WLED's 2D settings and wled-project's folders write them, and as the device reports its matrix. The request said "8x32", the panel's shop name. With the device's own size picked automatically, the order matters little.
 - **Numbers are planned per device, not fixed.** A device that has the pack's presets by name keeps them where they are. This is how an `install.py` install becomes a Tools install without moving anything. Otherwise the pack's own numbers are used, then free ones. This is what leaves room for future packs: WLED keeps only 250 presets, and two packs from different sources would otherwise collide.
-- **Nothing of the user's is overwritten or deleted.** A preset is "the pack's" only by its exact name. Presets a newer pack version no longer has stay on the device.
+- **Nothing of the user's is overwritten or deleted.** A preset is "the pack's" only by its exact name. Presets a newer pack version no longer has stay on the device. An independent review of the install found two ways around this, and both were closed:
+  - an error status reading `presets.json` counted as "no presets";
+  - a preset saved during the uploads was lost.
+- **Preset 250 is left to WLED's Autosave usermod**, which saves there by default: free numbers count down from 249.
+- **The background uploads only what an install sends**: a catalog GIF under its own name, or a `presets.json` that is a JSON object. It never uploads `cfg.json`, which WLED applies and reboots with.
 - **Always every GIF.** Re-uploading costs seconds. Skipping by size would keep a changed GIF of equal size stale.
 - **A pack is a set of its own**, as wled-project's import page already arranges it ("make a new effect set … call it Halloween"). It plays at once only when nothing else would.
 - **Pack texts are data**, not catalog keys, so that a pack can be added without touching code. This departs from CLAUDE.md's "every string from `t()`". The build script enforces the three languages instead.

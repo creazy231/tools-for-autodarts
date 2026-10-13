@@ -6,6 +6,23 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **WLED animation packs**: ready-made animations for LED matrices, put on your WLED and into Tools in one go.
+  - **Animation packs** in the WLED settings (or **Add › Animation packs**) lists them with moving previews: *Standard* (68 animations for a 32 × 8 matrix, 89 for 64 × 8) and *Halloween* (49 and 63).
+  - Type your WLED's address and pick a pack. **Add** puts its GIFs and presets on the WLED, and adds its effects, triggers and all, as an effect set named after the pack. The size your WLED reports is picked for you.
+  - Your own presets are never overwritten:
+    - the pack's go to free numbers when theirs are taken, counting down from 249, as WLED's Autosave usermod saves to 250;
+    - a pack added before is brought up to date where it is;
+    - a preset you save while the animations go up is kept;
+    - if the WLED doesn't keep the new presets, the old ones are put back, or handed to you as a file.
+  - A pack in another size, such as 64 × 64, can be asked for on Discord, on GitHub or by email.
+  - Checked in Chrome against a stand-in that answers the way WLED 16 does:
+    - Standard 64 × 8 put 93 GIFs, byte for byte the catalog's, and 94 presets in WLED's own file layout on it. Its 89 effects became a set whose rows' previews were read back from the device.
+    - Halloween beside it kept the five presets the two packs share where they were.
+    - **Update** left presets.json byte for byte the same, and kept an effect switched off.
+    - A preset saved on the device during the uploads was kept, and the pack's Game on moved to 249.
+    - A locked WLED, a full one, a strip and an address where nothing answers each stopped before anything was written.
+    - The dialog can't be closed while it runs, fit a 390 px screen, and read in English, German and Dutch.
+  - Headless, 58 tests ran the catalog build, the numbering, the install against a fake device that fails in every way, and the background's upload.
 - **Online Teams**: players on their own board join a team themselves. With own scores, the captains add their teams, and each player taps **Play for TEAM RED** in the invitation, which seats them on their own board first if they need a seat. **Leave team**, a person with a minus on their own row, takes them off again. Four players on four boards can now play two against two. Every Tools in the lobby needs this version: the invitation and the chip name any account whose Tools is older. The team server speaks a new protocol for it, and still takes 3.3.0's
 - **WLED** shows whose turn it is. A new trigger, `next_player`, plays at the start of a turn for a player who has no effect of their own, ahead of `gameon`, and a JSON API effect can carry that player's name: `{player}` in its JSON becomes the name as autodarts shows it, and `{player_ascii}` the same name in plain letters that a matrix's font can draw, Jürgen as Juergen. A URL effect takes both in its link. With WLED's *Scrolling Text* on a matrix, a name that fits stands still and a longer one scrolls, and the README has an effect for a 32×8 matrix to import as it is. In a Teams match it is the player's own name, not the team's, and the play button and **Test** fill in the name of the account you're signed in with. Checked in Chrome, in a match of two guests against a stand-in that answers the way WLED's own code does: each turn sent its player's name, and the first dart of a turn brought `gameon` back. A 32×8 matrix on WLED 16.0.1 took a JSON body sent the way the browser sends it, as plain text
 - **WLED** can keep a player's effect on for their whole turn. With the new option *Keep the player's effect between darts*, a dart that sets off no effect of its own brings back the effect the turn started with, instead of `gameon`: the player's own, their team's, `next_player` or `bot_throw`. Each player can have a colour of their own that stays on while they throw, with their darts' own effects in between. A turn keeps the one effect it started with, also where there are several to pick from, and with *Don't restart a running effect* on, an effect that is still showing isn't sent again. The option is off until you switch it on, so nothing changes by itself. Checked headless, with WLED's match code driven through turns of players with and without effects of their own, a bot, an online opponent, a corrected dart and a won leg: with the option off it sent exactly what it sent before. Checked in Chrome: the switch in WLED's options, in English, German and Dutch, stored on and off
