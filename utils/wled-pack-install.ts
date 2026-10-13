@@ -129,6 +129,8 @@ export async function installPack(io: DeviceIo, variant: PackVariant, onProgress
   const latest = await readPresets(io, LIST_TIMEOUT_MS);
   if (latest === undefined) return { ok: false, reason: "unreachable" };
   if (latest === "unreadable") return { ok: false, reason: "presets-unreadable" };
+  // presets.json doesn't vanish halfway through an install: a read that finds none, where there were some, went wrong.
+  if (!latest.text.trim() && device.text.trim()) return { ok: false, reason: "presets-unreadable" };
   if (!samePresets(latest.presets, device.presets)) {
     device = latest;
     plan = planInstall(device.presets, variant, fx.ids);
