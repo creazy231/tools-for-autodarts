@@ -1,0 +1,2138 @@
+{
+  "format": 1,
+  "pack": "halloween",
+  "size": "32x8",
+  "width": 32,
+  "height": 8,
+  "version": "bdf0c3976d25",
+  "fx": {
+    "53": "Image"
+  },
+  "presets": {
+    "103": {
+      "n": "AD Takeout",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_takeout.gif"
+        }
+      ]
+    },
+    "131": {
+      "n": "AD Board starting",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_starting.gif"
+        }
+      ]
+    },
+    "132": {
+      "n": "AD Board stopping",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_stopping.gif"
+        }
+      ]
+    },
+    "133": {
+      "n": "AD Calibrating",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_calibrating.gif"
+        }
+      ]
+    },
+    "151": {
+      "n": "AD 25 (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_25.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          14
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "152": {
+      "n": "AD T20 (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t20.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          11
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "153": {
+      "n": "AD Bull-off (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bulloff.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "154": {
+      "n": "AD Board on (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_boardon.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          17
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    },
+    "155": {
+      "n": "AD Board off (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_boardoff.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    },
+    "156": {
+      "n": "AD Tournament ready (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_tournament.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    },
+    "157": {
+      "n": "AD Three in a bed (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_threebed.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          26
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "158": {
+      "n": "AD Triple bull (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_triplebull.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          27
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "159": {
+      "n": "AD Player left (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_left.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          19
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    },
+    "160": {
+      "n": "AD Calibrated (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_calibrated.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    },
+    "161": {
+      "n": "AD Reset (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_reset.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "162": {
+      "n": "AD 25 Orbit (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_25_orbit.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          17
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "163": {
+      "n": "AD T20 Sixty (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t20_sixty.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "164": {
+      "n": "AD Bull-off VS (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bulloff_vs.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "165": {
+      "n": "AD Player left Bye (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_left_bye.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          21
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    },
+    "166": {
+      "n": "AD Three in a bed Sleep (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_threebed_sleep.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "167": {
+      "n": "AD Bag of nails (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_nails.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "168": {
+      "n": "AD 1-1-1 Minimum (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_minimum.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "169": {
+      "n": "AD Fish (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_fish.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          24
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "170": {
+      "n": "AD Bag of nuts (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_nuts.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          31
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "171": {
+      "n": "AD Route 66 (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_route66.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "172": {
+      "n": "AD Baby ton (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_babyton.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          28
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "173": {
+      "n": "AD So close (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_soclose.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          25
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "174": {
+      "n": "AD Nelson (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_nelson.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          26
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "175": {
+      "n": "AD Shanghai (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_shanghai.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          29
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "176": {
+      "n": "AD Champagne breakfast (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_champagne.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          33
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "177": {
+      "n": "AD T20 Oh yes (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t20_ohyes.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "178": {
+      "n": "AD T19 Emerald (HW)",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t19_emerald.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          23
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "189": {
+      "n": "AD Halloween Leg won afterglow",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_legwon_after.gif"
+        }
+      ]
+    },
+    "200": {
+      "n": "AD hold"
+    },
+    "232": {
+      "n": "AD Halloween Game on",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_gameon.gif"
+        }
+      ]
+    },
+    "233": {
+      "n": "AD Halloween Idle",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_idle.gif"
+        }
+      ]
+    },
+    "234": {
+      "n": "AD Halloween Eyes",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_eyes.gif"
+        }
+      ]
+    },
+    "235": {
+      "n": "AD Halloween Match won",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_matchwon.gif"
+        }
+      ]
+    },
+    "236": {
+      "n": "AD Halloween Bot",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_bot.gif"
+        }
+      ]
+    },
+    "237": {
+      "n": "AD Halloween 180",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_180.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          30
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "238": {
+      "n": "AD Halloween Ton",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_ton.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          25
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "239": {
+      "n": "AD Halloween 140+",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_140.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          30
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "240": {
+      "n": "AD Halloween Bust",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_bust.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          27
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "241": {
+      "n": "AD Halloween Leg won",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_legwon.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          31
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 189
+      }
+    },
+    "242": {
+      "n": "AD Halloween No score",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_noscore.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          30
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "243": {
+      "n": "AD Halloween Miss",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_miss.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "244": {
+      "n": "AD Halloween Bull",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_bull.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          20
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "245": {
+      "n": "AD Halloween Triple",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_triple.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "246": {
+      "n": "AD Halloween Double",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_double.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "247": {
+      "n": "AD Halloween 26",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_26.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          31
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 232
+      }
+    },
+    "248": {
+      "n": "AD Halloween Player joined",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_hw_joined.gif"
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          24
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 233
+      }
+    }
+  },
+  "effects": [
+    {
+      "name": "AD Takeout",
+      "preset": 103,
+      "triggers": []
+    },
+    {
+      "name": "AD Board starting",
+      "preset": 131,
+      "triggers": [
+        "board_starting"
+      ]
+    },
+    {
+      "name": "AD Board stopping",
+      "preset": 132,
+      "triggers": [
+        "board_stopping"
+      ]
+    },
+    {
+      "name": "AD Calibrating",
+      "preset": 133,
+      "triggers": [
+        "calibration_started"
+      ]
+    },
+    {
+      "name": "AD 25 (HW)",
+      "preset": 151,
+      "triggers": [
+        "s25"
+      ]
+    },
+    {
+      "name": "AD T20 (HW)",
+      "preset": 152,
+      "triggers": []
+    },
+    {
+      "name": "AD Bull-off (HW)",
+      "preset": 153,
+      "triggers": [
+        "bulloff"
+      ]
+    },
+    {
+      "name": "AD Board on (HW)",
+      "preset": 154,
+      "triggers": [
+        "board_started"
+      ]
+    },
+    {
+      "name": "AD Board off (HW)",
+      "preset": 155,
+      "triggers": [
+        "board_stopped"
+      ]
+    },
+    {
+      "name": "AD Tournament ready (HW)",
+      "preset": 156,
+      "triggers": [
+        "tournament_ready"
+      ]
+    },
+    {
+      "name": "AD Three in a bed (HW)",
+      "preset": 157,
+      "triggers": [
+        "t1_t1_t1",
+        "t2_t2_t2",
+        "t3_t3_t3",
+        "t4_t4_t4",
+        "t5_t5_t5",
+        "t6_t6_t6",
+        "t7_t7_t7",
+        "t8_t8_t8",
+        "t9_t9_t9",
+        "t10_t10_t10",
+        "t11_t11_t11",
+        "t12_t12_t12",
+        "t13_t13_t13",
+        "t14_t14_t14",
+        "t15_t15_t15",
+        "t16_t16_t16",
+        "t17_t17_t17",
+        "t18_t18_t18",
+        "t19_t19_t19",
+        "d1_d1_d1",
+        "d2_d2_d2",
+        "d3_d3_d3",
+        "d4_d4_d4",
+        "d5_d5_d5",
+        "d6_d6_d6",
+        "d7_d7_d7",
+        "d8_d8_d8",
+        "d9_d9_d9",
+        "d10_d10_d10",
+        "d11_d11_d11",
+        "d12_d12_d12",
+        "d13_d13_d13",
+        "d14_d14_d14",
+        "d15_d15_d15",
+        "d16_d16_d16",
+        "d17_d17_d17",
+        "d18_d18_d18",
+        "d19_d19_d19",
+        "d20_d20_d20"
+      ]
+    },
+    {
+      "name": "AD Triple bull (HW)",
+      "preset": 158,
+      "triggers": [
+        "bull_bull_bull"
+      ]
+    },
+    {
+      "name": "AD Player left (HW)",
+      "preset": 159,
+      "triggers": [
+        "lobby_out"
+      ]
+    },
+    {
+      "name": "AD Calibrated (HW)",
+      "preset": 160,
+      "triggers": [
+        "calibration_finished"
+      ]
+    },
+    {
+      "name": "AD Reset (HW)",
+      "preset": 161,
+      "triggers": []
+    },
+    {
+      "name": "AD 25 Orbit (HW)",
+      "preset": 162,
+      "triggers": [
+        "s25"
+      ]
+    },
+    {
+      "name": "AD T20 Sixty (HW)",
+      "preset": 163,
+      "triggers": []
+    },
+    {
+      "name": "AD Bull-off VS (HW)",
+      "preset": 164,
+      "triggers": [
+        "bulloff"
+      ]
+    },
+    {
+      "name": "AD Player left Bye (HW)",
+      "preset": 165,
+      "triggers": [
+        "lobby_out"
+      ]
+    },
+    {
+      "name": "AD Three in a bed Sleep (HW)",
+      "preset": 166,
+      "triggers": [
+        "t1_t1_t1",
+        "t2_t2_t2",
+        "t3_t3_t3",
+        "t4_t4_t4",
+        "t5_t5_t5",
+        "t6_t6_t6",
+        "t7_t7_t7",
+        "t8_t8_t8",
+        "t9_t9_t9",
+        "t10_t10_t10",
+        "t11_t11_t11",
+        "t12_t12_t12",
+        "t13_t13_t13",
+        "t14_t14_t14",
+        "t15_t15_t15",
+        "t16_t16_t16",
+        "t17_t17_t17",
+        "t18_t18_t18",
+        "t19_t19_t19",
+        "d1_d1_d1",
+        "d2_d2_d2",
+        "d3_d3_d3",
+        "d4_d4_d4",
+        "d5_d5_d5",
+        "d6_d6_d6",
+        "d7_d7_d7",
+        "d8_d8_d8",
+        "d9_d9_d9",
+        "d10_d10_d10",
+        "d11_d11_d11",
+        "d12_d12_d12",
+        "d13_d13_d13",
+        "d14_d14_d14",
+        "d15_d15_d15",
+        "d16_d16_d16",
+        "d17_d17_d17",
+        "d18_d18_d18",
+        "d19_d19_d19",
+        "d20_d20_d20"
+      ]
+    },
+    {
+      "name": "AD Bag of nails (HW)",
+      "preset": 167,
+      "triggers": [
+        "s1_s1_s1",
+        "s1_s1_d1",
+        "s1_s1_t1",
+        "s1_d1_s1",
+        "s1_d1_d1",
+        "s1_d1_t1",
+        "s1_t1_s1",
+        "s1_t1_d1",
+        "s1_t1_t1",
+        "d1_s1_s1",
+        "d1_s1_d1",
+        "d1_s1_t1",
+        "d1_d1_s1",
+        "d1_d1_t1",
+        "d1_t1_s1",
+        "d1_t1_d1",
+        "d1_t1_t1",
+        "t1_s1_s1",
+        "t1_s1_d1",
+        "t1_s1_t1",
+        "t1_d1_s1",
+        "t1_d1_d1",
+        "t1_d1_t1",
+        "t1_t1_s1",
+        "t1_t1_d1"
+      ]
+    },
+    {
+      "name": "AD 1-1-1 Minimum (HW)",
+      "preset": 168,
+      "triggers": [
+        "s1_s1_s1"
+      ]
+    },
+    {
+      "name": "AD Fish (HW)",
+      "preset": 169,
+      "triggers": [
+        "1-9"
+      ]
+    },
+    {
+      "name": "AD Bag of nuts (HW)",
+      "preset": 170,
+      "triggers": [
+        "45"
+      ]
+    },
+    {
+      "name": "AD Route 66 (HW)",
+      "preset": 171,
+      "triggers": [
+        "66"
+      ]
+    },
+    {
+      "name": "AD Baby ton (HW)",
+      "preset": 172,
+      "triggers": [
+        "95"
+      ]
+    },
+    {
+      "name": "AD So close (HW)",
+      "preset": 173,
+      "triggers": [
+        "99",
+        "177"
+      ]
+    },
+    {
+      "name": "AD Nelson (HW)",
+      "preset": 174,
+      "triggers": [
+        "111"
+      ]
+    },
+    {
+      "name": "AD Shanghai (HW)",
+      "preset": 175,
+      "triggers": [
+        "s1_d1_t1",
+        "s1_t1_d1",
+        "d1_s1_t1",
+        "d1_t1_s1",
+        "t1_s1_d1",
+        "t1_d1_s1",
+        "s2_d2_t2",
+        "s2_t2_d2",
+        "d2_s2_t2",
+        "d2_t2_s2",
+        "t2_s2_d2",
+        "t2_d2_s2",
+        "s3_d3_t3",
+        "s3_t3_d3",
+        "d3_s3_t3",
+        "d3_t3_s3",
+        "t3_s3_d3",
+        "t3_d3_s3",
+        "s4_d4_t4",
+        "s4_t4_d4",
+        "d4_s4_t4",
+        "d4_t4_s4",
+        "t4_s4_d4",
+        "t4_d4_s4",
+        "s5_d5_t5",
+        "s5_t5_d5",
+        "d5_s5_t5",
+        "d5_t5_s5",
+        "t5_s5_d5",
+        "t5_d5_s5",
+        "s6_d6_t6",
+        "s6_t6_d6",
+        "d6_s6_t6",
+        "d6_t6_s6",
+        "t6_s6_d6",
+        "t6_d6_s6",
+        "s7_d7_t7",
+        "s7_t7_d7",
+        "d7_s7_t7",
+        "d7_t7_s7",
+        "t7_s7_d7",
+        "t7_d7_s7",
+        "s8_d8_t8",
+        "s8_t8_d8",
+        "d8_s8_t8",
+        "d8_t8_s8",
+        "t8_s8_d8",
+        "t8_d8_s8",
+        "s9_d9_t9",
+        "s9_t9_d9",
+        "d9_s9_t9",
+        "d9_t9_s9",
+        "t9_s9_d9",
+        "t9_d9_s9",
+        "s10_d10_t10",
+        "s10_t10_d10",
+        "d10_s10_t10",
+        "d10_t10_s10",
+        "t10_s10_d10",
+        "t10_d10_s10",
+        "s11_d11_t11",
+        "s11_t11_d11",
+        "d11_s11_t11",
+        "d11_t11_s11",
+        "t11_s11_d11",
+        "t11_d11_s11",
+        "s12_d12_t12",
+        "s12_t12_d12",
+        "d12_s12_t12",
+        "d12_t12_s12",
+        "t12_s12_d12",
+        "t12_d12_s12",
+        "s13_d13_t13",
+        "s13_t13_d13",
+        "d13_s13_t13",
+        "d13_t13_s13",
+        "t13_s13_d13",
+        "t13_d13_s13",
+        "s14_d14_t14",
+        "s14_t14_d14",
+        "d14_s14_t14",
+        "d14_t14_s14",
+        "t14_s14_d14",
+        "t14_d14_s14",
+        "s15_d15_t15",
+        "s15_t15_d15",
+        "d15_s15_t15",
+        "d15_t15_s15",
+        "t15_s15_d15",
+        "t15_d15_s15",
+        "s16_d16_t16",
+        "s16_t16_d16",
+        "d16_s16_t16",
+        "d16_t16_s16",
+        "t16_s16_d16",
+        "t16_d16_s16",
+        "s17_d17_t17",
+        "s17_t17_d17",
+        "d17_s17_t17",
+        "d17_t17_s17",
+        "t17_s17_d17",
+        "t17_d17_s17",
+        "s18_d18_t18",
+        "s18_t18_d18",
+        "d18_s18_t18",
+        "d18_t18_s18",
+        "t18_s18_d18",
+        "t18_d18_s18",
+        "s19_d19_t19",
+        "s19_t19_d19",
+        "d19_s19_t19",
+        "d19_t19_s19",
+        "t19_s19_d19",
+        "t19_d19_s19",
+        "s20_d20_t20",
+        "s20_t20_d20",
+        "d20_s20_t20",
+        "d20_t20_s20",
+        "t20_s20_d20",
+        "t20_d20_s20"
+      ]
+    },
+    {
+      "name": "AD Champagne breakfast (HW)",
+      "preset": 176,
+      "triggers": [
+        "t20_t5_t1",
+        "t20_t1_t5",
+        "t5_t20_t1",
+        "t5_t1_t20",
+        "t1_t20_t5",
+        "t1_t5_t20"
+      ]
+    },
+    {
+      "name": "AD T20 Oh yes (HW)",
+      "preset": 177,
+      "triggers": [
+        "t20"
+      ]
+    },
+    {
+      "name": "AD T19 Emerald (HW)",
+      "preset": 178,
+      "triggers": [
+        "t19"
+      ]
+    },
+    {
+      "name": "AD Halloween Game on",
+      "preset": 232,
+      "triggers": [
+        "gameon"
+      ]
+    },
+    {
+      "name": "AD Halloween Idle",
+      "preset": 233,
+      "triggers": [
+        "idle"
+      ]
+    },
+    {
+      "name": "AD Halloween Eyes",
+      "preset": 234,
+      "triggers": [
+        "idle"
+      ]
+    },
+    {
+      "name": "AD Halloween Match won",
+      "preset": 235,
+      "triggers": [
+        "matchshot"
+      ]
+    },
+    {
+      "name": "AD Halloween Bot",
+      "preset": 236,
+      "triggers": [
+        "bot_throw"
+      ]
+    },
+    {
+      "name": "AD Halloween 180",
+      "preset": 237,
+      "triggers": [
+        "180",
+        "t20_t20_t20"
+      ]
+    },
+    {
+      "name": "AD Halloween Ton",
+      "preset": 238,
+      "triggers": [
+        "100-139"
+      ]
+    },
+    {
+      "name": "AD Halloween 140+",
+      "preset": 239,
+      "triggers": [
+        "140-179"
+      ]
+    },
+    {
+      "name": "AD Halloween Bust",
+      "preset": 240,
+      "triggers": [
+        "busted"
+      ]
+    },
+    {
+      "name": "AD Halloween Leg won",
+      "preset": 241,
+      "triggers": [
+        "gameshot"
+      ]
+    },
+    {
+      "name": "AD Halloween No score",
+      "preset": 242,
+      "triggers": [
+        "0"
+      ]
+    },
+    {
+      "name": "AD Halloween Miss",
+      "preset": 243,
+      "triggers": [
+        "outside",
+        "miss"
+      ]
+    },
+    {
+      "name": "AD Halloween Bull",
+      "preset": 244,
+      "triggers": [
+        "bull"
+      ]
+    },
+    {
+      "name": "AD Halloween Triple",
+      "preset": 245,
+      "triggers": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9",
+        "t10",
+        "t11",
+        "t12",
+        "t13",
+        "t14",
+        "t15",
+        "t16",
+        "t17",
+        "t18"
+      ]
+    },
+    {
+      "name": "AD Halloween Double",
+      "preset": 246,
+      "triggers": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "d6",
+        "d7",
+        "d8",
+        "d9",
+        "d10",
+        "d11",
+        "d12",
+        "d13",
+        "d14",
+        "d15",
+        "d16",
+        "d17",
+        "d18",
+        "d19",
+        "d20"
+      ]
+    },
+    {
+      "name": "AD Halloween 26",
+      "preset": 247,
+      "triggers": [
+        "26"
+      ]
+    },
+    {
+      "name": "AD Halloween Player joined",
+      "preset": 248,
+      "triggers": [
+        "lobby_in"
+      ]
+    }
+  ],
+  "gifs": [
+    {
+      "name": "ad_25.gif",
+      "bytes": 941
+    },
+    {
+      "name": "ad_25_orbit.gif",
+      "bytes": 2094
+    },
+    {
+      "name": "ad_babyton.gif",
+      "bytes": 2348
+    },
+    {
+      "name": "ad_boardoff.gif",
+      "bytes": 699
+    },
+    {
+      "name": "ad_boardon.gif",
+      "bytes": 1020
+    },
+    {
+      "name": "ad_bulloff.gif",
+      "bytes": 1008
+    },
+    {
+      "name": "ad_bulloff_vs.gif",
+      "bytes": 2746
+    },
+    {
+      "name": "ad_calibrated.gif",
+      "bytes": 909
+    },
+    {
+      "name": "ad_calibrating.gif",
+      "bytes": 2243
+    },
+    {
+      "name": "ad_champagne.gif",
+      "bytes": 3557
+    },
+    {
+      "name": "ad_fish.gif",
+      "bytes": 2746
+    },
+    {
+      "name": "ad_hw_140.gif",
+      "bytes": 3623
+    },
+    {
+      "name": "ad_hw_180.gif",
+      "bytes": 4450
+    },
+    {
+      "name": "ad_hw_26.gif",
+      "bytes": 2786
+    },
+    {
+      "name": "ad_hw_bot.gif",
+      "bytes": 2206
+    },
+    {
+      "name": "ad_hw_bull.gif",
+      "bytes": 1825
+    },
+    {
+      "name": "ad_hw_bust.gif",
+      "bytes": 2966
+    },
+    {
+      "name": "ad_hw_double.gif",
+      "bytes": 1349
+    },
+    {
+      "name": "ad_hw_eyes.gif",
+      "bytes": 3853
+    },
+    {
+      "name": "ad_hw_gameon.gif",
+      "bytes": 5180
+    },
+    {
+      "name": "ad_hw_idle.gif",
+      "bytes": 9602
+    },
+    {
+      "name": "ad_hw_joined.gif",
+      "bytes": 1572
+    },
+    {
+      "name": "ad_hw_legwon.gif",
+      "bytes": 4681
+    },
+    {
+      "name": "ad_hw_legwon_after.gif",
+      "bytes": 2847
+    },
+    {
+      "name": "ad_hw_matchwon.gif",
+      "bytes": 6402
+    },
+    {
+      "name": "ad_hw_miss.gif",
+      "bytes": 1270
+    },
+    {
+      "name": "ad_hw_noscore.gif",
+      "bytes": 2838
+    },
+    {
+      "name": "ad_hw_ton.gif",
+      "bytes": 4864
+    },
+    {
+      "name": "ad_hw_triple.gif",
+      "bytes": 1581
+    },
+    {
+      "name": "ad_left.gif",
+      "bytes": 765
+    },
+    {
+      "name": "ad_left_bye.gif",
+      "bytes": 1430
+    },
+    {
+      "name": "ad_minimum.gif",
+      "bytes": 3687
+    },
+    {
+      "name": "ad_nails.gif",
+      "bytes": 2804
+    },
+    {
+      "name": "ad_nelson.gif",
+      "bytes": 1689
+    },
+    {
+      "name": "ad_nuts.gif",
+      "bytes": 2765
+    },
+    {
+      "name": "ad_reset.gif",
+      "bytes": 782
+    },
+    {
+      "name": "ad_route66.gif",
+      "bytes": 1867
+    },
+    {
+      "name": "ad_shanghai.gif",
+      "bytes": 3902
+    },
+    {
+      "name": "ad_soclose.gif",
+      "bytes": 2020
+    },
+    {
+      "name": "ad_starting.gif",
+      "bytes": 1051
+    },
+    {
+      "name": "ad_stopping.gif",
+      "bytes": 1106
+    },
+    {
+      "name": "ad_t19_emerald.gif",
+      "bytes": 2730
+    },
+    {
+      "name": "ad_t20.gif",
+      "bytes": 750
+    },
+    {
+      "name": "ad_t20_ohyes.gif",
+      "bytes": 3349
+    },
+    {
+      "name": "ad_t20_sixty.gif",
+      "bytes": 1367
+    },
+    {
+      "name": "ad_takeout.gif",
+      "bytes": 1713
+    },
+    {
+      "name": "ad_threebed.gif",
+      "bytes": 1983
+    },
+    {
+      "name": "ad_threebed_sleep.gif",
+      "bytes": 2166
+    },
+    {
+      "name": "ad_tournament.gif",
+      "bytes": 759
+    },
+    {
+      "name": "ad_triplebull.gif",
+      "bytes": 2138
+    }
+  ]
+}
