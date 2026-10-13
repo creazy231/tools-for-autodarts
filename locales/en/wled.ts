@@ -144,10 +144,10 @@ export default {
    * A size is written "32 × 8", width × height, in every language.
    */
   packs: {
-    /** The panel's section, before the effect sets. */
+    /** The panel's first section, above its intro: the packs, a tile each. */
     section: {
       title: "Animation packs",
-      intro: "Ready-made animations for LED matrices. Tools puts a pack on your WLED and adds its effects as a set of their own.",
+      intro: "Ready-made animations for LED matrices. Tools puts them on your WLED: a whole pack as an effect set of its own, or single animations into one of your sets.",
       browse: "Browse packs",
     },
     dialog: {

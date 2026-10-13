@@ -8,6 +8,8 @@
     -->
     <div v-if="config" class="adt-container !overflow-visible">
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
+        <PacksOverview @open="openPacks" />
+
         <p class="mb-6 max-w-3xl">
           {{ t("wled.intro") }}
         </p>
@@ -31,24 +33,6 @@
           <OptionRow :description="t('wled.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.wledFx.disabledGameModes" :intro="t('wled.gameModes.intro')" feature="wledFx" />
           </OptionRow>
-        </section>
-
-        <section class="mb-10">
-          <div class="flex min-h-12 items-center justify-between gap-3">
-            <!-- One run of text, as the other headings, so a wrapped heading keeps its count after its last word. -->
-            <h3 class="adt-section-title">
-              <span>{{ t("wled.packs.section.title") }}<span v-if="packCount" class="adt-section-count">&nbsp;·&nbsp;{{ packCount }}</span></span>
-            </h3>
-            <AppButton @click="openPacks" auto size="sm">
-              <span class="flex items-center gap-1">
-                <span class="icon-[material-symbols--library-add-outline-rounded] text-lg" />
-                {{ t("wled.packs.section.browse") }}
-              </span>
-            </AppButton>
-          </div>
-          <p class="mt-1 max-w-3xl text-sm text-[var(--ad-text-muted)]">
-            {{ t("wled.packs.section.intro") }}
-          </p>
         </section>
 
         <LibrarySets
@@ -280,7 +264,7 @@
       </template>
     </AppModal>
 
-    <PacksDialog @added="showAddedSet" @close="showPacks = false" :show="showPacks" :target-set="viewed?.id ?? ''" />
+    <PacksDialog @added="showAddedSet" @close="showPacks = false" :show="showPacks" :start="packStart" :target-set="viewed?.id ?? ''" />
 
     <AppNotification
       @close="hideNotification"
@@ -348,6 +332,7 @@ import { stableKey } from "./Library/stable-key";
 import LibrarySets from "./Library/LibrarySets.vue";
 import PresetPreview from "./Wled/PresetPreview.vue";
 import PacksDialog from "./Wled/PacksDialog.vue";
+import PacksOverview from "./Wled/PacksOverview.vue";
 
 import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
@@ -358,7 +343,6 @@ import { getAuthToken } from "@/utils/helpers";
 import { type IWled } from "@/utils/storage";
 import { tokenAccount } from "@/utils/team-room";
 import { wledDevices } from "@/utils/wled-device";
-import { loadPackIndex } from "@/utils/wled-pack-catalog";
 import { type PresetRef, deviceOrigin, presetNames, presetRef } from "@/utils/wled-preview";
 import { WledType } from "#imports";
 
@@ -440,10 +424,9 @@ const csvImportPlaceholder = ref(
 const showDeleteAllModal = ref(false);
 
 // Animation packs
-const attrs = useAttrs();
 const showPacks = ref(false);
-/** How many packs there are, for the section's heading: read by the panel, not by the card. */
-const packCount = ref(0);
+/** The pack whose page the dialog opens on, by its id: "" is the list of packs. */
+const packStart = ref("");
 
 const { notification, showNotification, hideNotification } = useNotification();
 /**
@@ -506,11 +489,6 @@ const moreActions = computed(() => [
   },
 ]);
 
-onMounted(async () => {
-  if (attrs["data-feature-index"]) return;
-  packCount.value = (await loadPackIndex())?.packs.length ?? 0;
-});
-
 // Once the typing has stopped, not on every key: each read goes to the device.
 watchDebounced(() => [ newEffect.value.url, newEffect.value.type ], async () => {
   if (newEffect.value.type === WledType.PRESET && newEffect.value.url) await fetchPresets();
@@ -546,7 +524,9 @@ function openImportCSVModal() {
   csvError.value = null;
 }
 
-function openPacks() {
+/** The packs dialog: on a pack's page when its tile was clicked, else on the list of packs. Menus call it with nothing of theirs. */
+function openPacks(pack?: unknown) {
+  packStart.value = typeof pack === "string" ? pack : "";
   showPacks.value = true;
 }
 
