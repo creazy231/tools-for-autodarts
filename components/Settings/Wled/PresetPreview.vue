@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import type { PresetRef } from "@/utils/wled-preview";
 
-import { DIALOG_BOX, type LedPainter, ROW_BOX, everyFrame, ledGeometry, ledPainter } from "@/utils/led-canvas";
+import { DIALOG_BOX, ROW_BOX } from "@/utils/led-canvas";
 import { type PreviewState, wledDevices } from "@/utils/wled-device";
 
 const props = withDefaults(defineProps<{
@@ -48,14 +48,12 @@ const canvas = ref<HTMLCanvasElement>();
 const frame = ref<HTMLElement>();
 /** What shows while it loads: where it is tells when the list has stopped at it. */
 const pending = ref<HTMLElement>();
-const visible = ref(false);
 /**
  * Whether the list has stopped at this preview (composables/useSeenAtRest.ts):
  * until then nothing is read for it, so a long list on an older tablet reads
  * and decodes only what is looked at.
  */
 const seen = useSeenAtRest(pending);
-const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 const { width: frameWidth } = useElementSize(frame);
 // A row's: the line under the name it sits in, which the grid sizes.
 const { width: lineWidth } = useElementSize(computed(() => (props.variant === "row" ? frame.value?.parentElement ?? undefined : undefined)));
@@ -86,16 +84,10 @@ const message = computed(() => {
   if (now.status === "empty") return t("wled.preview.empty", { preset: now.target.preset });
   return "";
 });
+/** The picture once it is read, for the painter. */
+const preview = computed(() => (state.value.status === "ready" ? state.value.preview : undefined));
 
-let painter: LedPainter | undefined;
-let stop: (() => void) | undefined;
-let startedAt = 0;
-let shown = "";
 let run = 0;
-
-useIntersectionObserver(canvas, ([ entry ]) => {
-  visible.value = entry?.isIntersecting ?? false;
-});
 
 watch([ () => (props.target ? `${props.target.address}#${props.target.preset}` : ""), seen ], async () => {
   const target = props.target;
@@ -110,43 +102,14 @@ watch([ () => (props.target ? `${props.target.address}#${props.target.preset}` :
   if (mine === run) state.value = loaded;
 }, { immediate: true });
 
-// By the box's size: a measurement that says what was already read draws nothing again.
-watch([ canvas, state, () => box.value.width, () => box.value.height ], () => {
-  const now = state.value;
-  painter = undefined;
-  if (now.status !== "ready" || !canvas.value) return;
-  const layout = now.preview.layout;
-  painter = ledPainter(canvas.value, ledGeometry(layout, box.value));
-  startedAt = performance.now();
-  shown = "";
-  draw(startedAt);
-}, { flush: "post" });
-
-watch([ visible, reducedMotion, () => props.still, state ], () => {
-  stop?.();
-  stop = undefined;
-  const now = state.value;
-  if (now.status === "ready" && now.preview.animated && visible.value && !reducedMotion.value && !props.still) stop = everyFrame(draw);
-});
+useLedCanvas(canvas, preview, box, toRef(props, "still"));
 
 onBeforeUnmount(() => {
-  stop?.();
   run++;
 });
 
 /** An element's width as useElementSize will measure it, rounded down: 0 for none. */
 function widthNow(element?: HTMLElement | null): number {
   return element ? Math.floor(element.getBoundingClientRect().width) : 0;
-}
-
-/** The frame for `now`, when it differs from the one showing. */
-function draw(now: number) {
-  const current = state.value;
-  if (current.status !== "ready" || !painter) return;
-  const t = reducedMotion.value || props.still ? 0 : now - startedAt;
-  const key = current.preview.keyAt(t);
-  if (key === shown) return;
-  shown = key;
-  painter.paint(current.preview.pixelsAt(t));
 }
 </script>

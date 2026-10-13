@@ -200,6 +200,7 @@ declare global {
   const useIntervalFn: typeof import('@vueuse/core')['useIntervalFn']
   const useKeyModifier: typeof import('@vueuse/core')['useKeyModifier']
   const useLastChanged: typeof import('@vueuse/core')['useLastChanged']
+  const useLedCanvas: typeof import('./composables/useLedCanvas')['useLedCanvas']
   const useLibrarySets: typeof import('./composables/useLibrarySets')['useLibrarySets']
   const useLink: typeof import('vue-router')['useLink']
   const useLocalStorage: typeof import('@vueuse/core')['useLocalStorage']
