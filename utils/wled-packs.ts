@@ -1,7 +1,10 @@
 import type { Language } from "@/utils/i18n/site-language";
+import type { IConfig, IWled, IWledSet, IWledSetPack } from "@/utils/storage";
 import type { Layout } from "@/utils/wled-preview";
 
 import { canonicalJson } from "@/utils/canonical-json";
+import { activateLibrarySet, addLibrarySet, librarySetNameTaken, listLibrarySets } from "@/utils/library-sets";
+import { WledType } from "@/utils/storage";
 import { layoutOf } from "@/utils/wled-preview";
 
 /**
@@ -96,6 +99,10 @@ export type InstallPlan =
   | { ok: false; reason: "no-slots"; needed: number; free: number };
 
 export type Room = { ok: true } | { ok: false; neededKb: number; freeKb: number };
+
+/** WLED's settings, whose effects come in sets. */
+type WledFx = IConfig["wledFx"];
+
 
 /** The catalog format this version reads. */
 export const PACK_FORMAT = 1;
@@ -296,6 +303,73 @@ export function roomFor(info: unknown, files: Record<string, number> | undefined
   const needed = Math.max(free - after + keep, free - tightest + FS_BLOCK);
   return { ok: false, neededKb: Math.ceil(needed / 1000), freeKb: Math.max(0, Math.floor(free / 1000)) };
 }
+
+/** The pack's effects for Tools: each a PRESET effect on the device at `address`, playing its preset where the plan put it. */
+export function packEffects(variant: Pick<PackVariant, "effects">, slots: ReadonlyMap<number, number>, address: string): IWled[] {
+  return variant.effects.map(effect => ({
+    name: effect.name,
+    type: WledType.PRESET,
+    url: address,
+    preset: String(slots.get(effect.preset) ?? effect.preset),
+    json_api: "",
+    enabled: true,
+    triggers: [ ...effect.triggers ],
+  }));
+}
+
+/**
+ * A pack set's effects after an update: the pack's, each keeping the on/off of
+ * the effect of its name, then every other effect the set held, such as the
+ * user's own, in their order.
+ */
+export function mergePackEffects(current: readonly IWled[], fresh: readonly IWled[]): IWled[] {
+  const before = new Map<string, IWled>();
+  for (const effect of current) if (!before.has(effect.name)) before.set(effect.name, effect);
+  const names = new Set(fresh.map(effect => effect.name));
+  return [
+    ...fresh.map(effect => ({ ...effect, enabled: before.get(effect.name)?.enabled ?? effect.enabled })),
+    ...current.filter(effect => !names.has(effect.name)),
+  ];
+}
+
+/** A name for a pack's new set: the pack's; with its size if a set has that name; then numbered. */
+export function packSetName(name: string, size: string, sets: readonly { id: string; name: string }[], defaultName: string): string {
+  const sized = `${name} (${size})`;
+  if (!librarySetNameTaken(sets, name, defaultName)) return name;
+  if (!librarySetNameTaken(sets, sized, defaultName)) return sized;
+  for (let count = 2; ; count++) {
+    const numbered = `${sized} ${count}`;
+    if (!librarySetNameTaken(sets, numbered, defaultName)) return numbered;
+  }
+}
+
+/** The set added from `pack` in `size`, if there is one. */
+export function findPackSet(section: { sets?: IWledSet[] }, pack: string, size: string): IWledSet | undefined {
+  return (section.sets ?? []).find(set => set.pack?.id === pack && set.pack?.size === size);
+}
+
+/**
+ * `section` with a new set for a pack, holding `effects`, and the set's id.
+ * It plays at once when the set in use has no effects, as nothing would play
+ * otherwise; else the set in use goes on playing. `section` isn't changed.
+ */
+export function addPackSet(section: WledFx, name: string, pack: IWledSetPack, effects: IWled[]): { section: WledFx; id: string; inUse: boolean } {
+  const added = addLibrarySet(section, "effects", name, effects);
+  const marked: WledFx = { ...added.section, sets: (added.section.sets ?? []).map(set => (set.id === added.id ? { ...set, pack: { ...pack } } : set)) };
+  const playing = listLibrarySets(section, "effects").find(set => set.active)?.items ?? [];
+  if (playing.length) return { section: marked, id: added.id, inUse: false };
+  return { section: activateLibrarySet(marked, "effects", added.id), id: added.id, inUse: true };
+}
+
+/** `section` with set `id`'s effects brought up to date from its pack (mergePackEffects), and the pack's version. An id no set has gives back `section`. */
+export function updatePackSet(section: WledFx, id: string, pack: IWledSetPack, effects: IWled[]): WledFx {
+  const view = listLibrarySets(section, "effects").find(set => set.id === id);
+  if (!view) return section;
+  const merged = mergePackEffects(view.items, effects);
+  const sets = (section.sets ?? []).map(set => (set.id === id ? { ...set, pack: { ...pack }, ...(view.active ? {} : { effects: merged }) } : set));
+  return view.active ? { ...section, effects: merged, sets } : { ...section, sets };
+}
+
 
 /** A pack preset with its references and effect ids as the device has them. The pack's own copy isn't changed. */
 function renumbered(preset: Record<string, unknown>, slots: ReadonlyMap<number, number>, fxIds: Record<string, number>): Record<string, unknown> {

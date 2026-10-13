@@ -502,8 +502,16 @@ export interface IWled {
 /**
  * A list of WLED effects kept for an occasion, such as Halloween. One set is in
  * use at a time, and its effects are `wledFx.effects`: see utils/library-sets.ts.
+ * A set added from an animation pack remembers which (utils/wled-packs.ts).
  */
-export type IWledSet = LibrarySet<"effects", IWled>;
+export type IWledSet = LibrarySet<"effects", IWled> & { pack?: IWledSetPack };
+
+/** The animation pack a set was added from: its id, its size ("64x8") and the version added, to offer an update. */
+export interface IWledSetPack {
+  id: string;
+  size: string;
+  version: string;
+}
 
 export type TBoardStatus = BoardStatus | undefined;
 
