@@ -9,6 +9,7 @@
  * what is wrong, rather than found out on their device.
  */
 
+import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -303,4 +304,3 @@ function sha256(bytes: Buffer): string {
 function isRecord(value: unknown): value is Record<string, any> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
-

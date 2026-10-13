@@ -34,4 +34,3 @@ try {
   console.error(`wled:packs: ${error.message}`);
   process.exit(1);
 }
-

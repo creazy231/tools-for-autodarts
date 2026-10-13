@@ -134,4 +134,3 @@ function parseJson(bytes: Uint8Array | undefined): unknown {
     return undefined;
   }
 }
-

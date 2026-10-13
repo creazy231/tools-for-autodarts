@@ -103,7 +103,6 @@ export type Room = { ok: true } | { ok: false; neededKb: number; freeKb: number 
 /** WLED's settings, whose effects come in sets. */
 type WledFx = IConfig["wledFx"];
 
-
 /** The catalog format this version reads. */
 export const PACK_FORMAT = 1;
 
@@ -370,7 +369,6 @@ export function updatePackSet(section: WledFx, id: string, pack: IWledSetPack, e
   return view.active ? { ...section, effects: merged, sets } : { ...section, sets };
 }
 
-
 /** A pack preset with its references and effect ids as the device has them. The pack's own copy isn't changed. */
 function renumbered(preset: Record<string, unknown>, slots: ReadonlyMap<number, number>, fxIds: Record<string, number>): Record<string, unknown> {
   const copy = JSON.parse(JSON.stringify(preset)) as Record<string, any>;
@@ -411,4 +409,3 @@ function isCount(value: unknown): value is number {
 function isRecord(value: unknown): value is Record<string, any> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
-

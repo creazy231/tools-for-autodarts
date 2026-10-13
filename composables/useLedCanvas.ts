@@ -1,8 +1,7 @@
-import type { Ref } from "vue";
-import type { Preview } from "@/utils/wled-preview";
-
+import { type Ref, ref, watch } from "vue";
 import { tryOnScopeDispose, useIntersectionObserver, useMediaQuery } from "@vueuse/core";
-import { ref, watch } from "vue";
+
+import type { Preview } from "@/utils/wled-preview";
 
 import { type LedPainter, everyFrame, ledGeometry, ledPainter } from "@/utils/led-canvas";
 
@@ -55,4 +54,3 @@ export function useLedCanvas(canvas: Ref<HTMLCanvasElement | undefined>, preview
     painter.paint(current.pixelsAt(t));
   }
 }
-

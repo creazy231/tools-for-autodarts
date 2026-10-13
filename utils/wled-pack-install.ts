@@ -140,4 +140,3 @@ function parsed(bytes: Uint8Array | null | undefined): unknown {
     return null;
   }
 }
-

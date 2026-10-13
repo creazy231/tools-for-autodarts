@@ -35,6 +35,9 @@ const NAME = /^\/[\w.-]{1,30}$/;
 const GIF = /^[\w.-]+\.gif$/i;
 const DEFAULT_TIMEOUT_MS = 20_000;
 
+/** The multipart field WLED's /upload reads the file from, as its own settings page sends it. */
+const UPLOAD_FIELD = "data";
+
 export async function wledUpload(message: WledUploadMessage, deps: WledUploadDeps = defaultDeps()): Promise<{ ok: boolean; status?: number; error?: string }> {
   let origin: string;
   try {
@@ -60,7 +63,7 @@ export async function wledUpload(message: WledUploadMessage, deps: WledUploadDep
       blob = new Blob([ message.text! ], { type: "application/json" });
     }
     const form = new FormData();
-    form.append("data", blob, message.name);
+    form.append(UPLOAD_FIELD, blob, message.name);
     const response = await deps.fetch(`${origin}/upload`, { method: "POST", body: form, credentials: "omit", cache: "no-store", signal: controller.signal });
     return { ok: response.ok, status: response.status };
   } catch (error) {
@@ -77,4 +80,3 @@ function defaultDeps(): WledUploadDeps {
     packaged: path => (browser.runtime.getURL as (path: string) => string)(path),
   };
 }
-
