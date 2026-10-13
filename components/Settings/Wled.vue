@@ -33,6 +33,24 @@
           </OptionRow>
         </section>
 
+        <section class="mb-10">
+          <div class="flex min-h-12 items-center justify-between gap-3">
+            <!-- One run of text, as the other headings, so a wrapped heading keeps its count after its last word. -->
+            <h3 class="adt-section-title">
+              <span>{{ t("wled.packs.section.title") }}<span v-if="packCount" class="adt-section-count">&nbsp;·&nbsp;{{ packCount }}</span></span>
+            </h3>
+            <AppButton @click="openPacks" auto size="sm">
+              <span class="flex items-center gap-1">
+                <span class="icon-[material-symbols--library-add-outline-rounded] text-lg" />
+                {{ t("wled.packs.section.browse") }}
+              </span>
+            </AppButton>
+          </div>
+          <p class="mt-1 max-w-3xl text-sm text-[var(--ad-text-muted)]">
+            {{ t("wled.packs.section.intro") }}
+          </p>
+        </section>
+
         <LibrarySets
           @create="createSet"
           @delete="deleteSet"
@@ -106,6 +124,9 @@
             </AppButton>
             <AppButton @click="openImportCSVModal" auto>
               {{ t("wled.add.csv.label") }}
+            </AppButton>
+            <AppButton @click="openPacks" auto>
+              {{ t("wled.add.packs.label") }}
             </AppButton>
           </template>
         </LibrarySection>
@@ -259,6 +280,8 @@
       </template>
     </AppModal>
 
+    <PacksDialog @added="showAddedSet" @close="showPacks = false" :show="showPacks" />
+
     <AppNotification
       @close="hideNotification"
       :show="notification.show"
@@ -324,6 +347,7 @@ import TriggerField from "./Library/TriggerField.vue";
 import { stableKey } from "./Library/stable-key";
 import LibrarySets from "./Library/LibrarySets.vue";
 import PresetPreview from "./Wled/PresetPreview.vue";
+import PacksDialog from "./Wled/PacksDialog.vue";
 
 import type { MessageKey, Params } from "@/utils/i18n";
 import type { LibraryEntry } from "@/utils/library-search";
@@ -334,6 +358,7 @@ import { getAuthToken } from "@/utils/helpers";
 import { type IWled } from "@/utils/storage";
 import { tokenAccount } from "@/utils/team-room";
 import { wledDevices } from "@/utils/wled-device";
+import { loadPackIndex } from "@/utils/wled-pack-catalog";
 import { type PresetRef, deviceOrigin, presetNames, presetRef } from "@/utils/wled-preview";
 import { WledType } from "#imports";
 
@@ -414,6 +439,12 @@ const csvImportPlaceholder = ref(
 // Delete all modal
 const showDeleteAllModal = ref(false);
 
+// Animation packs
+const attrs = useAttrs();
+const showPacks = ref(false);
+/** How many packs there are, for the section's heading: read by the panel, not by the card. */
+const packCount = ref(0);
+
 const { notification, showNotification, hideNotification } = useNotification();
 /**
  * The effect sets (composables/useLibrarySets.ts). `effects` is the list the
@@ -452,6 +483,7 @@ const availablePresetsOptions = computed(() => presetChoices.value.map(choice =>
 })));
 
 const addActions = computed(() => [
+  { label: t("wled.add.packs.label"), hint: t("wled.add.packs.hint"), icon: "icon-[material-symbols--library-add-outline-rounded]", action: openPacks },
   { label: t("wled.add.effect.label"), hint: t("wled.add.effect.hint"), icon: "icon-[material-symbols--add-rounded]", action: openAddEffectModal },
   { label: t("wled.add.csv.label"), hint: t("wled.add.csv.hint"), icon: "icon-[material-symbols--content-paste-rounded]", action: openImportCSVModal },
 ]);
@@ -473,6 +505,11 @@ const moreActions = computed(() => [
     action: openDeleteAllModal,
   },
 ]);
+
+onMounted(async () => {
+  if (attrs["data-feature-index"]) return;
+  packCount.value = (await loadPackIndex())?.packs.length ?? 0;
+});
 
 // Once the typing has stopped, not on every key: each read goes to the device.
 watchDebounced(() => [ newEffect.value.url, newEffect.value.type ], async () => {
@@ -507,6 +544,15 @@ function openImportCSVModal() {
   showImportCSVModal.value = true;
   csvData.value = "";
   csvError.value = null;
+}
+
+function openPacks() {
+  showPacks.value = true;
+}
+
+/** A pack's set was added or brought up to date: the list shows it. */
+function showAddedSet(id: string) {
+  viewedId.value = id;
 }
 
 function closeImportCSVModal() {

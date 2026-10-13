@@ -1,0 +1,5380 @@
+{
+  "format": 1,
+  "pack": "standard",
+  "size": "64x8",
+  "width": 64,
+  "height": 8,
+  "version": "1cd7b7d809d7",
+  "fx": {
+    "53": "Image",
+    "77": "Copy Segment"
+  },
+  "presets": {
+    "49": {
+      "n": "AD W T19",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_t19.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          25
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "51": {
+      "n": "AD W Game on",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_gameon.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ]
+    },
+    "52": {
+      "n": "AD W Idle",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_idle.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ]
+    },
+    "53": {
+      "n": "AD W 180",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_180.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "54": {
+      "n": "AD W 140+",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_140.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          23
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "55": {
+      "n": "AD W 100+",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_100.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          21
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "56": {
+      "n": "AD W 26",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_26.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          25
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "57": {
+      "n": "AD W No score",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_noscore.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          20
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "58": {
+      "n": "AD W Bull",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_bull.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          18
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "59": {
+      "n": "AD W T20",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_t20.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "60": {
+      "n": "AD W Bust",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_bust.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "61": {
+      "n": "AD W Leg won",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_legwon.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 91
+      }
+    },
+    "62": {
+      "n": "AD W Match won",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_matchwon.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ]
+    },
+    "63": {
+      "n": "AD W Bull-off",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_bulloff.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "64": {
+      "n": "AD W Player joined",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_joined.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 52
+      }
+    },
+    "65": {
+      "n": "AD W Board on",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_boardon.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 52
+      }
+    },
+    "66": {
+      "n": "AD W Miss",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_miss.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          14
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "67": {
+      "n": "AD W Triple",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_triple.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "68": {
+      "n": "AD W Double",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_double.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "69": {
+      "n": "AD W 180 Wave",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_180wave.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          29
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 51
+      }
+    },
+    "70": {
+      "n": "AD W Ping-pong",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_pingpong.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ]
+    },
+    "91": {
+      "n": "AD W Leg won afterglow",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_w_legwon_after.gif"
+        },
+        {
+          "id": 1,
+          "stop": 0
+        }
+      ]
+    },
+    "101": {
+      "n": "AD Game on",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_gameon.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "102": {
+      "n": "AD Idle",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_idle.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "103": {
+      "n": "AD Takeout",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_takeout.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "104": {
+      "n": "AD Match won",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_matchwon.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "105": {
+      "n": "AD 180",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_180.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          31
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "106": {
+      "n": "AD 140+",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_140plus.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          28
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "107": {
+      "n": "AD 100+",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_100plus.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "108": {
+      "n": "AD 26",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_26.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          23
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "109": {
+      "n": "AD No score",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_noscore.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "110": {
+      "n": "AD Bull",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bull.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "111": {
+      "n": "AD 25",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_25.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          14
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "112": {
+      "n": "AD Miss",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_miss.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          12
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "113": {
+      "n": "AD T20",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t20.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          11
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "114": {
+      "n": "AD Bust",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bust.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          23
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "115": {
+      "n": "AD Leg won",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_legwon.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          30
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 186
+      }
+    },
+    "116": {
+      "n": "AD Bull-off",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bulloff.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "117": {
+      "n": "AD Board on",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_boardon.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          17
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "118": {
+      "n": "AD Board off",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_boardoff.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "119": {
+      "n": "AD Player joined",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_joined.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "120": {
+      "n": "AD Tournament ready",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_tournament.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "121": {
+      "n": "AD 180 Maximum",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_maximum.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          26
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "122": {
+      "n": "AD Bullseye",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bullseye.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "123": {
+      "n": "AD Bust Boom",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_balloon.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          18
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "124": {
+      "n": "AD Leg won Flag",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_flag.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          17
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 187
+      }
+    },
+    "125": {
+      "n": "AD Triple",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_triple.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          12
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "126": {
+      "n": "AD Double",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_double.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          11
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "127": {
+      "n": "AD Three in a bed",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_threebed.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          26
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "128": {
+      "n": "AD Triple bull",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_triplebull.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          27
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "129": {
+      "n": "AD Bot",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bot.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "130": {
+      "n": "AD Player left",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_left.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          19
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "131": {
+      "n": "AD Board starting",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_starting.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "132": {
+      "n": "AD Board stopping",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_stopping.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "133": {
+      "n": "AD Calibrating",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_calibrating.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "134": {
+      "n": "AD Calibrated",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_calibrated.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "135": {
+      "n": "AD Reset",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_reset.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          13
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "136": {
+      "n": "AD T20 Oh yes",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t20_ohyes.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "137": {
+      "n": "AD T19 Emerald",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t19_emerald.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          23
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "186": {
+      "n": "AD Leg won afterglow",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_legwon_after.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "187": {
+      "n": "AD Leg won Flag afterglow",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_flag_after.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "188": {
+      "n": "AD Leg won Medal afterglow",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_legwon_medal_after.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "200": {
+      "n": "AD hold"
+    },
+    "201": {
+      "n": "AD 180 Lightning",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_180_lightning.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          31
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "202": {
+      "n": "AD 140+ Meteor",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_140_meteor.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          24
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "203": {
+      "n": "AD 100+ Neon",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_100_neon.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          23
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "204": {
+      "n": "AD 26 Toaster",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_26_toaster.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          28
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "205": {
+      "n": "AD No score Donut",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_noscore_donut.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          24
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "206": {
+      "n": "AD Bust Shatter",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bust_shatter.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "207": {
+      "n": "AD Leg won Medal",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_legwon_medal.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          30
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 188
+      }
+    },
+    "208": {
+      "n": "AD Match won Fireworks",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_matchwon_fireworks.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "209": {
+      "n": "AD Bull Ripple",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bull_ripple.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "210": {
+      "n": "AD Game on Scanner",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_gameon_scanner.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "211": {
+      "n": "AD Idle Plasma",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_idle_plasma.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "212": {
+      "n": "AD 25 Orbit",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_25_orbit.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          17
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "213": {
+      "n": "AD Miss Wall",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_miss_wall.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          14
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "214": {
+      "n": "AD T20 Sixty",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_t20_sixty.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          15
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "215": {
+      "n": "AD Triple x3",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_triple_x3.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          16
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "216": {
+      "n": "AD Double x2",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_double_x2.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          12
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "217": {
+      "n": "AD Bull-off VS",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bulloff_vs.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "218": {
+      "n": "AD Player joined Welcome",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_joined_welcome.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          19
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "219": {
+      "n": "AD Player left Bye",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_left_bye.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          21
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 102
+      }
+    },
+    "220": {
+      "n": "AD Bot Terminal",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_bot_terminal.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ]
+    },
+    "221": {
+      "n": "AD Three in a bed Sleep",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_threebed_sleep.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "222": {
+      "n": "AD Bag of nails",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_nails.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "223": {
+      "n": "AD 1-1-1 Minimum",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_minimum.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          32
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "224": {
+      "n": "AD Fish",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_fish.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          24
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "225": {
+      "n": "AD Bag of nuts",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_nuts.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          31
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "226": {
+      "n": "AD Route 66",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_route66.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          22
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "227": {
+      "n": "AD Baby ton",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_babyton.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          28
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "228": {
+      "n": "AD So close",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_soclose.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          25
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "229": {
+      "n": "AD Nelson",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_nelson.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          26
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "230": {
+      "n": "AD Shanghai",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_shanghai.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          29
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    },
+    "231": {
+      "n": "AD Champagne breakfast",
+      "on": true,
+      "transition": 0,
+      "seg": [
+        {
+          "id": 0,
+          "start": 0,
+          "stop": 32,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 53,
+          "sx": 128,
+          "ix": 0,
+          "n": "ad_champagne.gif"
+        },
+        {
+          "id": 1,
+          "start": 32,
+          "stop": 64,
+          "startY": 0,
+          "stopY": 8,
+          "on": true,
+          "frz": false,
+          "fx": 77,
+          "ix": 0,
+          "c1": 0,
+          "c2": 0,
+          "c3": 0,
+          "o1": false,
+          "o2": false
+        }
+      ],
+      "playlist": {
+        "ps": [
+          200
+        ],
+        "dur": [
+          33
+        ],
+        "transition": [
+          0
+        ],
+        "repeat": 1,
+        "end": 101
+      }
+    }
+  },
+  "effects": [
+    {
+      "name": "AD Game on",
+      "preset": 101,
+      "triggers": [
+        "gameon"
+      ]
+    },
+    {
+      "name": "AD Idle",
+      "preset": 102,
+      "triggers": [
+        "idle"
+      ]
+    },
+    {
+      "name": "AD Takeout",
+      "preset": 103,
+      "triggers": []
+    },
+    {
+      "name": "AD Match won",
+      "preset": 104,
+      "triggers": [
+        "matchshot"
+      ]
+    },
+    {
+      "name": "AD 180",
+      "preset": 105,
+      "triggers": [
+        "180",
+        "t20_t20_t20"
+      ]
+    },
+    {
+      "name": "AD 140+",
+      "preset": 106,
+      "triggers": [
+        "140-179"
+      ]
+    },
+    {
+      "name": "AD 100+",
+      "preset": 107,
+      "triggers": [
+        "100-139"
+      ]
+    },
+    {
+      "name": "AD 26",
+      "preset": 108,
+      "triggers": [
+        "26"
+      ]
+    },
+    {
+      "name": "AD No score",
+      "preset": 109,
+      "triggers": [
+        "0"
+      ]
+    },
+    {
+      "name": "AD Bull",
+      "preset": 110,
+      "triggers": [
+        "bull"
+      ]
+    },
+    {
+      "name": "AD 25",
+      "preset": 111,
+      "triggers": [
+        "s25"
+      ]
+    },
+    {
+      "name": "AD Miss",
+      "preset": 112,
+      "triggers": [
+        "outside",
+        "miss"
+      ]
+    },
+    {
+      "name": "AD T20",
+      "preset": 113,
+      "triggers": []
+    },
+    {
+      "name": "AD Bust",
+      "preset": 114,
+      "triggers": [
+        "busted"
+      ]
+    },
+    {
+      "name": "AD Leg won",
+      "preset": 115,
+      "triggers": [
+        "gameshot"
+      ]
+    },
+    {
+      "name": "AD Bull-off",
+      "preset": 116,
+      "triggers": [
+        "bulloff"
+      ]
+    },
+    {
+      "name": "AD Board on",
+      "preset": 117,
+      "triggers": [
+        "board_started"
+      ]
+    },
+    {
+      "name": "AD Board off",
+      "preset": 118,
+      "triggers": [
+        "board_stopped"
+      ]
+    },
+    {
+      "name": "AD Player joined",
+      "preset": 119,
+      "triggers": [
+        "lobby_in"
+      ]
+    },
+    {
+      "name": "AD Tournament ready",
+      "preset": 120,
+      "triggers": [
+        "tournament_ready"
+      ]
+    },
+    {
+      "name": "AD 180 Maximum",
+      "preset": 121,
+      "triggers": [
+        "180",
+        "t20_t20_t20"
+      ]
+    },
+    {
+      "name": "AD Bullseye",
+      "preset": 122,
+      "triggers": [
+        "bull"
+      ]
+    },
+    {
+      "name": "AD Bust Boom",
+      "preset": 123,
+      "triggers": [
+        "busted"
+      ]
+    },
+    {
+      "name": "AD Leg won Flag",
+      "preset": 124,
+      "triggers": [
+        "gameshot"
+      ]
+    },
+    {
+      "name": "AD Triple",
+      "preset": 125,
+      "triggers": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9",
+        "t10",
+        "t11",
+        "t12",
+        "t13",
+        "t14",
+        "t15",
+        "t16",
+        "t17",
+        "t18"
+      ]
+    },
+    {
+      "name": "AD Double",
+      "preset": 126,
+      "triggers": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "d6",
+        "d7",
+        "d8",
+        "d9",
+        "d10",
+        "d11",
+        "d12",
+        "d13",
+        "d14",
+        "d15",
+        "d16",
+        "d17",
+        "d18",
+        "d19",
+        "d20"
+      ]
+    },
+    {
+      "name": "AD Three in a bed",
+      "preset": 127,
+      "triggers": [
+        "t1_t1_t1",
+        "t2_t2_t2",
+        "t3_t3_t3",
+        "t4_t4_t4",
+        "t5_t5_t5",
+        "t6_t6_t6",
+        "t7_t7_t7",
+        "t8_t8_t8",
+        "t9_t9_t9",
+        "t10_t10_t10",
+        "t11_t11_t11",
+        "t12_t12_t12",
+        "t13_t13_t13",
+        "t14_t14_t14",
+        "t15_t15_t15",
+        "t16_t16_t16",
+        "t17_t17_t17",
+        "t18_t18_t18",
+        "t19_t19_t19",
+        "d1_d1_d1",
+        "d2_d2_d2",
+        "d3_d3_d3",
+        "d4_d4_d4",
+        "d5_d5_d5",
+        "d6_d6_d6",
+        "d7_d7_d7",
+        "d8_d8_d8",
+        "d9_d9_d9",
+        "d10_d10_d10",
+        "d11_d11_d11",
+        "d12_d12_d12",
+        "d13_d13_d13",
+        "d14_d14_d14",
+        "d15_d15_d15",
+        "d16_d16_d16",
+        "d17_d17_d17",
+        "d18_d18_d18",
+        "d19_d19_d19",
+        "d20_d20_d20"
+      ]
+    },
+    {
+      "name": "AD Triple bull",
+      "preset": 128,
+      "triggers": [
+        "bull_bull_bull"
+      ]
+    },
+    {
+      "name": "AD Bot",
+      "preset": 129,
+      "triggers": [
+        "bot_throw"
+      ]
+    },
+    {
+      "name": "AD Player left",
+      "preset": 130,
+      "triggers": [
+        "lobby_out"
+      ]
+    },
+    {
+      "name": "AD Board starting",
+      "preset": 131,
+      "triggers": [
+        "board_starting"
+      ]
+    },
+    {
+      "name": "AD Board stopping",
+      "preset": 132,
+      "triggers": [
+        "board_stopping"
+      ]
+    },
+    {
+      "name": "AD Calibrating",
+      "preset": 133,
+      "triggers": [
+        "calibration_started"
+      ]
+    },
+    {
+      "name": "AD Calibrated",
+      "preset": 134,
+      "triggers": [
+        "calibration_finished"
+      ]
+    },
+    {
+      "name": "AD Reset",
+      "preset": 135,
+      "triggers": []
+    },
+    {
+      "name": "AD T20 Oh yes",
+      "preset": 136,
+      "triggers": [
+        "t20"
+      ]
+    },
+    {
+      "name": "AD T19 Emerald",
+      "preset": 137,
+      "triggers": [
+        "t19"
+      ]
+    },
+    {
+      "name": "AD 180 Lightning",
+      "preset": 201,
+      "triggers": [
+        "180",
+        "t20_t20_t20"
+      ]
+    },
+    {
+      "name": "AD 140+ Meteor",
+      "preset": 202,
+      "triggers": [
+        "140-179"
+      ]
+    },
+    {
+      "name": "AD 100+ Neon",
+      "preset": 203,
+      "triggers": [
+        "100-139"
+      ]
+    },
+    {
+      "name": "AD 26 Toaster",
+      "preset": 204,
+      "triggers": [
+        "26"
+      ]
+    },
+    {
+      "name": "AD No score Donut",
+      "preset": 205,
+      "triggers": [
+        "0"
+      ]
+    },
+    {
+      "name": "AD Bust Shatter",
+      "preset": 206,
+      "triggers": [
+        "busted"
+      ]
+    },
+    {
+      "name": "AD Leg won Medal",
+      "preset": 207,
+      "triggers": [
+        "gameshot"
+      ]
+    },
+    {
+      "name": "AD Match won Fireworks",
+      "preset": 208,
+      "triggers": [
+        "matchshot"
+      ]
+    },
+    {
+      "name": "AD Bull Ripple",
+      "preset": 209,
+      "triggers": [
+        "bull"
+      ]
+    },
+    {
+      "name": "AD Game on Scanner",
+      "preset": 210,
+      "triggers": [
+        "gameon"
+      ]
+    },
+    {
+      "name": "AD Idle Plasma",
+      "preset": 211,
+      "triggers": [
+        "idle"
+      ]
+    },
+    {
+      "name": "AD 25 Orbit",
+      "preset": 212,
+      "triggers": [
+        "s25"
+      ]
+    },
+    {
+      "name": "AD Miss Wall",
+      "preset": 213,
+      "triggers": [
+        "outside",
+        "miss"
+      ]
+    },
+    {
+      "name": "AD T20 Sixty",
+      "preset": 214,
+      "triggers": []
+    },
+    {
+      "name": "AD Triple x3",
+      "preset": 215,
+      "triggers": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9",
+        "t10",
+        "t11",
+        "t12",
+        "t13",
+        "t14",
+        "t15",
+        "t16",
+        "t17",
+        "t18"
+      ]
+    },
+    {
+      "name": "AD Double x2",
+      "preset": 216,
+      "triggers": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "d6",
+        "d7",
+        "d8",
+        "d9",
+        "d10",
+        "d11",
+        "d12",
+        "d13",
+        "d14",
+        "d15",
+        "d16",
+        "d17",
+        "d18",
+        "d19",
+        "d20"
+      ]
+    },
+    {
+      "name": "AD Bull-off VS",
+      "preset": 217,
+      "triggers": [
+        "bulloff"
+      ]
+    },
+    {
+      "name": "AD Player joined Welcome",
+      "preset": 218,
+      "triggers": [
+        "lobby_in"
+      ]
+    },
+    {
+      "name": "AD Player left Bye",
+      "preset": 219,
+      "triggers": [
+        "lobby_out"
+      ]
+    },
+    {
+      "name": "AD Bot Terminal",
+      "preset": 220,
+      "triggers": [
+        "bot_throw"
+      ]
+    },
+    {
+      "name": "AD Three in a bed Sleep",
+      "preset": 221,
+      "triggers": [
+        "t1_t1_t1",
+        "t2_t2_t2",
+        "t3_t3_t3",
+        "t4_t4_t4",
+        "t5_t5_t5",
+        "t6_t6_t6",
+        "t7_t7_t7",
+        "t8_t8_t8",
+        "t9_t9_t9",
+        "t10_t10_t10",
+        "t11_t11_t11",
+        "t12_t12_t12",
+        "t13_t13_t13",
+        "t14_t14_t14",
+        "t15_t15_t15",
+        "t16_t16_t16",
+        "t17_t17_t17",
+        "t18_t18_t18",
+        "t19_t19_t19",
+        "d1_d1_d1",
+        "d2_d2_d2",
+        "d3_d3_d3",
+        "d4_d4_d4",
+        "d5_d5_d5",
+        "d6_d6_d6",
+        "d7_d7_d7",
+        "d8_d8_d8",
+        "d9_d9_d9",
+        "d10_d10_d10",
+        "d11_d11_d11",
+        "d12_d12_d12",
+        "d13_d13_d13",
+        "d14_d14_d14",
+        "d15_d15_d15",
+        "d16_d16_d16",
+        "d17_d17_d17",
+        "d18_d18_d18",
+        "d19_d19_d19",
+        "d20_d20_d20"
+      ]
+    },
+    {
+      "name": "AD Bag of nails",
+      "preset": 222,
+      "triggers": [
+        "s1_s1_s1",
+        "s1_s1_d1",
+        "s1_s1_t1",
+        "s1_d1_s1",
+        "s1_d1_d1",
+        "s1_d1_t1",
+        "s1_t1_s1",
+        "s1_t1_d1",
+        "s1_t1_t1",
+        "d1_s1_s1",
+        "d1_s1_d1",
+        "d1_s1_t1",
+        "d1_d1_s1",
+        "d1_d1_t1",
+        "d1_t1_s1",
+        "d1_t1_d1",
+        "d1_t1_t1",
+        "t1_s1_s1",
+        "t1_s1_d1",
+        "t1_s1_t1",
+        "t1_d1_s1",
+        "t1_d1_d1",
+        "t1_d1_t1",
+        "t1_t1_s1",
+        "t1_t1_d1"
+      ]
+    },
+    {
+      "name": "AD 1-1-1 Minimum",
+      "preset": 223,
+      "triggers": [
+        "s1_s1_s1"
+      ]
+    },
+    {
+      "name": "AD Fish",
+      "preset": 224,
+      "triggers": [
+        "1-9"
+      ]
+    },
+    {
+      "name": "AD Bag of nuts",
+      "preset": 225,
+      "triggers": [
+        "45"
+      ]
+    },
+    {
+      "name": "AD Route 66",
+      "preset": 226,
+      "triggers": [
+        "66"
+      ]
+    },
+    {
+      "name": "AD Baby ton",
+      "preset": 227,
+      "triggers": [
+        "95"
+      ]
+    },
+    {
+      "name": "AD So close",
+      "preset": 228,
+      "triggers": [
+        "99",
+        "177"
+      ]
+    },
+    {
+      "name": "AD Nelson",
+      "preset": 229,
+      "triggers": [
+        "111"
+      ]
+    },
+    {
+      "name": "AD Shanghai",
+      "preset": 230,
+      "triggers": [
+        "s1_d1_t1",
+        "s1_t1_d1",
+        "d1_s1_t1",
+        "d1_t1_s1",
+        "t1_s1_d1",
+        "t1_d1_s1",
+        "s2_d2_t2",
+        "s2_t2_d2",
+        "d2_s2_t2",
+        "d2_t2_s2",
+        "t2_s2_d2",
+        "t2_d2_s2",
+        "s3_d3_t3",
+        "s3_t3_d3",
+        "d3_s3_t3",
+        "d3_t3_s3",
+        "t3_s3_d3",
+        "t3_d3_s3",
+        "s4_d4_t4",
+        "s4_t4_d4",
+        "d4_s4_t4",
+        "d4_t4_s4",
+        "t4_s4_d4",
+        "t4_d4_s4",
+        "s5_d5_t5",
+        "s5_t5_d5",
+        "d5_s5_t5",
+        "d5_t5_s5",
+        "t5_s5_d5",
+        "t5_d5_s5",
+        "s6_d6_t6",
+        "s6_t6_d6",
+        "d6_s6_t6",
+        "d6_t6_s6",
+        "t6_s6_d6",
+        "t6_d6_s6",
+        "s7_d7_t7",
+        "s7_t7_d7",
+        "d7_s7_t7",
+        "d7_t7_s7",
+        "t7_s7_d7",
+        "t7_d7_s7",
+        "s8_d8_t8",
+        "s8_t8_d8",
+        "d8_s8_t8",
+        "d8_t8_s8",
+        "t8_s8_d8",
+        "t8_d8_s8",
+        "s9_d9_t9",
+        "s9_t9_d9",
+        "d9_s9_t9",
+        "d9_t9_s9",
+        "t9_s9_d9",
+        "t9_d9_s9",
+        "s10_d10_t10",
+        "s10_t10_d10",
+        "d10_s10_t10",
+        "d10_t10_s10",
+        "t10_s10_d10",
+        "t10_d10_s10",
+        "s11_d11_t11",
+        "s11_t11_d11",
+        "d11_s11_t11",
+        "d11_t11_s11",
+        "t11_s11_d11",
+        "t11_d11_s11",
+        "s12_d12_t12",
+        "s12_t12_d12",
+        "d12_s12_t12",
+        "d12_t12_s12",
+        "t12_s12_d12",
+        "t12_d12_s12",
+        "s13_d13_t13",
+        "s13_t13_d13",
+        "d13_s13_t13",
+        "d13_t13_s13",
+        "t13_s13_d13",
+        "t13_d13_s13",
+        "s14_d14_t14",
+        "s14_t14_d14",
+        "d14_s14_t14",
+        "d14_t14_s14",
+        "t14_s14_d14",
+        "t14_d14_s14",
+        "s15_d15_t15",
+        "s15_t15_d15",
+        "d15_s15_t15",
+        "d15_t15_s15",
+        "t15_s15_d15",
+        "t15_d15_s15",
+        "s16_d16_t16",
+        "s16_t16_d16",
+        "d16_s16_t16",
+        "d16_t16_s16",
+        "t16_s16_d16",
+        "t16_d16_s16",
+        "s17_d17_t17",
+        "s17_t17_d17",
+        "d17_s17_t17",
+        "d17_t17_s17",
+        "t17_s17_d17",
+        "t17_d17_s17",
+        "s18_d18_t18",
+        "s18_t18_d18",
+        "d18_s18_t18",
+        "d18_t18_s18",
+        "t18_s18_d18",
+        "t18_d18_s18",
+        "s19_d19_t19",
+        "s19_t19_d19",
+        "d19_s19_t19",
+        "d19_t19_s19",
+        "t19_s19_d19",
+        "t19_d19_s19",
+        "s20_d20_t20",
+        "s20_t20_d20",
+        "d20_s20_t20",
+        "d20_t20_s20",
+        "t20_s20_d20",
+        "t20_d20_s20"
+      ]
+    },
+    {
+      "name": "AD Champagne breakfast",
+      "preset": 231,
+      "triggers": [
+        "t20_t5_t1",
+        "t20_t1_t5",
+        "t5_t20_t1",
+        "t5_t1_t20",
+        "t1_t20_t5",
+        "t1_t5_t20"
+      ]
+    },
+    {
+      "name": "AD W T19",
+      "preset": 49,
+      "triggers": [
+        "t19"
+      ]
+    },
+    {
+      "name": "AD W Game on",
+      "preset": 51,
+      "triggers": [
+        "gameon"
+      ]
+    },
+    {
+      "name": "AD W Idle",
+      "preset": 52,
+      "triggers": [
+        "idle"
+      ]
+    },
+    {
+      "name": "AD W 180",
+      "preset": 53,
+      "triggers": [
+        "180",
+        "t20_t20_t20"
+      ]
+    },
+    {
+      "name": "AD W 140+",
+      "preset": 54,
+      "triggers": [
+        "140-179"
+      ]
+    },
+    {
+      "name": "AD W 100+",
+      "preset": 55,
+      "triggers": [
+        "100-139"
+      ]
+    },
+    {
+      "name": "AD W 26",
+      "preset": 56,
+      "triggers": [
+        "26"
+      ]
+    },
+    {
+      "name": "AD W No score",
+      "preset": 57,
+      "triggers": [
+        "0"
+      ]
+    },
+    {
+      "name": "AD W Bull",
+      "preset": 58,
+      "triggers": [
+        "bull"
+      ]
+    },
+    {
+      "name": "AD W T20",
+      "preset": 59,
+      "triggers": []
+    },
+    {
+      "name": "AD W Bust",
+      "preset": 60,
+      "triggers": [
+        "busted"
+      ]
+    },
+    {
+      "name": "AD W Leg won",
+      "preset": 61,
+      "triggers": [
+        "gameshot"
+      ]
+    },
+    {
+      "name": "AD W Match won",
+      "preset": 62,
+      "triggers": [
+        "matchshot"
+      ]
+    },
+    {
+      "name": "AD W Bull-off",
+      "preset": 63,
+      "triggers": [
+        "bulloff"
+      ]
+    },
+    {
+      "name": "AD W Player joined",
+      "preset": 64,
+      "triggers": [
+        "lobby_in"
+      ]
+    },
+    {
+      "name": "AD W Board on",
+      "preset": 65,
+      "triggers": [
+        "board_started"
+      ]
+    },
+    {
+      "name": "AD W Miss",
+      "preset": 66,
+      "triggers": [
+        "outside",
+        "miss"
+      ]
+    },
+    {
+      "name": "AD W Triple",
+      "preset": 67,
+      "triggers": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9",
+        "t10",
+        "t11",
+        "t12",
+        "t13",
+        "t14",
+        "t15",
+        "t16",
+        "t17",
+        "t18"
+      ]
+    },
+    {
+      "name": "AD W Double",
+      "preset": 68,
+      "triggers": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "d6",
+        "d7",
+        "d8",
+        "d9",
+        "d10",
+        "d11",
+        "d12",
+        "d13",
+        "d14",
+        "d15",
+        "d16",
+        "d17",
+        "d18",
+        "d19",
+        "d20"
+      ]
+    },
+    {
+      "name": "AD W 180 Wave",
+      "preset": 69,
+      "triggers": [
+        "180",
+        "t20_t20_t20"
+      ]
+    },
+    {
+      "name": "AD W Ping-pong",
+      "preset": 70,
+      "triggers": [
+        "idle"
+      ]
+    }
+  ],
+  "gifs": [
+    {
+      "name": "ad_100_neon.gif",
+      "bytes": 2373
+    },
+    {
+      "name": "ad_100plus.gif",
+      "bytes": 988
+    },
+    {
+      "name": "ad_140_meteor.gif",
+      "bytes": 3065
+    },
+    {
+      "name": "ad_140plus.gif",
+      "bytes": 5310
+    },
+    {
+      "name": "ad_180.gif",
+      "bytes": 4378
+    },
+    {
+      "name": "ad_180_lightning.gif",
+      "bytes": 3250
+    },
+    {
+      "name": "ad_25.gif",
+      "bytes": 941
+    },
+    {
+      "name": "ad_25_orbit.gif",
+      "bytes": 2094
+    },
+    {
+      "name": "ad_26.gif",
+      "bytes": 1482
+    },
+    {
+      "name": "ad_26_toaster.gif",
+      "bytes": 3006
+    },
+    {
+      "name": "ad_babyton.gif",
+      "bytes": 2348
+    },
+    {
+      "name": "ad_balloon.gif",
+      "bytes": 1463
+    },
+    {
+      "name": "ad_boardoff.gif",
+      "bytes": 699
+    },
+    {
+      "name": "ad_boardon.gif",
+      "bytes": 1020
+    },
+    {
+      "name": "ad_bot.gif",
+      "bytes": 1393
+    },
+    {
+      "name": "ad_bot_terminal.gif",
+      "bytes": 2061
+    },
+    {
+      "name": "ad_bull.gif",
+      "bytes": 1053
+    },
+    {
+      "name": "ad_bull_ripple.gif",
+      "bytes": 1928
+    },
+    {
+      "name": "ad_bulloff.gif",
+      "bytes": 1008
+    },
+    {
+      "name": "ad_bulloff_vs.gif",
+      "bytes": 2746
+    },
+    {
+      "name": "ad_bullseye.gif",
+      "bytes": 1263
+    },
+    {
+      "name": "ad_bust.gif",
+      "bytes": 1677
+    },
+    {
+      "name": "ad_bust_shatter.gif",
+      "bytes": 2232
+    },
+    {
+      "name": "ad_calibrated.gif",
+      "bytes": 909
+    },
+    {
+      "name": "ad_calibrating.gif",
+      "bytes": 2243
+    },
+    {
+      "name": "ad_champagne.gif",
+      "bytes": 3557
+    },
+    {
+      "name": "ad_double.gif",
+      "bytes": 599
+    },
+    {
+      "name": "ad_double_x2.gif",
+      "bytes": 1094
+    },
+    {
+      "name": "ad_fish.gif",
+      "bytes": 2746
+    },
+    {
+      "name": "ad_flag.gif",
+      "bytes": 2357
+    },
+    {
+      "name": "ad_flag_after.gif",
+      "bytes": 2610
+    },
+    {
+      "name": "ad_gameon.gif",
+      "bytes": 1904
+    },
+    {
+      "name": "ad_gameon_scanner.gif",
+      "bytes": 4882
+    },
+    {
+      "name": "ad_idle.gif",
+      "bytes": 13128
+    },
+    {
+      "name": "ad_idle_plasma.gif",
+      "bytes": 18961
+    },
+    {
+      "name": "ad_joined.gif",
+      "bytes": 579
+    },
+    {
+      "name": "ad_joined_welcome.gif",
+      "bytes": 1921
+    },
+    {
+      "name": "ad_left.gif",
+      "bytes": 765
+    },
+    {
+      "name": "ad_left_bye.gif",
+      "bytes": 1430
+    },
+    {
+      "name": "ad_legwon.gif",
+      "bytes": 2453
+    },
+    {
+      "name": "ad_legwon_after.gif",
+      "bytes": 1963
+    },
+    {
+      "name": "ad_legwon_medal.gif",
+      "bytes": 3186
+    },
+    {
+      "name": "ad_legwon_medal_after.gif",
+      "bytes": 2242
+    },
+    {
+      "name": "ad_matchwon.gif",
+      "bytes": 2925
+    },
+    {
+      "name": "ad_matchwon_fireworks.gif",
+      "bytes": 8173
+    },
+    {
+      "name": "ad_maximum.gif",
+      "bytes": 3413
+    },
+    {
+      "name": "ad_minimum.gif",
+      "bytes": 3687
+    },
+    {
+      "name": "ad_miss.gif",
+      "bytes": 1077
+    },
+    {
+      "name": "ad_miss_wall.gif",
+      "bytes": 3107
+    },
+    {
+      "name": "ad_nails.gif",
+      "bytes": 2804
+    },
+    {
+      "name": "ad_nelson.gif",
+      "bytes": 1689
+    },
+    {
+      "name": "ad_noscore.gif",
+      "bytes": 2052
+    },
+    {
+      "name": "ad_noscore_donut.gif",
+      "bytes": 2346
+    },
+    {
+      "name": "ad_nuts.gif",
+      "bytes": 2765
+    },
+    {
+      "name": "ad_reset.gif",
+      "bytes": 782
+    },
+    {
+      "name": "ad_route66.gif",
+      "bytes": 1867
+    },
+    {
+      "name": "ad_shanghai.gif",
+      "bytes": 3902
+    },
+    {
+      "name": "ad_soclose.gif",
+      "bytes": 2020
+    },
+    {
+      "name": "ad_starting.gif",
+      "bytes": 1051
+    },
+    {
+      "name": "ad_stopping.gif",
+      "bytes": 1106
+    },
+    {
+      "name": "ad_t19_emerald.gif",
+      "bytes": 2730
+    },
+    {
+      "name": "ad_t20.gif",
+      "bytes": 750
+    },
+    {
+      "name": "ad_t20_ohyes.gif",
+      "bytes": 3349
+    },
+    {
+      "name": "ad_t20_sixty.gif",
+      "bytes": 1367
+    },
+    {
+      "name": "ad_takeout.gif",
+      "bytes": 1713
+    },
+    {
+      "name": "ad_threebed.gif",
+      "bytes": 1983
+    },
+    {
+      "name": "ad_threebed_sleep.gif",
+      "bytes": 2166
+    },
+    {
+      "name": "ad_tournament.gif",
+      "bytes": 759
+    },
+    {
+      "name": "ad_triple.gif",
+      "bytes": 668
+    },
+    {
+      "name": "ad_triple_x3.gif",
+      "bytes": 1113
+    },
+    {
+      "name": "ad_triplebull.gif",
+      "bytes": 2138
+    },
+    {
+      "name": "ad_w_100.gif",
+      "bytes": 2953
+    },
+    {
+      "name": "ad_w_140.gif",
+      "bytes": 3597
+    },
+    {
+      "name": "ad_w_180.gif",
+      "bytes": 6761
+    },
+    {
+      "name": "ad_w_180wave.gif",
+      "bytes": 3956
+    },
+    {
+      "name": "ad_w_26.gif",
+      "bytes": 3867
+    },
+    {
+      "name": "ad_w_boardon.gif",
+      "bytes": 3164
+    },
+    {
+      "name": "ad_w_bull.gif",
+      "bytes": 3766
+    },
+    {
+      "name": "ad_w_bulloff.gif",
+      "bytes": 3605
+    },
+    {
+      "name": "ad_w_bust.gif",
+      "bytes": 2316
+    },
+    {
+      "name": "ad_w_double.gif",
+      "bytes": 1789
+    },
+    {
+      "name": "ad_w_gameon.gif",
+      "bytes": 3965
+    },
+    {
+      "name": "ad_w_idle.gif",
+      "bytes": 7482
+    },
+    {
+      "name": "ad_w_joined.gif",
+      "bytes": 3052
+    },
+    {
+      "name": "ad_w_legwon.gif",
+      "bytes": 3557
+    },
+    {
+      "name": "ad_w_legwon_after.gif",
+      "bytes": 3091
+    },
+    {
+      "name": "ad_w_matchwon.gif",
+      "bytes": 7674
+    },
+    {
+      "name": "ad_w_miss.gif",
+      "bytes": 1977
+    },
+    {
+      "name": "ad_w_noscore.gif",
+      "bytes": 3125
+    },
+    {
+      "name": "ad_w_pingpong.gif",
+      "bytes": 3401
+    },
+    {
+      "name": "ad_w_t19.gif",
+      "bytes": 3594
+    },
+    {
+      "name": "ad_w_t20.gif",
+      "bytes": 2208
+    },
+    {
+      "name": "ad_w_triple.gif",
+      "bytes": 2113
+    }
+  ]
+}

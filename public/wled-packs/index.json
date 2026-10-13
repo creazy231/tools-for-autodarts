@@ -1,0 +1,83 @@
+{
+  "format": 1,
+  "packs": [
+    {
+      "id": "standard",
+      "name": {
+        "en": "Standard",
+        "de": "Standard",
+        "nl": "Standaard"
+      },
+      "description": {
+        "en": "The big moments and the small ones: 180s, bull, busts, leg and match wins, Shanghai to Nelson, and the lobby and your board. Many moments come in two looks, picked at random.",
+        "de": "Die großen Momente und die kleinen: 180er, Bull, Busts, gewonnene Legs und Matches, von Shanghai bis Nelson, dazu die Lobby und dein Board. Viele Momente gibt es in zwei Varianten, die zufällig wechseln.",
+        "nl": "De grote momenten en de kleine: 180's, bull, busts, gewonnen legs en wedstrijden, van Shanghai tot Nelson, plus de lobby en je bord. Veel momenten hebben twee varianten, willekeurig gekozen."
+      },
+      "sizes": [
+        {
+          "size": "32x8",
+          "width": 32,
+          "height": 8,
+          "file": "standard-32x8.json",
+          "version": "a2c4bbea6d46",
+          "effects": 68,
+          "presets": 72,
+          "gifs": 71,
+          "bytes": 180809,
+          "cover": 105
+        },
+        {
+          "size": "64x8",
+          "width": 64,
+          "height": 8,
+          "file": "standard-64x8.json",
+          "version": "1cd7b7d809d7",
+          "effects": 89,
+          "presets": 94,
+          "gifs": 93,
+          "bytes": 261822,
+          "cover": 53
+        }
+      ]
+    },
+    {
+      "id": "halloween",
+      "name": {
+        "en": "Halloween",
+        "de": "Halloween",
+        "nl": "Halloween"
+      },
+      "description": {
+        "en": "Pumpkins, ghosts and bats for October. Moments without a Halloween animation of their own play the Standard pack's, so nothing goes dark.",
+        "de": "Kürbisse, Geister und Fledermäuse für den Oktober. Momente ohne eigene Halloween-Animation zeigen die aus dem Standard-Paket, damit nichts dunkel bleibt.",
+        "nl": "Pompoenen, spoken en vleermuizen voor oktober. Momenten zonder eigen Halloween-animatie tonen die uit het Standaard-pakket, zodat er niets donker blijft."
+      },
+      "sizes": [
+        {
+          "size": "32x8",
+          "width": 32,
+          "height": 8,
+          "file": "halloween-32x8.json",
+          "version": "bdf0c3976d25",
+          "effects": 49,
+          "presets": 51,
+          "gifs": 50,
+          "bytes": 125029,
+          "cover": 233
+        },
+        {
+          "size": "64x8",
+          "width": 64,
+          "height": 8,
+          "file": "halloween-64x8.json",
+          "version": "c0c468b2d5a2",
+          "effects": 63,
+          "presets": 66,
+          "gifs": 65,
+          "bytes": 195643,
+          "cover": 78
+        }
+      ]
+    }
+  ]
+}

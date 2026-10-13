@@ -1,6 +1,7 @@
 import { AutodartsToolsGlobalStatus } from "@/utils/storage";
 import { claimLease, releaseLease } from "@/utils/teams-lease";
 import { undoVisit } from "@/utils/teams-undo";
+import { wledUpload } from "@/utils/wled-upload";
 
 console.log("Background script loading...");
 
@@ -36,6 +37,9 @@ export default defineBackground({
           return { ok: response.ok, status: response.status };
         });
       }
+
+      // WLED animation packs: one file put on the user's WLED (utils/wled-upload.ts).
+      if (message.type === "wled:upload") return wledUpload(message);
 
       // Handle fetch requests with chunked download support
       if (message.type === "fetch") {

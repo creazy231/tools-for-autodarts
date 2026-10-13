@@ -258,7 +258,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
 - **Sound FX**: Ambient sound effects for different game events
 - **Sound Upload**: Add your own custom sounds for personalized feedback
 - **Text-to-Speech (TTS)**: Generate custom caller and sound FX audio directly from text using your device's built-in voices
-- **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events, from sets of effects you switch between, such as one for Halloween
+- **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events, from sets of effects you switch between, such as one for Halloween, and ready-made animation packs for LED matrices that go on your WLED in one go
 - **Quiet Own Darts**: Silences autodarts' own *Dart landed* sound for the darts thrown at your board, which you can already hear
 
 ### 🤫 Quiet Own Darts
@@ -539,6 +539,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Keep the player's effect between darts**: A dart that sets off no effect of its own brings back the effect the turn started with, instead of `gameon`: the player's own, their team's, `next_player` or `bot_throw`. A player with an effect on their name keeps it for their whole turn, with their darts' own effects in between. Off by default
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
+- **Animation packs**: Ready-made animations for LED matrices, put on your WLED as presets and added as an effect set in one go. See [Animation packs](#animation-packs)
 - **Previews**: Each effect that plays a preset shows it the way your lights do, drawn from your own WLED. See [Previews](#previews)
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
@@ -554,6 +555,30 @@ Effects come in sets, and one set plays at a time. Your effects are the set *Def
 - A match, lobby or board page that is already open keeps the effects it started with until it loads again
 - A settings export carries every set. A version of Tools from before effect sets plays the set in use
 - Animations, the Caller and Sound FX keep sets the same way: see [Animation sets](#animation-sets), [Sound sets (Caller)](#sound-sets-caller) and [Sound sets (Sound FX)](#sound-sets-sound-fx)
+
+#### Animation packs
+Ready-made animations for LED matrices: Tools puts a pack's animations on your WLED as presets and adds their effects, triggers and all, as an effect set. Open them from **Animation packs** in the WLED settings, or from **Add › Animation packs**.
+
+- **The packs**:
+  - *Standard*: 180s, bull, busts, leg and match wins, Shanghai to Nelson, the lobby and your board, many of them in two looks picked at random.
+  - *Halloween*: plays the Standard animations for the moments it has none of its own.
+  - Each comes for a 32 × 8 matrix (one panel) and a 64 × 8 one (two panels side by side, with animations across both). Sizes are width × height, as WLED's 2D settings put them
+- **Your WLED**: Type its address, such as `192.168.0.69`. The dialog shows what answered: its name, its WLED version, its matrix and its free space. Each card picks your matrix's size, shows a preview, and lists every animation with its triggers under **Show all … animations**
+- **Add**: Puts the pack's GIFs and presets on your WLED, then adds its effects as a new effect set named after the pack.
+  - The set plays at once when the set in use has no effects; otherwise **Use this set** switches to it.
+  - Keep the tab open while it runs: an ESP32 takes a while for the files, and leaving the page asks first
+- **Your presets stay**: Tools reads your WLED's presets first and never overwrites or deletes one of yours.
+  - A pack's presets take their own numbers when those are free, and free numbers counted down from 249 when they aren't. Preset 250 stays free: WLED's *Autosave* usermod saves there.
+  - Presets already on your WLED under the same name, from an earlier install, are brought up to date where they are.
+  - A preset you save on the WLED while the animations go up is kept: the presets are read again just before they are written.
+  - If the WLED doesn't keep the new presets, the old ones are put back. If even that fails, **Save your old presets** hands them to you as a file, to restore in WLED under *Security & Updates*. The button stays until an install succeeds or you close the dialog, also after *Try again*
+- **Update**: A pack you added before shows **Update**. It puts the pack on your WLED again and brings its set up to date: each effect keeps its on/off, and effects you added to the set stay. A newer version of a pack is pointed out on its card
+- **What it needs**:
+  - WLED 16 or newer on an ESP32, set up as a 2D matrix: the *Image* effect plays the GIFs, and a 64 × 8 pack uses *Copy Segment*. WLED 0.15 has neither.
+  - Room on its file system: about 125 to 260 kB of GIFs, and room for presets.json to grow.
+  - A settings PIN has to be unlocked first.
+  - A size other than your matrix's can be added, with a warning
+- **Other sizes**: Need a pack for a 64 × 64 matrix, or another size? Ask on [Discord](https://discord.gg/autodarts), on [GitHub](https://github.com/creazy231/tools-for-autodarts/issues/new) or by [email](mailto:info@tobias-thiele.de)
 
 #### Previews
 Each effect that plays a preset shows that preset in its row the way your matrix or strip shows it: round LEDs on a dark panel, moving as the preset moves. The effect's dialog shows it larger, with the preset's name on the device. Nothing changes on your lights. The previews are drawn from what the device holds: its `presets.json`, its LED layout and the GIFs its presets play.

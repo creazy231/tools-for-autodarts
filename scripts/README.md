@@ -344,3 +344,25 @@ The workflow now creates **live releases** that are immediately public, which me
 - The AltStore source is updated with real, downloadable assets
 - Users can immediately download new versions through AltStore
 - The automation is fully hands-off once triggered 
+## WLED animation packs
+
+`yarn wled:packs <folder>` builds the animation packs the WLED settings offer, `public/wled-packs/`, from the sources listed in `scripts/wled-packs.json`. So far `<folder>` is wled-project's `animations` folder (`/Volumes/WD_BLACK/PROJECTS/wled-project/animations` on the maintainer's Mac). The output is committed, so builds never need the sources.
+
+Each pack in `scripts/wled-packs.json` has an `id`, a `name` and a `description` in English, German and Dutch, and its `sizes`, keyed `<width>x<height>` as WLED's 2D settings put a matrix. Each size names:
+
+- `presets`: the WLED `presets.json` that holds its presets;
+- `effects`: Tools CSV files (`name;PRESET;address;preset;trigger;…`). The address is ignored, since a user's own WLED takes its place;
+- `gifs`: the folders its GIFs are found in;
+- `cover`: the name of the preset the pack's card shows.
+
+The script takes the presets the effects play, and every preset those hold on or end on, and the GIFs their *Image* segments play. It refuses whatever would break an install on a user's WLED:
+
+- a missing preset or GIF;
+- a preset without a name, or a name used twice;
+- an effect it has no WLED name for (`KNOWN_FX` in `scripts/lib/wled-packs.ts`);
+- a GIF name a WLED can't keep;
+- two packs of one size that give one preset name two meanings;
+- a missing language.
+
+**To add a pack:** add its entry, run the script, check the counts it prints, and commit `scripts/wled-packs.json` with `public/wled-packs/`. A pack's presets are found on a device by their names, so names must be unique across packs of a size (wled-project's start with `AD `).
+

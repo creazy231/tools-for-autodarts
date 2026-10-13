@@ -1,0 +1,51 @@
+{
+  "packs": [
+    {
+      "id": "standard",
+      "name": { "en": "Standard", "de": "Standard", "nl": "Standaard" },
+      "description": {
+        "en": "The big moments and the small ones: 180s, bull, busts, leg and match wins, Shanghai to Nelson, and the lobby and your board. Many moments come in two looks, picked at random.",
+        "de": "Die großen Momente und die kleinen: 180er, Bull, Busts, gewonnene Legs und Matches, von Shanghai bis Nelson, dazu die Lobby und dein Board. Viele Momente gibt es in zwei Varianten, die zufällig wechseln.",
+        "nl": "De grote momenten en de kleine: 180's, bull, busts, gewonnen legs en wedstrijden, van Shanghai tot Nelson, plus de lobby en je bord. Veel momenten hebben twee varianten, willekeurig gekozen."
+      },
+      "sizes": {
+        "32x8": {
+          "presets": "presets.json",
+          "effects": [ "set_1/tools-for-autodarts.csv" ],
+          "gifs": [ "set_1/32x8/gifs" ],
+          "cover": "AD 180"
+        },
+        "64x8": {
+          "presets": "dual/presets.json",
+          "effects": [ "set_1/tools-for-autodarts.csv", "set_1/tools-for-autodarts-wide.csv" ],
+          "gifs": [ "set_1/64x8/gifs", "set_1/32x8/gifs" ],
+          "cover": "AD W 180"
+        }
+      }
+    },
+    {
+      "id": "halloween",
+      "name": { "en": "Halloween", "de": "Halloween", "nl": "Halloween" },
+      "description": {
+        "en": "Pumpkins, ghosts and bats for October. Moments without a Halloween animation of their own play the Standard pack's, so nothing goes dark.",
+        "de": "Kürbisse, Geister und Fledermäuse für den Oktober. Momente ohne eigene Halloween-Animation zeigen die aus dem Standard-Paket, damit nichts dunkel bleibt.",
+        "nl": "Pompoenen, spoken en vleermuizen voor oktober. Momenten zonder eigen Halloween-animatie tonen die uit het Standaard-pakket, zodat er niets donker blijft."
+      },
+      "sizes": {
+        "32x8": {
+          "presets": "presets.json",
+          "effects": [ "set_halloween/tools-for-autodarts-halloween.csv" ],
+          "gifs": [ "set_halloween/32x8/gifs", "set_1/32x8/gifs" ],
+          "cover": "AD Halloween Idle"
+        },
+        "64x8": {
+          "presets": "dual/presets.json",
+          "effects": [ "set_halloween/tools-for-autodarts-halloween.csv", "set_halloween/tools-for-autodarts-wide-halloween.csv" ],
+          "gifs": [ "set_halloween/64x8/gifs", "set_halloween/32x8/gifs", "set_1/64x8/gifs", "set_1/32x8/gifs" ],
+          "cover": "AD W HW Idle"
+        }
+      }
+    }
+  ]
+}
+
