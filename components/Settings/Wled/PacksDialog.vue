@@ -188,6 +188,13 @@ watch(() => props.show, (open) => {
   if (open) openDialog();
 }, { immediate: true });
 
+// A new address: what answered at the one before no longer counts, and an older read's answer is dropped.
+// Until the typing stops and it is read, the line says so and Add is off.
+watch(origin, (now) => {
+  probing++;
+  probe.value = now ? { state: "reading" } : { state: "idle" };
+});
+
 watchDebounced(origin, () => tryAddress(), { debounce: PROBE_DEBOUNCE_MS });
 
 /** Opening: back at the packs, the address of the user's effects when none is typed, and the catalog, once. */
