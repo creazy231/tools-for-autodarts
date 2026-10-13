@@ -116,16 +116,16 @@ export default {
   packs: {
     section: {
       title: "Animationspakete",
-      intro: "Fertige Animationen für LED-Matrizen. Tools überträgt ein Paket auf dein WLED-Gerät und legt seine Effekte als eigenes Set an.",
+      intro: "Fertige Animationen für LED-Matrizen. Tools überträgt sie auf dein WLED-Gerät: ein ganzes Paket als eigenes Effekt-Set oder einzelne Animationen in eines deiner Sets.",
       browse: "Pakete ansehen",
     },
     dialog: {
       title: "Animationspakete",
-      intro: "Wähle ein Paket und die Größe deiner Matrix. Tools überträgt die Animationen als Presets auf dein WLED-Gerät und legt ihre Effekte in Tools als Effekt-Set an.",
+      intro: "Wähle ein Paket und die Größe deiner Matrix. Tools überträgt die Animationen als Presets auf dein WLED-Gerät und legt ihre Effekte in Tools an: ein ganzes Paket als eigenes Effekt-Set oder einzelne Animationen in dem Effekt-Set, das du gerade bearbeitest.",
     },
     device: {
       label: "Dein WLED-Gerät",
-      hint: "Gib die Adresse deines WLED-Geräts ein, um ein Paket hinzuzufügen.",
+      hint: "Gib die Adresse deines WLED-Geräts ein, um Animationen hinzuzufügen.",
       reading: "Dein WLED-Gerät wird gesucht …",
       found: "{name} · WLED {version} · {size} · {free} kB frei",
       foundNoRoom: "{name} · WLED {version} · {size}",
@@ -139,15 +139,23 @@ export default {
     card: {
       count: { one: "{count} Animation", other: "{count} Animationen" },
       size: "Größe",
-      add: "Hinzufügen",
+      add: "Alle hinzufügen",
       update: "Aktualisieren",
       fits: "Passt zu deinem WLED-Gerät ({size})",
       misfit: "Gemacht für {size}. Dein WLED-Gerät hat {device}.",
       added: "In deinen Effekt-Sets als {set}",
       newer: "Es gibt eine neuere Version.",
-      show: { one: "Animation zeigen", other: "Alle {count} Animationen zeigen" },
-      hide: "Animationen ausblenden",
+      open: "Animationen ansehen",
       cover: "{pack} in {size}",
+    },
+    page: {
+      back: "Alle Pakete",
+      intro: "Füge einzelne Animationen dem Effekt-Set {set} hinzu oder alle als eigenes Effekt-Set.",
+      noMatch: "Keine Animation hat das im Namen oder in den Triggern.",
+      addOne: "{name} hinzufügen",
+      adding: "Wird auf dein WLED-Gerät übertragen…",
+      added: "Zu {set} hinzugefügt",
+      present: "Schon in {set}",
     },
     otherSizes: "Du brauchst ein Paket in einer anderen Größe, etwa 64 × 64? Frag auf {discord}, auf {github} oder per {email}.",
     links: {
@@ -156,6 +164,7 @@ export default {
     loadFailed: "Die Pakete konnten nicht geladen werden. Lade die Seite neu und versuch es noch einmal.",
     install: {
       back: "Zurück zu den Paketen",
+      backTo: "Zurück zu {pack}",
       summary: "Überträgt {files} Animationsdateien ({kb} kB) und {presets} Presets auf dein WLED-Gerät unter {address} und legt {effects} Effekte in Tools als Effekt-Set {set} an.",
       summaryUpdate: "Überträgt {files} Animationsdateien ({kb} kB) und {presets} Presets erneut auf dein WLED-Gerät unter {address} und bringt die {effects} Effekte im Effekt-Set {set} auf den neuesten Stand.",
       yours: "Deine eigenen Presets bleiben, wie sie sind. Presets aus einer früheren Installation dieses Pakets werden auf den neuesten Stand gebracht.",

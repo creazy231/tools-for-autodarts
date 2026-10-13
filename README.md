@@ -258,7 +258,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
 - **Sound FX**: Ambient sound effects for different game events
 - **Sound Upload**: Add your own custom sounds for personalized feedback
 - **Text-to-Speech (TTS)**: Generate custom caller and sound FX audio directly from text using your device's built-in voices
-- **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events, from sets of effects you switch between, such as one for Halloween, and ready-made animation packs for LED matrices that go on your WLED in one go
+- **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events, from sets of effects you switch between, such as one for Halloween, and ready-made animation packs for LED matrices that go on your WLED whole or one animation at a time
 - **Quiet Own Darts**: Silences autodarts' own *Dart landed* sound for the darts thrown at your board, which you can already hear
 
 ### 🤫 Quiet Own Darts
@@ -539,7 +539,7 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Keep the player's effect between darts**: A dart that sets off no effect of its own brings back the effect the turn started with, instead of `gameon`: the player's own, their team's, `next_player` or `bot_throw`. A player with an effect on their name keeps it for their whole turn, with their darts' own effects in between. Off by default
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
-- **Animation packs**: Ready-made animations for LED matrices, put on your WLED as presets and added as an effect set in one go. See [Animation packs](#animation-packs)
+- **Animation packs**: Ready-made animations for LED matrices, put on your WLED as presets: a whole pack as an effect set of its own, or single animations into the set you're editing. They come first in the WLED settings. See [Animation packs](#animation-packs)
 - **Previews**: Each effect that plays a preset shows it the way your lights do, drawn from your own WLED. See [Previews](#previews)
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
@@ -557,21 +557,25 @@ Effects come in sets, and one set plays at a time. Your effects are the set *Def
 - Animations, the Caller and Sound FX keep sets the same way: see [Animation sets](#animation-sets), [Sound sets (Caller)](#sound-sets-caller) and [Sound sets (Sound FX)](#sound-sets-sound-fx)
 
 #### Animation packs
-Ready-made animations for LED matrices: Tools puts a pack's animations on your WLED as presets and adds their effects, triggers and all, as an effect set. Open them from **Animation packs** in the WLED settings, or from **Add › Animation packs**.
+Ready-made animations for LED matrices: Tools puts them on your WLED as presets and adds their effects, triggers and all: a whole pack as an effect set of its own, or single animations into the effect set you're editing. The packs come first in the WLED settings, highlighted, with a tile per pack and its preview moving. A tile opens its pack's page; **Browse packs** and **Add › Animation packs** open the list of packs.
 
 - **The packs**:
   - *Standard*: 180s, bull, busts, leg and match wins, Shanghai to Nelson, the lobby and your board, many of them in two looks picked at random.
   - *Halloween*: plays the Standard animations for the moments it has none of its own.
   - Each comes for a 32 × 8 matrix (one panel) and a 64 × 8 one (two panels side by side, with animations across both). Sizes are width × height, as WLED's 2D settings put them
-- **Your WLED**: Type its address, such as `192.168.0.69`. The dialog shows what answered: its name, its WLED version, its matrix and its free space. Each card picks your matrix's size, shows a preview, and lists every animation with its triggers under **Show all … animations**
-- **Add**: Puts the pack's GIFs and presets on your WLED, then adds its effects as a new effect set named after the pack.
+- **Your WLED**: Type its address, such as `192.168.0.69`. The dialog shows what answered: its name, its WLED version, its matrix and its free space. Each card picks your matrix's size and shows a preview. **Show animations** opens the pack's page
+- **A pack's page**: Every animation of the pack in the size picked, with its preview and triggers, searchable by name or trigger.
+  - **+** puts just that animation on your WLED: its preset, the presets it plays and ends on (the hold, and the loop or afterglow it returns to) and the GIFs they show. Its effect goes at the top of the effect set the WLED settings show; one of the same name there is brought up to date where it is, keeping its on/off.
+  - A row says when the set has the effect already. Its **+** then puts the animation on your WLED again and brings the effect up to date.
+  - One install runs at a time, and the dialog stays open while it does. A later **Add all** keeps the animation's presets where they are
+- **Add all**: Puts the pack's GIFs and presets on your WLED, then adds its effects as a new effect set named after the pack.
   - The set plays at once when the set in use has no effects; otherwise **Use this set** switches to it.
   - Keep the tab open while it runs: an ESP32 takes a while for the files, and leaving the page asks first
 - **Your presets stay**: Tools reads your WLED's presets first and never overwrites or deletes one of yours.
   - A pack's presets take their own numbers when those are free, and free numbers counted down from 249 when they aren't. Preset 250 stays free: WLED's *Autosave* usermod saves there.
   - Presets already on your WLED under the same name, from an earlier install, are brought up to date where they are.
   - A preset you save on the WLED while the animations go up is kept: the presets are read again just before they are written.
-  - If the WLED doesn't keep the new presets, the old ones are put back. If even that fails, **Save your old presets** hands them to you as a file, to restore in WLED under *Security & Updates*. The button stays until an install succeeds or you close the dialog, also after *Try again*
+  - If the WLED doesn't keep the new presets, the old ones are put back. If even that fails, **Save your old presets** hands them to you as a file, to restore in WLED under *Security & Updates*. The button stays until you close the dialog, also after *Try again* and after a later install that succeeds
 - **Update**: A pack you added before shows **Update**. It puts the pack on your WLED again and brings its set up to date: each effect keeps its on/off, and effects you added to the set stay. A newer version of a pack is pointed out on its card
 - **What it needs**:
   - WLED 16 or newer on an ESP32, set up as a 2D matrix: the *Image* effect plays the GIFs, and a 64 × 8 pack uses *Copy Segment*. WLED 0.15 has neither.

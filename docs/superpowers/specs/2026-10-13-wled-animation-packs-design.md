@@ -216,3 +216,59 @@ The dialog's texts are under `wled.packs` in `locales/{en,de,nl}/wled.ts`. Pack 
 - Installing on two devices at once, or one set for two devices.
 - A remote catalog (approach 2).
 - Packs for strips.
+
+## Follow-up: highlighted at the top, and single animations (2026-10-13)
+
+> bitte passe das ganze so an, dass "Animation packs" in der Übersicht gehighligted ist und ganz oben steht. die Unterseiten davon solltest du so anpassen, dass es für User auch möglich ist nur einzelne Animationen zu ihrem WLED setup hinzuzufügen - nicht nur das ganze Set so wie jetzt
+
+Decided without asking back, as the rest of this work was.
+
+### The overview: first, and highlighted
+- The WLED panel opens with the packs, above its intro sentence: a card with the site's brand gradient (`--ad-gradient-brand`, cyan to green) as its border. It holds the title with the number of packs, the section's sentence, and **Browse packs** as a primary button.
+  - This departs from the settings' "one blue button per screen" (`settings-design-language`): the request asks for this entry to stand out, and the effect list's **Add** stays blue too.
+- **One tile per pack** with its cover drawn and moving (the pack's first size), its name and its number of animations. A tile opens the dialog straight on that pack's page.
+
+### The dialog's pages
+1. **Packs** (as before):
+   - the address field;
+   - a card per pack, with its cover, texts, sizes and fit;
+   - **Show animations** opens the pack's page;
+   - **Add all** (or **Update**) puts the whole pack on the WLED as a set of its own, through the install page as before.
+2. **A pack's page:**
+   - **All packs** to go back;
+   - the cover, the name and the number of animations;
+   - the size choice and its fit;
+   - **Add all** or **Update**;
+   - the line "Add single animations to the effect set {set}, or all of them as an effect set of their own.";
+   - a search field, by name or trigger (`searchLibrary`, as the libraries search);
+   - every animation as a row: its preview, its name and trigger chips, its state and a **+**.
+3. **Installing the whole pack**, as before. Back returns to the page it came from.
+
+### A single animation
+- **What goes on the WLED:**
+  - its preset, and every preset that one plays or ends on: the hold, and the loop or afterglow it returns to (`packSubset`). For example, *AD 180* brings *AD Game on* and *AD hold*;
+  - the GIFs those presets show.
+  - The same install runs as for a pack, with the same rules: the numbers are planned around the user's presets, presets.json is re-read before the write, the read-back decides, and the old file goes back if needed.
+- **What goes into Tools:** only the animation's own effect, at the top of the effect set the WLED panel shows. An effect of the same name there is brought up to date where it is, keeping its on/off. No new set is made.
+- **How it runs:**
+  - No confirm step, as it is a few files. The row says *Putting it on your WLED…*, then *Added to {set}*, or what went wrong.
+  - One install at a time: while one runs, every **+** and **Add all** waits, and the dialog can't be closed or left.
+  - A row whose effect the set already has says *Already in {set}*. Its **+** puts it on the WLED again and brings the effect up to date.
+
+### Texts
+New or changed keys under `wled.packs`, in en/de/nl:
+- the card's **Add all** and **Show animations**;
+- the page's back link, line, search, empty search, the row's **+** label and its three states;
+- the section's and the dialog's sentences, which now name single animations.
+
+### Testing
+- **tsx:**
+  - `packSubset`: what an animation brings along, for a loop, a one-shot, an afterglow, the 64 × 8 mirror, and a name the pack lacks;
+  - `addEffectsToSet`: new ones on top, same name updated in place keeping on/off, a set that has gone falls back to the set in use, the input unchanged;
+  - an install of a single animation, then of the whole pack, on a device with the user's presets: the pack's later install keeps the animation's numbers.
+- **In the dev Chrome against the stand-in:**
+  - the overview at the top, at 1600 and 390 px;
+  - a tile opening its pack;
+  - a single *AD 180 Lightning*: the stand-in gets its GIFs and presets, and the panel's list shows the effect at the top;
+  - the row's states, the search, then **Add all** from the page;
+  - en/de/nl.

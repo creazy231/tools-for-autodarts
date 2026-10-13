@@ -116,16 +116,16 @@ export default {
   packs: {
     section: {
       title: "Animatiepakketten",
-      intro: "Kant-en-klare animaties voor LED-matrixen. Tools zet een pakket op je WLED-apparaat en voegt de effecten toe als een eigen set.",
+      intro: "Kant-en-klare animaties voor LED-matrixen. Tools zet ze op je WLED-apparaat: een heel pakket als eigen effectenset, of losse animaties in een van je sets.",
       browse: "Pakketten bekijken",
     },
     dialog: {
       title: "Animatiepakketten",
-      intro: "Kies een pakket en de grootte van je matrix. Tools zet de animaties als presets op je WLED-apparaat en voegt de effecten in Tools toe als effectenset.",
+      intro: "Kies een pakket en de grootte van je matrix. Tools zet de animaties als presets op je WLED-apparaat en voegt de effecten toe aan Tools: een heel pakket als eigen effectenset, of losse animaties in de effectenset die je nu bewerkt.",
     },
     device: {
       label: "Je WLED-apparaat",
-      hint: "Typ het adres van je WLED-apparaat om een pakket toe te voegen.",
+      hint: "Typ het adres van je WLED-apparaat om animaties toe te voegen.",
       reading: "Je WLED-apparaat wordt gezocht…",
       found: "{name} · WLED {version} · {size} · {free} kB vrij",
       foundNoRoom: "{name} · WLED {version} · {size}",
@@ -139,15 +139,23 @@ export default {
     card: {
       count: { one: "{count} animatie", other: "{count} animaties" },
       size: "Grootte",
-      add: "Toevoegen",
+      add: "Alles toevoegen",
       update: "Bijwerken",
       fits: "Gemaakt voor je WLED-apparaat ({size})",
       misfit: "Gemaakt voor {size}. Je WLED-apparaat is {device}.",
       added: "In je effectensets als {set}",
       newer: "Er is een nieuwere versie.",
-      show: { one: "Animatie tonen", other: "Alle {count} animaties tonen" },
-      hide: "Animaties verbergen",
+      open: "Animaties bekijken",
       cover: "{pack} in {size}",
+    },
+    page: {
+      back: "Alle pakketten",
+      intro: "Voeg losse animaties toe aan de effectenset {set}, of allemaal als eigen effectenset.",
+      noMatch: "Geen animatie heeft dat in de naam of de triggers.",
+      addOne: "{name} toevoegen",
+      adding: "Wordt op je WLED-apparaat gezet…",
+      added: "Toegevoegd aan {set}",
+      present: "Al in {set}",
     },
     otherSizes: "Wil je een pakket in een andere grootte, zoals 64 × 64? Vraag het op {discord}, op {github} of per {email}.",
     links: {
@@ -156,6 +164,7 @@ export default {
     loadFailed: "De pakketten konden niet worden geladen. Laad de pagina opnieuw en probeer het nog eens.",
     install: {
       back: "Terug naar de pakketten",
+      backTo: "Terug naar {pack}",
       summary: "Zet {files} animatiebestanden ({kb} kB) en {presets} presets op je WLED-apparaat op {address}, en voegt {effects} effecten in Tools toe als de effectenset {set}.",
       summaryUpdate: "Zet {files} animatiebestanden ({kb} kB) en {presets} presets opnieuw op je WLED-apparaat op {address}, en werkt de {effects} effecten van de effectenset {set} bij.",
       yours: "Je eigen presets blijven zoals ze zijn. Presets van een eerdere installatie van dit pakket worden bijgewerkt.",

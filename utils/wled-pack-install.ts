@@ -67,6 +67,12 @@ export type InstallState =
   | { phase: "done"; set: string; count: number; inUse: boolean; playing: string }
   | { phase: "failed"; failure: InstallFailure };
 
+/** What a pack page's row shows of its single animation's install (components/Settings/Wled/PackPage.vue): on its way, in effect set `set`, or why not, at `address`. */
+export type SingleState =
+  | { phase: "running" }
+  | { phase: "done"; set: string }
+  | { phase: "failed"; failure: InstallFailure; address: string };
+
 /** /json/info is small, so an answer is expected soon: a device that is off shows quickly. */
 export const INFO_TIMEOUT_MS = 4000;
 /** An ESP32 took 3–4.5 s for a 56 KB presets.json. */

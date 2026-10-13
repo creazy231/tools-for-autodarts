@@ -21,7 +21,13 @@
         button-size="sm"
       />
       <span v-else class="adt-chip">{{ label }}</span>
-      <AppButton @click="emit('add')" :disabled="!canAdd" auto class="ml-auto" size="sm">
+      <AppButton @click="emit('open')" auto class="ml-auto" size="sm">
+        <span class="flex items-center gap-1">
+          {{ t("wled.packs.card.open") }}
+          <span aria-hidden="true" class="icon-[material-symbols--chevron-right-rounded] -mr-1 text-lg" />
+        </span>
+      </AppButton>
+      <AppButton @click="emit('add')" :disabled="!canAdd" auto size="sm">
         <span class="flex items-center gap-1">
           <span aria-hidden="true" class="text-lg" :class="[added ? 'icon-[material-symbols--refresh-rounded]' : 'icon-[material-symbols--add-rounded]']" />
           {{ added ? t("wled.packs.card.update") : t("wled.packs.card.add") }}
@@ -38,27 +44,12 @@
         · {{ t("wled.packs.card.newer") }}
       </template>
     </p>
-
-    <button @click="open = !open" :aria-expanded="open" class="mt-3 flex items-center gap-1 text-sm font-semibold text-[var(--ad-text-secondary)] hover:text-[var(--ad-text-primary)]" type="button">
-      <span aria-hidden="true" class="text-lg" :class="[open ? 'icon-[material-symbols--expand-less-rounded]' : 'icon-[material-symbols--expand-more-rounded]']" />
-      {{ open ? t("wled.packs.card.hide") : t("wled.packs.card.show", { count: current.effects }) }}
-    </button>
-    <ul v-if="open && variant" class="mt-3 border-t border-[var(--ad-border-subtle)]">
-      <li v-for="effect in variant.effects" :key="effect.name" class="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-center gap-x-3 gap-y-1 border-b border-[var(--ad-border-subtle)] py-2 sm:grid-cols-[minmax(0,12.5rem)_minmax(0,1fr)_minmax(0,1fr)]">
-        <span class="flex min-w-0">
-          <PackPreview :label="effect.name" :preset="effect.preset" :variant="variant" />
-        </span>
-        <span class="min-w-0 truncate text-sm font-semibold text-[var(--ad-text-primary)]">{{ effect.name }}</span>
-        <TriggerChips :max="3" :triggers="effect.triggers" :wrap="false" class="col-span-2 sm:col-span-1" />
-      </li>
-    </ul>
   </article>
 </template>
 
 <script setup lang="ts">
 import AppButton from "../../AppButton.vue";
 import AppRadioGroup from "../../AppRadioGroup.vue";
-import TriggerChips from "../Library/TriggerChips.vue";
 
 import PackPreview from "./PackPreview.vue";
 
@@ -78,11 +69,10 @@ const props = defineProps<{
   canAdd: boolean;
 }>();
 
-const emit = defineEmits<{ "update:size": [ size: string ]; "add": [] }>();
+const emit = defineEmits<{ "update:size": [ size: string ]; "add": []; "open": [] }>();
 
 const { t, language } = useI18n();
 
-const open = ref(false);
 const variant = shallowRef<PackVariant>();
 
 const current = computed(() => props.pack.sizes.find(size => size.size === props.size) ?? props.pack.sizes[0]);
