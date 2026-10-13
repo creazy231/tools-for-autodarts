@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppInput id="wled-pack-address" v-model="address" :label="t('wled.packs.device.label')" :placeholder="ADDRESS_EXAMPLE">
+    <AppInput id="wled-pack-address" v-model="address" :disabled="disabled" :label="t('wled.packs.device.label')" :placeholder="ADDRESS_EXAMPLE">
       <template #icon>
         <span class="icon-[material-symbols--router-outline-rounded]" />
       </template>
@@ -21,6 +21,8 @@ defineProps<{
   reading: boolean;
   /** Said as a warning: nothing answered there, or not a matrix. */
   warns: boolean;
+  /** While an install runs: the WLED it goes to stays the one named. */
+  disabled?: boolean;
 }>();
 
 /** An example address: the same in every language. */

@@ -575,7 +575,7 @@ Ready-made animations for LED matrices: Tools puts them on your WLED as presets 
   - A pack's presets take their own numbers when those are free, and free numbers counted down from 249 when they aren't. Preset 250 stays free: WLED's *Autosave* usermod saves there.
   - Presets already on your WLED under the same name, from an earlier install, are brought up to date where they are.
   - A preset you save on the WLED while the animations go up is kept: the presets are read again just before they are written.
-  - If the WLED doesn't keep the new presets, the old ones are put back. If even that fails, **Save your old presets** hands them to you as a file, to restore in WLED under *Security & Updates*. The button stays until an install succeeds or you close the dialog, also after *Try again*
+  - If the WLED doesn't keep the new presets, the old ones are put back. If even that fails, **Save your old presets** hands them to you as a file, to restore in WLED under *Security & Updates*. The button stays until you close the dialog, also after *Try again* and after a later install that succeeds
 - **Update**: A pack you added before shows **Update**. It puts the pack on your WLED again and brings its set up to date: each effect keeps its on/off, and effects you added to the set stay. A newer version of a pack is pointed out on its card
 - **What it needs**:
   - WLED 16 or newer on an ESP32, set up as a 2D matrix: the *Image* effect plays the GIFs, and a 64 × 8 pack uses *Copy Segment*. WLED 0.15 has neither.

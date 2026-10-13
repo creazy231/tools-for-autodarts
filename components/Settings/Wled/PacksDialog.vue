@@ -1,7 +1,7 @@
 <template>
   <!-- While a pack or an animation goes on the WLED, nothing closes the dialog: its progress, and what it adds at the end, would be out of sight. -->
   <AppModal @close="close" :disable-backdrop-click="busy" :hide-close-button="busy" :show="show" :title="t('wled.packs.dialog.title')" ghost-close size="lg">
-    <div v-if="!chosen && viewedPack" class="space-y-5">
+    <div v-if="!chosen && viewedPack" ref="pageRoot" class="space-y-5">
       <button @click="viewedPack = undefined" :disabled="busy" class="flex items-center gap-1 text-sm font-semibold text-[var(--ad-text-secondary)] hover:text-[var(--ad-text-primary)] disabled:opacity-45" type="button">
         <span aria-hidden="true" class="icon-[material-symbols--arrow-back-rounded] text-lg" />
         {{ t("wled.packs.page.back") }}
@@ -21,16 +21,16 @@
         :set="targetLabel"
         :size="sizeOf(viewedPack).size"
       >
-        <PackAddress v-model="address" :reading="probe.state === 'reading'" :text="probeText" :warns="probeWarns" />
+        <PackAddress v-model="address" :disabled="busy" :reading="probe.state === 'reading'" :text="probeText" :warns="probeWarns" />
       </PackPage>
     </div>
 
-    <div v-else-if="!chosen" class="space-y-6">
+    <div v-else-if="!chosen" ref="pageRoot" class="space-y-6">
       <p class="text-sm text-[var(--ad-text-muted)]">
         {{ t("wled.packs.dialog.intro") }}
       </p>
 
-      <PackAddress v-model="address" :reading="probe.state === 'reading'" :text="probeText" :warns="probeWarns" />
+      <PackAddress v-model="address" :disabled="busy" :reading="probe.state === 'reading'" :text="probeText" :warns="probeWarns" />
 
       <AppAlert v-if="catalog === 'failed'" compact variant="error">
         {{ t("wled.packs.loadFailed") }}
@@ -65,7 +65,7 @@
       </p>
     </div>
 
-    <div v-else class="space-y-5">
+    <div v-else ref="pageRoot" class="space-y-5">
       <button @click="back" :disabled="running" class="flex items-center gap-1 text-sm font-semibold text-[var(--ad-text-secondary)] hover:text-[var(--ad-text-primary)] disabled:opacity-45" type="button">
         <span aria-hidden="true" class="icon-[material-symbols--arrow-back-rounded] text-lg" />
         {{ backText }}
@@ -177,10 +177,15 @@ const chosenVariant = shallowRef<PackVariant>();
 const state = ref<InstallState>({ phase: "confirm" });
 /** The set the last install added or brought up to date. */
 const addedId = ref("");
-/** The WLED's presets.json from before an install that couldn't put it back. */
+/**
+ * The WLED's presets.json from before an install that couldn't put it back, on offer until the dialog closes: a later
+ * install that succeeds may have written over what the failed one left, so this can be the only copy of them.
+ */
 const backup = ref("");
 /** The pack whose page shows; none for the list of packs. */
 const viewedPack = shallowRef<PackInfo>();
+/** The page shown: the list, a pack's page or the install view. */
+const pageRoot = ref<HTMLElement>();
 /** Single animations on their way to the WLED, put there or not: by pack and size ("standard@64x8"), then by name. */
 const singles = ref<Record<string, Record<string, SingleState>>>({});
 /** Which address read is the latest: an older one's answer is dropped. */
@@ -195,7 +200,9 @@ const busy = computed(() => running.value || Object.values(singles.value).some(r
 /** The effect set single animations go into: the one the panel shows, or the set in use if that one has gone. */
 const target = computed(() => {
   const fx = config.value?.wledFx;
-  const sets = fx ? listLibrarySets(toRaw(fx), "effects") : [];
+  // Through the reactive settings, not toRaw: the panel edits a set's list in place (a delete, an add), and the rows'
+  // "Already in" follows it.
+  const sets = fx ? listLibrarySets(fx, "effects") : [];
   return sets.find(set => set.id === props.targetSet) ?? sets.find(set => set.active);
 });
 const targetLabel = computed(() => (target.value ? librarySetLabel(target.value, t("library.sets.defaultName")) : ""));
@@ -235,6 +242,14 @@ watch(origin, (now) => {
 });
 
 watchDebounced(origin, () => tryAddress(), { debounce: PROBE_DEBOUNCE_MS });
+
+// A new page opens at its top. The dialog's body is what scrolls, and it would keep the page before's place: a pack's
+// page opened from far down the list would start mid-way, its way back out of sight.
+watch([ viewedPack, chosen ], async () => {
+  await nextTick();
+  const body = pageRoot.value?.closest(".adt-modal-body");
+  if (body) body.scrollTop = 0;
+});
 
 // An install cut off while presets.json is written can leave it damaged, and the old one is only kept here:
 // leaving the page while one runs asks first.
@@ -343,7 +358,6 @@ async function start() {
     state.value = { phase: "failed", failure: failureOf(result) };
     return;
   }
-  backup.value = "";
   const stored = storeSet(pick, variant, result.slots, target);
   if (!stored) {
     state.value = { phase: "failed", failure: { reason: "pack-unreadable" } };
@@ -391,7 +405,6 @@ async function addSingle(pack: PackInfo, name: string) {
     const subset = packSubset(variant, [ name ]);
     const result = await installPack(deviceIo(at), subset);
     if (!result.ok) return failed(failureOf(result));
-    backup.value = "";
     if (!config.value) return failed({ reason: "pack-unreadable" });
     const placed = addEffectsToSet(toRaw(config.value.wledFx), props.targetSet ?? "", packEffects(subset, result.slots, at));
     config.value.wledFx = placed.section;
@@ -416,7 +429,8 @@ function setSingle(pack: PackInfo, size: PackSize, name: string, single: SingleS
 function failureOf(result: { ok: false } & InstallFailure): InstallFailure {
   const { ok: _ok, ...failure } = result;
   if (failure.reason === "not-restored" && !backup.value) backup.value = failure.backup;
-  // While one is held, presets.json is damaged from that try, so "nothing was changed" would be wrong.
+  // While one is held, presets.json may be damaged from that try, so "nothing was changed" could be wrong, and the copy
+  // held is what to restore.
   return backup.value && failure.reason === "presets-unreadable" ? { reason: "not-restored", backup: backup.value } : failure;
 }
 

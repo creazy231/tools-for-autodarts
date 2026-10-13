@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
     - the pack's go to free numbers when theirs are taken, counting down from 249, as WLED's Autosave usermod saves to 250;
     - a pack added before is brought up to date where it is;
     - a preset you save while the animations go up is kept;
-    - if the WLED doesn't keep the new presets, the old ones are put back, or handed to you as a file, which stays on offer until an install succeeds; leaving the page while an install runs asks first.
+    - if the WLED doesn't keep the new presets, the old ones are put back, or handed to you as a file, which stays on offer until the dialog closes; leaving the page while an install runs asks first.
   - A pack in another size, such as 64 × 64, can be asked for on Discord, on GitHub or by email.
   - Checked in Chrome against a stand-in that answers the way WLED 16 does:
     - Standard 64 × 8 put 93 GIFs, byte for byte the catalog's, and 94 presets in WLED's own file layout on it. Its 89 effects became a set whose rows' previews were read back from the device.
