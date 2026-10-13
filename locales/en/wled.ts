@@ -230,7 +230,7 @@ export default {
       notWled: "{address} isn't a WLED.",
       notMatrix: "Your WLED drives a strip. The packs are for LED matrices.",
       /** `effect` is WLED's name of an effect, such as Image. */
-      effectMissing: "Your WLED has no {effect} effect, which the pack needs. It takes WLED 0.15 or newer on an ESP32.",
+      effectMissing: "Your WLED has no {effect} effect, which the pack needs. It takes WLED 16 or newer on an ESP32.",
       presetsUnreadable: "Your WLED's presets.json can't be read, so nothing was changed.",
       noSlots: "The pack needs {needed} free preset numbers, and your WLED has {free}.",
       /** `address` here is the WLED's whole address, such as http://192.168.0.227. */

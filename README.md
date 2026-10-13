@@ -574,7 +574,7 @@ Ready-made animations for LED matrices: Tools puts a pack's animations on your W
   - If the WLED doesn't keep the new presets, the old ones are put back. If even that fails, **Save your old presets** hands them to you as a file, to restore in WLED under *Security & Updates*
 - **Update**: A pack you added before shows **Update**. It puts the pack on your WLED again and brings its set up to date: each effect keeps its on/off, and effects you added to the set stay. A newer version of a pack is pointed out on its card
 - **What it needs**:
-  - WLED 0.15 or newer on an ESP32, set up as a 2D matrix: the *Image* effect plays the GIFs, and a 64 × 8 pack uses *Copy Segment*.
+  - WLED 16 or newer on an ESP32, set up as a 2D matrix: the *Image* effect plays the GIFs, and a 64 × 8 pack uses *Copy Segment*. WLED 0.15 has neither.
   - Room on its file system: about 125 to 260 kB of GIFs, and room for presets.json to grow.
   - A settings PIN has to be unlocked first.
   - A size other than your matrix's can be added, with a warning

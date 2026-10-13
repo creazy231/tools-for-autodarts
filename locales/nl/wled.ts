@@ -181,7 +181,7 @@ export default {
       unreachable: "Je WLED-apparaat op {address} gaf geen antwoord. Staat het aan en zit het op dit netwerk?",
       notWled: "{address} is geen WLED-apparaat.",
       notMatrix: "Je WLED-apparaat stuurt een strip aan. De pakketten zijn voor LED-matrixen.",
-      effectMissing: "Je WLED-apparaat heeft geen {effect}-effect, en dat heeft het pakket nodig. Daarvoor is WLED 0.15 of nieuwer op een ESP32 nodig.",
+      effectMissing: "Je WLED-apparaat heeft geen {effect}-effect, en dat heeft het pakket nodig. Daarvoor is WLED 16 of nieuwer op een ESP32 nodig.",
       presetsUnreadable: "De presets.json van je WLED-apparaat is niet te lezen, dus er is niets veranderd.",
       noSlots: "Het pakket heeft {needed} vrije presetnummers nodig, en je WLED-apparaat heeft er {free}.",
       noRoom: "Het pakket heeft {needed} kB nodig, en je WLED-apparaat heeft {free} kB vrij. Verwijder bestanden die je niet nodig hebt in de bestandseditor van WLED ({address}/edit).",

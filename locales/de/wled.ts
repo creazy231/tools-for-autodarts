@@ -181,7 +181,7 @@ export default {
       unreachable: "Dein WLED-Gerät unter {address} hat nicht geantwortet. Ist es an und in diesem Netzwerk?",
       notWled: "{address} ist kein WLED-Gerät.",
       notMatrix: "Dein WLED-Gerät steuert einen Streifen. Die Pakete sind für LED-Matrizen.",
-      effectMissing: "Deinem WLED-Gerät fehlt der Effekt {effect}, den das Paket braucht. Den gibt es ab WLED 0.15 auf einem ESP32.",
+      effectMissing: "Deinem WLED-Gerät fehlt der Effekt {effect}, den das Paket braucht. Den gibt es ab WLED 16 auf einem ESP32.",
       presetsUnreadable: "Die presets.json deines WLED-Geräts lässt sich nicht lesen, darum wurde nichts geändert.",
       noSlots: "Das Paket braucht {needed} freie Preset-Nummern, und dein WLED-Gerät hat {free}.",
       noRoom: "Das Paket braucht {needed} kB, und dein WLED-Gerät hat {free} kB frei. Lösche Dateien, die du nicht brauchst, im Dateieditor von WLED ({address}/edit).",

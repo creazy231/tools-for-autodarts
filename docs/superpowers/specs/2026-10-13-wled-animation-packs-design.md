@@ -76,7 +76,7 @@ Adding a pack later means adding its entry to `scripts/wled-packs.json`, running
 `utils/wled-pack-install.ts` runs the steps over an injected device I/O (`read(path)`, `upload(name, file)`), so a fake device tests every branch. `utils/wled-packs.ts` holds the pure parts. All reads and writes go through the background:
 
 1. **Look:** `/json/info` (4 s). Unreachable, not a WLED, or a strip rather than a matrix: stop.
-2. **Effects by name:** `/json/eff`. Each effect the pack uses (`fx`) is looked up by its name. A device without *Image* (no GIF support, e.g. an ESP8266 build) or without *Copy Segment* stops, naming it. Ids that differ from WLED 16's are rewritten in the presets, because WLED's effect ids move between versions.
+2. **Effects by name:** `/json/eff`. Each effect the pack uses (`fx`) is looked up by its name. A device without *Image* or without *Copy Segment* stops, naming it. Both come with WLED 16: in 0.15, 53 is an unused slot and 77 is *Meteor Smooth*. Ids that differ from WLED 16's are rewritten in the presets, because WLED's effect ids move between versions.
 3. **Presets:** `/presets.json` (15 s), kept as read. Only a 404 or an empty file means no presets. Stopping cases, since replacing the file would lose the user's presets:
    - any other error status;
    - bytes that aren't UTF-8, or aren't a JSON object;
@@ -158,7 +158,7 @@ All three open the same nested `AppModal` (`size="lg"`).
 |---|---|---|
 | no answer | Your WLED at {address} didn't answer. Is it on and on this network? | nothing |
 | not a WLED / a strip | That address isn't a WLED / Your WLED is a strip; packs are for LED matrices. | nothing |
-| effect missing | Your WLED has no {effect} effect, which the pack needs. It takes WLED 0.15 or newer on an ESP32. | nothing |
+| effect missing | Your WLED has no {effect} effect, which the pack needs. It takes WLED 16 or newer on an ESP32. | nothing |
 | presets unreadable | Your WLED's presets.json can't be read, so nothing was changed. | nothing |
 | no numbers | The pack needs {needed} preset numbers, and your WLED has {free} free. | nothing |
 | no room | The pack needs {needed} kB, and your WLED has {free} kB free. Delete files you don't need in WLED's file editor ({address}/edit). | nothing |
