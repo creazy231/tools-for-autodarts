@@ -249,6 +249,51 @@ export function planInstall(device: Record<string, unknown>, variant: Pick<PackV
 }
 
 /**
+ * What `names`, effects of `variant`, need on a device: their presets and every
+ * preset those play or end on, over and over (a playlist's hold, the loop or
+ * afterglow it returns to); the GIFs all of them show; and the WLED effects
+ * they use. Only the effects named come along, in the variant's order, and a
+ * name the pack lacks adds nothing. Installed, it puts just those on a device
+ * (utils/wled-pack-install.ts), where a later install of the whole pack finds
+ * them by name. `variant` isn't changed.
+ */
+export function packSubset(variant: PackVariant, names: readonly string[]): PackVariant {
+  const wanted = new Set(names);
+  const effects = variant.effects.filter(effect => wanted.has(effect.name));
+  const needed = new Set<number>();
+  const queue = effects.map(effect => effect.preset);
+  while (queue.length) {
+    const id = queue.pop()!;
+    const preset = variant.presets[String(id)];
+    if (needed.has(id) || !preset) continue;
+    needed.add(id);
+    queue.push(...references(preset));
+  }
+
+  const presets: PackVariant["presets"] = {};
+  const fx: Record<string, string> = {};
+  const shown = new Set<string>();
+  for (const id of [ ...needed ].sort((a, b) => a - b)) {
+    const preset = variant.presets[String(id)];
+    presets[String(id)] = JSON.parse(JSON.stringify(preset));
+    for (const segment of segmentsOf(preset)) {
+      const name = typeof segment.fx === "number" ? variant.fx[String(segment.fx)] : undefined;
+      if (!name) continue;
+      fx[String(segment.fx)] = name;
+      // An Image segment shows the GIF its `n` names, as the catalog's build reads it (scripts/lib/wled-packs.ts).
+      if (name === "Image" && typeof segment.n === "string") shown.add(segment.n);
+    }
+  }
+  return {
+    ...variant,
+    fx,
+    presets,
+    effects: effects.map(effect => ({ ...effect, triggers: [ ...effect.triggers ] })),
+    gifs: variant.gifs.filter(gif => shown.has(gif.name)).map(gif => ({ ...gif })),
+  };
+}
+
+/**
  * A device's presets.json as WLED writes it itself (wled00/file.cpp), which
  * its in-place edits rely on: `"0"` first, then one preset a line in number
  * order, each line after the first starting with its comma. wled-project's
@@ -390,6 +435,18 @@ function renumbered(preset: Record<string, unknown>, slots: ReadonlyMap<number, 
     if (isRecord(segment) && typeof segment.fx === "number" && String(segment.fx) in fxIds) segment.fx = fxIds[String(segment.fx)];
   }
   return copy;
+}
+
+/** The presets a pack preset plays or ends on: a playlist's entries and its end, and a top-level `ps`. */
+function references(preset: Record<string, unknown>): number[] {
+  const found: unknown[] = [ preset.ps ];
+  if (isRecord(preset.playlist)) found.push(...(Array.isArray(preset.playlist.ps) ? preset.playlist.ps : []), preset.playlist.end);
+  return found.filter((id): id is number => typeof id === "number");
+}
+
+function segmentsOf(preset: Record<string, unknown>): Record<string, unknown>[] {
+  const segments = Array.isArray(preset.seg) ? preset.seg : isRecord(preset.seg) ? [ preset.seg ] : [];
+  return segments.filter(isRecord);
 }
 
 function withoutPlaceholder(presets: Record<string, unknown>): Record<string, unknown> {
