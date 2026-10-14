@@ -116,7 +116,7 @@ export default {
   packs: {
     section: {
       title: "Animatiepakketten",
-      intro: "Kant-en-klare animaties voor LED-matrixen. Tools zet ze op je WLED-apparaat: een heel pakket als eigen effectenset, of losse animaties in een van je sets.",
+      intro: "Kant-en-klare animaties voor LED-matrixen, direct op je WLED-apparaat: een heel pakket als eigen effectenset, of losse in je sets.",
       browse: "Pakketten bekijken",
     },
     dialog: {

@@ -147,7 +147,7 @@ export default {
     /** The panel's first section, above its intro: the packs, a tile each. */
     section: {
       title: "Animation packs",
-      intro: "Ready-made animations for LED matrices. Tools puts them on your WLED: a whole pack as an effect set of its own, or single animations into one of your sets.",
+      intro: "Ready-made animations for LED matrices, put on your WLED: a whole pack as its own effect set, or single ones into your sets.",
       browse: "Browse packs",
     },
     dialog: {
