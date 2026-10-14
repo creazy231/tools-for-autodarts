@@ -1,5 +1,5 @@
 <template>
-  <!-- A cover takes its column's width; a row's preview sits in its cell beside the animation's name. -->
+  <!-- A cover takes its column's width; a row's or a tile's preview sits in its cell beside the name. -->
   <span ref="frame" class="min-w-0" :class="[size === 'cover' ? 'flex w-full' : 'inline-flex shrink-0']">
     <canvas v-if="preview" ref="canvas" :aria-label="label" class="block shrink-0 rounded-[3px]" role="img" :title="size === 'row' ? label : undefined" />
     <!-- Until it is drawn, the dark panel at the picture's size: nothing moves when it comes. -->
@@ -11,14 +11,14 @@
 import type { PackVariant } from "@/utils/wled-packs";
 import type { Preview } from "@/utils/wled-preview";
 
-import { DIALOG_BOX, ROW_BOX, ledGeometry } from "@/utils/led-canvas";
+import { DIALOG_BOX, ROW_BOX, TILE_BOX, ledGeometry } from "@/utils/led-canvas";
 import { packPreview } from "@/utils/wled-pack-catalog";
 
 const props = withDefaults(defineProps<{
   variant: PackVariant;
   /** The variant's own number for the preset. */
   preset: number;
-  size?: "row" | "cover";
+  size?: "row" | "tile" | "cover";
   /** Its accessible name: the animation's, or the pack's for a cover. */
   label: string;
 }>(), {
@@ -32,13 +32,13 @@ const preview = shallowRef<Preview>();
 /** Read and decoded once the list stops at it (composables/useSeenAtRest.ts), as a long list's previews are many. */
 const seen = useSeenAtRest(pending);
 const { width: frameWidth } = useElementSize(frame);
-// A row's: the cell it sits in.
-const { width: cellWidth } = useElementSize(computed(() => (props.size === "row" ? frame.value?.parentElement ?? undefined : undefined)));
+// A row's or a tile's: the cell it sits in.
+const { width: cellWidth } = useElementSize(computed(() => (props.size === "cover" ? undefined : frame.value?.parentElement ?? undefined)));
 let run = 0;
 
-/** What the preview may take: a cover its column, a row its cell, never more than the box of its kind. */
+/** What the preview may take: a cover its column, a row or a tile its cell, never more than the box of its kind. */
 const box = computed(() => {
-  const area = props.size === "cover" ? DIALOG_BOX : ROW_BOX;
+  const area = props.size === "cover" ? DIALOG_BOX : props.size === "tile" ? TILE_BOX : ROW_BOX;
   const width = Math.floor(props.size === "cover" ? frameWidth.value : cellWidth.value) || area.width;
   return { width: Math.min(area.width, width), height: area.height };
 });

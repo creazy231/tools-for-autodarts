@@ -32,6 +32,8 @@ const PLATE_RADIUS = 3;
 
 /** What a preview may take: a row's, in the line under the effect's name, and the dialog's. */
 export const ROW_BOX = { width: 200, height: 28 };
+/** An animation pack's tile on the WLED panel: a 64 × 8 matrix at a pitch of 4. */
+export const TILE_BOX = { width: 260, height: 36 };
 export const DIALOG_BOX = { width: 520, height: 96 };
 
 export interface LedGeometry {

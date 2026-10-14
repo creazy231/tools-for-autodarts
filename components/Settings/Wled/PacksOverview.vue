@@ -1,6 +1,6 @@
 <template>
   <!-- The WLED panel's first section: the packs, edged in the site's brand gradient, a tile each that opens its page. -->
-  <section class="adt-packs-overview relative mb-8 rounded-[var(--ad-radius-lg)] p-4 sm:p-5">
+  <section class="adt-packs-overview relative mb-6 rounded-[var(--ad-radius-lg)] p-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <!-- One run of text, as the other headings, so a wrapped heading keeps its count after its last word. -->
       <h3 class="adt-section-title">
@@ -13,10 +13,10 @@
         </span>
       </AppButton>
     </div>
-    <p class="mt-1 max-w-3xl text-sm text-[var(--ad-text-secondary)]">
+    <p class="mt-1 text-balance text-sm text-[var(--ad-text-secondary)]">
       {{ t("wled.packs.section.intro") }}
     </p>
-    <ul v-if="index?.packs.length" class="mt-4 grid gap-3 sm:grid-cols-2">
+    <ul v-if="index?.packs.length" class="mt-3 grid gap-3 sm:grid-cols-2">
       <li v-for="pack in index.packs" :key="pack.id" class="min-w-0">
         <PackTile @open="emit('open', pack.id)" :pack="pack" />
       </li>

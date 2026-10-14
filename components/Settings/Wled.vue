@@ -10,7 +10,8 @@
       <div class="relative z-10 pr-2 text-[var(--ad-text-secondary)]">
         <PacksOverview @open="openPacks" />
 
-        <p class="mb-6 max-w-3xl">
+        <!-- The panel's full width, so the sentence keeps to one line where it can, and breaks into two even lines where it can't. -->
+        <p class="mb-6 text-balance">
           {{ t("wled.intro") }}
         </p>
 

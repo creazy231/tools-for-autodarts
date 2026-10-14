@@ -116,7 +116,7 @@ export default {
   packs: {
     section: {
       title: "Animationspakete",
-      intro: "Fertige Animationen für LED-Matrizen. Tools überträgt sie auf dein WLED-Gerät: ein ganzes Paket als eigenes Effekt-Set oder einzelne Animationen in eines deiner Sets.",
+      intro: "Fertige Animationen für LED-Matrizen, direkt auf dein WLED-Gerät: ein ganzes Paket als eigenes Effekt-Set oder einzelne in deine Sets.",
       browse: "Pakete ansehen",
     },
     dialog: {
