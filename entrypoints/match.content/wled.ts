@@ -181,16 +181,17 @@ export function wledFxOnRemove() {
  * What the turn up started with (see {@link turnEffect}): `bot_throw` for a
  * bot; else the effect on the first of `names` that has one (the player's,
  * then their team's, each as typed and with underscores for its spaces, and in
- * a `+` item with the context, `alice+x01`); then `next_player`, which can
- * show whoever is up; and `gameon` when there is none of those. A trigger is
+ * a `+` item with the context, `alice+x01`); then `next_player` — `gameon` on
+ * the leg's first visit —, which can show whoever is up, also as
+ * `next_player+player2`; and `gameon` when there is none of those. A trigger is
  * settled on one of its effects here. With Teams, a change of who throws is a
  * change of `names`, and chooses again.
  */
 function effectOfTheTurn(match: IMatch, names: readonly string[], context: string[]): string | IWled {
   // Alone it is the same player's turn the whole leg, so their effect is kept for the leg.
   const solo = (match.players?.length ?? 0) === 1;
-  const visit = solo ? [] : [ match.round, match.player, match.turns?.[0]?.id ];
-  const turn = [ match.id, match.set, match.leg, ...visit, ...names ].join("\n");
+  const visit = solo ? [] : [match.round, match.player, match.turns?.[0]?.id];
+  const turn = [match.id, match.set, match.leg, ...visit, ...names].join("\n");
   if (turnEffect?.turn === turn) return turnEffect.effect;
 
   let effect: string | IWled;
@@ -204,8 +205,18 @@ function effectOfTheTurn(match: IMatch, names: readonly string[], context: strin
       bonus: -0.1 * index,
       priority: 10 - 0.1 * index,
     })));
-    effect = pickBest(config.wledFx.effects, nameTriggers, { context })?.items[0]
-      ?? (itemsOn(config.wledFx.effects, "next_player").length ? "next_player" : "gameon");
+    // `next_player` and `gameon` are ranked with the names, so that their `+`
+    // items find the seat's effect (`next_player+player2`, `gameon+player1`).
+    // The leg's first visit is the gameon's, as it is in derive.ts.
+    const legStart = match.round === 1 && match.player === 0;
+    const turnTriggers: IRankedTrigger[] = [
+      ...nameTriggers,
+      legStart
+        ? { trigger: "gameon", category: TriggerCategory.START, level: "GAMEON", bonus: 0, priority: 5 }
+        : { trigger: "next_player", category: TriggerCategory.PLAYER, level: "PLAYER_NAME_COMMON", bonus: 0, priority: 5 },
+      { trigger: "gameon", category: TriggerCategory.START, level: "GAMEON", bonus: 0, priority: 0 },
+    ];
+    effect = pickBest(config.wledFx.effects, turnTriggers, { context })?.items[0] ?? "gameon";
   }
   turnEffect = { turn, effect: typeof effect === "string" ? pickEffect(effect) ?? effect : effect };
   return turnEffect.effect;
