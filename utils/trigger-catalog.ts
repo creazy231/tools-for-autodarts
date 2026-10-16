@@ -21,12 +21,12 @@ export interface TriggerHint {
 
 const README = "https://github.com/creazy231/tools-for-autodarts?tab=readme-ov-file";
 
-/** The README section with the full list, per feature. */
+/** The README section with the full list: one table for all four, with a column each. */
 export const TRIGGER_DOCS: Record<TriggerFeature, string> = {
-  caller: `${README}#%EF%B8%8F-caller-feature`,
-  soundFx: `${README}#-sound-fx-feature`,
-  wled: `${README}#-wled-integration`,
-  animations: `${README}#-animations`,
+  caller: `${README}#-triggers`,
+  soundFx: `${README}#-triggers`,
+  wled: `${README}#-triggers`,
+  animations: `${README}#-triggers`,
 };
 
 /** The pattern-shaped triggers, in one line each. */
@@ -37,11 +37,17 @@ export const TRIGGER_PATTERN_KEYS: Record<TriggerFeature, MessageKey> = {
   animations: "triggers.patterns.animations",
 };
 
+/** The board's events: one table for every feature since utils/game-events/board.ts. */
 function board(prefix = ""): TriggerHint[] {
   return [
+    { trigger: `${prefix}board_starting`, descriptionKey: "triggers.board.boardStarting" },
     { trigger: `${prefix}board_started`, descriptionKey: "triggers.board.boardStarted" },
+    { trigger: `${prefix}board_stopping`, descriptionKey: "triggers.board.boardStopping" },
     { trigger: `${prefix}board_stopped`, descriptionKey: "triggers.board.boardStopped" },
     { trigger: `${prefix}manual_reset_done`, descriptionKey: "triggers.board.manualResetDone" },
+    { trigger: `${prefix}throw`, descriptionKey: "triggers.board.throw" },
+    { trigger: `${prefix}last_throw`, descriptionKey: "triggers.board.lastThrow" },
+    { trigger: `${prefix}takeout`, descriptionKey: "triggers.board.takeout" },
     { trigger: `${prefix}takeout_finished`, descriptionKey: "triggers.board.takeoutFinished" },
     { trigger: `${prefix}calibration_started`, descriptionKey: "triggers.board.calibrationStarted" },
     { trigger: `${prefix}calibration_finished`, descriptionKey: "triggers.board.calibrationFinished" },
@@ -53,10 +59,21 @@ const CRICKET: TriggerHint[] = [
   { trigger: "cricket_miss", descriptionKey: "triggers.cricket.miss" },
 ];
 
+/** A lucky number left, and Gotcha's and Killer's own moments (utils/game-events/derive.ts). */
+function variants(prefix = ""): TriggerHint[] {
+  return [
+    { trigger: `${prefix}luckynumber`, descriptionKey: "triggers.variants.luckynumber" },
+    { trigger: `${prefix}gotcha`, descriptionKey: "triggers.variants.gotcha" },
+    { trigger: `${prefix}killer_became_killer`, descriptionKey: "triggers.variants.killerBecameKiller" },
+    { trigger: `${prefix}killer_killed`, descriptionKey: "triggers.variants.killerKilled" },
+  ];
+}
+
 export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
   caller: [
     { trigger: "gameon", descriptionKey: "triggers.caller.gameon" },
     { trigger: "gameshot", descriptionKey: "triggers.caller.gameshot" },
+    { trigger: "matchshot", descriptionKey: "triggers.caller.matchshot" },
     { trigger: "busted", descriptionKey: "triggers.caller.busted" },
     { trigger: "partner_rule", descriptionKey: "triggers.caller.partnerRule" },
     { trigger: "you_require", descriptionKey: "triggers.caller.youRequire" },
@@ -68,6 +85,7 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
     { trigger: "double", descriptionKey: "triggers.caller.double" },
     { trigger: "triple", descriptionKey: "triggers.caller.triple" },
     ...CRICKET,
+    ...variants(),
     ...board(),
   ],
   soundFx: [
@@ -87,12 +105,12 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
     { trigger: "ambient_lobby_out", descriptionKey: "triggers.soundFx.ambientLobbyOut" },
     { trigger: "ambient_tournament_ready", descriptionKey: "triggers.soundFx.ambientTournamentReady" },
     ...CRICKET,
+    ...variants("ambient_"),
     ...board("ambient_"),
   ],
   wled: [
     { trigger: "gameon", descriptionKey: "triggers.wled.gameon" },
     { trigger: "next_player", descriptionKey: "triggers.wled.nextPlayer" },
-    { trigger: "takeout", descriptionKey: "triggers.wled.takeout" },
     { trigger: "gameshot", descriptionKey: "triggers.wled.gameshot" },
     { trigger: "matchshot", descriptionKey: "triggers.wled.matchshot" },
     { trigger: "busted", descriptionKey: "triggers.wled.busted" },
@@ -102,10 +120,8 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
     { trigger: "bull", descriptionKey: "triggers.wled.bull" },
     { trigger: "outside", descriptionKey: "triggers.wled.outside" },
     { trigger: "miss", descriptionKey: "triggers.wled.miss" },
-    { trigger: "throw", descriptionKey: "triggers.wled.throw" },
-    { trigger: "last_throw", descriptionKey: "triggers.wled.lastThrow" },
-    { trigger: "board_starting", descriptionKey: "triggers.wled.boardStarting" },
-    { trigger: "board_stopping", descriptionKey: "triggers.wled.boardStopping" },
+    ...CRICKET,
+    ...variants(),
     ...board(),
     { trigger: "bot_throw", descriptionKey: "triggers.wled.botThrow" },
     { trigger: "lobby_in", descriptionKey: "triggers.wled.lobbyIn" },
@@ -115,9 +131,14 @@ export const TRIGGER_HINTS: Record<TriggerFeature, TriggerHint[]> = {
   ],
   animations: [
     { trigger: "gameshot", descriptionKey: "triggers.animations.gameshot" },
+    { trigger: "matchshot", descriptionKey: "triggers.animations.matchshot" },
     { trigger: "busted", descriptionKey: "triggers.animations.busted" },
+    { trigger: "partner_rule", descriptionKey: "triggers.animations.partnerRule" },
     { trigger: "bull", descriptionKey: "triggers.animations.bull" },
     { trigger: "s25", descriptionKey: "triggers.animations.s25" },
     { trigger: "outside", descriptionKey: "triggers.animations.outside" },
+    { trigger: "miss", descriptionKey: "triggers.animations.miss" },
+    ...CRICKET,
+    ...variants(),
   ],
 };

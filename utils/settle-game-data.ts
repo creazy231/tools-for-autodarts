@@ -5,11 +5,21 @@ export interface GameDataSettler {
   push: (gameData: IGameData, oldGameData: IGameData) => void;
   /** Drop whatever is waiting without acting on it. */
   cancel: () => void;
+  /**
+   * Make way for an update acted on straight away, as one with game events is
+   * (utils/game-events/processor.ts): what is waiting about another moment is
+   * acted on first, so it is not lost; one about the same moment is dropped.
+   */
+  flushBefore: (gameData: IGameData) => void;
+  /** Note an update acted on elsewhere, so the same state coming again is not acted on twice. */
+  markActed: (gameData: IGameData) => void;
 }
 
 /**
- * The wait between a game-data update and acting on it, for the features that
- * call out what just happened — the Caller, Sound FX and WLED.
+ * The wait between a game-data update and acting on it, for the updates that
+ * come without game events (utils/game-events/processor.ts): a page load, a
+ * correction, a frame whose events were lost. Those are diffed against the
+ * state before, as every feature once did with all of them.
  *
  * The same dart is often reported more than once while it settles: a
  * correction passes through several updates, and a merge of `activated` lands
@@ -64,6 +74,18 @@ export function settleGameData(act: (gameData: IGameData, oldGameData: IGameData
       if (timer) clearTimeout(timer);
       timer = null;
       waiting = null;
+    },
+    flushBefore(gameData) {
+      if (waiting && moment(waiting.gameData) !== moment(gameData)) {
+        flush();
+        return;
+      }
+      if (timer) clearTimeout(timer);
+      timer = null;
+      waiting = null;
+    },
+    markActed(gameData) {
+      actedOn = whatHappened(gameData);
     },
   };
 }

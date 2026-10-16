@@ -21,6 +21,10 @@ export default {
     description: "Die Spiele, in denen WLED leuchtet. Lobby- und Turniereffekte werden in jedem Spiel abgespielt.",
     intro: "WLED leuchtet nur in den hier eingeschalteten Spielen.",
   },
+  priority: {
+    description: "Welcher Effekt gewinnt, wenn mehrere passen.",
+    intro: "WLED zeigt den Effekt des höchsten Triggers in dieser Liste, für den es einen gibt.",
+  },
   list: {
     title: "Effekte",
     searchPlaceholder: "Effekte nach Name, Trigger oder Adresse suchen",

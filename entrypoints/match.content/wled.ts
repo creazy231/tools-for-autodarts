@@ -1,23 +1,24 @@
-import type { ILobbies, IMatch } from "@/utils/websocket-helpers";
+import type { TriggerUpdate } from "@/utils/game-events/processor";
+import type { MatchOptions } from "@/utils/game-events/match";
+import type { IRankedTrigger } from "@/utils/game-events/types";
+import type { IMatch } from "@/utils/websocket-helpers";
 
-import { AutodartsToolsGameData, type IGameData } from "@/utils/game-data-storage";
-import { pageVariant, playsIn } from "@/utils/game-modes";
-import { AutodartsToolsLobbyData } from "@/utils/lobby-data-storage";
+import { AutodartsToolsGameData } from "@/utils/game-data-storage";
+import { GameMode, pageVariant } from "@/utils/game-modes";
+import { getUserIdFromToken } from "@/utils/helpers";
 import { selectedBoard } from "@/utils/lobby-guests";
-import { AutodartsToolsBoardData, type IBoard } from "@/utils/board-data-storage";
 import { isPlayerUpInTheRoom } from "@/utils/own-board";
 import { AutodartsToolsConfig, type IConfig, type IWled } from "@/utils/storage";
-import { getUserIdFromToken, triggerPatterns } from "@/utils/helpers";
-import { settleGameData } from "@/utils/settle-game-data";
-import { legWinNames, loadTeamCalls, matchWinNames, turnNames } from "@/utils/team-calls";
+import { isOnALobbyPage } from "@/utils/game-events/board";
+import { spellings } from "@/utils/game-events/derive";
+import { itemsOn, oneOn, pickBest } from "@/utils/game-events/match";
+import { registerTriggers } from "@/utils/game-events/processor";
+import { TriggerCategory } from "@/utils/game-events/types";
+import { turnNames } from "@/utils/team-calls";
 import { isTournamentPage, watchTournamentReady } from "@/utils/tournament-ready";
-import { gameDataProcessor, turnStartEffect } from "@/utils/wled";
 import { type WledRequest, wledRequest } from "@/utils/wled-request";
-import { winId } from "@/utils/win";
 
-let gameDataWatcherUnwatch: any;
-let lobbyDataWatcherUnwatch: any;
-let boardDataWatcherUnwatch: any;
+let unregisterTriggers: (() => void) | null = null;
 let tournamentReadyUnwatch: (() => void) | null = null;
 let config: IConfig;
 
@@ -27,25 +28,13 @@ let config: IConfig;
  * online opponent say, an effect on `other` stands in for every effect, board
  * events included.
  *
- * Settled by every game message, and from the stored match as the page opens,
+ * Settled by every game update, and from the stored match as the page opens,
  * since board events can come first. True until a match says otherwise.
  */
 let playerUpHere = true;
 
 /** Your account, which tells your guests and bots: asked for until the access token has landed. */
 let localUserId: string | null = null;
-
-// Each game-data update settles before its effect is set, without a finished
-// visit ever being lost to the next one — see utils/settle-game-data.ts.
-const settled = settleGameData((gameData, oldGameData) => processGameData(gameData, oldGameData, true));
-
-/**
- * The win the gameshot/matchshot effect was last set for — see {@link winId}.
- *
- * A won leg goes on being reported after the dart that won it, and Finish sends
- * it once more, so going by the winner alone set the effect again each time.
- */
-let announcedWin: string | undefined;
 
 /**
  * Whose name `{player}` and `{player_ascii}` stand for: the player up in the
@@ -66,24 +55,37 @@ let lastRequest: string | undefined;
 /**
  * The effect the turn up started with, and the turn it was chosen for, for
  * *Keep the player's effect between darts* (`wledFx.keepTurnEffect`). Chosen
- * once a turn and settled on one effect, so a player with more than one, or
- * more than one `next_player` effect, keeps the one their turn started with.
- * Forgotten whenever WLED starts on a page, as the effects may have changed.
+ * once a turn, as the player comes up, and settled on one effect, so a player
+ * with more than one, or more than one `next_player` effect, keeps the one
+ * their turn started with for all its darts. A player alone keeps it for the
+ * leg. Forgotten whenever WLED starts on a page, as the effects may have changed.
  */
 let turnEffect: { turn: string; effect: string | IWled } | undefined;
 
-/** `/lobby/<id>` on the rebuilt site, `/lobbies/<id>` on the old one. */
-function isOnALobbyPage(): boolean {
-  return /\/lobb(?:y|ies)\//.test(window.location.href);
-}
+/** What WLED lights for a game's triggers (utils/game-events/derive.ts); a practice game's target is its own. */
+const CATEGORIES: readonly TriggerCategory[] = [
+  TriggerCategory.OUTCOME,
+  TriggerCategory.PLAYER,
+  TriggerCategory.START,
+  TriggerCategory.THROW,
+  TriggerCategory.TOTAL,
+  TriggerCategory.COMBO,
+  TriggerCategory.VARIANT,
+  TriggerCategory.TARGET,
+];
+
+/** A bot coming up has always lit `bot_throw`, the effect for its darts. */
+const MATCH_OPTIONS: MatchOptions = {
+  forms: trigger => (trigger === "bot" ? [ "bot_throw" ] : [ trigger ]),
+};
 
 /**
  * Whether the player up in `match` throws in this room. One who can't be told
  * yet, a guest with no board before the access token has landed, counts as
  * here: `other` is for somebody known to be elsewhere.
  */
-async function isPlayerUpHere(match: IMatch | undefined): Promise<boolean> {
-  if (!localUserId) localUserId = await getUserIdFromToken();
+function isPlayerUpHere(match: IMatch | undefined): boolean {
+  if (!localUserId) getUserIdFromToken().then(id => (localUserId = id)).catch(() => undefined);
   return isPlayerUpInTheRoom(match, localUserId, { url: window.location.href, selected: selectedBoard() }) !== false;
 }
 
@@ -93,44 +95,10 @@ async function isPlayerUpHere(match: IMatch | undefined): Promise<boolean> {
  * showing, and their takeout leaves it there. A lobby or a tournament page has
  * nobody up, whatever the last match left behind, so its events are yours.
  */
-function eventTrigger(trigger: string) {
-  if (!isTriggerPresent(trigger)) return;
-  if (!playerUpHere && isTriggerPresent("other") && !isOnALobbyPage() && !isTournamentPage()) return;
+function boardEffect(trigger: string): void {
+  if (!itemsOn(config.wledFx.effects, trigger).length) return;
+  if (!playerUpHere && itemsOn(config.wledFx.effects, "other").length && !isOnALobbyPage(window.location.href) && !isTournamentPage()) return;
   setEffectByTrigger(trigger);
-}
-
-async function checkStatus(boardData: IBoard): Promise<void> {
-  const boardEvent: string | undefined = boardData.event;
-  const boardStatus: string | undefined = boardData.status;
-
-  console.log(`Autodarts Tools: WLED: Board: event '${boardEvent}', status '${boardStatus}'`);
-  if ((boardEvent === "Starting" && (boardStatus === "" || boardStatus === "Starting")) ||
-    (boardEvent === "start" && boardStatus === ""))
-    eventTrigger("board_starting");
-  else if (boardEvent === "Started" && boardStatus === "Throw")
-    eventTrigger("board_started");
-  else if (boardEvent === "Stopping" && boardStatus === "Stopping")
-    eventTrigger("board_stopping");
-  else if (boardEvent === "Stopped" && boardStatus === "Stopped")
-    eventTrigger("board_stopped");
-  else if (boardEvent === "Disconnected" && (boardStatus === "Offline" || boardStatus === ""))
-    eventTrigger("board_stopped");
-  else if (boardEvent === "Manual reset" && boardStatus === "Throw")
-    eventTrigger("manual_reset_done");
-  else if (boardEvent === "Throw detected" && boardStatus === "Throw")
-    eventTrigger("throw");
-  else if (boardEvent === "Throw detected" && boardStatus === "Takeout")
-    eventTrigger("last_throw");
-  else if (boardEvent === "Takeout started" && boardStatus === "Takeout in progress")
-    eventTrigger("takeout");
-  else if (boardEvent === "Takeout finished" && boardStatus === "Throw")
-    eventTrigger("takeout_finished");
-  else if (boardEvent === "Calibration started")
-    eventTrigger("calibration_started");
-  else if (boardEvent === "Calibration finished")
-    eventTrigger("calibration_finished");
-  else
-    console.log(`Autodarts Tools: WLED: Board: event '${boardEvent}' with status '${boardStatus}' was unhandled`);
 }
 
 export async function wledFx() {
@@ -140,67 +108,29 @@ export async function wledFx() {
     config = await AutodartsToolsConfig.getValue();
     lastRequest = undefined;
     turnEffect = undefined;
-    await loadTeamCalls();
+    localUserId = await getUserIdFromToken();
     const gameData = await AutodartsToolsGameData.getValue();
     console.log(`Autodarts Tools: WLED: Config loaded, ${config.wledFx?.effects?.length || 0} effects available`);
 
-    // Board events can arrive before the first game message, so who is up is
+    // Board events can arrive before the first game update, so who is up is
     // settled up front: from the stored match on its own page, and nobody
     // elsewhere anywhere else. A lobby's stored match is the last one played.
     playerUpHere = pageVariant(gameData.match, window.location.href) === undefined
-      || await isPlayerUpHere(gameData.match);
+      || isPlayerUpHere(gameData.match);
 
-    if (!gameDataWatcherUnwatch) {
-      gameDataWatcherUnwatch = AutodartsToolsGameData.watch(
-        (gameData: IGameData, oldGameData: IGameData) => {
-          if (!playsIn(config?.wledFx, gameData.match?.variant)) return;
-          settled.push(gameData, oldGameData);
-        },
-      );
-
-      const url = window.location.href;
-      const matchId = url.match(
-        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
-      )?.[0];
-
-      if (gameData.match?.id === matchId && playsIn(config?.wledFx, gameData.match?.variant)) {
-        processGameData(gameData, gameData);
-      }
-    }
-
-    if (!lobbyDataWatcherUnwatch) {
-      lobbyDataWatcherUnwatch = AutodartsToolsLobbyData.watch(
-        async (_lobbyData: ILobbies | undefined, _oldLobbyData: ILobbies | undefined) => {
-          if (!_lobbyData || !_oldLobbyData || !config.wledFx?.enabled) return;
-          // The rebuilt site's lobby is `/lobby/<id>`. Matching only the old
-          // spelling meant these two never fired on it.
-          if (!isOnALobbyPage()) return;
-
-          if (
-            (_lobbyData.players?.length ?? 0) > (_oldLobbyData.players?.length ?? 0)
-            && (_lobbyData.players?.length ?? 0) > 1
-          ) {
-            setEffectByTrigger("lobby_in");
-          }
-
-          if (
-            (_lobbyData.players?.length ?? 0) < (_oldLobbyData.players?.length ?? 0)
-            && (_lobbyData.players?.length ?? 0) > 0
-          ) {
-            setEffectByTrigger("lobby_out");
-          }
-        },
-      );
-    }
-
-    if (!boardDataWatcherUnwatch) {
-      boardDataWatcherUnwatch = AutodartsToolsBoardData.watch(async (boardData: IBoard) => {
-        // A board event follows the game of this page's own match: in a lobby the
-        // stored match is the last one played, and its game says nothing here.
-        const stored = await AutodartsToolsGameData.getValue();
-        if (playsIn(config?.wledFx, pageVariant(stored?.match, window.location.href))) checkStatus(boardData).catch(e => console.error(e));
-      });
-    }
+    unregisterTriggers ??= registerTriggers({
+      feature: "wledFx",
+      settings: () => config?.wledFx,
+      categories: () => CATEGORIES,
+      fallbacks: [ "outside", "missWildcard" ],
+      // Cricket counts points only on numbers already closed, so nearly every
+      // visit totals 0 however many marks it took, and an effect on `0` lit up
+      // after almost all of them. Like Sound FX, leave Cricket's visit totals out.
+      filter: trigger => trigger.tag !== "cricketScore",
+      onTriggers: showEffect,
+      onBoard: boardEffect,
+      onLobby: trigger => setEffectByTrigger(trigger),
+    });
 
     // A tournament match of yours waiting for you to mark ready, the same
     // moment Sound FX plays `ambient_tournament_ready` on — see
@@ -228,31 +158,18 @@ export async function wledFx() {
 
 export function wledFxOnRemove() {
   console.log("Autodarts Tools: WLED: wledFx on remove");
-  if (gameDataWatcherUnwatch) {
-    gameDataWatcherUnwatch();
-    gameDataWatcherUnwatch = null;
-  }
 
-  if (lobbyDataWatcherUnwatch) {
-    lobbyDataWatcherUnwatch();
-    lobbyDataWatcherUnwatch = null;
-  }
-
-  if (boardDataWatcherUnwatch) {
-    boardDataWatcherUnwatch();
-    boardDataWatcherUnwatch = null;
-  }
+  // Stopped before the idle effect below, so no update still settling sets its
+  // effect over it — which is how the lights stayed on the matchshot once
+  // Finish had left the match.
+  unregisterTriggers?.();
+  unregisterTriggers = null;
 
   if (tournamentReadyUnwatch) {
     tournamentReadyUnwatch();
     tournamentReadyUnwatch = null;
   }
 
-  // An update still settling would otherwise run after the teardown and set its
-  // effect over the idle one below — which is how the lights stayed on the
-  // matchshot once Finish had left the match.
-  settled.cancel();
-  announcedWin = undefined;
   turnPlayer = "";
   turnEffect = undefined;
   playerUpHere = true;
@@ -261,148 +178,116 @@ export function wledFxOnRemove() {
 }
 
 /**
- * What the turn up started with (see {@link turnEffect}): `bot_throw`, the
- * player's or their team's effect, `next_player` or `gameon`, as
- * turnStartEffect chooses. A trigger is settled on one of its effects here.
- * With Teams, a change of who throws is a change of `names`, and chooses again.
+ * What the turn up started with (see {@link turnEffect}): `bot_throw` for a
+ * bot; else the effect on the first of `names` that has one (the player's,
+ * then their team's, each as typed and with underscores for its spaces, and in
+ * a `+` item with the context, `alice+x01`); then `next_player` — `gameon` on
+ * the leg's first visit —, which can show whoever is up, also as
+ * `next_player+player2`; and `gameon` when there is none of those. A trigger is
+ * settled on one of its effects here. With Teams, a change of who throws is a
+ * change of `names`, and chooses again.
  */
-function effectOfTheTurn(match: IMatch, names: readonly string[]): string | IWled {
-  const turn = [ match.id, match.set, match.leg, match.round, match.player, match.turns[0]?.id, ...names ].join("\n");
-  if (turnEffect?.turn !== turn) {
-    const isBot = match.players?.[match.player]?.cpuPPR !== null;
-    const effect = turnStartEffect(names, isBot, config.wledFx.effects, isTriggerPresent);
-    turnEffect = { turn, effect: typeof effect === "string" ? pickEffect(effect) ?? effect : effect };
+function effectOfTheTurn(match: IMatch, names: readonly string[], context: string[]): string | IWled {
+  // Alone it is the same player's turn the whole leg, so their effect is kept for the leg.
+  const solo = (match.players?.length ?? 0) === 1;
+  const visit = solo ? [] : [match.round, match.player, match.turns?.[0]?.id];
+  const turn = [match.id, match.set, match.leg, ...visit, ...names].join("\n");
+  if (turnEffect?.turn === turn) return turnEffect.effect;
+
+  let effect: string | IWled;
+  if (match.players?.[match.player]?.cpuPPR) {
+    effect = "bot_throw";
+  } else {
+    const nameTriggers: IRankedTrigger[] = names.flatMap((name, index) => spellings(name).map(spelling => ({
+      trigger: spelling,
+      category: TriggerCategory.PLAYER,
+      level: "PLAYER_NAME" as const,
+      bonus: -0.1 * index,
+      priority: 10 - 0.1 * index,
+    })));
+    // `next_player` and `gameon` are ranked with the names, so that their `+`
+    // items find the seat's effect (`next_player+player2`, `gameon+player1`).
+    // The leg's first visit is the gameon's, as it is in derive.ts.
+    const legStart = match.round === 1 && match.player === 0;
+    const turnTriggers: IRankedTrigger[] = [
+      ...nameTriggers,
+      legStart
+        ? { trigger: "gameon", category: TriggerCategory.START, level: "GAMEON", bonus: 0, priority: 5 }
+        : { trigger: "next_player", category: TriggerCategory.PLAYER, level: "PLAYER_NAME_COMMON", bonus: 0, priority: 5 },
+      { trigger: "gameon", category: TriggerCategory.START, level: "GAMEON", bonus: 0, priority: 0 },
+    ];
+    effect = pickBest(config.wledFx.effects, turnTriggers, { context })?.items[0] ?? "gameon";
   }
+  turnEffect = { turn, effect: typeof effect === "string" ? pickEffect(effect) ?? effect : effect };
   return turnEffect.effect;
 }
 
 /**
- * Process game data to trigger effects based on game events
+ * The effect for an update: the one on its highest trigger in WLED's order
+ * (utils/game-events/priorities.ts). Without one, a visit that has just
+ * started shows its turn's effect, the player's say, and so does a dart with
+ * *Keep the player's effect between darts*; else `gameon`. A win reported
+ * again never gets here, so the lights stay on it.
  */
-async function processGameData(
-  gameData: IGameData,
-  oldGameData: IGameData,
-  fromWebSocket: boolean = false,
-): Promise<void> {
-  if (!gameData.match || !gameData.match.turns?.length) return;
-
-  const names = turnNames(gameData.match);
+function showEffect({ triggers, context, match }: TriggerUpdate): void {
+  const names = turnNames(match);
   turnPlayer = names[0] ?? "";
-  // Before anything below returns: the board events in between go by it.
-  playerUpHere = await isPlayerUpHere(gameData.match);
+  playerUpHere = isPlayerUpHere(match);
 
-  const editMode: boolean = gameData.match.activated !== undefined && gameData.match.activated >= 0;
-  if (editMode) return;
-  if (gameData.match.variant === "Bull-off" && isTriggerPresent("bulloff")) {
+  // Somebody elsewhere is up, an online opponent say: an effect on `other`
+  // stands in for theirs. Without one, everybody's effects play.
+  if (!playerUpHere && itemsOn(config.wledFx.effects, "other").length) {
+    setEffectByTrigger("other");
+    return;
+  }
+
+  const found = pickBest(config.wledFx.effects, triggers, { ...MATCH_OPTIONS, context });
+  // Whoever comes up gets the effect their turn settles on, not one picked
+  // afresh, so their darts with no effect of their own bring the same one back.
+  if (found?.category === TriggerCategory.PLAYER) {
+    const kept = effectOfTheTurn(match, names, context);
+    const effect = typeof kept === "string" ? found.items[0] : kept;
+    console.log(`Autodarts Tools: WLED: "${found.matched}" lights ${effect.name}`);
+    setEffect(effect);
+    return;
+  }
+  if (found) {
+    console.log(`Autodarts Tools: WLED: "${found.matched}" lights ${found.items[0].name}`);
+    setEffect(found.items[0]);
+    return;
+  }
+
+  // The bull-off is announced once, but stays lit while it lasts.
+  if (match.variant === GameMode.BULL_OFF && itemsOn(config.wledFx.effects, "bulloff").length) {
     setEffectByTrigger("bulloff");
     return;
   }
 
-  // The same win reported again leaves the lights as they are — not even the
-  // `gameon` fallback, which would take the matchshot off them.
-  const win = winId(gameData.match);
-  if (win) {
-    if (win === announcedWin) return;
-    announcedWin = win;
+  // A visit that has just started: the player's own effect, or the one that
+  // shows whoever is up. With *Keep the player's effect between darts* it also
+  // stands in for gameon after a dart with no effect of its own, as long as it
+  // is an effect: a bot's turn starts with `bot_throw` whether or not an
+  // effect has that trigger.
+  const visitStarted = !match.turns?.[0]?.throws?.length;
+  if (match.variant !== GameMode.BULL_OFF && (visitStarted || config.wledFx.keepTurnEffect)) {
+    const kept = effectOfTheTurn(match, names, context);
+    if (typeof kept !== "string") {
+      setEffect(kept);
+      return;
+    }
+    if (visitStarted) {
+      setEffectByTrigger(kept);
+      return;
+    }
   }
 
   // gameon is the default effect to play when no other event happened
-  let nextEffect: string | IWled = "gameon";
-
-  // A visit that has just started: the player's own effect, or the one that
-  // shows whoever is up. With Teams, `names` is the player's and then their
-  // team's (utils/team-calls.ts). With *Keep the player's effect between
-  // darts* it also stands in for gameon after a dart with no effect of its
-  // own, as long as it is an effect: a bot's turn starts with `bot_throw`
-  // whether or not an effect has that trigger.
-  if (gameData.match.turns[0].throws.length === 0) {
-    nextEffect = effectOfTheTurn(gameData.match, names);
-  } else if (config.wledFx.keepTurnEffect) {
-    const kept = effectOfTheTurn(gameData.match, names);
-    if (typeof kept !== "string") nextEffect = kept;
-  }
-
-  const effect: string | null = await gameDataProcessor(gameData, oldGameData, fromWebSocket, isTriggerPresent, {
-    leg: legWinNames(gameData.match),
-    match: matchWinNames(gameData.match),
-  });
-  if (effect) {
-    // found effect for match variant
-    nextEffect = effect;
-  }
-
-  // Somebody elsewhere is up, an online opponent say: an effect on `other`
-  // stands in for theirs. Without one, everybody's effects play.
-  if (!playerUpHere && isTriggerPresent("other")) {
-    nextEffect = "other";
-  }
-
-  if (typeof nextEffect === "string") setEffectByTrigger(nextEffect);
-  else setEffect(nextEffect);
+  setEffectByTrigger("gameon");
 }
 
-function isTriggerPresent(trigger: string): boolean {
-  const present: boolean = config.wledFx.effects?.some(
-    effect => effect.enabled && effect?.triggers.includes(trigger),
-  );
-  if (present) return present;
-
-  // search for range trigger(range_[min]_[max])
-  const points = Number(trigger);
-  if (Number.isNaN(points)) return false;
-  const range_triggers = config.wledFx.effects?.filter(
-    effect =>
-      effect.enabled && effect?.triggers.some(trigger => trigger.match(triggerPatterns.ranges)),
-  );
-  for (let i = 0; i < range_triggers.length; i++) {
-    const element = range_triggers[i];
-    for (let j = 0; j < element.triggers.length; j++) {
-      const parts = element.triggers[j].match(triggerPatterns.ranges);
-      if (!parts) continue;
-      const min = Number(parts[1]);
-      const max = Number(parts[2]);
-      if (min <= points && points <= max) return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * One of the switched-on effects on `trigger`, picked at random when there are
- * more; a number also finds the ranges that take it in.
- */
+/** One of the switched-on effects on `trigger`, picked at random when there are more; a number also finds the ranges that take it in. */
 function pickEffect(trigger: string): IWled | undefined {
-  // Find all effects that match the trigger
-  const matchingEffects = config.wledFx.effects.filter(
-    effect => effect.enabled && effect.triggers && effect.triggers.includes(trigger),
-  );
-
-  const points = Number(trigger);
-  if (!matchingEffects.length && !Number.isNaN(points)) {
-    const range_triggers = config.wledFx.effects.filter(
-      effect =>
-        effect.enabled && effect?.triggers.some(trigger => trigger.match(triggerPatterns.ranges)),
-    );
-    for (let i = 0; i < range_triggers.length; i++) {
-      const element = range_triggers[i];
-      for (let j = 0; j < element.triggers.length; j++) {
-        const parts = element.triggers[j].match(triggerPatterns.ranges);
-        if (!parts) continue;
-        const min = Number(parts[1]);
-        const max = Number(parts[2]);
-        if (min <= points && points <= max) {
-          matchingEffects.push(element);
-          break;
-        }
-      }
-    }
-  }
-
-  if (!matchingEffects.length) return undefined;
-
-  // If multiple effects match the trigger, pick a random one
-  return matchingEffects[Math.floor(Math.random() * matchingEffects.length)];
+  return oneOn(config.wledFx.effects, trigger);
 }
 
 /**

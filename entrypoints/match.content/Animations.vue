@@ -28,24 +28,23 @@
 </template>
 
 <script setup lang="ts">
-import type { IGameData } from "@/utils/game-data-storage";
-import type { IThrow } from "@/utils/websocket-helpers";
+import type { TriggerUpdate } from "@/utils/game-events/processor";
 
 import { animationDuration } from "@/utils/animation-duration";
-import { AutodartsToolsGameData } from "@/utils/game-data-storage";
-import { playsIn } from "@/utils/game-modes";
-import { getAnimationFromOPFS, isOPFSAvailable, triggerPatterns } from "@/utils/helpers";
+import { pickBest } from "@/utils/game-events/match";
+import { registerTriggers } from "@/utils/game-events/processor";
+import { TriggerCategory } from "@/utils/game-events/types";
+import { getAnimationFromOPFS, isOPFSAvailable } from "@/utils/helpers";
 import { SELECTORS, qs } from "@/utils/selectors";
 import { AutodartsToolsConfig, type IAnimation, type IConfig } from "@/utils/storage";
 import { LAYERS } from "@/utils/layers";
-import { winId } from "@/utils/win";
 
 /** Matches the `duration-300` on the image. */
 const FADE_MS = 300;
 /** One frame's grace so the browser paints opacity-0 before it animates. */
 const FADE_IN_DELAY_MS = 50;
-/** Between the turn total and the three-dart combination, so both are seen. */
-const COMBINATION_GAP_MS = 500;
+/** What Animations show a GIF for (utils/game-events/derive.ts): a win or a bust, a dart, a visit, a game's own moment. */
+const CATEGORIES: readonly TriggerCategory[] = [ TriggerCategory.OUTCOME, TriggerCategory.THROW, TriggerCategory.TOTAL, TriggerCategory.COMBO, TriggerCategory.VARIANT ];
 /** How much longer than its duration an animation waits for its GIF before giving up on it. */
 const LOAD_WAIT_MS = 3000;
 
@@ -63,9 +62,7 @@ const boardRect = ref({ top: 0, left: 0, width: 0, height: 0 });
 let hideTimer: number | null = null;
 /** The duration of the animation on screen, in ms, held until its GIF has loaded. */
 let heldDuration: number | null = null;
-let unwatchGameData: (() => void) | undefined;
-/** The win the gameshot last played for — see {@link winId}. */
-let announcedWin: string | undefined;
+let unregisterTriggers: (() => void) | undefined;
 
 /** Object URLs handed out by OPFS, revoked on unmount. */
 const opfsUrls = new Map<string, string>();
@@ -95,9 +92,18 @@ onMounted(async () => {
     window.addEventListener("resize", measureBoard);
 
     // Keep the handle: without it a remount — a new leg, or the hand-off out of
-    // a bull-off — stacks a second watcher and every animation plays twice.
-    unwatchGameData = AutodartsToolsGameData.watch((gameData: IGameData) => {
-      if (playsIn(config.value?.animations, gameData.match?.variant)) processGameData(gameData);
+    // a bull-off — stacks a second registration and every animation plays twice.
+    unregisterTriggers = registerTriggers({
+      feature: "animations",
+      settings: () => config.value?.animations,
+      categories: () => CATEGORIES,
+      // A miss falls back to `outside`.
+      fallbacks: [ "outside", "missWildcard" ],
+      // Cricket counts points only on numbers already closed, so nearly every visit
+      // totals 0 however many marks it took, and an animation on `0` played after
+      // almost all of them. Like Sound FX, leave Cricket's visit totals out.
+      filter: trigger => trigger.tag !== "cricketScore",
+      onTriggers: showAnimation,
     });
   } catch (error) {
     console.error("Autodarts Tools: Animations - initialization error", error);
@@ -105,7 +111,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  unwatchGameData?.();
+  unregisterTriggers?.();
   window.removeEventListener("resize", measureBoard);
   if (hideTimer) clearTimeout(hideTimer);
   for (const url of opfsUrls.values()) URL.revokeObjectURL(url);
@@ -142,107 +148,24 @@ function hide(): void {
 }
 
 /**
- * Turn a game-data update into the triggers it fires.
- *
- * INFO: 50 is reported as "bull".
+ * The GIF for an update: the one on its highest trigger in Animations' order
+ * (utils/game-events/priorities.ts) — a win or a bust over the dart, the
+ * visit's darts over its total. A win reported again never gets here.
  */
-async function processGameData(gameData: IGameData): Promise<void> {
-  // `activated` is set while a throw is being corrected. Those updates replay
-  // scores that were already played, so they must not fire anything.
-  if (!gameData.match || gameData.match.activated !== undefined || !gameData.match.turns?.length) return;
-  if (gameData.match.variant === "Bull-off") return;
-
-  const turn = gameData.match.turns[0];
-  const currentThrow = turn.throws[turn.throws.length - 1];
-  if (!currentThrow) return;
-
-  // A won leg goes on being reported after the dart that won it — Finish sends
-  // it once more — and each report played that dart and the gameshot again.
-  const win = winId(gameData.match);
-  if (win) {
-    if (win === announcedWin) return;
-    announcedWin = win;
-  }
-
-  const throwName: string = dartName(currentThrow); // s1
-  const isLastThrow: boolean = turn.throws.length >= 3;
-  const winner: boolean = gameData.match.gameWinner >= 0;
-  const busted: boolean = turn.busted;
-  const points: number = turn.points;
-  const miss: boolean = throwName.startsWith("m");
-  const combination: string = turn.throws.map(dartName).join("_");
-
-  // `25` is what setups have always used for the single bull, so it goes on
-  // meaning that; `s25` takes over only when an animation is waiting on it.
-  play(throwName === "s25" && !hasTrigger("s25") ? "25" : throwName);
-  if (winner) play("gameshot");
-  if (busted) play("busted");
-  if (isLastThrow && !busted) {
-    // Cricket counts points only on numbers already closed, so nearly every visit
-    // totals 0 however many marks it took, and an animation on `0` played after
-    // almost all of them. Like Sound FX, leave Cricket's visit totals out.
-    if (gameData.match.variant !== "Cricket") play(points.toString());
-    await new Promise(resolve => setTimeout(resolve, COMBINATION_GAP_MS));
-    play(combination);
-  }
-  if (miss) play("outside");
+function showAnimation({ triggers, context }: TriggerUpdate): void {
+  const found = pickBest(config.value?.animations?.data, triggers, { context });
+  if (found) play(found.items[0], found.matched);
 }
 
-/**
- * What a dart is called in a trigger.
- *
- * Autodarts names the outer bull "25" — the same string a 25-point visit fires,
- * so an animation on `25` went off for both and no name meant the bull on its
- * own. `s25` is that name: WLED, the Caller and Sound FX all answer to it
- * already, and the trigger validator has always accepted it. Only the bull is
- * ever called "25", and its bed is what separates the single from the bullseye,
- * which autodarts reports as "bull" instead.
- */
-function dartName(dart: IThrow): string {
-  const name = dart.segment.name.toLowerCase();
-  return name === "25" && dart.segment.bed === "Single" ? "s25" : name;
-}
-
-/** Whether an enabled animation is waiting on this exact trigger. */
-function hasTrigger(trigger: string): boolean {
-  return Boolean(config.value?.animations?.data?.some(
-    animation => animation.enabled && Array.isArray(animation.triggers) && animation.triggers.includes(trigger),
-  ));
-}
-
-/** Pick an animation for a trigger, at random when several match, with how long it stays up in seconds. */
-async function resolveAnimation(trigger: string): Promise<{ url: string; duration: number } | null> {
-  const animations = config.value?.animations?.data;
-  if (!animations?.length) return null;
-
-  const matched = animations.filter(animation => animation.enabled && matchesTrigger(animation, trigger));
-  if (!matched.length) return null;
-
-  const picked = matched[Math.floor(Math.random() * matched.length)];
-
+/** An animation's GIF and how long it stays up, in seconds. */
+async function resolveAnimation(animation: IAnimation): Promise<{ url: string; duration: number } | null> {
   // Uploaded GIFs live in OPFS and are addressed by id; the rest are plain URLs.
-  const url = picked.animationId && !picked.url
-    ? opfsUrls.get(picked.animationId) ?? await loadFromOPFS(picked.animationId)
-    : picked.url;
+  const url = animation.animationId && !animation.url
+    ? opfsUrls.get(animation.animationId) ?? await loadFromOPFS(animation.animationId)
+    : animation.url;
   if (!url) return null;
 
-  return { url, duration: animationDuration(picked, config.value?.animations?.duration ?? 5) };
-}
-
-function matchesTrigger(animation: IAnimation, trigger: string): boolean {
-  if (!Array.isArray(animation.triggers)) return false;
-
-  // Range triggers ("100-140") only ever apply to a numeric trigger.
-  const asNumber = Number(trigger);
-  if (!Number.isNaN(asNumber)) {
-    const inRange = animation.triggers.some((t: string) => {
-      const range = t.match(triggerPatterns.ranges);
-      return range ? asNumber >= Number(range[1]) && asNumber <= Number(range[2]) : false;
-    });
-    if (inRange) return true;
-  }
-
-  return animation.triggers.includes(trigger);
+  return { url, duration: animationDuration(animation, config.value?.animations?.duration ?? 5) };
 }
 
 async function loadFromOPFS(animationId: string): Promise<string | null> {
@@ -264,9 +187,9 @@ async function loadFromOPFS(animationId: string): Promise<string | null> {
   return null;
 }
 
-async function play(trigger: string): Promise<void> {
+async function play(picked: IAnimation, trigger: string): Promise<void> {
   try {
-    const animation = await resolveAnimation(trigger);
+    const animation = await resolveAnimation(picked);
     if (!animation) return;
 
     console.log("Autodarts Tools: Animations - playing", trigger);

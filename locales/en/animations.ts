@@ -46,6 +46,11 @@ export default {
     description: "The games it shows GIFs in.",
     intro: "Animations only show in the games switched on here.",
   },
+  /** The row is headed triggerPriorities.title. */
+  priority: {
+    description: "Which GIF shows when several fit.",
+    intro: "Animations show the GIF of the highest trigger in this list that has one.",
+  },
   list: {
     emptyTitle: "No animations yet",
     emptyText: "Upload GIFs from your computer, or add one from a link. Links from Tenor and Giphy work.",

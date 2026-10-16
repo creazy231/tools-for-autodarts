@@ -38,6 +38,10 @@ export default {
     description: "De spellen waarin GIF's worden getoond.",
     intro: "Animaties worden alleen getoond in de spellen die hier aan staan.",
   },
+  priority: {
+    description: "Welke GIF verschijnt als er meerdere passen.",
+    intro: "Animaties tonen de GIF van de hoogste trigger in deze lijst waarvoor er een is.",
+  },
   list: {
     emptyTitle: "Nog geen animaties",
     emptyText: "Upload GIF's vanaf je computer, of voeg er een toe via een link. Links van Tenor en Giphy werken.",

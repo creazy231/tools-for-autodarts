@@ -53,6 +53,9 @@
           <OptionRow :description="t('animations.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.animations.disabledGameModes" :intro="t('animations.gameModes.intro')" feature="animations" />
           </OptionRow>
+          <OptionRow :description="t('animations.priority.description')" :title="t('triggerPriorities.title')">
+            <PriorityOrderField v-model="config.animations.priorityOrder" :intro="t('animations.priority.intro')" feature="animations" />
+          </OptionRow>
         </section>
 
         <LibrarySets
@@ -318,6 +321,7 @@ import ConfirmDeleteButton from "./Library/ConfirmDeleteButton.vue";
 import GameModesField from "./Library/GameModesField.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";
+import PriorityOrderField from "./Library/PriorityOrderField.vue";
 import TriggerChips from "./Library/TriggerChips.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import UploadDialog from "./Library/UploadDialog.vue";

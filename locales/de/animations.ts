@@ -39,6 +39,10 @@ export default {
     description: "Die Spiele, in denen GIFs gezeigt werden.",
     intro: "Animationen werden nur in den hier eingeschalteten Spielen gezeigt.",
   },
+  priority: {
+    description: "Welches GIF erscheint, wenn mehrere passen.",
+    intro: "Animationen zeigen das GIF des höchsten Triggers in dieser Liste, für den es eins gibt.",
+  },
   list: {
     emptyTitle: "Noch keine Animationen",
     emptyText: "Lade GIFs von deinem Computer hoch oder füge eines über einen Link hinzu. Links von Tenor und Giphy funktionieren.",

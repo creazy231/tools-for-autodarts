@@ -15,6 +15,9 @@
           <OptionRow :description="t('soundFx.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.soundFx.disabledGameModes" :intro="t('soundFx.gameModes.intro')" feature="soundFx" />
           </OptionRow>
+          <OptionRow :description="t('soundFx.priority.description')" :title="t('triggerPriorities.title')">
+            <PriorityOrderField v-model="config.soundFx.priorityOrder" :intro="t('soundFx.priority.intro')" feature="soundFx" />
+          </OptionRow>
         </section>
 
         <LibrarySets
@@ -220,6 +223,7 @@ import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";
 import PlayButton from "./Library/PlayButton.vue";
+import PriorityOrderField from "./Library/PriorityOrderField.vue";
 import SoundDialog from "./Library/SoundDialog.vue";
 import SoundSource from "./Library/SoundSource.vue";
 import TtsDialog from "./Library/TtsDialog.vue";

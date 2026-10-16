@@ -14,6 +14,10 @@ export default {
     description: "Die Spiele, in denen Sounds abgespielt werden. Lobby- und Turniersounds werden in jedem Spiel abgespielt.",
     intro: "Sound FX spielt Sounds nur in den hier eingeschalteten Spielen ab.",
   },
+  priority: {
+    description: "Welcher Sound gewinnt, wenn mehrere passen, und in welcher Reihenfolge sie abgespielt werden.",
+    intro: "Sound FX spielt die Trigger eines Moments von oben nach unten ab, einen von jeder Art.",
+  },
   list: {
     emptyText: "Lade eigene Sounds hoch, füge einen über einen Link hinzu oder erzeuge einen aus Text.",
   },
