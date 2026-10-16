@@ -120,9 +120,12 @@ function start(): Promise<void> {
     const run = ++generation;
     await loadTeamCalls();
     localUserId = await getUserIdFromToken();
-    const stored = (await AutodartsToolsGameData.getValue())?.match;
+    const gameData = await AutodartsToolsGameData.getValue();
+    const stored = gameData?.match;
     if (run !== generation) return;
 
+    // The events stored now were for an update before this page started.
+    lastBatchId = gameData?.batch?.id;
     if (stored && onThisPage(stored)) {
       forgetIfNew(stored);
       lastActed = stored;

@@ -6,8 +6,9 @@ export interface IGameData {
   match: IMatch | undefined;
   /**
    * The game events that came in just before `match` was stored, with an id
-   * that is new for every state frame: utils/game-events/processor.ts reads
-   * them, nothing else does. Missing on a state stored without them.
+   * that is new for every state frame that brought events:
+   * utils/game-events/processor.ts reads them, nothing else does. A frame
+   * without events keeps the id before it, with no events.
    */
   batch?: IGameEventBatch;
 }

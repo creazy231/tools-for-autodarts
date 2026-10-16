@@ -421,7 +421,12 @@ async function storeMatchFrame(data: IMatch, events: IGameEvent[]): Promise<void
 
   const gameData = await AutodartsToolsGameData.getValue();
   await loadTeamsContext();
-  const batch: IGameEventBatch = { id: `${batchPage}:${++batchCount}`, events };
+  // A frame without events keeps the id before it, and none of its events: a
+  // frame sent again is then the same as the one stored, and WXT's watch,
+  // which leaves out a value equal to the old one, wakes nobody for it.
+  const batch: IGameEventBatch | undefined = events.length
+    ? { id: `${batchPage}:${++batchCount}`, events }
+    : gameData.batch && { id: gameData.batch.id, events: [] };
   if (data.activated !== undefined) {
     // Merge activated state with existing match data
     await AutodartsToolsGameData.setValue({
