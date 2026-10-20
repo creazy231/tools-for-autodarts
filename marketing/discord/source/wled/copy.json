@@ -1,0 +1,59 @@
+{
+  "platforms": "Chrome · Firefox · Safari",
+  "plates": [
+    {
+      "name": "Anna",
+      "rgb": [ 0, 190, 255 ],
+      "trigger": "next_player",
+      "label": "Scrolling Text"
+    },
+    {
+      "gif": "ad_w_180.gif",
+      "frame": 48,
+      "trigger": "180",
+      "label": "Standard"
+    },
+    {
+      "gif": "ad_w_hw_bust.gif",
+      "frame": 36,
+      "trigger": "busted",
+      "label": "Halloween"
+    },
+    {
+      "gif": "ad_w_hw_idle.gif",
+      "frame": 60,
+      "trigger": "idle",
+      "label": "Halloween"
+    }
+  ],
+  "variants": [
+    {
+      "name": "wled-en",
+      "lang": "en",
+      "kicker": "New in 3.4",
+      "headline": [ "WLED", "levels up" ],
+      "sub": "Ready-made animations for your LED matrix, from the 180 to the bust",
+      "points": [
+        "Animation packs: Standard and Halloween",
+        "Previews of your presets, as they light up",
+        "Your name lights up when it's your turn",
+        "Your own colour for the whole visit",
+        "Effect sets to switch between"
+      ]
+    },
+    {
+      "name": "wled-de",
+      "lang": "de",
+      "kicker": "Neu in 3.4",
+      "headline": [ "WLED", "dreht auf" ],
+      "sub": "Fertige Animationen für deine LED-Matrix, vom 180er bis zum Bust",
+      "points": [
+        "Animationspakete: Standard und Halloween",
+        "Vorschau deiner Presets, wie sie leuchten",
+        "Dein Name leuchtet, wenn du dran bist",
+        "Deine Farbe für die ganze Aufnahme",
+        "Effekt-Sets zum Wechseln"
+      ]
+    }
+  ]
+}

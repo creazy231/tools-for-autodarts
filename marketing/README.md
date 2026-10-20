@@ -8,8 +8,8 @@ They show the features people use every day rather than the newest ones: the mat
 on autodarts' own board and in its own colours.
 
 The screenshots for the App Store (the iPhone and Mac Safari apps) are in `app-store/`; see
-[App Store](#app-store-iphone-and-mac) below. Pictures announcing Teams on Discord are in
-`discord/`; see [Discord: Teams](#discord-teams).
+[App Store](#app-store-iphone-and-mac) below. Pictures announcing Teams and 3.4's WLED changes on
+Discord are in `discord/`; see [Discord: Teams](#discord-teams) and [Discord: WLED](#discord-wled).
 
 ## What goes where
 
@@ -233,3 +233,48 @@ python3 marketing/discord/source/make.py finish marketing/discord
 The text is in `discord/source/copy.json`, the layout in `discord/source/template.html`. The
 colour conversion and the headless Chromium are the App Store set's. The page loads Bebas Neue
 and Manrope from Google Fonts, so rendering needs a network connection.
+
+## Discord: WLED
+
+`discord/` also holds one picture announcing the WLED changes of 3.4, in English and German. Like
+the Teams pictures, each is a 1920×1080 PNG with no transparency and an sRGB profile, about 1.2 MB.
+
+| File | Kicker | Headline |
+|---|---|---|
+| `discord/wled-en.png` | New in 3.4 | WLED levels up |
+| `discord/wled-de.png` | Neu in 3.4 | WLED dreht auf |
+
+Under the headline: "Ready-made animations for your LED matrix, from the 180 to the bust"
+("Fertige Animationen für deine LED-Matrix, vom 180er bis zum Bust"), then five points: the
+animation packs, the previews, the player's name on the matrix, a player's own colour for the
+whole visit (*Keep the player's effect between darts*), and effect sets.
+
+### How they were made
+
+There is no screenshot in this one. The right side is four 64 × 8 matrices, drawn the way the WLED
+settings draw a preview (`utils/led-canvas.ts`): an LED is a circle of 0.42 pitches on an
+`rgb(10 10 12)` plate, and one that is off is `rgb(30 30 34)`. The picture adds a lighter centre to
+each lit LED and a glow. Above each matrix are the trigger it plays on and where it comes from:
+
+- `next_player`: the name Anna, as WLED 16 draws it with the README's player-name effect.
+  *Scrolling Text* with `c2` 64 picks the font TinyUnicode 8px, and a name that fits stands still,
+  centred. The font is `discord/source/wled/font_TinyUnicode_8px.wbf`, copied from
+  `wled00/src/font` of WLED v16.0.1; TinyUnicode itself is public domain. The name is cyan rather
+  than the README's amber, so that it stands apart from the 180.
+- `180`: frame 48 of the Standard pack's `ad_w_180.gif`.
+- `busted`: frame 36 of the Halloween pack's `ad_w_hw_bust.gif`.
+- `idle`: frame 60 of the Halloween pack's `ad_w_hw_idle.gif`.
+
+The frames come from `public/wled-packs/gifs`, composited by Pillow, which the settings' own GIF
+decoder matches. So new text, or another frame or pack, needs no capture:
+
+```bash
+python3 marketing/discord/source/wled/make.py prepare <work-dir>
+node marketing/discord/source/render.mjs <work-dir> marketing/discord
+python3 marketing/discord/source/wled/make.py finish marketing/discord
+```
+
+The text and the plates are in `discord/source/wled/copy.json`, the layout in
+`discord/source/wled/template.html`. `render.mjs` renders every page in `<work-dir>`, so the Teams
+and WLED sets each need a work-dir of their own. Rendering needs a network connection for the fonts,
+as it does for Teams.

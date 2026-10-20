@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@600;700;800&display=block">
+<style>
+  /* Canvas: 1920 × 1080, Discord's landscape picture, laid out as the Teams one is.
+     The copy sits on the left, and on the right four 64 × 8 matrices drawn the way
+     the WLED settings draw a preview: round LEDs on a dark plate, with a glow. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  body {
+    position: relative;
+    color: #fff;
+    font-family: "Manrope", system-ui, sans-serif;
+    background:
+      radial-gradient(90% 110% at 0% 0%, #3d86ff 0%, rgba(61,134,255,0) 55%),
+      linear-gradient(135deg, #0b55df 0%, #0c3f9e 50%, #061c52 100%);
+  }
+  /* The plates' light, glowing behind them. */
+  .glow { position: absolute; border-radius: 50%; filter: blur(100px); }
+  .glow.cyan { left: 1180px; top: 40px; width: 640px; height: 360px; background: #00beff; opacity: .34; }
+  .glow.purple { left: 900px; top: 640px; width: 760px; height: 420px; background: #8a3cff; opacity: .42; }
+
+  .brand { position: absolute; left: 100px; top: 76px; display: flex; align-items: center; gap: 22px; }
+  .logo { width: 92px; height: 92px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 28px rgba(1, 8, 32, .35); }
+  .logo img { width: 66px; height: 66px; display: block; }
+  .brand span { font-family: "Bebas Neue", sans-serif; font-size: 46px; line-height: 1; letter-spacing: .02em; text-transform: uppercase; }
+
+  .copy { position: absolute; left: 100px; top: 232px; width: 620px; display: flex; flex-direction: column; align-items: flex-start; }
+  .kicker {
+    display: inline-flex; align-items: center; height: 46px; padding: 0 20px; border-radius: 999px;
+    background: rgba(255,255,255,.14); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3);
+    font-size: 21px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  }
+  .headline {
+    margin-top: 22px; width: 100%;
+    font-family: "Bebas Neue", sans-serif; font-weight: 400; text-transform: uppercase;
+    font-size: 158px; line-height: .9; letter-spacing: .01em; white-space: nowrap;
+    text-shadow: 0 6px 24px rgba(0,0,0,.3);
+  }
+  .sub { margin-top: 24px; font-size: 31px; line-height: 1.32; font-weight: 600; color: rgba(255,255,255,.9); text-wrap: balance; }
+  .nowrap { white-space: nowrap; }
+  .points { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; list-style: none; }
+  .points li { display: flex; align-items: center; gap: 16px; font-size: 25px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+  /* Each point's bullet is an LED, lit in one of the plates' colours. */
+  .points i { flex: none; width: 18px; height: 18px; border-radius: 50%; }
+  .points li:nth-child(1) i { --led: #00beff; }
+  .points li:nth-child(2) i { --led: #ffd76a; }
+  .points li:nth-child(3) i { --led: #ff7a1a; }
+  .points li:nth-child(4) i { --led: #6fd13a; }
+  .points li:nth-child(5) i { --led: #a35bff; }
+  .points i { background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--led) 45%, #fff) 0%, var(--led) 62%); box-shadow: 0 0 0 2px rgba(10,10,12,.55), 0 0 14px 2px color-mix(in srgb, var(--led) 70%, transparent); }
+  .platforms { position: absolute; left: 100px; bottom: 70px; font-size: 22px; font-weight: 600; letter-spacing: .02em; color: rgba(255,255,255,.72); }
+
+  .wall { position: absolute; right: 100px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 22px; }
+  .row-head { display: flex; align-items: center; justify-content: space-between; height: 34px; margin-bottom: 12px; padding: 0 2px; }
+  /* A trigger, as the settings show it under an effect: a pill, the text face. */
+  .chip {
+    display: inline-flex; align-items: center; height: 34px; padding: 0 15px; border-radius: 999px;
+    background: rgba(255,255,255,.14); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.22);
+    font-size: 19px; font-weight: 700; letter-spacing: .01em; color: #fff;
+  }
+  .label { font-family: "Bebas Neue", sans-serif; font-size: 26px; line-height: 1; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.66); }
+  .plate { position: relative; }
+  .plate canvas { display: block; }
+  .plate .lit { position: absolute; left: 0; top: 0; }
+  .plate .bloom { position: absolute; left: -40px; top: -40px; filter: blur(9px); opacity: .8; mix-blend-mode: screen; pointer-events: none; }
+  .plate .panel { border-radius: 10px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.1), 0 26px 64px rgba(1, 8, 32, .58), 0 8px 20px rgba(1, 8, 32, .4); }
+</style>
+</head>
+<body>
+  <div class="glow cyan"></div>
+  <div class="glow purple"></div>
+
+  <div class="brand">
+    <div class="logo"><img src="img/icon-128.png" alt=""></div>
+    <span>Tools for Autodarts</span>
+  </div>
+
+  <div class="copy">
+    <div class="kicker">{{KICKER}}</div>
+    <div class="headline" id="headline">{{HEADLINE}}</div>
+    <div class="sub">{{SUB}}</div>
+    <ul class="points">{{POINTS}}</ul>
+  </div>
+  <div class="platforms">{{PLATFORMS}}</div>
+
+  <div class="wall" id="wall"></div>
+
+<script>
+  // The headline's longest line fills the column, never more.
+  const h = document.getElementById("headline");
+  let size = parseFloat(getComputedStyle(h).fontSize);
+  while (h.scrollWidth > h.clientWidth && size > 90) { size -= 2; h.style.fontSize = size + "px"; }
+
+  // The plates. The settings' preview draws an LED as a circle of 0.42 pitches on
+  // rgb(10 10 12), an LED that is off in rgb(30 30 34) (utils/led-canvas.ts); a lit
+  // one gets a lighter centre here, and the plate a blurred copy of its lit LEDs.
+  const PLATES = {{PLATES}};
+  const PITCH = 15, MARGIN = 8, RADIUS = 0.42 * PITCH, BLOOM = 40;
+  const wall = document.getElementById("wall");
+  for (const plate of PLATES) {
+    const rows = plate.leds.length, cols = plate.leds[0].length;
+    const width = cols * PITCH + 2 * MARGIN, height = rows * PITCH + 2 * MARGIN;
+
+    const block = document.createElement("div");
+    const head = document.createElement("div");
+    head.className = "row-head";
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = plate.trigger;
+    const label = document.createElement("span");
+    label.className = "label";
+    label.textContent = plate.label;
+    head.append(chip, label);
+
+    const box = document.createElement("div");
+    box.className = "plate";
+    const panel = document.createElement("canvas");
+    panel.className = "panel";
+    panel.width = width; panel.height = height;
+    const lit = document.createElement("canvas");
+    lit.className = "lit";
+    lit.width = width; lit.height = height;
+    const bloom = document.createElement("canvas");
+    bloom.className = "bloom";
+    bloom.width = width + 2 * BLOOM; bloom.height = height + 2 * BLOOM;
+
+    const p = panel.getContext("2d"), l = lit.getContext("2d"), b = bloom.getContext("2d");
+    p.fillStyle = "rgb(10 10 12)";
+    p.beginPath(); p.roundRect(0, 0, width, height, 10); p.fill();
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const [ r, g, bl ] = plate.leds[y][x];
+        const cx = MARGIN + (x + .5) * PITCH, cy = MARGIN + (y + .5) * PITCH;
+        if (Math.max(r, g, bl) <= 8) {
+          p.fillStyle = "rgb(30 30 34)";
+          p.beginPath(); p.arc(cx, cy, RADIUS, 0, 2 * Math.PI); p.fill();
+          continue;
+        }
+        const colour = `rgb(${r} ${g} ${bl})`;
+        const centre = `rgb(${Math.round(r + (255 - r) * .45)} ${Math.round(g + (255 - g) * .45)} ${Math.round(bl + (255 - bl) * .45)})`;
+        const fill = l.createRadialGradient(cx, cy - RADIUS * .15, 0, cx, cy, RADIUS);
+        fill.addColorStop(0, centre); fill.addColorStop(.6, colour); fill.addColorStop(1, colour);
+        l.fillStyle = fill;
+        l.beginPath(); l.arc(cx, cy, RADIUS, 0, 2 * Math.PI); l.fill();
+        b.fillStyle = colour;
+        b.beginPath(); b.arc(cx + BLOOM, cy + BLOOM, RADIUS * 1.25, 0, 2 * Math.PI); b.fill();
+      }
+    }
+    box.append(panel, lit, bloom);
+    block.append(head, box);
+    wall.append(block);
+  }
+</script>
+</body>
+</html>

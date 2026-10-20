@@ -1,6 +1,7 @@
-// Render the pages `make.py prepare` wrote to 1920 × 1080 PNGs.
+// Render the pages a `make.py prepare` wrote to 1920 × 1080 PNGs: Teams'
+// (make.py here) or WLED's (wled/make.py).
 //
-//   node render.mjs <work-dir> <out-dir>   → <out-dir>/teams-*.png
+//   node render.mjs <work-dir> <out-dir>   → <out-dir>/<page>.png, one per page
 //
 // The same headless Chromium as the App Store set: static pages, no extension,
 // nothing shared with the yarn dev browser, and forced to sRGB.
@@ -14,7 +15,7 @@ const require = createRequire(path.join(HERE, "..", "..", "..", "package.json"))
 const { chromium } = require("playwright");
 
 const [ work, out ] = process.argv.slice(2).map(p => path.resolve(p));
-const pages = fs.readdirSync(work).filter(f => /^teams-.+\.html$/.test(f)).sort();
+const pages = fs.readdirSync(work).filter(f => f.endsWith(".html")).sort();
 
 const browser = await chromium.launch({ args: [ "--force-color-profile=srgb", "--allow-file-access-from-files" ] });
 try {
