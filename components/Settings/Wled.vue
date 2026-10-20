@@ -34,6 +34,9 @@
           <OptionRow :description="t('wled.gameModes.description')" :title="t('gameModes.title')">
             <GameModesField v-model="config.wledFx.disabledGameModes" :intro="t('wled.gameModes.intro')" feature="wledFx" />
           </OptionRow>
+          <OptionRow :description="t('wled.priority.description')" :title="t('triggerPriorities.title')">
+            <PriorityOrderField v-model="config.wledFx.priorityOrder" :intro="t('wled.priority.intro')" feature="wledFx" />
+          </OptionRow>
         </section>
 
         <LibrarySets
@@ -328,6 +331,7 @@ import LibraryItem from "./Library/LibraryItem.vue";
 import LibrarySection from "./Library/LibrarySection.vue";
 import OptionRow from "./Library/OptionRow.vue";
 import PlayButton from "./Library/PlayButton.vue";
+import PriorityOrderField from "./Library/PriorityOrderField.vue";
 import TriggerField from "./Library/TriggerField.vue";
 import { stableKey } from "./Library/stable-key";
 import LibrarySets from "./Library/LibrarySets.vue";

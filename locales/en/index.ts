@@ -31,6 +31,7 @@ import soundFx from "./soundFx";
 import streamingMode from "./streamingMode";
 import takeoutNotification from "./takeoutNotification";
 import teams from "./teams";
+import triggerPriorities from "./triggerPriorities";
 import triggers from "./triggers";
 import whatsNew from "./whatsNew";
 import winnerAnimation from "./winnerAnimation";
@@ -72,6 +73,7 @@ export default {
   streamingMode,
   takeoutNotification,
   teams,
+  triggerPriorities,
   triggers,
   whatsNew,
   winnerAnimation,

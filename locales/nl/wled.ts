@@ -21,6 +21,10 @@ export default {
     description: "De spellen waarin WLED oplicht. Lobby- en toernooi-effecten worden in elk spel afgespeeld.",
     intro: "WLED licht alleen op in de spellen die hier aan staan.",
   },
+  priority: {
+    description: "Welk effect wint als er meerdere passen.",
+    intro: "WLED toont het effect van de hoogste trigger in deze lijst waarvoor er een is.",
+  },
   list: {
     title: "Effecten",
     searchPlaceholder: "Effecten zoeken op naam, trigger of adres",

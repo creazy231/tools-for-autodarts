@@ -423,12 +423,6 @@ export function turnCallNames(match: TurnState, context: CallContext): string[] 
   return present(seatCall(match, match.player ?? 0, context));
 }
 
-/** A leg won: the player who checked out, then their team. */
-export function legWinCallNames(match: TeamMatch, context: CallContext): string[] {
-  const seat = match.gameWinner ?? -1;
-  return seat < 0 ? [] : present(seatCall(match, seat, context));
-}
-
 /** A match won: the team first, since it is the team's win, then the player who checked out. */
 export function matchWinCallNames(match: TeamMatch, context: CallContext): string[] {
   const seat = (match.gameWinner ?? -1) >= 0 ? match.gameWinner! : match.winner ?? -1;

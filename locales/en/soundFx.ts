@@ -22,6 +22,11 @@ export default {
     description: "The games it plays in. Lobby and tournament sounds play in any game.",
     intro: "Sound FX only plays in the games switched on here.",
   },
+  /** The row is headed triggerPriorities.title. */
+  priority: {
+    description: "Which sound wins when several fit, and the order they play in.",
+    intro: "Sound FX plays a moment's triggers from the top of this list down, one of each kind.",
+  },
   list: {
     emptyText: "Upload sounds of your own, add one from a link, or generate one from text.",
   },

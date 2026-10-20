@@ -49,7 +49,10 @@ const RANGE_RE = new RegExp(`^(?:range_)?(${SCORE})[-_](${SCORE})$`);
 /** One dart: a single, double, triple or miss beside a number, or the single bull. */
 const DART_RE = /^(?:[sdtm](?:1[0-9]|20|[0-9])|s25|bull)$/;
 
-const THROW_WORDS = new Set([ "bull", "outside", "miss", "double", "triple" ]);
+/** Which part names a `+` item's kind, the first there is of these. */
+const JOINED_ORDER: readonly TriggerCategory[] = [ "events", "throws", "scores", "board" ];
+
+const THROW_WORDS = new Set([ "bull", "outside", "miss", "single", "double", "triple" ]);
 
 const BOARD_WORDS = new Set([
   "board_starting",
@@ -69,6 +72,7 @@ const EVENT_WORDS = new Set([
   "gameshot",
   "matchshot",
   "busted",
+  "partner_rule",
   "bulloff",
   "takeout",
   "idle",
@@ -80,6 +84,10 @@ const EVENT_WORDS = new Set([
   "opponent_throw",
   "cricket_hit",
   "cricket_miss",
+  "gotcha",
+  "luckynumber",
+  "killer_became_killer",
+  "killer_killed",
   "lobby_in",
   "lobby_out",
   "tournament_ready",
@@ -107,11 +115,19 @@ export function triggerCategory(trigger: string): TriggerCategory {
   if (SCORE_RE.test(t) || RANGE_RE.test(t)) return "scores";
   if (THROW_WORDS.has(t) || DART_RE.test(t)) return "throws";
 
+  // A visit's darts; `miss` stands for any missed dart in its place (`s20_miss_d20`).
   const darts = t.split("_");
-  if (darts.length >= 2 && darts.length <= 3 && darts.every(dart => DART_RE.test(dart))) return "throws";
+  if (darts.length >= 2 && darts.length <= 3 && darts.every(dart => DART_RE.test(dart) || dart === "miss")) return "throws";
+
+  // A `+` item is of the kind of its strongest part: `gameshot+d20` an event,
+  // `t20+alice` a throw, `180+player2` a score. Names, seats and games alone are players.
+  if (t.includes("+")) {
+    const kinds = t.split("+").filter(Boolean).map(triggerCategory);
+    return JOINED_ORDER.find(kind => kinds.includes(kind)) ?? "players";
+  }
 
   if (BOARD_WORDS.has(t)) return "board";
-  if (EVENT_WORDS.has(t) || /^(?:gameshot|matchshot)[+_]/.test(t) || /^target(?:\d+|bull)$/.test(t)) return "events";
+  if (EVENT_WORDS.has(t) || /^target(?:\d+|bull)$/.test(t)) return "events";
   return "players";
 }
 

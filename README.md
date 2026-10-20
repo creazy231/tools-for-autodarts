@@ -77,6 +77,8 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - [Match Customization](#-match-customization)
   - [Gameplay Features](#-gameplay-features)
   - [Audio Features](#-audio-features)
+  - [Triggers](#-triggers)
+  - [Trigger Priority](#️-trigger-priority)
   - [WLED Integration](#-wled-integration)
   - [Animations](#-animations)
   - [Utility Features](#-utility-features)
@@ -119,7 +121,7 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
   - In the lobby, a team's row wears its colour and lists its players in order, and the pencil beside it edits the team
   - In the match, the card of the team that's up is filled with the team's colour instead of raspberry, and a waiting team's name tag carries its colour. Each card lists the team's players, the one throwing filled white. A pill under the turn bar says who's up ("TOM to throw"), and fades to the next team's colour at each handover. After a checkout it says who won the leg ("TEAM RED wins the leg"). It's one line that never wraps, so the board keeps its size: with own scores the teams' legs sit either side of it, and the partner rule's warning and bust take the pill itself. On a phone and in portrait, where the cards sit above the board, the top bar's cells get no extra rows, and own-score cards there leave out the team chip that the pill's legs already give
   - Every new leg starts with each team's next player. The order is worked out from the site's own set, leg and round, so a reload or an undo doesn't throw it off. **Tap a name** in a team's card to make that player the one who's up (or next), and the order carries on from them
-  - The **Caller**, **Sound FX** and **WLED** call the player whose turn it is by their name, by their team's name when they have nothing for the player, and with their own fallback after that (`next_player`, `ambient_next_player`), with a shared score and with own scores alike. A leg won goes to the player who checked out and then the team (`gameshot_<name>`), a match won to the team first (`matchshot_<name>`)
+  - The **Caller**, **Sound FX** and **WLED** call the player whose turn it is by their name, by their team's name when they have nothing for the player, and with their own fallback after that (`next_player`, `ambient_next_player`), with a shared score and with own scores alike. A leg or match won goes to whoever checked out, by their name or their team's (`gameshot+<name>`, `matchshot+<name>`)
   - Teams are remembered by name: any guest of yours with a saved team's name plays as that team, in any lobby
   - With a shared score, each team is a guest on its captain's board. With **Online Teams**, below, every screen in the lobby shows every team; without it, only the browser that added a team shows it. Bots can play against a team but not in one, since the server throws every visit of a bot's seat: use own scores to put a bot on a team
   - Switching Teams off in the settings takes it off an open lobby or match straight away
@@ -261,6 +263,154 @@ The texts are in [`locales/`](locales): English in `locales/en`, German in `loca
 - **WLED Integration**: Trigger lighting effects and HTTP requests synchronized with game events, from sets of effects you switch between, such as one for Halloween, and ready-made animation packs for LED matrices that go on your WLED whole or one animation at a time
 - **Quiet Own Darts**: Silences autodarts' own *Dart landed* sound for the darts thrown at your board, which you can already hear
 
+### 🎯 Triggers
+The Caller, Sound FX, WLED and Animations share one set of triggers: a sound, an effect or a GIF goes off for the triggers you give it. They are worked out once for all four, from autodarts' own game events together with the match state they come with, so a trigger means the same thing everywhere. The columns say which feature takes it: **C** Caller, **S** Sound FX, **W** WLED, **A** Animations.
+
+- Triggers are not case-sensitive. A name may be typed with its spaces (`john doe`) or with underscores (`john_doe`)
+- **Sound FX** looks every trigger up with `ambient_` in front first (`ambient_t20`), then without it (`t20`), so its sounds can stay apart from the Caller's
+- When a moment fits several triggers, the feature's [Trigger Priority](#️-trigger-priority) decides which counts most
+- Several items on the same trigger take turns at random
+
+#### Darts
+
+| Trigger                            | When                                                                                                  |   C   |   S   |   W   |   A   |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------- | :---: | :---: | :---: | :---: |
+| `s1`–`s20`, `d1`–`d20`, `t1`–`t20` | A dart in that single, double or triple. The Caller only calls every dart with **Call Every Dart** on |   ✓   |   ✓   |   ✓   |   ✓   |
+| `s25`                              | The single bull                                                                                       |   ✓   |   ✓   |   ✓   |   ✓   |
+| `bull`                             | The bullseye                                                                                          |   ✓   |   ✓   |   ✓   |   ✓   |
+| `m1`–`m20`                         | A dart outside the double ring beside that number                                                     |   ✓   |   ✓   |   ✓   |   ✓   |
+| `miss`                             | A dart entered with the keypad's Miss button, or corrected to a bouncer                               |   ✓   |   ✓   |   ✓   |   ✓   |
+
+When there is nothing for the dart itself, something else stands in for it, and counts a little less:
+
+| Stand-in                                               | For                                                                                                                |   C   |   S   |   W   |   A   |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | :---: | :---: | :---: | :---: |
+| `single`, `double` or `triple`, followed by the number | `s20`, `d20`, `t20`; the word alone when there is nothing for the number                                           |   ✓   |   ✓   |       |       |
+| the number alone (`20`)                                | `s20` only: a double's or a triple's number is only said after its word                                          |   ✓   |   ✓   |       |       |
+| `miss`                                                 | `m1`–`m20`                                                                                                         |   ✓   |   ✓   |   ✓   |   ✓   |
+| `outside`                                              | any missed dart                                                                                                    |   ✓   |   ✓   |   ✓   |   ✓   |
+| `miss` in a combination                                | any missed dart in its place: `s20_miss_d20` for `s20_m5_d20`, `miss_miss_d20` for two. The exact combination wins |   ✓   |   ✓   |   ✓   |   ✓   |
+
+#### Visits
+
+| Trigger                    | When                                                                                                                                                               |   C   |   S   |   W   |   A   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :---: | :---: | :---: | :---: |
+| `0`–`180`                  | A visit's total, after its last dart                                                                                                                               |   ✓   |   ✓   |   ✓   |   ✓   |
+| `100-180`, `range_100_180` | A visit's total within the range                                                                                                                                   |   ✓   |   ✓   |   ✓   |   ✓   |
+| `t20_t20_t20`              | A visit's three darts in that order, with `s25` for the single bull and `bull` for the bullseye (`s25_s25_bull`)                                                    |   ✓   |   ✓   |   ✓   |   ✓   |
+| `luckynumber`              | A visit that scored at least one point leaves a lucky number, one digit repeated (`11`, `22`, `111`, `333`). In X01 and Random Checkout, the games that count down |   ✓   |   ✓   |   ✓   |   ✓   |
+
+- A bust or a win is called instead of the visit's total and its darts by the Caller and Sound FX
+- With **Prefer Combined Throws**, the Caller calls a combination instead of the total when it has a sound for it
+- **Cricket** counts points only on numbers already closed, so nearly every visit there totals 0: there are no totals or ranges in Cricket. The Caller calls the running score instead, when it moved, and the Caller and Sound FX leave out the combinations
+
+#### Game events
+
+| Trigger                                                                               | When                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |   C   |   S   |   W   |   A   |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---: | :---: | :---: | :---: |
+| `gameon`                                                                              | At the start of each leg. WLED also falls back to it when nothing else fits                                                                                                                                                                                                                                                                                                                                                                                                                          |   ✓   |   ✓   |   ✓   |       |
+| `bulloff`                                                                             | Once when the bull-off begins, not again as the throw passes between players, and only if the first player has no `bulloff+<name>` of their own. WLED keeps it lit while the bull-off lasts                                                                                                                                                                                                                                                                                                       |   ✓   |   ✓   |   ✓   |       |
+| `bulloff+<name>`, `bulloff+player2`                                                   | Calls that player to the oche in the bull-off: when it is their turn and the board is clear, before they throw — for the first player when the bull-off begins, in place of the plain `bulloff`, which then does not play at all                                                                                                                                                                                                                                                                     |   ✓   |   ✓   |   ✓   |       |
+| `gameshot`                                                                            | A player wins a leg                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |   ✓   |   ✓   |   ✓   |   ✓   |
+| `matchshot`                                                                           | A player wins the match; `gameshot` goes off when there is nothing for it                                                                                                                                                                                                                                                                                                                                                                                                                            |   ✓   |   ✓   |   ✓   |   ✓   |
+| `busted`                                                                              | A player busts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |   ✓   |   ✓   |   ✓   |   ✓   |
+| `partner_rule`                                                                        | Teams' partner rule takes a checkout back; `busted` goes off when there is nothing for it                                                                                                                                                                                                                                                                                                                                                                                                            |   ✓   |   ✓   |   ✓   |   ✓   |
+| `matchshot+t20`, `gameshot+d10`, …                                                    | Triggers joined with `+` go off when all their parts do, and rank just above their strongest part: `matchshot+bull` > `matchshot` > `gameshot+bull` > `gameshot`                                                                                                                                                                                                                                                                                                                                     |   ✓   |   ✓   |   ✓   |   ✓   |
+| `t20+alice`, `t20+player1`, `t20+x01`, `t20+alice+cricket`, `gameshot+max_mustermann` | A part of a `+` trigger may also be whoever is up (with Teams the player or the team), their seat in the match (`player1`, `player2`, …, the same in every leg), or the game, as autodarts names it (`x01`, `cricket`, `atc`, `bob's_27`, `random_checkout`, `bull-off`). Each such part counts a little, so the more a trigger names, the more it wins by. On their own they never go off: `alice+x01` needs a trigger of the moment as well. A name keeps its underscores, since `+` is what joins |   ✓   |   ✓   |   ✓   |   ✓   |
+| `gameshot+d20`, `gameshot+t20_t15_d20`, `matchshot+player2+s25_bull`                  | A win with that winning dart, or that winning visit, of two or three darts. A win for one player or team is `gameshot+<name>` and `matchshot+<name>`; `gameshot_<name>` and `matchshot_<name>` set up before are changed over to it                                                                                                                                                                                                                                                                  |   ✓   |   ✓   |   ✓   |   ✓   |
+
+A win goes off once: autodarts goes on reporting a won leg after the dart that won it, and Finish sends the whole match once more. Correcting a dart stops what is playing and calls the visit again as it now stands.
+
+#### Players
+
+| Trigger                        | When                                                                                                                                                                                                                                                                                                                                                        |   C   |   S   |   W   |   A   |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---: | :---: | :---: | :---: |
+| a player's name (`creazy.eth`) | It is their turn, and at the start of each leg. A solo game names its player once a leg. In a **Teams** match the player first, then their team, with a shared score and with own scores alike                                                                                                                                                              |   ✓   |   ✓   |   ✓   |       |
+| `next_player`                  | It is somebody else's turn and there is nothing for their name. On WLED, with `{player}` in an effect, it shows whose turn it is                                                                                                                                                                                                                            |   ✓   |   ✓   |   ✓   |       |
+| `bot`                          | Instead of the name when a bot is up (WLED: `bot_throw`)                                                                                                                                                                                                                                                                                                    |   ✓   |   ✓   |   ✓   |       |
+| the winner's name              | After a `matchshot`: with Teams the team's name, then the player's who checked out; `bot` for a bot on no team                                                                                                                                                                                                                                              |   ✓   |       |       |       |
+| `bot_throw`                    | A bot throws a dart                                                                                                                                                                                                                                                                                                                                         |       |   ✓   |       |       |
+| `opponent_throw`               | Somebody outside your room throws a dart, an online opponent or a guest of theirs, as throw feedback when playing online without looking at the screen. Your own darts, those of a guest or a bot you added and of anyone at your board are left out, since your board already makes the noise; see [Your board and the others](#your-board-and-the-others) |       |   ✓   |       |       |
+
+#### Checkout
+With **Call Checkout** on, the Caller says what is left at the start of a visit on a checkout, Gotcha's distance to its target score included:
+
+| Trigger           | When                                                  |   C   |   S   |   W   |   A   |
+| ----------------- | ----------------------------------------------------- | :---: | :---: | :---: | :---: |
+| `yr_170`          | What is left, in one sound                            |   ✓   |       |       |       |
+| `you_require_170` | The same, when there is no `yr_` sound                |   ✓   |       |       |       |
+| `you_require`     | Followed by the number (`170`), when there is neither |   ✓   |       |       |       |
+
+#### Other games
+
+| Trigger                                 | When                                                                                                                                                                            |   C   |   S   |   W   |   A   |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---: | :---: | :---: | :---: |
+| `cricket_hit`                           | A Cricket dart on one of the game's numbers still open: 15–20 and Bull, 10–20 and Bull in Tactics, and in Hidden Cricket its hidden numbers, the dart that reveals one included |   ✓   |   ✓   |   ✓   |   ✓   |
+| `cricket_miss`                          | Any other Cricket dart: another number, the board missed, or a number everybody has closed                                                                                      |   ✓   |   ✓   |   ✓   |   ✓   |
+| `target7`, `targetbull`                 | The number a player is on in Around The Clock, Round The World, Shanghai and Bob's 27; `targetbull` for the bull in a Double or Triple Around The Clock                         |       |       |   ✓   |       |
+| `gotcha`                                | In Gotcha, a dart sends another player's score back to zero                                                                                                                     |   ✓   |   ✓   |   ✓   |   ✓   |
+| `killer_became_killer`, `killer_killed` | In Killer, a player becomes a killer, and a player is out                                                                                                                       |   ✓   |   ✓   |   ✓   |   ✓   |
+
+#### Board status
+Only during a game.
+
+| Trigger                | When                                              |   C   |   S   |   W   |   A   |
+| ---------------------- | ------------------------------------------------- | :---: | :---: | :---: | :---: |
+| `board_starting`       | The board is about to start                       |   ✓   |   ✓   |   ✓   |       |
+| `board_started`        | The board has started                             |   ✓   |   ✓   |   ✓   |       |
+| `board_stopping`       | The board is about to stop                        |   ✓   |   ✓   |   ✓   |       |
+| `board_stopped`        | The board has stopped or disconnected             |   ✓   |   ✓   |   ✓   |       |
+| `manual_reset_done`    | After a manual reset, and when a new round starts |   ✓   |   ✓   |   ✓   |       |
+| `throw`                | A dart is detected                                |   ✓   |   ✓   |   ✓   |       |
+| `last_throw`           | The last dart of a visit is detected              |   ✓   |   ✓   |   ✓   |       |
+| `takeout`              | While takeout is in progress                      |   ✓   |   ✓   |   ✓   |       |
+| `takeout_finished`     | Takeout has finished                              |   ✓   |   ✓   |   ✓   |       |
+| `calibration_started`  | Calibration has started                           |   ✓   |   ✓   |   ✓   |       |
+| `calibration_finished` | Calibration has finished                          |   ✓   |   ✓   |   ✓   |       |
+
+#### Lobby and tournament
+These go off in any game, whatever **Game modes** says.
+
+| Trigger            | When                                                                                                                                                                                                                                                                                                      |   C   |   S   |   W   |   A   |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---: | :---: | :---: | :---: |
+| `lobby_in`         | A player joins the lobby, from the second player on, so opening a lobby and adding yourself does not set it off                                                                                                                                                                                           |       |   ✓   |   ✓   |       |
+| `lobby_out`        | A player leaves the lobby, as long as somebody is still in it                                                                                                                                                                                                                                             |       |   ✓   |   ✓   |       |
+| `tournament_ready` | A tournament match of yours is ready and autodarts asks you to *Mark Ready*. Keep the tournament's page open while you wait, whichever of *Information*, *Bracket* or *Rankings* is showing. It goes off once each time you are called, not again as the countdown runs, in any language autodarts speaks |       |   ✓   |   ✓   |       |
+
+#### WLED only
+
+| Trigger | When                                                                                                                                                            |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `idle`  | Leaving the match                                                                                                                                               |
+| `other` | Plays instead of every other effect while somebody outside your room is up, an online opponent say; see [Your board and the others](#your-board-and-the-others) |
+
+### 🎚️ Trigger Priority
+The Caller, Sound FX, WLED and Animations hear about the game from one place, which reads autodarts' own game events (a dart landing, a visit starting and ending, a leg starting, a game shot) together with the match state they come with. A moment usually fits several triggers at once: the last dart of a visit is a dart (`t20`), the visit's total (`180`) and its three darts together (`t20_t20_t20`), and a checkout is a dart and a `gameshot` as well.
+
+**Priority** under each feature's Options says which of them counts most. It is a list of kinds of trigger, most important first, that you can drag into another order (or move with the arrows beside each row):
+
+| Kind                     | Triggers                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Match shot               | `matchshot`                                                                                                  |
+| Game shot                | `gameshot`                                                                                                   |
+| Bust                     | `busted`, `partner_rule`                                                                                     |
+| Player's name            | a player's or team's name, `bot`                                                                             |
+| Next player              | `next_player`                                                                                                |
+| Start of a leg           | `gameon`, `bulloff`                                                                                          |
+| Darts of the visit       | combinations like `t20_t20_t20`                                                                              |
+| Visit total              | `0`–`180` and ranges                                                                                         |
+| Checkout call            | `yr_<n>`, `you_require_<n>`                                                                                  |
+| Checkout call in parts   | `you_require` followed by the number                                                                         |
+| Game-specific            | `luckynumber`, `cricket_hit`, `cricket_miss`, `target<N>`, `gotcha`, `killer_became_killer`, `killer_killed` |
+| Single dart              | `s20`, `t19`, `bull`, `m17`, `miss`, and the stand-ins for a dart without a sound of its own                 |
+| Bot's or opponent's dart | `bot_throw`, `opponent_throw`                                                                                |
+
+- **Caller and Sound FX** play one sound of each kind, from the top of the list down: their order is the order of the calls. By default the Caller names whoever is up before the checkout, and calls a dart before the visit's total and the total before its combination. A match shot or a bust is called instead of the dart that made it.
+- **WLED and Animations** show one effect or GIF: the one on the highest trigger there is one for. By default a win or a bust beats everything, and a visit's three darts beat its total.
+- **A sound for a combined trigger** like `matchshot+t20` ranks just above its strongest part, so it beats a plain `matchshot`, while `gameshot+t20` stays below `matchshot`.
+- **Stand-ins** count less than the trigger they stand in for, see [Darts](#darts).
+- **Reset to default** puts a feature's own order back. Nothing is stored while the order is the default, so a better default in a later version reaches you.
+
 ### 🤫 Quiet Own Darts
 Autodarts plays a thud whenever a dart lands, wherever in the world it was thrown. For a remote opponent that is the only sign anything happened; for the board in front of you it arrives a moment after the real one and tells you nothing you did not just hear.
 
@@ -292,6 +442,7 @@ The Caller feature provides voice announcements during your darts gameplay, simi
 - **Call Checkout**: Announces possible checkout combinations when a player is on a checkout score
   - Covers **Gotcha** too, which autodarts works out no route for: the number left to reach the target score is announced the same way
 - **Prefer Combined Throws**: When enabled and a sound for the exact dart combination (e.g. `s20_s5_s1`) exists, the generic points sound (e.g. `26`) is skipped for that throw
+- **Priority**: Which call wins when several fit a moment, and the order they are called in — see [Trigger Priority](#️-trigger-priority)
 - **Custom Sound Library**: Add, edit, and organize voice clips for different game events. Everything that adds sounds is under **Add**: a predefined caller set, uploaded files, text-to-speech, or a link. Sorting by trigger and deleting everything are under **⋯**
 - **Sound sets**: Keep more than one list of sounds, such as a second voice or one for Halloween, and choose which one plays. See [Sound sets (Caller)](#sound-sets-caller)
 - **Search and Filters**: Find a sound by its name or trigger with the search above the list. A number also finds the ranges that cover it, so `150` finds a sound on `100-180`. The pills narrow the list to scores, throws, events, board status, player names, or the sounds you have switched off. Drag a sound by its handle to reorder the list, while no search or filter narrows it
@@ -306,43 +457,8 @@ The Caller's sounds come in sets, and one set plays at a time. Your sounds are t
 - The options above the sounds and the switch on the card are the same for every set. With two or more sets, the card names the set that plays
 - A page that is already open keeps the sounds it started with until it loads again
 
-#### Supported Triggers
-You can assign sounds to be played based on these triggers:
-
-- **Points**: `0` to `180` (point totals)
-- **Point Ranges**: A range between `0` and `180`, e.g. `0-20` or `100-180` (point totals)
-- **Singles**: `s1` to `s20` and `s25` (single segments)
-- **Doubles**: `d1` to `d20` and `bull` (double segments and bullseye)
-- **Triples**: `t1` to `t20` (triple segments)
-- **Special Voice Lines**:
-  - `gameon`: At the start of a new game
-  - `gameshot`: When a player wins the game
-  - `you_require`: Plays before announcing checkout combinations (numbers are called separately)
-  - `busted`: When a player busts
-  - `partner_rule`: When Teams' partner rule takes a checkout back; `busted` plays when there is no sound for it
-  - `double`, `triple`: Generic announcements for dart types
-  - `outside`: When a dart lands outside the scoring area
-  - `next_player`: Plays when switching to the next player (fallback if no player name sound is found)
-  - `bot`: Plays instead of player name when the player is a CPU/bot player
-  - `bulloff`: Once when the bull-off begins, not again as the throw passes between players
-  - `playername`: Player name sounds play automatically when it's their turn. Example: If your name is `creazy.eth` on Autodarts, simply use `creazy.eth` (supports spaces or `_` like `player_name` or `player name`)
-    - In a **Teams** match, the player whose turn it is is called by their name, and their team's name is the fallback, with a shared score and with own scores alike. A match won calls `matchshot`, then the team's name, then the player's who checked out
-- **Board Status**:
-  - `board_started`: When the board has started
-  - `board_stopped`: When the board has stopped or disconnected
-  - `manual_reset_done`: After a manual reset (also triggered when a new round starts)
-  - `takeout_finished`: When takeout has finished
-  - `calibration_started`: When calibration is started
-  - `calibration_finished`: When calibration has finished
-- **Cricket-Specific**:
-  - `cricket_hit`: When a player hits a Cricket target (15-20 and Bull)
-  - `cricket_miss`: When a player hits a non-Cricket target (Miss-14)
-
-#### Cricket Mode Behavior
-In Cricket games, the caller has specific behavior:
-- `cricket_hit` is triggered when a player hits a target that's still open (15-20 and Bull)
-- `cricket_miss` is triggered when a player hits any other number (Miss-14) or hits a target that's already closed by all players
-- Regular throw sounds (like `t20`, `d16`) are still announced when enabled
+#### Triggers
+The Caller takes the triggers in [Triggers](#-triggers) marked **C**. Its own are the checkout calls and the winner's name after a match shot.
 
 #### Audio Interaction Requirements
 Due to browser security policies, especially on Safari and mobile browsers, audio can only be played after user interaction (click, tap, or keypress). The extension will:
@@ -395,13 +511,7 @@ Simply select one of these presets when adding sounds through the "Import from U
 > Some predefined caller sets may not work in Safari due to browser restrictions. Tools for Autodarts is not responsible for the content of these caller sets.
 
 #### Intelligent Fallback System
-The caller has a sophisticated fallback system to provide complete coverage even with limited sound files:
-- **Segment Announcements**: If a specific segment sound (e.g., `s20`) isn't available, it automatically plays just the number (`20`)
-- **Double/Triple Handling**: For doubles and triples, it follows the pattern of playing the word followed by the number (e.g., `d20` → `double` + `20`)
-- **Miss Handling**: `miss` or `m` prefixed throws will fall back to `outside` sounds
-- **Matchshot Handling**: When no `matchshot` sound is available, the system will automatically use the `gameshot` sound instead
-- **Player Announcements**: Automatically announces the current player's name at the start of their turn
-- **Game Start**: Plays the "game on" sound at the beginning of a match
+The caller covers a whole game even with limited sound files: a dart it has no sound for is called with `single`, `double` or `triple` and the number, or the number alone, a missed dart with `miss` or `outside`, and a match shot with `gameshot` when there is no `matchshot`. See the stand-ins under [Darts](#darts).
 
 #### Cross-Browser Audio Support
 - Compatible with all major browsers including Safari on iOS/MacOS
@@ -414,80 +524,23 @@ The Sound FX feature adds ambient sound effects to your gameplay experience:
 #### Game Modes
 **Game modes** under Options keeps Sound FX to the games you choose: X01, Cricket, the practice games (Count Up, Around The Clock, Random Checkout, Round the World, Segment Training, Bob's 27, 121), the party games (Shanghai, Gotcha, Bermuda, Killer) and the bull-off. Every game is on until you switch one off. Lobby and tournament sounds play in any game.
 
-#### Game Event Sounds
-Add sound effects for various game events:
-- **Point Triggers**: Sounds can be triggered for any score from `ambient_0` to `ambient_180`
-- **Point Ranges**: A range between `0` and `180`, e.g. `0-20` or `100-180` (point totals). Format: `ambient_100-180` or `100-180` (with or without the `ambient_` prefix)
-- **Individual Throws**: Sounds for specific throws like `ambient_s20`, `ambient_d16`, `ambient_t19`, etc.
-- **Combined Throws**: Trigger sounds based on a sequence of throws using format `s20_t19_d12`
-- **Special Events**: Dedicated sounds for `ambient_gameon`, `gameshot`, `busted`, and more. `ambient_partner_rule` plays instead of `ambient_busted` when Teams' partner rule takes a checkout back
-- **Player Turn Sounds**: 
-  - `ambient_next_player`: Plays when switching to the next player (fallback if no player name sound exists)
-  - `ambient_bot`: Plays when switching to a CPU/bot player
-  - `bot_throw`: Plays when a bot player throws a dart
-  - `opponent_throw`: Plays when a remote opponent, or a guest of theirs, throws a dart — useful as throw feedback when playing online without looking at the screen. Your own throws and bot throws are excluded (bots use `bot_throw`), and so are your guests and anyone sharing your board (e.g. a friend visiting to play on your board with their own account), since that board already makes the throw noise. It counts who is in your room the way [WLED](#your-board-and-the-others) does
-  - Player-specific sounds using format: `ambient_playername` or `ambient_player_name`. In a **Teams** match a team's name works too: the player whose turn it is first, then their team
-- **Lobby Sounds**:
-  - `ambient_lobby_in`: Plays when a player joins the lobby
-  - `ambient_lobby_out`: Plays when a player leaves the lobby
-- **Tournament Sounds**:
-  - `ambient_tournament_ready`: Plays when a tournament match of yours is ready and autodarts asks you to *Mark Ready*. Keep the tournament's page open while you wait, whichever of *Information*, *Bracket* or *Rankings* is showing, since that is where autodarts puts its *Match Ready* card. It plays once each time you are called, not again as the countdown runs or when you mark ready and change your mind, and works in English, German and Dutch as well as any language autodarts adds later
-- **Board Status Sounds** (only during a game):
-  - `ambient_board_started`: Plays when the board has started
-  - `ambient_board_stopped`: Plays when the board has stopped or disconnected
-  - `ambient_manual_reset_done`: Plays after a manual reset (also triggered when a new round starts)
-  - `ambient_takeout_finished`: Plays when takeout has finished
-  - `ambient_calibration_started`: Plays when calibration is started
-  - `ambient_calibration_finished`: Plays when calibration has finished
-- **Player-Specific Gameshot**: Create personalized winning sounds for specific players using the following formats:
-  - `gameshot_player name` (spaces preserved)
-  - `gameshot_player_name` (with underscores replacing spaces)
-  - With ambient prefix: `ambient_gameshot_player_name`
-  - In a **Teams** match a team's name works too: the player who checked out first, then their team
-- **Cricket Mode**: Special triggers for Cricket games:
-  - `cricket_hit`: Triggered when hitting one of the game's targets that is still open: 15-20 and Bull in Cricket, 10-20 and Bull in Tactics, and in Hidden Cricket its hidden numbers, the dart that reveals one included
-  - `cricket_miss`: Triggered when hitting any other number, missing the board, or hitting a target already closed by all players
+#### Priority
+**Priority** under Options says which sound wins when several fit a moment, and the order they play in — see [Trigger Priority](#️-trigger-priority). By default Cricket's `cricket_hit` or `cricket_miss` plays before the dart.
+
+#### Triggers
+Sound FX takes the triggers in [Triggers](#-triggers) marked **S**, each with or without `ambient_` in front. Its own are `bot_throw` and `opponent_throw`, which play on the second channel beside the board and lobby sounds.
 
 #### Volume per Sound
 Every sound has a volume from 0 to 200% in its editor, so each can be tuned on its own. The default Bull, for one, is much quieter than the triples; at 200% it is about as loud as T18. 100% plays the file as it is, 0% silences a sound without taking it out of the list, and the list shows any sound that isn't at 100%. Text-to-speech sounds go up to 100%. A sound on a link can only be turned up when its site lets the extension read the file, which the default *busted* and *gameshot* on myinstants.com do not; the editor says so, and uploading the file works instead
 
-#### Match vs Game Winning Sounds
-The Sound FX feature distinguishes between winning a single game (gameshot) and winning the entire match (matchshot):
-- **Match Win**: `ambient_matchshot` or `matchshot` triggers when a player wins the complete match
-- **Game Win**: `ambient_gameshot` or `gameshot` triggers when a player wins a single game/leg
-- **Player-Specific Match Win**: Create personalized match winning sounds:
-  - `matchshot_player_name` (with underscores)
-  - `matchshot_player name` (with spaces)
-  - With ambient prefix: `ambient_matchshot_player_name`
-  - In a **Teams** match the team's name comes first, then the player's who checked out
-
 #### Ambient Sound Prefix
-- Use the `ambient_` prefix (e.g., `ambient_180`, `ambient_t20`) to keep ambient sounds apart from the Caller's
+- Use the `ambient_` prefix (e.g., `ambient_180`, `ambient_t20`) to keep ambient sounds apart from the Caller's. Every trigger is looked up with the prefix first, then without it
 - This allows you to have professional voice announcements via the Caller while also having fun sound effects via Sound FX
 
 #### Dual Audio Channels
 - Enhanced sound playback with separate audio channels for caller and ambient sounds
 - Improved game mode handling for specialized sound triggers
 - Better performance with simultaneous sound playback
-
-#### Smart Fallback System
-The Sound FX feature includes a sophisticated multi-level fallback system:
-- If an exact match with `ambient_` prefix isn't found, it tries without the prefix
-- For segment triggers like `ambient_t20`, it tries multiple fallbacks in this order:
-  - Exact match: `ambient_t20`
-  - Without ambient prefix: `t20`
-  - Split into word+number: `ambient_triple` + `ambient_20`
-  - Non-ambient word+number: `triple` + `20`
-  - Just the number: `20`
-- Similar fallback chains exist for double segments (`d16`) and single segments (`s1`)
-- For `miss` or `m` prefixed throws, it falls back to `outside` sounds
-- In Cricket games, `miss` triggers may fall back to `cricket_miss` sounds
-- **Matchshot Fallbacks**: When a player wins a match, the system tries sounds in this order:
-  - Player-specific matchshot: `ambient_matchshot_player_name` (in a **Teams** match the team's name, then the player's)
-  - Player-specific gameshot: `ambient_gameshot_player_name` (the same names, in the same order)
-  - Generic matchshot: `ambient_matchshot`
-  - Generic gameshot: `ambient_gameshot`
-- If no match is found after all fallback attempts, no sound is played
 
 #### Text-to-Speech (TTS) Generation
 Generate sound effects directly from text without needing external audio files:
@@ -536,11 +589,12 @@ WLED is a popular open-source firmware for controlling addressable LED strips (W
 - **Search and Filters**: Find an effect by its name, trigger or address, and narrow the list with the pills to scores, throws, events, board status, player names, or the effects you have switched off
 - **Your board and the others**: WLED tells for itself who throws in your room, with nothing to enter. An effect on `other` plays while anybody else is up, such as an online opponent. See [Your board and the others](#your-board-and-the-others)
 - **Don't restart a running effect**: An effect isn't sent again while the lights show it, so they don't start over. What counts is what is sent: the same effect with another player's name in it is sent again. The play button and **Test** always send
-- **Keep the player's effect between darts**: A dart that sets off no effect of its own brings back the effect the turn started with, instead of `gameon`: the player's own, their team's, `next_player` or `bot_throw`. A player with an effect on their name keeps it for their whole turn, with their darts' own effects in between. Off by default
+- **Keep the player's effect between darts**: A dart that sets off no effect of its own brings back the effect the turn started with, instead of `gameon`: the player's own, their team's, `next_player` or `bot_throw`. A player with an effect on their name keeps it for their whole turn, with their darts' own effects in between, and where there are several to pick from, the one their turn started with. Playing alone, the effect stays the same for the whole leg. Off by default
 - **Game modes**: The games WLED lights up in, from **Game modes** under Options. Every game is on until you switch one off. Lobby and tournament effects (`lobby_in`, `lobby_out`, `tournament_ready`) play in any game
 - **Effect sets**: Keep more than one list of effects, such as one for Halloween or a birthday, and choose which one plays. See [Effect sets](#effect-sets)
 - **Animation packs**: Ready-made animations for LED matrices, put on your WLED as presets: a whole pack as an effect set of its own, or single animations into the set you're editing. They come first in the WLED settings. See [Animation packs](#animation-packs)
 - **Previews**: Each effect that plays a preset shows it the way your lights do, drawn from your own WLED. See [Previews](#previews)
+- **Priority**: Which effect wins when several fit a moment — see [Trigger Priority](#️-trigger-priority). By default a practice game's `target<N>` beats the dart that hit it, and a visit's three darts beat its total
 - **CSV Import**: Bulk import effects using CSV format: `[name];[type];[url];[trigger1];[trigger2]...`, see [CSV Import Format](#csv-import-format)
 - **Drag & Drop**: Reorder effects by dragging them by their handle, while no search or filter narrows the list
 - **URL Validation**: A URL must start with `http://` or `https://`. Plain `http://` is what a WLED device on your own network speaks, and it is accepted — the settings page only warns that a browser may treat it as mixed content
@@ -595,78 +649,15 @@ Each effect that plays a preset shows that preset in its row the way your matrix
 - **Panels**: A matrix of several panels shows them apart, as WLED's 2D settings place them, with two LEDs' room where two panels meet. WLED doesn't know how far apart your panels hang, so panels mounted edge to edge get that room too, and panels WLED already places apart keep the gap it leaves. Where the room would leave out LEDs, as for stacked panels in a row's few pixels, the matrix shows as one panel
 - On a narrow screen the previews are smaller. With your system's *reduce motion* setting, and for an effect that is switched off, they stand still
 
-#### Supported Triggers
-Effects can be triggered by various game events using these triggers:
-
-##### Board Status (only during a game)
-- **board_starting**: when the board is going to start
-- **board_started**: when the board has started
-- **board_stopping**: when the board is going to stop
-- **board_stopped**: when the board has stopped
-- **manual_reset_done**: after a manual reset (is also triggered when a new round starts)
-- **throw**: when a throw is detected
-- **last_throw**: when the last throw is detected
-- **takeout_finished**: when takeout has finished
-- **calibration_started**: when calibration is started
-- **calibration_finished**: when calibration has finished
-
-##### Game Events
-- **`gameon`**: At the start of each player's turn when there is neither an effect for the player nor a `next_player` effect, and whenever nothing else matches (the default fallback effect). With *Keep the player's effect between darts* on, a dart that matches nothing brings back the effect the turn started with instead
-- **`next_player`**: At the start of a player's turn, when there is no effect for the player. With `{player}` or `{player_ascii}` in it, it shows whose turn it is: see [The player's name in an effect](#the-players-name-in-an-effect)
-- **`takeout`**: When takeout is in progress
-- **`gameshot`**: When a player wins a game/leg
-- **`gameshot+[throwName]`**: When a player wins a game/leg with the specified throw (e.g. `gameshot+d10`)
-- **`matchshot`**: When a player wins the entire match
-- **`matchshot+[throwName]`**: When a player wins the entire match with the specified throw (e.g. `matchshot+bull`)
-- **`busted`**: When a player busts (scores more than needed)
-- **`partner_rule`**: When Teams' partner rule takes a checkout back; `busted` plays when there is no effect for it
-- **`bulloff`**: Once when the bull-off begins, not again as the throw passes between players
-- **`idle`**: When leaving the match (cleanup effect)
-
-##### Point Totals
-- **`0` to `180`**: Triggered by the total points scored in a turn. Not in Cricket, which counts points only on numbers already closed, so nearly every visit there totals 0 however many marks it took
-- **Range Format**: `range_[min]_[max]` (e.g., `range_100_180` for scores between 100-180), not in Cricket either
-
-##### Individual Dart Throws
-- **Singles**: `s1` to `s20`, `s25` (single segments, s25 for single bull)
-- **Doubles**: `d1` to `d20`, `bull` (double segments, bull for bullseye)
-- **Triples**: `t1` to `t20` (triple segments)
-- **Misses**: `m1` to `m20` for a dart that lands outside the double ring beside that number, `miss` for one entered with the keypad's Miss button or corrected to a bouncer
-- **`outside`**: When a dart misses, whichever way autodarts records it — unless an effect is set up on the miss itself (`m17`, `miss`), which takes precedence
-
-##### Combination Throws
-- **Format**: `[dart1]_[dart2]_[dart3]` (e.g., `t20_t20_t20` for three triple 20s)
-- Triggered only when all three darts are thrown in the exact sequence
-
-##### Other Game Modes
-- **`target[N]`**: The number a player is on in Around The Clock, Round The World, Shanghai and Bob's 27 — `target7` for the 7, `targetbull` for the bull in a Double or Triple Around The Clock
-- These modes fall back to the X01 triggers above when no `target` effect matches, so `gameshot`, `matchshot` and the individual dart triggers work there too
-
-##### Lobby Events
-- **`lobby_in`**: When a player joins the lobby — from the second player on, so opening a lobby and adding yourself does not set it off
-- **`lobby_out`**: When a player leaves the lobby, as long as somebody is still in it
-
-##### Tournament Events
-- **`tournament_ready`**: When a tournament match of yours is ready and autodarts asks you to *Mark Ready*, the same moment Sound FX plays `ambient_tournament_ready` on: once for each of your matches, while the tournament's page is open
-
-##### Player-Specific Effects
-- **Player Names**: Use the exact player name as it appears in Autodarts. This is triggered instead of `next_player` and the generic `gameon` effect. In a **Teams** match a team's name works too: the player whose turn it is first, then their team.
-- **Spaces**: Player names with spaces are supported (e.g., `john doe`)
-- **Underscores**: Alternative format with whitespaces replaced by underscores (e.g., `john_doe`)
-- **`bot_throw`**: Triggered when a CPU/bot player throws
-- **`gameshot_[player name]`**: player specific gameshot trigger
-- **`matchshot_[player name]`**: player specific matchshot trigger
-- In a **Teams** match both take a team's name too: a leg the player who checked out first, a match the team first
-
-##### Throws elsewhere
-- **`other`**: Plays instead of every other effect while somebody who isn't in your room is up: an online opponent, a guest of theirs, or anyone in a match you only watch. Without an effect on `other`, everybody's throws play their own effects
-- See [Your board and the others](#your-board-and-the-others) for who counts as in your room
+#### Triggers
+WLED takes the triggers in [Triggers](#-triggers) marked **W**. Its own are `target<N>` for the practice games, `idle` and `other`, see [Your board and the others](#your-board-and-the-others). A bot coming up lights `bot_throw`, and the practice games fall back to the dart, total and win triggers when no `target` effect fits. `next_player` and a JSON API effect with `{player}` in it show whose turn it is: see [The player's name in an effect](#the-players-name-in-an-effect)
 
 #### Smart Effect Selection
 - **Multiple Effects**: If multiple effects share the same trigger, one is randomly selected
-- **Priority System**: More specific effects take precedence over general ones
-- **A turn's first effect**: A bot's turn starts with `bot_throw`, anyone else's with their own effect, then their team's, then `next_player`, then `gameon`
-- **Fallback Logic**: Falls back to `gameon` effect if no specific trigger matches, or, with *Keep the player's effect between darts* on, to the effect the turn started with
+- **Priority System**: The effect on the highest trigger in WLED's [Trigger Priority](#️-trigger-priority) wins, and a combined trigger like `matchshot+t20` ranks just above its strongest part, so it beats a plain `matchshot`, while `gameshot+t20` stays below `matchshot`
+- **A turn's first effect**: A bot's turn starts with `bot_throw`, anyone else's with their own effect (or one like `alice+x01`), then their team's, then `next_player`, then `gameon`. A solo game shows it at every visit
+- **Fallback Logic**: Falls back to `gameon` effect if no specific trigger matches, or, with *Keep the player's effect between darts* on, to the effect the turn started with; during the bull-off the `bulloff` effect stays on
+- **A win stays lit**: A won leg reported again (Finish sends the match once more) leaves the lights as they are
 
 #### Technical Implementation
 - **HTTP Requests**: Effects trigger HTTP GET requests to the specified URLs
@@ -731,12 +722,6 @@ In an online match both screens show every throw, so your lights would celebrate
 - **Board events** (`throw`, `takeout`, `board_started` …) belong to whoever is up: while somebody outside your room is up, `other` stays on through their takeout. In a lobby they are always yours
 - **Unchanged**: `bulloff`, the lobby and tournament triggers and `idle` play whoever is up
 
-#### Game Mode Support
-- **X01 Games**: Full support for all triggers and point combinations
-- **ATC, RTW, Shanghai, Bob's 27**: `target[1-20,25,bull]` for the current target 
-- **Cricket**: Every trigger but the point totals and their ranges, since Cricket counts points only on numbers already closed
-- **Bull-off**: `bulloff` trigger on bull-off rounds
-
 #### Best Practices
 1. **Test Effects**: Use the play button in settings to test effects before games
 2. **HTTPS URLs**: Always use HTTPS URLs for security compliance
@@ -762,6 +747,7 @@ The Animations feature allows you to display custom GIF animations for special e
 - **Fit**: Choose between **Cover** (fill the space, cropping the GIF if needed) or **Contain** (show all of it)
 - **Covers**: Choose between **Board only** (the animation covers the dartboard) or **Full page** (it covers the whole page, over a blurred background)
 - **Game modes**: The games animations show in, such as everything but Round the World, where a visit scores little and an animation on low scores would go off all the time. Every game is on until you switch one off
+- **Priority**: Which GIF shows when several fit a moment — see [Trigger Priority](#️-trigger-priority). By default a win or a bust beats the dart, a game's own moment like `luckynumber` beats the visit, and a visit's three darts beat its total
 - **Add**: Upload GIFs, or add one from a link, whose editor previews it. Sorting by trigger and deleting everything are under **⋯**
 - **Animation sets**: Keep more than one list of animations, such as one for Halloween, and choose which one plays. See [Animation sets](#animation-sets)
 - **Search and Filters**: Find an animation by its trigger or link, and narrow the grid with the pills to scores, throws, events, other triggers, or the animations you have switched off. Drag an animation by its handle to reorder the grid, while no search or filter narrows it
@@ -776,26 +762,8 @@ Animations come in sets, and one set shows at a time. Your animations are the se
 - **Start delay**, **Show for**, **Fit**, **Covers**, **Game modes** and the switch on the card are the same for every set. With two or more sets, the card names the set in use
 - A match page that is already open keeps the animations it started with until it loads again
 
-#### Supported Triggers
-Animations can be triggered by various game events using these tags:
-
-- **Points**: `0` to `180` (total points scored in a turn). Not in Cricket, which counts points only on numbers already closed, so nearly every visit there totals 0 however many marks it took
-- **Ranges**: `100-180` (any turn total within the range; `range_100_180` also works), not in Cricket either
-- **Singles**: `s0` to `s20`, and `s25` or `25` for the single bull. Prefer `s25`: `25` also fires whenever a visit totals 25 points, while `s25` only ever fires for the bull. Setups that already use `25` keep working — `s25` takes over only if you have an animation on it
-- **Doubles**: `d1` to `d20` (double segments, `bull` for bullseye)
-- **Triples**: `t1` to `t20` (triple segments)
-- **Special Events**:
-  - `bull`: When a player hits the bullseye
-  - `outside`: When a dart lands outside the scoring area
-  - `busted`: When a player busts (scores more than needed)
-  - `gameshot`: When a player wins the game or leg
-
-#### Combination Tags
-You can also use combination tags to trigger animations based on specific dart throw combinations. Format: `[first dart]_[second dart]_[third dart]`
-
-Example: `s20_s5_d20` would trigger when a player throws single 20, then single 5, then double 20. Use `s25` for a single bull and `bull` for a bullseye — e.g. `s25_s25_bull`.
-
-You can add multiple triggers for the same animation by entering each trigger on a new line in the animation settings.
+#### Triggers
+Animations take the triggers in [Triggers](#-triggers) marked **A**: the darts, the visits and their combinations, the wins and busts, and the games' own moments such as `luckynumber`. One animation shows for each moment, the one on its highest trigger in Animations' [Trigger Priority](#️-trigger-priority). Each trigger goes on a line of its own in an animation's settings.
 
 > [!NOTE]  
 > If you assign the same trigger to multiple animations, the system will randomly select one of the matching animations to play each time the trigger occurs. This allows for variety in your gameplay experience.

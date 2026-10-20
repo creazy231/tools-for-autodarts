@@ -26,6 +26,10 @@ export default {
     description: "Die Spiele, in denen angesagt wird.",
     intro: "Der Caller sagt nur in den hier eingeschalteten Spielen an.",
   },
+  priority: {
+    description: "Welche Ansage gewinnt, wenn mehrere passen, und in welcher Reihenfolge angesagt wird.",
+    intro: "Der Caller sagt die Trigger eines Moments von oben nach unten an, einen von jeder Art.",
+  },
   list: {
     // Sprachaufnahmen, not Aufnahmen: a visit is an Aufnahme on the site.
     emptyText: "Importiere ein fertiges Caller-Set, lade eigene Sprachaufnahmen hoch oder erzeuge sie aus Text.",

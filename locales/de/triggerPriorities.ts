@@ -1,0 +1,45 @@
+import type en from "../en/triggerPriorities";
+import type { Translation } from "../../utils/i18n/types";
+
+export default {
+  title: "Priorität",
+  buttonLabel: "Priorität: {summary}",
+  summary: {
+    standard: "Standard",
+    custom: "Angepasst",
+  },
+  howTo: "Weiter oben gewinnt, wenn mehrere Trigger zum selben Moment passen. Zieh eine Zeile oder nutze ihre Pfeile.",
+  moveUp: "{level} nach oben",
+  moveDown: "{level} nach unten",
+  reset: "Auf Standard zurücksetzen",
+  levels: {
+    matchshot: "Matchshot",
+    gameshot: "Gameshot",
+    busted: "Bust",
+    playerName: "Name des Spielers",
+    nextPlayer: "Nächster Spieler",
+    gameon: "Beginn eines Legs",
+    combo: "Darts der Aufnahme",
+    total: "Summe der Aufnahme",
+    checkout: "Checkout-Ansage",
+    checkoutCommon: "Checkout-Ansage in Teilen",
+    variant: "Je nach Spiel",
+    dart: "Einzelner Dart",
+    thrower: "Dart eines Bots oder Gegners",
+  },
+  hints: {
+    matchshot: "Der Dart, der das Match gewinnt",
+    gameshot: "Der Dart, der ein Leg gewinnt",
+    busted: "Ein Bust oder ein Checkout, das die Partnerregel von Teams zurücknimmt",
+    playerName: "Wer dran ist, beim Namen, und nach einem Matchshot der Gewinner",
+    nextPlayer: "Eine neue Aufnahme, wenn es für den Namen nichts gibt",
+    gameon: "Der Beginn eines Legs und des Bull-Offs",
+    combo: "Die drei Darts einer Aufnahme zusammen",
+    total: "Was eine Aufnahme erzielt hat",
+    checkout: "Was zum Auschecken bleibt, in einer Ansage",
+    checkoutCommon: "Was bleibt, in zwei Teilen angesagt",
+    variant: "Eine Schnapszahl als Rest (111, 333), Treffer oder Fehlwurf in Cricket, das Ziel eines Trainingsspiels, Gotcha, Killer",
+    dart: "Jeder Dart und was für einen einspringt, für den es nichts gibt",
+    thrower: "Ein Dart eines Bots oder eines Gegners auf einem anderen Board",
+  },
+} satisfies Translation<typeof en>;
