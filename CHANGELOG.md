@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.4.0] - 2026-10-20
 
 ### Added
 
@@ -57,6 +57,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- **Darts Zoom**'s camera close-ups show their own dart in Safari too, on an iPad as on a Mac. A close-up showed the picture from one dart back, with the marker on the right spot and no dart under it. It used to read each picture by its address on the page, which Safari doesn't allow an extension to do, so every attempt failed and the close-up made do with the board as it was when drawn. That is the previous dart's picture. Each close-up now keeps the picture as an image of its own, the way autodarts shows it. How long it waits for that picture is a new setting, *Picture wait*, a second and a half by default as before. Longer suits a slow connection, where the board can still show the previous dart's picture when the wait runs out, and shorter suits a quick thrower. A picture that comes after the wait still replaces the board as soon as it arrives. Checked live on a followed board, with Chrome made to refuse those reads and the pictures held back 1.7 and 3.5 seconds: every close-up ended on its own dart's picture
 - **WLED**'s preset list in the effect's dialog reads your WLED's presets in Firefox too. It read them from the page, which Firefox doesn't allow for a device on your own network, so the list said it couldn't read them
 - **WLED**'s play button sends its effect on every press. With *Don't restart a running effect* on, a second press of the same effect sent nothing
 - **Settings import** no longer swaps a sound's own source for another sound's recording. A Caller or Sound FX sound on a link, on text-to-speech or with its recording kept in the settings took the uploaded recording of any sound with the same name, which with sets is often another set's: the set in use came back speaking in another set's voice
@@ -77,7 +78,6 @@ All notable changes to this project will be documented in this file.
 - **Local Lobby** moves everyone who joins onto your board again. On the rebuilt site it pressed the house button, which takes a player you host off your board, so it never moved anyone, and the globe in each new player's row had to be pressed by hand. It presses the globe itself now, three seconds after the player joins. Checked in Chrome, with a second account of ours joining a private lobby on its own. Thanks to [@mulich](https://github.com/mulich) for the report ([#263](https://github.com/creazy231/tools-for-autodarts/issues/263))
 - **Teams**: a saved own-score team with two bots of one level keeps both. Reading the settings merged them into one bot
 - **Animations** and **WLED** no longer go by a visit's points in Cricket. Cricket counts points only on numbers already closed, so nearly every visit there totals 0, however many marks it took, and an animation or effect on `0`, or on a range from 0, went off after almost every visit. Point totals and their ranges now go off in every game but Cricket, as Sound FX's already did, and the darts, the three-dart combinations and the game events still play in Cricket. Checked against a Cricket match of our own. Thanks to [@andypech06](https://github.com/andypech06) for the report ([#262](https://github.com/creazy231/tools-for-autodarts/issues/262))
-- **Darts Zoom**'s camera close-ups show their own dart in Safari too, on an iPad as on a Mac. A close-up showed the picture from one dart back, with the marker on the right spot and no dart under it. It used to read each picture by its address on the page, which Safari doesn't allow an extension to do, so every attempt failed and the close-up made do with the board as it was when drawn. That is the previous dart's picture. Each close-up now keeps the picture as an image of its own, the way autodarts shows it. How long it waits for that picture is a new setting, *Picture wait*, a second and a half by default as before. Longer suits a slow connection, where the board can still show the previous dart's picture when the wait runs out, and shorter suits a quick thrower. A picture that comes after the wait still replaces the board as soon as it arrives. Checked live on a followed board, with Chrome made to refuse those reads and the pictures held back 1.7 and 3.5 seconds: every close-up ended on its own dart's picture
 
 ## [3.2.0] - 2026-10-03
 

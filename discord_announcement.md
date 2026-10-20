@@ -1,31 +1,30 @@
-# 🎯 Tools for Autodarts v3.3.0 🎯
+# 🎯 Tools for Autodarts v3.4.0 🎯
 
-### 🌐 Online Teams *(beta)*
-Teams isn't local only any more. Two teams on two boards in different places play one autodarts online match, **X01** or **Cricket**, and both screens show both teams: who's up, the throwing order, the colours and the team legs.
+### 💡 WLED levels up
+🎞️ **Animation packs**: ready-made animations for your LED matrix, *Standard* and *Halloween*, in 32 × 8 and 64 × 8. Type your WLED's address, pick a pack and press **Add all**: Tools puts the animations on your WLED and adds their effects, triggers and all, as an effect set of its own. Or add single ones with **+**. Your own presets stay as they are. The packs need WLED 16 or newer on an ESP32.
 
-🔗 **Invite a team**, next to *Shuffle* in a lobby you host, copies the lobby's link. The other captain opens it and joins with a saved team in one tap.
+👀 **Previews**: every effect that plays a preset shows it the way your lights do, read from your own WLED.
 
-👥 **Add Team** is now in every lobby you're in, not only the ones you host, so each captain adds their own team on their own board.
+🗣️ **Whose turn it is**: the new trigger `next_player`, with `{player}` or `{player_ascii}` in an effect, puts the player's name on your matrix. The README has an effect to import as it is.
 
-🟢 A chip in the lobby shows whether Tools can reach the team server and who is in sync. Tap it for the details.
+🎨 **Keep the player's effect between darts**: with this new option, a player's own colour stays on for their whole visit, between their darts' own effects.
 
-✋ Tap-to-correct, own scores and the **partner rule** work on both screens.
+🗂️ **Effect sets**: keep one for Halloween, another for a birthday, and choose which one plays. Animations, the Caller and Sound FX have sets too.
 
-🎚️ Online Teams comes on with Teams. Its switch is on the lobby page, in a card under *Autoscoring*, and under Teams → **Online Teams**.
+🏠 **No more board IDs**: WLED works out for itself who throws in your room. An effect on `other` plays while anybody else is up.
 
-📍 Both captains need Tools, with Teams on.
-
-🔒 Tools shares your autodarts name and your teams with the other Tools in the lobby, through its own server. Your login never leaves your browser, and no darts or scores are sent. The full list is in the README, under *Online Teams and your data*.
+### 🌐 Online Teams
+🙋 Players on their own board join a team themselves: **Play for TEAM RED** in the invitation, **Leave team** on your own row. Four players on four boards can play two against two. Everyone in the lobby needs 3.4.0.
 
 ### 🔧 Notable fixes
-🏠 **Local Lobby** moves everyone who joins onto your board again *(#263)*.
+🔍 **Darts Zoom**'s camera close-ups show their own dart in Safari, and how long they wait for the picture is a new setting, *Picture wait*.
 
-🎆 **Animations** and **WLED** effects on 0 points, or on a range from 0, no longer go off after almost every Cricket visit *(#262)*.
+🦊 **WLED**'s preset list works in Firefox, and its play button sends the effect on every press.
 
-🤖 A saved own-score team with two bots of the same level keeps both bots.
+📥 A **settings import** no longer gives a sound another sound's recording.
 
 ### 🤝 Community
-Thanks to **@mulich** for reporting the Local Lobby problem *(#263)*, to **@andypech06** for the Cricket one *(#262)*, and to all of you in the bug channels 🎉
+Thanks to **@vert0r** for keeping the player's effect on through their visit *(#267)*, and to all of you in the bug channels 🎉
 
 ---
 
